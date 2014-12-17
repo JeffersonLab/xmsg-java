@@ -1,0 +1,5 @@
+#!/bin/sh -f
+
+# setenv CLASSPATH
+
+$JAVA_HOME/bin/java  -XX:+UnlockCommercialFeatures -XX:+FlightRecorder org.jlab.coda.xmsg.xsys.xMsgFE

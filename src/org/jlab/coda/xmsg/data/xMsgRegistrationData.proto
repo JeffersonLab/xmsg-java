@@ -1,0 +1,24 @@
+// Google's protobuf deffinition of the xMsg data structure
+// author: gurjyan
+// date: 10.06.14
+
+option optimize_for = SPEED;
+option java_outer_classname = "xMsgR";
+
+message xMsgRegistrationData {
+
+    enum OwnerType {
+        PUBLISHER = 1;
+        SUBSCRIBER = 2;
+    }
+
+    optional string host = 1 [default = "localhost"];
+    optional sfixed32 port = 2;
+
+    optional string domain = 3;
+    optional string subject = 4 [default = "undefined"];
+    optional string type = 5 [default = "undefined"];
+
+    optional OwnerType ownerType = 6;
+
+}

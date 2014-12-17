@@ -1,0 +1,84 @@
+// Google's protobuf deffinition of the xMsg data class
+// author: gurjyan
+// date: 10.06.14
+
+option optimize_for = SPEED;
+option java_outer_classname = "xMsgD";
+
+message xMsgData {
+
+    // Data class
+    message Data {
+        optional sint32 VLSINT32 = 1; // variable length signed int32
+        optional sint64 VLSINT64 = 2; // variable length signed int64
+        optional sfixed32 FLSINT32 = 3; // fixed length signed int32
+        optional sfixed64 FLSINT64 = 4; // fixed length signed int64
+        optional float FLOAT = 5;
+        optional double DOUBLE = 6;
+        optional string STRING = 7; // contains UTF-8 encoding or 7-bit ASCII text
+        optional bytes BYTES = 8; // contains arbitrary sequence of bytes
+
+        repeated sint32 VLSINT32A = 9; // array of variable length signed int32s
+        repeated sint64 VLSINT64A = 10; // array of variable length signed int64s
+        repeated sfixed32 FLSINT32A = 11; // array of fixed length signed int32s
+        repeated sfixed64 FLSINT64A = 12; // array of fixed length signed int64s
+        repeated float FLOATA = 13; // array of floats
+        repeated double DOUBLEA = 14; // array of doubles
+        repeated string STRINGA = 15; // array of UTF-8 encoded or 7-bit ASCII strings
+        repeated bytes BYTESA = 16; // array of arbitrary sequence of bytes
+    }
+
+    // Payload class
+    message Payload {
+        required string name =1; // payload name
+        required DataType type =2; // payload data type
+        required Data data =3; // data itself
+        optional string byteOrder = 4; // byteorde in case data type is BTES/BYTESA
+        optional string dataDescription = 5; // data description
+    }
+
+    // data type enumeration
+    enum DataType {
+        VLSINT32 = 1;   // variable length signed int32
+        VLSINT64 = 2;   // variable length signed int64
+        FLSINT32 = 3;   // fixed length signed int32
+        FLSINT64 = 4;   // fixed length signed int64
+        FLOAT = 5;
+        DOUBLE = 6;
+        STRING = 7;     // contains UTF-8 encoding or 7-bit ASCII text
+        BYTES = 8;      // contains arbitrary sequence of bytes
+
+        VLSINT32A = 9;  // array of variable length signed int32s
+        VLSINT64A = 10; // array of variable length signed int64s
+        FLSINT32A = 11; // array of fixed length signed int32s
+        FLSINT64A = 12; // array of fixed length signed int64s
+        FLOATA = 13;    // array of floats
+        DOUBLEA = 14;   // array of doubles
+        STRINGA = 15;   // array of UTF-8 encoded or 7-bit ASCII strings
+        BYTESA = 16;    // array of arbitrary sequence of bytes
+
+        PAYLOAD = 17;    // payload data type
+    }
+
+    // communication id, used to gnetically relate messages
+    optional fixed32 id = 1;
+
+    // author of the data
+    optional string authour = 2;
+
+    // data itself
+    optional Data data = 3;
+
+    //data type. If set to DataTpe.PAYLOAD access data useing the "payload"
+    // filed, otherwise "data" filed
+    optional DataType type = 4;
+
+    // byte ordering in case data type is BYTES/BYTESA
+    optional string byteOrder = 5;
+
+    // data textual description
+    optional string dataDescription = 6;
+
+    // data within the payload
+    repeated Payload payload = 7;
+}

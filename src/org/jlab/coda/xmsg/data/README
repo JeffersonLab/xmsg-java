@@ -1,0 +1,13 @@
+xMsg defines to data objects:
+a) xMsgData, used to send a receive multiple types of data. This data object is self descriptive
+b) xMsgRegistrationData, used to send/receive publisher and or subscriber registration information.
+xMsg data classes are created by compiling xMsg data protobuf description files.
+Google's protobuf is used by xMsg to serialize/de-serialize data.
+
+Compile by typing:
+> protoc -I=./ --java_out=./ ./xMsgData.proto
+> protoc -I=./ --java_out=./ ./xMsgRegistrationData.proto
+
+Modify created Java classes by adding the following package statement:
+package org.jlab.coda.xmsg.data;
+
