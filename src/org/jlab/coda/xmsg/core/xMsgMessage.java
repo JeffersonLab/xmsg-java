@@ -1,6 +1,6 @@
 package org.jlab.coda.xmsg.core;
 
-import org.jlab.coda.xmsg.data.xMsgD.xMsgData;
+import org.jlab.coda.xmsg.data.xMsgD;
 import org.jlab.coda.xmsg.excp.xMsgException;
 
 /**
@@ -26,7 +26,7 @@ public class xMsgMessage {
     /**
      * Message data section
      */
-    private xMsgData data;
+    private xMsgD.Data data;
 
     public xMsgMessage(String author,
                        String domain,
@@ -38,8 +38,8 @@ public class xMsgMessage {
         this.subject = subject;
         this.type = type;
 
-        if (data instanceof xMsgData){
-            this.data = (xMsgData)data;
+        if (data instanceof xMsgD.Data){
+            this.data = (xMsgD.Data)data;
         } else {
             this.data = _createData(data);
         }
@@ -78,76 +78,60 @@ public class xMsgMessage {
         this.type = type;
     }
 
-    public xMsgData getData() {
+    public xMsgD.Data getData() {
         return data;
     }
 
-    public void setData(xMsgData data) {
+    public void setData(xMsgD.Data data) {
         this.data = data;
     }
 
-    private xMsgData _createData(Object d) throws xMsgException {
-        xMsgData.Builder trb = xMsgData.newBuilder();
+    private xMsgD.Data _createData(Object d) throws xMsgException {
+        xMsgD.Data.Builder trb = xMsgD.Data.newBuilder();
 
-        trb.setAuthour(author);
+        trb.setAuthor(author);
         trb.setId(0);
         trb.setDataDescription(xMsgConstants.UNDEFINED.getStringValue());
 
         if(d instanceof Integer){
             Integer in_data = (Integer)d;
-            trb.setType(xMsgData.DataType.FLSINT32);
-            xMsgData.Data.Builder t_data = xMsgData.Data.newBuilder();
-            t_data.setFLSINT32(in_data);
-            trb.setData(t_data);
+            trb.setXtype(xMsgD.Data.DataType.T_FLSINT32);
+            trb.setFLSINT32(in_data);
 
         } else if (d instanceof Integer[]){
             Integer[] in_data = (Integer[])d;
-            trb.setType(xMsgData.DataType.FLSINT32A);
-            xMsgData.Data.Builder t_data = xMsgData.Data.newBuilder();
-            for(int id:in_data) t_data.addFLSINT32A(id);
-            trb.setData(t_data);
+            trb.setXtype(xMsgD.Data.DataType.T_FLSINT32A);
+            for(int id:in_data) trb.addFLSINT32A(id);
 
         } else if (d instanceof Float){
             Float in_data = (Float)d;
-            trb.setType(xMsgData.DataType.FLOAT);
-            xMsgData.Data.Builder t_data = xMsgData.Data.newBuilder();
-            t_data.setFLOAT(in_data);
-            trb.setData(t_data);
+            trb.setXtype(xMsgD.Data.DataType.T_FLOAT);
+            trb.setFLOAT(in_data);
 
         } else if (d instanceof Float[]){
             Float[] in_data = (Float[])d;
-            trb.setType(xMsgData.DataType.FLOATA);
-            xMsgData.Data.Builder t_data = xMsgData.Data.newBuilder();
-            for(float id:in_data) t_data.addFLOATA(id);
-            trb.setData(t_data);
+            trb.setXtype(xMsgD.Data.DataType.T_FLOATA);
+            for(float id:in_data) trb.addFLOATA(id);
 
         } else if (d instanceof Double){
             Double in_data = (Double)d;
-            trb.setType(xMsgData.DataType.DOUBLE);
-            xMsgData.Data.Builder t_data = xMsgData.Data.newBuilder();
-            t_data.setDOUBLE(in_data);
-            trb.setData(t_data);
+            trb.setXtype(xMsgD.Data.DataType.T_DOUBLE);
+            trb.setDOUBLE(in_data);
 
         } else if (d instanceof Double[]){
             Double[] in_data = (Double[])d;
-            trb.setType(xMsgData.DataType.DOUBLEA);
-            xMsgData.Data.Builder t_data = xMsgData.Data.newBuilder();
-            for(double id:in_data) t_data.addDOUBLEA(id);
-            trb.setData(t_data);
+            trb.setXtype(xMsgD.Data.DataType.T_DOUBLEA);
+            for(double id:in_data) trb.addDOUBLEA(id);
 
         } else if (d instanceof String){
             String in_data = (String)d;
-            trb.setType(xMsgData.DataType.STRING);
-            xMsgData.Data.Builder t_data = xMsgData.Data.newBuilder();
-            t_data.setSTRING(in_data);
-            trb.setData(t_data);
+            trb.setXtype(xMsgD.Data.DataType.T_STRING);
+            trb.setSTRING(in_data);
 
         } else if (d instanceof String[]){
             String[] in_data = (String[])d;
-            trb.setType(xMsgData.DataType.STRINGA);
-            xMsgData.Data.Builder t_data = xMsgData.Data.newBuilder();
-            for(String id:in_data) t_data.addSTRINGA(id);
-            trb.setData(t_data);
+            trb.setXtype(xMsgD.Data.DataType.T_STRINGA);
+            for(String id:in_data) trb.addSTRINGA(id);
 
         } else {
             throw new xMsgException("Unsupported data type");

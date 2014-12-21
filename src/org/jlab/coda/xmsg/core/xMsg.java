@@ -1,10 +1,10 @@
 package org.jlab.coda.xmsg.core;
 
 import com.google.protobuf.InvalidProtocolBufferException;
+import org.jlab.coda.xmsg.data.xMsgD;
 import org.jlab.coda.xmsg.excp.*;
 import org.jlab.coda.xmsg.net.xMsgAddress;
 import org.jlab.coda.xmsg.net.xMsgConnection;
-import org.jlab.coda.xmsg.data.xMsgD.xMsgData;
 import org.jlab.coda.xmsg.data.xMsgR.xMsgRegistrationData;
 import org.jlab.coda.xmsg.xsys.regdis.xMsgRegDiscDriver;
 import org.zeromq.ZContext;
@@ -631,8 +631,7 @@ public class xMsg {
                                     String domain,
                                     String subject,
                                     String type) throws xMsgDiscoverException {
-        if(findPublishers(name, host, port, domain, subject, type).size()>0) return true;
-        else return false;
+        return findPublishers(name, host, port, domain, subject, type).size() > 0;
     }
 
     /**
@@ -654,8 +653,7 @@ public class xMsg {
                                     String domain,
                                     String subject,
                                     String type) throws xMsgDiscoverException {
-        if(findPublishers(name, domain, subject, type).size()>0) return true;
-        else return false;
+        return findPublishers(name, domain, subject, type).size() > 0;
     }
 
     /**
@@ -681,8 +679,7 @@ public class xMsg {
                                     String domain,
                                     String subject,
                                     String type) throws xMsgDiscoverException {
-        if(findSubscribers(name, host, port, domain, subject, type).size()>0) return true;
-        else return false;
+        return findSubscribers(name, host, port, domain, subject, type).size() > 0;
     }
 
     /**
@@ -704,8 +701,7 @@ public class xMsg {
                                     String domain,
                                     String subject,
                                     String type) throws xMsgDiscoverException {
-        if(findSubscribers(name, domain, subject, type).size()>0) return true;
-        else return false;
+        return findSubscribers(name, domain, subject, type).size() > 0;
     }
 
     /**
@@ -731,8 +727,7 @@ public class xMsg {
                                     String domain,
                                     String subject,
                                     String type) throws xMsgDiscoverException {
-        if(findLocalPublishers(name, host, port, domain, subject, type).size()>0) return true;
-        else return false;
+        return findLocalPublishers(name, host, port, domain, subject, type).size() > 0;
     }
 
     /**
@@ -754,8 +749,7 @@ public class xMsg {
                                     String domain,
                                     String subject,
                                     String type) throws xMsgDiscoverException {
-        if(findLocalPublishers(name, domain, subject, type).size()>0) return true;
-        else return false;
+        return findLocalPublishers(name, domain, subject, type).size() > 0;
     }
 
     /**
@@ -781,8 +775,7 @@ public class xMsg {
                                      String domain,
                                      String subject,
                                      String type) throws xMsgDiscoverException {
-        if(findLocalSubscribers(name, host, port, domain, subject, type).size()>0) return true;
-        else return false;
+        return findLocalSubscribers(name, host, port, domain, subject, type).size() > 0;
     }
 
     /**
@@ -804,8 +797,7 @@ public class xMsg {
                                      String domain,
                                      String subject,
                                      String type) throws xMsgDiscoverException {
-        if(findLocalSubscribers(name, domain, subject, type).size()>0) return true;
-        else return false;
+        return findLocalSubscribers(name, domain, subject, type).size() > 0;
     }
 
     /**
@@ -831,7 +823,7 @@ public class xMsg {
      * @param type type of the topic
      * @param publisherName the name of the publisher/sender. Required according to
      *             the xMsg zmq message structure definition. (topic, sender, data)
-     * @param data {@link org.jlab.coda.xmsg.data.xMsgD.xMsgData} object
+     * @param data {@link org.jlab.coda.xmsg.data.xMsgD.Data} object
      * @throws xMsgPublishingException
      */
     private void _publish(xMsgConnection connection,
@@ -839,7 +831,7 @@ public class xMsg {
                          String subject,
                          String type,
                          String publisherName,
-                         xMsgData data)
+                         xMsgD.Data data)
             throws xMsgException {
 
         // check connection
@@ -855,7 +847,6 @@ public class xMsg {
         // data serialization
         if(data.isInitialized()) {
             dt = data.toByteArray(); // serialize data object
-            if (dt == null) throw new xMsgPublishingException("null serialization: data");
         } else throw new xMsgPublishingException("some of the data object required fields are not set.");
 
         // send topic, sender, followed by the data
@@ -954,11 +945,11 @@ public class xMsg {
 
 
             // de-serialize received message components
-            final xMsgData s_data;
+            final xMsgD.Data s_data;
             String s_topic = new String(r_topic.getData(), ZMQ.CHARSET);
             String s_sender = new String(r_sender.getData(),ZMQ.CHARSET);
             try {
-                s_data = xMsgData.parseFrom(r_data.getData());
+                s_data = xMsgD.Data.parseFrom(r_data.getData());
             } catch (InvalidProtocolBufferException e) {
                 throw new xMsgSubscribingException(e.getMessage());
             }
