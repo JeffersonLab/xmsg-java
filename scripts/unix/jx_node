@@ -2,4 +2,4 @@
 
 # setenv CLASSPATH
 
-$JAVA_HOME/bin/java  -XX:+UnlockCommercialFeatures -XX:+FlightRecorder org.jlab.coda.xmsg.xsys.xMsgNode $1 $2
+java  -XX:+UnlockCommercialFeatures -XX:+FlightRecorder org.jlab.coda.xmsg.xsys.xMsgNode $1 $2

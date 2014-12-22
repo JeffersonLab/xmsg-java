@@ -47,7 +47,6 @@ public class Subscriber extends xMsg {
                 subscriber.subscribe(con, domain, subject, type, subscriber.callback, true);
             }
         } catch (xMsgException e) {
-
             e.printStackTrace();
         }
     }

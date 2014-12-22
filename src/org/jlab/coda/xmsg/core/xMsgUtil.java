@@ -144,7 +144,7 @@ public class xMsgUtil {
         topic.append(domain);
         if(subject!=null && !subject.equals("*")) {
             topic.append(":").append(subject);
-            if(type!=null && !type.equals("*")) topic.append(":").append(subject);
+            if(type!=null && !type.equals("*")) topic.append(":").append(type);
         }
         return topic.toString();
     }
