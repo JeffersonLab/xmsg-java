@@ -63,6 +63,7 @@ public class Publisher extends xMsg {
             // Create the message to be published
             xMsgMessage msg = new xMsgMessage(myName, domain, subject,type, data);
 
+
             // Publish data for ever...
             while(true) {
                 publisher.publish(con, msg);

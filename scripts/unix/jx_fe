@@ -1,5 +1,6 @@
 #!/bin/sh -f
 
-# setenv CLASSPATH
+export CLASSPATH="$JXMSG_HOME/lib/*"
 
-$JAVA_HOME/bin/java  -XX:+UnlockCommercialFeatures -XX:+FlightRecorder org.jlab.coda.xmsg.xsys.xMsgFE
+java  -XX:+UnlockCommercialFeatures -XX:+FlightRecorder org.jlab.coda.xmsg.xsys.xMsgFE
+

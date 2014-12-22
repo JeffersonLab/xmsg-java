@@ -41,7 +41,7 @@ public class xMsgMessage {
         if (data instanceof xMsgD.Data){
             this.data = (xMsgD.Data)data;
         } else {
-            this.data = _createData(data);
+            this.data = _createData(author, 0, "java_publisher",data);
         }
     }
 
@@ -86,12 +86,12 @@ public class xMsgMessage {
         this.data = data;
     }
 
-    private xMsgD.Data _createData(Object d) throws xMsgException {
+    private xMsgD.Data _createData(String author, int com_id, String description, Object d) throws xMsgException {
         xMsgD.Data.Builder trb = xMsgD.Data.newBuilder();
 
         trb.setAuthor(author);
-        trb.setId(0);
-        trb.setDataDescription(xMsgConstants.UNDEFINED.getStringValue());
+        trb.setId(com_id);
+        trb.setDataDescription(description);
 
         if(d instanceof Integer){
             Integer in_data = (Integer)d;
