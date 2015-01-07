@@ -1,49 +1,102 @@
-// Google's protocol buffers definition of the xMsg data class
+// Google's protocol-buffer definition of the xMsg data class
 // author: gurjyan
-// date: 10.06.14
+// date: 01.07.15
 
 option optimize_for = SPEED;
 option java_outer_classname = "xMsgD";
 
+// ... Data class ...
 message Data {
 
-    // communication id, used to genetically relate messages
-    optional fixed32 id = 1;
+    // ... This section is defined by the message ...
+    // ... data generator, such as service engine ...
+    // Data version
+    optional string dataVersion = 1;
 
-    // author of the data
-    optional string author = 2;
+    // Data textual description
+    optional string dataDescription = 2;
 
-    // data itself
-    optional sint32 VLSINT32 = 3; // variable length signed int32
-    optional sint64 VLSINT64 = 4; // variable length signed int64
-    optional sfixed32 FLSINT32 = 5; // fixed length signed int32
-    optional sfixed64 FLSINT64 = 6; // fixed length signed int64
-    optional float FLOAT = 7;
-    optional double DOUBLE = 8;
-    optional string STRING = 9; // contains UTF-8 encoding or 7-bit ASCII text
-    optional bytes BYTES = 10; // contains arbitrary sequence of bytes
+    // Author of the data
+    optional string dataAuthor = 3;
 
-    repeated sint32 VLSINT32A = 11; // array of variable length signed int32s
-    repeated sint64 VLSINT64A = 12; // array of variable length signed int64s
-    repeated sfixed32 FLSINT32A = 13; // array of fixed length signed int32s
-    repeated sfixed64 FLSINT64A = 14; // array of fixed length signed int64s
-    repeated float FLOATA = 15; // array of floats
-    repeated double DOUBLEA = 16; // array of doubles
-    repeated string STRINGA = 17; // array of UTF-8 encoded or 7-bit ASCII strings
-    repeated bytes BYTESA = 18; // array of arbitrary sequence of bytes
+    // The state of the message sender
+    optional string dataAuthorState = 4;
 
-    // data type. if set to DataTpe.PAYLOAD access data using the "payload"
+    // Overall status/severity of the data generation process
+    optional Severity dataGenerationStatus = 5 [default = INFO];
+
+    // Data itself
+    optional sint32 VLSINT32 = 6; // variable length signed int32
+    optional sint64 VLSINT64 = 7; // variable length signed int64
+    optional sfixed32 FLSINT32 = 8; // fixed length signed int32
+    optional sfixed64 FLSINT64 = 9; // fixed length signed int64
+    optional float FLOAT = 10;
+    optional double DOUBLE = 11;
+    optional string STRING = 12; // contains UTF-8 encoding or 7-bit ASCII text
+    optional bytes BYTES = 13; // contains arbitrary sequence of bytes
+
+    repeated sint32 VLSINT32A = 14; // array of variable length signed int32s
+    repeated sint64 VLSINT64A = 15; // array of variable length signed int64s
+    repeated sfixed32 FLSINT32A = 16; // array of fixed length signed int32s
+    repeated sfixed64 FLSINT64A = 17; // array of fixed length signed int64s
+    repeated float FLOATA = 18; // array of floats
+    repeated double DOUBLEA = 19; // array of doubles
+    repeated string STRINGA = 20; // array of UTF-8 encoded or 7-bit ASCII strings
+    repeated bytes BYTESA = 21; // array of arbitrary sequence of bytes
+
+    // Data type. If set to DataTpe.PAYLOAD access data using the "payload"
     // filed, otherwise "data: filed
-    optional DataType xtype = 19;
+    optional DType dataType = 22;
 
-    // byte ordering in case data type is BYTES/BYTESA
-    optional string byteOrder = 20;
+    // Byte ordering in case data type is BYTES/BYTESA
+    optional string byteOrder = 23;
 
-    // data textual description
-    optional string dataDescription = 21;
 
-    // data type enumeration
-    enum DataType {
+    // ... This section is defined by the message transporter ...
+    // The name of the message transporter
+    optional string sender = 24;
+
+    // Communication id, used to genetically relate messages
+    optional fixed32 id = 25;
+
+    // ... Fields that are used to control message receiver ...
+    // If set to true, for example Clara service container will
+    // broadcast exceptions to
+    // [ exception_<service_name>,
+    //             requestId,
+    //             exceptionType <Severity>,
+    //             exceptionString <String> ]
+    optional bool exceptionMonitor = 26;
+
+    // If set to true, for example Clara service container will
+    // broadcast "done" string
+    // [ done_<service_name>,
+    //             requestId]
+    optional bool doneMonitor = 27;
+
+    // If set to true, for example Clara service container will
+    // broadcast resulting data to
+    // [ data_<service_name>,
+    //             requestId,
+    //             transient_data ]
+    optional bool dataMonitor = 28;
+
+    // Reserved and used for Clara service based application
+    // composition i.e. link schema (list of linked service names)
+    // e.g. s1+s2;s1+s3,s4,s5+&s6
+    optional string composition = 29;
+
+    // Reserved and used to define which of the CLARA interface
+    // methods must be called on a service engine.
+    optional ControlAction action =30;
+
+    // Reserved control field
+    optional SubControlAction controlR = 31;
+
+
+    // ... Enumerations ...
+    // Data type enumeration
+    enum DType {
         T_VLSINT32 = 1;   // variable length signed int32
         T_VLSINT64 = 2;   // variable length signed int64
         T_FLSINT32 = 3;   // fixed length signed int32
@@ -64,14 +117,47 @@ message Data {
 
         T_PAYLOAD = 17;    // payload data type
     }
+
+    // In the case data is passed as a byte[], i.e. DataType = T_BYTESA
+    // following enum shows how to handle passed byte[]
+    enum BAType {
+        JOBJECT = 1;
+        COBJECT = 2;
+        POBJECT = 3;
+        NETCDF = 4;
+        HDF = 5;
+    }
+
+    // Control actions, used to define service control directive
+    enum ControlAction {
+        EXECUTE = 0;
+        CONFIGURE = 1;
+    }
+
+    // Sub control action, used to micromanage service engine activity
+    enum SubControlAction {
+        SKIP = 0;
+    }
+
+    // Message severity
+    enum Severity {
+        ERROR1 = 1;
+        ERROR2 = 2;
+        ERROR3 = 3;
+        WARNING1 = 4;
+        WARNING2 = 5;
+        WARNING3 = 6;
+        INFO = 7;
+    }
 }
 
-// Payload class
+//... Payload class ...
 message Payload {
 
     message Item {
         required string name =1; // payload name
         required Data data =2; // data
     }
+
     repeated Item item = 1;
 }

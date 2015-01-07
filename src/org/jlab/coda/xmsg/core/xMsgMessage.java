@@ -89,48 +89,48 @@ public class xMsgMessage {
     private xMsgD.Data _createData(String author, int com_id, String description, Object d) throws xMsgException {
         xMsgD.Data.Builder trb = xMsgD.Data.newBuilder();
 
-        trb.setAuthor(author);
+        trb.setDataAuthor(author);
         trb.setId(com_id);
         trb.setDataDescription(description);
 
         if(d instanceof Integer){
             Integer in_data = (Integer)d;
-            trb.setXtype(xMsgD.Data.DataType.T_FLSINT32);
+            trb.setDataType(xMsgD.Data.DType.T_FLSINT32);
             trb.setFLSINT32(in_data);
 
         } else if (d instanceof Integer[]){
             Integer[] in_data = (Integer[])d;
-            trb.setXtype(xMsgD.Data.DataType.T_FLSINT32A);
+            trb.setDataType(xMsgD.Data.DType.T_FLSINT32A);
             for(int id:in_data) trb.addFLSINT32A(id);
 
         } else if (d instanceof Float){
             Float in_data = (Float)d;
-            trb.setXtype(xMsgD.Data.DataType.T_FLOAT);
+            trb.setDataType(xMsgD.Data.DType.T_FLOAT);
             trb.setFLOAT(in_data);
 
         } else if (d instanceof Float[]){
             Float[] in_data = (Float[])d;
-            trb.setXtype(xMsgD.Data.DataType.T_FLOATA);
+            trb.setDataType(xMsgD.Data.DType.T_FLOATA);
             for(float id:in_data) trb.addFLOATA(id);
 
         } else if (d instanceof Double){
             Double in_data = (Double)d;
-            trb.setXtype(xMsgD.Data.DataType.T_DOUBLE);
+            trb.setDataType(xMsgD.Data.DType.T_DOUBLE);
             trb.setDOUBLE(in_data);
 
         } else if (d instanceof Double[]){
             Double[] in_data = (Double[])d;
-            trb.setXtype(xMsgD.Data.DataType.T_DOUBLEA);
+            trb.setDataType(xMsgD.Data.DType.T_DOUBLEA);
             for(double id:in_data) trb.addDOUBLEA(id);
 
         } else if (d instanceof String){
             String in_data = (String)d;
-            trb.setXtype(xMsgD.Data.DataType.T_STRING);
+            trb.setDataType(xMsgD.Data.DType.T_STRING);
             trb.setSTRING(in_data);
 
         } else if (d instanceof String[]){
             String[] in_data = (String[])d;
-            trb.setXtype(xMsgD.Data.DataType.T_STRINGA);
+            trb.setDataType(xMsgD.Data.DType.T_STRINGA);
             for(String id:in_data) trb.addSTRINGA(id);
 
         } else {

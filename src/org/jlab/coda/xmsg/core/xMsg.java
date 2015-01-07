@@ -51,7 +51,7 @@ public class xMsg {
 
     // Fixed size thread pool
     private ExecutorService threadPool = null;
-    private int pool_size = 16;
+    private int pool_size = 2;
 
     private xMsgRegDiscDriver driver;
 
@@ -161,8 +161,8 @@ public class xMsg {
      *     in the local connection database created
      *     {@link org.jlab.coda.xmsg.net.xMsgConnection} object.
      * </p>
-     * @param address {@link org.jlab.coda.xmsg.net.xMsgAddress} object
-     * @return {@link org.jlab.coda.xmsg.net.xMsgConnection} object
+     * @param address {@link xMsgAddress} object
+     * @return {@link xMsgConnection} object
      * @throws xMsgException
      */
     public xMsgConnection connect(xMsgAddress address) throws xMsgException {
@@ -195,6 +195,33 @@ public class xMsg {
 
     /**
      * <p>
+     *     Connects to the xMsgNode by creating two sockets for publishing and
+     *     subscribing/receiving messages.
+     *     This is method will be used in case one need to have multiple
+     *     threads using the same zmq socket. Note: do not try to
+     *     use the same socket from multiple threads. Each thread should
+     *     create it's own zmq socket and a context.
+     * </p>
+     * @param address {@link xMsgAddress} object
+     * @return {@link xMsgConnection} object
+     * @throws xMsgException
+     */
+    public xMsgConnection getNewConnection(xMsgAddress address) throws xMsgException {
+
+        ZContext context = new ZContext();
+
+        xMsgConnection feCon = new xMsgConnection();
+        feCon.setAddress(address);
+        feCon.setPubSock(__zmqSocket(context, ZMQ.PUB, address.getHost(),
+                address.getPort(), xMsgConstants.CONNECT.getIntValue()));
+
+        feCon.setSubSock(__zmqSocket(context, ZMQ.SUB, address.getHost(),
+                address.getPort() + 1, xMsgConstants.CONNECT.getIntValue()));
+        return feCon;
+    }
+
+    /**
+     * <p>
      *     If you are periodically publishing data, use this method to
      *     register yourself as a publisher with the local registrar.
      *     This is necessary for future subscribers to discover and
@@ -217,6 +244,7 @@ public class xMsg {
                                   String type)
             throws xMsgRegistrationException {
         xMsgRegistrationData.Builder regb= xMsgRegistrationData.newBuilder();
+        regb.setName(name);
         regb.setHost(host);
         regb.setPort(port);
         regb.setDomain(domain);
@@ -269,13 +297,14 @@ public class xMsg {
      * @throws xMsgRegistrationException
      */
     public void registerSubscriber(String name,
-                                  String host,
-                                  int port,
-                                  String domain,
-                                  String subject,
-                                  String type)
+                                   String host,
+                                   int port,
+                                   String domain,
+                                   String subject,
+                                   String type)
             throws xMsgRegistrationException {
         xMsgRegistrationData.Builder regb= xMsgRegistrationData.newBuilder();
+        regb.setName(name);
         regb.setHost(host);
         regb.setPort(port);
         regb.setDomain(domain);
@@ -303,9 +332,9 @@ public class xMsg {
      * @throws xMsgRegistrationException
      */
     public void registerSubscriber(String name,
-                                  String domain,
-                                  String subject,
-                                  String type)
+                                   String domain,
+                                   String subject,
+                                   String type)
             throws xMsgRegistrationException {
         registerSubscriber(name, "localhost", xMsgConstants.DEFAULT_PORT.getIntValue(),
                 domain, subject, type);
@@ -329,6 +358,7 @@ public class xMsg {
                                              String type)
             throws xMsgRegistrationException {
         xMsgRegistrationData.Builder regb= xMsgRegistrationData.newBuilder();
+        regb.setName(name);
         regb.setDomain(domain);
         regb.setSubject(subject);
         regb.setType(type);
@@ -356,6 +386,7 @@ public class xMsg {
                                               String type)
             throws xMsgRegistrationException {
         xMsgRegistrationData.Builder regb= xMsgRegistrationData.newBuilder();
+        regb.setName(name);
         regb.setDomain(domain);
         regb.setSubject(subject);
         regb.setType(type);
@@ -393,6 +424,7 @@ public class xMsg {
         if(type.equals("*")) type = xMsgConstants.UNDEFINED.getStringValue();
 
         xMsgRegistrationData.Builder regb= xMsgRegistrationData.newBuilder();
+        regb.setName(name);
         regb.setHost(host);
         regb.setPort(port);
         regb.setDomain(domain);
@@ -453,6 +485,7 @@ public class xMsg {
         if(type.equals("*")) type = xMsgConstants.UNDEFINED.getStringValue();
 
         xMsgRegistrationData.Builder regb= xMsgRegistrationData.newBuilder();
+        regb.setName(name);
         regb.setHost(host);
         regb.setPort(port);
         regb.setDomain(domain);
@@ -514,6 +547,7 @@ public class xMsg {
         if(type.equals("*")) type = xMsgConstants.UNDEFINED.getStringValue();
 
         xMsgRegistrationData.Builder regb= xMsgRegistrationData.newBuilder();
+        regb.setName(name);
         regb.setHost(host);
         regb.setPort(port);
         regb.setDomain(domain);
@@ -576,6 +610,7 @@ public class xMsg {
         if(type.equals("*")) type = xMsgConstants.UNDEFINED.getStringValue();
 
         xMsgRegistrationData.Builder regb= xMsgRegistrationData.newBuilder();
+        regb.setName(name);
         regb.setHost(host);
         regb.setPort(port);
         regb.setDomain(domain);
@@ -674,11 +709,11 @@ public class xMsg {
      * @throws xMsgDiscoverException
      */
     public boolean isThereSubscriber(String name,
-                                    String host,
-                                    int port,
-                                    String domain,
-                                    String subject,
-                                    String type) throws xMsgDiscoverException {
+                                     String host,
+                                     int port,
+                                     String domain,
+                                     String subject,
+                                     String type) throws xMsgDiscoverException {
         return findSubscribers(name, host, port, domain, subject, type).size() > 0;
     }
 
@@ -698,9 +733,9 @@ public class xMsg {
      * @throws xMsgDiscoverException
      */
     public boolean isThereSubscriber(String name,
-                                    String domain,
-                                    String subject,
-                                    String type) throws xMsgDiscoverException {
+                                     String domain,
+                                     String subject,
+                                     String type) throws xMsgDiscoverException {
         return findSubscribers(name, domain, subject, type).size() > 0;
     }
 
@@ -722,11 +757,11 @@ public class xMsg {
      * @throws xMsgDiscoverException
      */
     public boolean isThereLocalPublisher(String name,
-                                    String host,
-                                    int port,
-                                    String domain,
-                                    String subject,
-                                    String type) throws xMsgDiscoverException {
+                                         String host,
+                                         int port,
+                                         String domain,
+                                         String subject,
+                                         String type) throws xMsgDiscoverException {
         return findLocalPublishers(name, host, port, domain, subject, type).size() > 0;
     }
 
@@ -746,9 +781,9 @@ public class xMsg {
      * @throws xMsgDiscoverException
      */
     public boolean isThereLocalPublisher(String name,
-                                    String domain,
-                                    String subject,
-                                    String type) throws xMsgDiscoverException {
+                                         String domain,
+                                         String subject,
+                                         String type) throws xMsgDiscoverException {
         return findLocalPublishers(name, domain, subject, type).size() > 0;
     }
 
@@ -770,11 +805,11 @@ public class xMsg {
      * @throws xMsgDiscoverException
      */
     public boolean isThereLocalSubscriber(String name,
-                                     String host,
-                                     int port,
-                                     String domain,
-                                     String subject,
-                                     String type) throws xMsgDiscoverException {
+                                          String host,
+                                          int port,
+                                          String domain,
+                                          String subject,
+                                          String type) throws xMsgDiscoverException {
         return findLocalSubscribers(name, host, port, domain, subject, type).size() > 0;
     }
 
@@ -794,9 +829,9 @@ public class xMsg {
      * @throws xMsgDiscoverException
      */
     public boolean isThereLocalSubscriber(String name,
-                                     String domain,
-                                     String subject,
-                                     String type) throws xMsgDiscoverException {
+                                          String domain,
+                                          String subject,
+                                          String type) throws xMsgDiscoverException {
         return findLocalSubscribers(name, domain, subject, type).size() > 0;
     }
 
@@ -827,11 +862,11 @@ public class xMsg {
      * @throws xMsgPublishingException
      */
     private void _publish(xMsgConnection connection,
-                         String domain,
-                         String subject,
-                         String type,
-                         String publisherName,
-                         xMsgD.Data data)
+                          String domain,
+                          String subject,
+                          String type,
+                          String publisherName,
+                          xMsgD.Data data)
             throws xMsgException {
 
         // check connection
@@ -844,16 +879,21 @@ public class xMsg {
         // build a topic
         String topic = xMsgUtil.buildTopic(domain, subject, type);
 
-        // data serialization
-        if(data.isInitialized()) {
-            dt = data.toByteArray(); // serialize data object
-        } else throw new xMsgPublishingException("some of the data object required fields are not set.");
 
         // send topic, sender, followed by the data
         ZMsg msg = new ZMsg();
         msg.addString(topic);
         msg.addString(publisherName);
-        msg.add(dt);
+
+        if(data!=null) {
+            // data serialization
+            if (data.isInitialized()) {
+                dt = data.toByteArray(); // serialize data object
+            } else throw new xMsgPublishingException("some of the data object " +
+                    "required fields are not set.");
+            msg.add(dt);
+        }
+
         if (!msg.send(con))throw new xMsgPublishingException("error publishing the message");
         msg.destroy();
     }
@@ -916,9 +956,56 @@ public class xMsg {
      * @param cb {@link xMsgCallBack} implemented object reference
      * @param isSync if set to true method will block until subscription method is
      *               received and user callback method is returned
-     * @throws xMsgSubscribingException
      */
-    public void subscribe(xMsgConnection connection,
+    public void subscribe(final xMsgConnection connection,
+                            final String domain,
+                            final String subject,
+                            final String type,
+                            final xMsgCallBack cb,
+                            final boolean isSync) {
+        Thread t1 = new Thread(new Runnable() {
+            public void run() {
+                try {
+                    _subscribe(connection, domain, subject, type, cb, isSync);
+                } catch (xMsgException e) {
+                    e.printStackTrace();
+                }
+            }
+        });
+        t1.start();
+    }
+
+        /**
+         * <p>
+         *     Subscribes to a specified xMsg topic. 3 elements are defining xMsg topic:
+         *     <ul>
+         *         <li>domain</li>
+         *         <li>subject</li>
+         *         <li>type</li>
+         *     </ul>
+         *     Topic is constructed from these elements separated by <b>:</b>
+         *     Domain is required , however subject and topic can be set to <b>*</b>.
+         *     If subject is set * type will be ignored. Here are examples of
+         *     accepted topic definitions:<br>
+         *         domain:*:* <br>
+         *         domain:subject:*<br>
+         *         domain:subject:type<br>
+         *     Supplied user callback object must implement xMsgCallBack interface.
+         *     This method will de-serialize received xMsgData object and pass it
+         *     to the user implemented callback method of thee interface.
+         *     In the case isSync input parameter is set to be false the method will
+         *     utilize private thread pool to run user callback method in a separate thread.
+         * </p>
+         * @param connection socket to a xMsgNode proxy output port.
+         * @param domain domain of the topic
+         * @param subject subject of the topic
+         * @param type type of the topic
+         * @param cb {@link xMsgCallBack} implemented object reference
+         * @param isSync if set to true method will block until subscription method is
+         *               received and user callback method is returned
+         * @throws xMsgSubscribingException
+         */
+    private void _subscribe(xMsgConnection connection,
                           String domain,
                           String subject,
                           String type,
@@ -941,23 +1028,25 @@ public class xMsg {
             ZFrame r_topic = msg.pop();
             ZFrame r_sender = msg.pop();
             ZFrame r_data = msg.pop();
-            if (r_data == null)throw new xMsgSubscribingException("null xMsg data is received");
-
 
             // de-serialize received message components
-            final xMsgD.Data s_data;
             String s_topic = new String(r_topic.getData(), ZMQ.CHARSET);
             String s_sender = new String(r_sender.getData(),ZMQ.CHARSET);
-            try {
-                s_data = xMsgD.Data.parseFrom(r_data.getData());
-            } catch (InvalidProtocolBufferException e) {
-                throw new xMsgSubscribingException(e.getMessage());
+
+            xMsgD.Data s_data = null;
+            if(r_data != null) {
+                try {
+                    s_data = xMsgD.Data.parseFrom(r_data.getData());
+                } catch (InvalidProtocolBufferException e) {
+                    throw new xMsgSubscribingException(e.getMessage());
+                }
+                // cleanup the data
+                r_data.destroy();
             }
 
-            // cleanup
+            // cleanup the rest
             r_topic.destroy();
             r_sender.destroy();
-            r_data.destroy();
             msg.destroy();
 
             // Create a message to be passed to the user callback method
@@ -971,8 +1060,8 @@ public class xMsg {
             if(isSync){
                 cb.callback(cb_msg);
             } else {
-                threadPool.submit(new Runnable(){
-                                      public void run(){
+                threadPool.submit(new Runnable() {
+                                      public void run() {
                                           cb.callback(cb_msg);
                                       }
                                   }

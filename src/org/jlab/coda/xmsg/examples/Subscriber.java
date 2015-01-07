@@ -1,5 +1,6 @@
 package org.jlab.coda.xmsg.examples;
 
+import org.jlab.coda.xmsg.core.xMsgUtil;
 import org.jlab.coda.xmsg.excp.xMsgException;
 import org.jlab.coda.xmsg.net.xMsgConnection;
 import org.jlab.coda.xmsg.core.xMsg;
@@ -43,8 +44,12 @@ public class Subscriber extends xMsg {
             // Find a publisher that publishes to requested topic
             // defined as a static variables above
             if (subscriber.isThereLocalPublisher(myName, domain, subject, type)){
+
                 // Subscribe by passing a callback to the subscription
                 subscriber.subscribe(con, domain, subject, type, subscriber.callback, true);
+
+                xMsgUtil.keepAlive();
+
             }
         } catch (xMsgException e) {
             e.printStackTrace();

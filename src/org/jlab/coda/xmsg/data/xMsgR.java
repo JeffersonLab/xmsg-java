@@ -10,83 +10,125 @@ public final class xMsgR {
   public interface xMsgRegistrationDataOrBuilder
       extends com.google.protobuf.MessageOrBuilder {
 
-    // required string host = 1;
+    // required string name = 1;
     /**
-     * <code>required string host = 1;</code>
+     * <code>required string name = 1;</code>
+     */
+    boolean hasName();
+    /**
+     * <code>required string name = 1;</code>
+     */
+    java.lang.String getName();
+    /**
+     * <code>required string name = 1;</code>
+     */
+    com.google.protobuf.ByteString
+        getNameBytes();
+
+    // optional string description = 2 [default = "undefined"];
+    /**
+     * <code>optional string description = 2 [default = "undefined"];</code>
+     */
+    boolean hasDescription();
+    /**
+     * <code>optional string description = 2 [default = "undefined"];</code>
+     */
+    java.lang.String getDescription();
+    /**
+     * <code>optional string description = 2 [default = "undefined"];</code>
+     */
+    com.google.protobuf.ByteString
+        getDescriptionBytes();
+
+    // required string host = 3;
+    /**
+     * <code>required string host = 3;</code>
      */
     boolean hasHost();
     /**
-     * <code>required string host = 1;</code>
+     * <code>required string host = 3;</code>
      */
     java.lang.String getHost();
     /**
-     * <code>required string host = 1;</code>
+     * <code>required string host = 3;</code>
      */
     com.google.protobuf.ByteString
         getHostBytes();
 
-    // required sfixed32 port = 2;
+    // required sfixed32 port = 4;
     /**
-     * <code>required sfixed32 port = 2;</code>
+     * <code>required sfixed32 port = 4;</code>
      */
     boolean hasPort();
     /**
-     * <code>required sfixed32 port = 2;</code>
+     * <code>required sfixed32 port = 4;</code>
      */
     int getPort();
 
-    // required string domain = 3;
+    // required string domain = 5;
     /**
-     * <code>required string domain = 3;</code>
+     * <code>required string domain = 5;</code>
+     *
+     * <pre>
+     * xMsg topic definition
+     * </pre>
      */
     boolean hasDomain();
     /**
-     * <code>required string domain = 3;</code>
+     * <code>required string domain = 5;</code>
+     *
+     * <pre>
+     * xMsg topic definition
+     * </pre>
      */
     java.lang.String getDomain();
     /**
-     * <code>required string domain = 3;</code>
+     * <code>required string domain = 5;</code>
+     *
+     * <pre>
+     * xMsg topic definition
+     * </pre>
      */
     com.google.protobuf.ByteString
         getDomainBytes();
 
-    // optional string subject = 4 [default = "undefined"];
+    // optional string subject = 6 [default = "undefined"];
     /**
-     * <code>optional string subject = 4 [default = "undefined"];</code>
+     * <code>optional string subject = 6 [default = "undefined"];</code>
      */
     boolean hasSubject();
     /**
-     * <code>optional string subject = 4 [default = "undefined"];</code>
+     * <code>optional string subject = 6 [default = "undefined"];</code>
      */
     java.lang.String getSubject();
     /**
-     * <code>optional string subject = 4 [default = "undefined"];</code>
+     * <code>optional string subject = 6 [default = "undefined"];</code>
      */
     com.google.protobuf.ByteString
         getSubjectBytes();
 
-    // optional string type = 5 [default = "undefined"];
+    // optional string type = 7 [default = "undefined"];
     /**
-     * <code>optional string type = 5 [default = "undefined"];</code>
+     * <code>optional string type = 7 [default = "undefined"];</code>
      */
     boolean hasType();
     /**
-     * <code>optional string type = 5 [default = "undefined"];</code>
+     * <code>optional string type = 7 [default = "undefined"];</code>
      */
     java.lang.String getType();
     /**
-     * <code>optional string type = 5 [default = "undefined"];</code>
+     * <code>optional string type = 7 [default = "undefined"];</code>
      */
     com.google.protobuf.ByteString
         getTypeBytes();
 
-    // optional .xMsgRegistrationData.OwnerType ownerType = 6;
+    // optional .xMsgRegistrationData.OwnerType ownerType = 8;
     /**
-     * <code>optional .xMsgRegistrationData.OwnerType ownerType = 6;</code>
+     * <code>optional .xMsgRegistrationData.OwnerType ownerType = 8;</code>
      */
     boolean hasOwnerType();
     /**
-     * <code>optional .xMsgRegistrationData.OwnerType ownerType = 6;</code>
+     * <code>optional .xMsgRegistrationData.OwnerType ownerType = 8;</code>
      */
     xMsgR.xMsgRegistrationData.OwnerType getOwnerType();
   }
@@ -143,36 +185,46 @@ public final class xMsgR {
             }
             case 10: {
               bitField0_ |= 0x00000001;
-              host_ = input.readBytes();
+              name_ = input.readBytes();
               break;
             }
-            case 21: {
+            case 18: {
               bitField0_ |= 0x00000002;
-              port_ = input.readSFixed32();
+              description_ = input.readBytes();
               break;
             }
             case 26: {
               bitField0_ |= 0x00000004;
-              domain_ = input.readBytes();
+              host_ = input.readBytes();
               break;
             }
-            case 34: {
+            case 37: {
               bitField0_ |= 0x00000008;
-              subject_ = input.readBytes();
+              port_ = input.readSFixed32();
               break;
             }
             case 42: {
               bitField0_ |= 0x00000010;
+              domain_ = input.readBytes();
+              break;
+            }
+            case 50: {
+              bitField0_ |= 0x00000020;
+              subject_ = input.readBytes();
+              break;
+            }
+            case 58: {
+              bitField0_ |= 0x00000040;
               type_ = input.readBytes();
               break;
             }
-            case 48: {
+            case 64: {
               int rawValue = input.readEnum();
               xMsgR.xMsgRegistrationData.OwnerType value = xMsgR.xMsgRegistrationData.OwnerType.valueOf(rawValue);
               if (value == null) {
-                unknownFields.mergeVarintField(6, rawValue);
+                unknownFields.mergeVarintField(8, rawValue);
               } else {
-                bitField0_ |= 0x00000020;
+                bitField0_ |= 0x00000080;
                 ownerType_ = value;
               }
               break;
@@ -218,6 +270,10 @@ public final class xMsgR {
 
     /**
      * Protobuf enum {@code xMsgRegistrationData.OwnerType}
+     *
+     * <pre>
+     * Type of a an actor that sends the registration data
+     * </pre>
      */
     public enum OwnerType
         implements com.google.protobuf.ProtocolMessageEnum {
@@ -299,17 +355,103 @@ public final class xMsgR {
     }
 
     private int bitField0_;
-    // required string host = 1;
-    public static final int HOST_FIELD_NUMBER = 1;
-    private java.lang.Object host_;
+    // required string name = 1;
+    public static final int NAME_FIELD_NUMBER = 1;
+    private java.lang.Object name_;
     /**
-     * <code>required string host = 1;</code>
+     * <code>required string name = 1;</code>
      */
-    public boolean hasHost() {
+    public boolean hasName() {
       return ((bitField0_ & 0x00000001) == 0x00000001);
     }
     /**
-     * <code>required string host = 1;</code>
+     * <code>required string name = 1;</code>
+     */
+    public java.lang.String getName() {
+      java.lang.Object ref = name_;
+      if (ref instanceof java.lang.String) {
+        return (java.lang.String) ref;
+      } else {
+        com.google.protobuf.ByteString bs = 
+            (com.google.protobuf.ByteString) ref;
+        java.lang.String s = bs.toStringUtf8();
+        if (bs.isValidUtf8()) {
+          name_ = s;
+        }
+        return s;
+      }
+    }
+    /**
+     * <code>required string name = 1;</code>
+     */
+    public com.google.protobuf.ByteString
+        getNameBytes() {
+      java.lang.Object ref = name_;
+      if (ref instanceof java.lang.String) {
+        com.google.protobuf.ByteString b = 
+            com.google.protobuf.ByteString.copyFromUtf8(
+                (java.lang.String) ref);
+        name_ = b;
+        return b;
+      } else {
+        return (com.google.protobuf.ByteString) ref;
+      }
+    }
+
+    // optional string description = 2 [default = "undefined"];
+    public static final int DESCRIPTION_FIELD_NUMBER = 2;
+    private java.lang.Object description_;
+    /**
+     * <code>optional string description = 2 [default = "undefined"];</code>
+     */
+    public boolean hasDescription() {
+      return ((bitField0_ & 0x00000002) == 0x00000002);
+    }
+    /**
+     * <code>optional string description = 2 [default = "undefined"];</code>
+     */
+    public java.lang.String getDescription() {
+      java.lang.Object ref = description_;
+      if (ref instanceof java.lang.String) {
+        return (java.lang.String) ref;
+      } else {
+        com.google.protobuf.ByteString bs = 
+            (com.google.protobuf.ByteString) ref;
+        java.lang.String s = bs.toStringUtf8();
+        if (bs.isValidUtf8()) {
+          description_ = s;
+        }
+        return s;
+      }
+    }
+    /**
+     * <code>optional string description = 2 [default = "undefined"];</code>
+     */
+    public com.google.protobuf.ByteString
+        getDescriptionBytes() {
+      java.lang.Object ref = description_;
+      if (ref instanceof java.lang.String) {
+        com.google.protobuf.ByteString b = 
+            com.google.protobuf.ByteString.copyFromUtf8(
+                (java.lang.String) ref);
+        description_ = b;
+        return b;
+      } else {
+        return (com.google.protobuf.ByteString) ref;
+      }
+    }
+
+    // required string host = 3;
+    public static final int HOST_FIELD_NUMBER = 3;
+    private java.lang.Object host_;
+    /**
+     * <code>required string host = 3;</code>
+     */
+    public boolean hasHost() {
+      return ((bitField0_ & 0x00000004) == 0x00000004);
+    }
+    /**
+     * <code>required string host = 3;</code>
      */
     public java.lang.String getHost() {
       java.lang.Object ref = host_;
@@ -326,7 +468,7 @@ public final class xMsgR {
       }
     }
     /**
-     * <code>required string host = 1;</code>
+     * <code>required string host = 3;</code>
      */
     public com.google.protobuf.ByteString
         getHostBytes() {
@@ -342,33 +484,41 @@ public final class xMsgR {
       }
     }
 
-    // required sfixed32 port = 2;
-    public static final int PORT_FIELD_NUMBER = 2;
+    // required sfixed32 port = 4;
+    public static final int PORT_FIELD_NUMBER = 4;
     private int port_;
     /**
-     * <code>required sfixed32 port = 2;</code>
+     * <code>required sfixed32 port = 4;</code>
      */
     public boolean hasPort() {
-      return ((bitField0_ & 0x00000002) == 0x00000002);
+      return ((bitField0_ & 0x00000008) == 0x00000008);
     }
     /**
-     * <code>required sfixed32 port = 2;</code>
+     * <code>required sfixed32 port = 4;</code>
      */
     public int getPort() {
       return port_;
     }
 
-    // required string domain = 3;
-    public static final int DOMAIN_FIELD_NUMBER = 3;
+    // required string domain = 5;
+    public static final int DOMAIN_FIELD_NUMBER = 5;
     private java.lang.Object domain_;
     /**
-     * <code>required string domain = 3;</code>
+     * <code>required string domain = 5;</code>
+     *
+     * <pre>
+     * xMsg topic definition
+     * </pre>
      */
     public boolean hasDomain() {
-      return ((bitField0_ & 0x00000004) == 0x00000004);
+      return ((bitField0_ & 0x00000010) == 0x00000010);
     }
     /**
-     * <code>required string domain = 3;</code>
+     * <code>required string domain = 5;</code>
+     *
+     * <pre>
+     * xMsg topic definition
+     * </pre>
      */
     public java.lang.String getDomain() {
       java.lang.Object ref = domain_;
@@ -385,7 +535,11 @@ public final class xMsgR {
       }
     }
     /**
-     * <code>required string domain = 3;</code>
+     * <code>required string domain = 5;</code>
+     *
+     * <pre>
+     * xMsg topic definition
+     * </pre>
      */
     public com.google.protobuf.ByteString
         getDomainBytes() {
@@ -401,17 +555,17 @@ public final class xMsgR {
       }
     }
 
-    // optional string subject = 4 [default = "undefined"];
-    public static final int SUBJECT_FIELD_NUMBER = 4;
+    // optional string subject = 6 [default = "undefined"];
+    public static final int SUBJECT_FIELD_NUMBER = 6;
     private java.lang.Object subject_;
     /**
-     * <code>optional string subject = 4 [default = "undefined"];</code>
+     * <code>optional string subject = 6 [default = "undefined"];</code>
      */
     public boolean hasSubject() {
-      return ((bitField0_ & 0x00000008) == 0x00000008);
+      return ((bitField0_ & 0x00000020) == 0x00000020);
     }
     /**
-     * <code>optional string subject = 4 [default = "undefined"];</code>
+     * <code>optional string subject = 6 [default = "undefined"];</code>
      */
     public java.lang.String getSubject() {
       java.lang.Object ref = subject_;
@@ -428,7 +582,7 @@ public final class xMsgR {
       }
     }
     /**
-     * <code>optional string subject = 4 [default = "undefined"];</code>
+     * <code>optional string subject = 6 [default = "undefined"];</code>
      */
     public com.google.protobuf.ByteString
         getSubjectBytes() {
@@ -444,17 +598,17 @@ public final class xMsgR {
       }
     }
 
-    // optional string type = 5 [default = "undefined"];
-    public static final int TYPE_FIELD_NUMBER = 5;
+    // optional string type = 7 [default = "undefined"];
+    public static final int TYPE_FIELD_NUMBER = 7;
     private java.lang.Object type_;
     /**
-     * <code>optional string type = 5 [default = "undefined"];</code>
+     * <code>optional string type = 7 [default = "undefined"];</code>
      */
     public boolean hasType() {
-      return ((bitField0_ & 0x00000010) == 0x00000010);
+      return ((bitField0_ & 0x00000040) == 0x00000040);
     }
     /**
-     * <code>optional string type = 5 [default = "undefined"];</code>
+     * <code>optional string type = 7 [default = "undefined"];</code>
      */
     public java.lang.String getType() {
       java.lang.Object ref = type_;
@@ -471,7 +625,7 @@ public final class xMsgR {
       }
     }
     /**
-     * <code>optional string type = 5 [default = "undefined"];</code>
+     * <code>optional string type = 7 [default = "undefined"];</code>
      */
     public com.google.protobuf.ByteString
         getTypeBytes() {
@@ -487,23 +641,25 @@ public final class xMsgR {
       }
     }
 
-    // optional .xMsgRegistrationData.OwnerType ownerType = 6;
-    public static final int OWNERTYPE_FIELD_NUMBER = 6;
+    // optional .xMsgRegistrationData.OwnerType ownerType = 8;
+    public static final int OWNERTYPE_FIELD_NUMBER = 8;
     private xMsgR.xMsgRegistrationData.OwnerType ownerType_;
     /**
-     * <code>optional .xMsgRegistrationData.OwnerType ownerType = 6;</code>
+     * <code>optional .xMsgRegistrationData.OwnerType ownerType = 8;</code>
      */
     public boolean hasOwnerType() {
-      return ((bitField0_ & 0x00000020) == 0x00000020);
+      return ((bitField0_ & 0x00000080) == 0x00000080);
     }
     /**
-     * <code>optional .xMsgRegistrationData.OwnerType ownerType = 6;</code>
+     * <code>optional .xMsgRegistrationData.OwnerType ownerType = 8;</code>
      */
     public xMsgR.xMsgRegistrationData.OwnerType getOwnerType() {
       return ownerType_;
     }
 
     private void initFields() {
+      name_ = "";
+      description_ = "undefined";
       host_ = "";
       port_ = 0;
       domain_ = "";
@@ -516,6 +672,10 @@ public final class xMsgR {
       byte isInitialized = memoizedIsInitialized;
       if (isInitialized != -1) return isInitialized == 1;
 
+      if (!hasName()) {
+        memoizedIsInitialized = 0;
+        return false;
+      }
       if (!hasHost()) {
         memoizedIsInitialized = 0;
         return false;
@@ -536,22 +696,28 @@ public final class xMsgR {
                         throws java.io.IOException {
       getSerializedSize();
       if (((bitField0_ & 0x00000001) == 0x00000001)) {
-        output.writeBytes(1, getHostBytes());
+        output.writeBytes(1, getNameBytes());
       }
       if (((bitField0_ & 0x00000002) == 0x00000002)) {
-        output.writeSFixed32(2, port_);
+        output.writeBytes(2, getDescriptionBytes());
       }
       if (((bitField0_ & 0x00000004) == 0x00000004)) {
-        output.writeBytes(3, getDomainBytes());
+        output.writeBytes(3, getHostBytes());
       }
       if (((bitField0_ & 0x00000008) == 0x00000008)) {
-        output.writeBytes(4, getSubjectBytes());
+        output.writeSFixed32(4, port_);
       }
       if (((bitField0_ & 0x00000010) == 0x00000010)) {
-        output.writeBytes(5, getTypeBytes());
+        output.writeBytes(5, getDomainBytes());
       }
       if (((bitField0_ & 0x00000020) == 0x00000020)) {
-        output.writeEnum(6, ownerType_.getNumber());
+        output.writeBytes(6, getSubjectBytes());
+      }
+      if (((bitField0_ & 0x00000040) == 0x00000040)) {
+        output.writeBytes(7, getTypeBytes());
+      }
+      if (((bitField0_ & 0x00000080) == 0x00000080)) {
+        output.writeEnum(8, ownerType_.getNumber());
       }
       getUnknownFields().writeTo(output);
     }
@@ -564,27 +730,35 @@ public final class xMsgR {
       size = 0;
       if (((bitField0_ & 0x00000001) == 0x00000001)) {
         size += com.google.protobuf.CodedOutputStream
-          .computeBytesSize(1, getHostBytes());
+          .computeBytesSize(1, getNameBytes());
       }
       if (((bitField0_ & 0x00000002) == 0x00000002)) {
         size += com.google.protobuf.CodedOutputStream
-          .computeSFixed32Size(2, port_);
+          .computeBytesSize(2, getDescriptionBytes());
       }
       if (((bitField0_ & 0x00000004) == 0x00000004)) {
         size += com.google.protobuf.CodedOutputStream
-          .computeBytesSize(3, getDomainBytes());
+          .computeBytesSize(3, getHostBytes());
       }
       if (((bitField0_ & 0x00000008) == 0x00000008)) {
         size += com.google.protobuf.CodedOutputStream
-          .computeBytesSize(4, getSubjectBytes());
+          .computeSFixed32Size(4, port_);
       }
       if (((bitField0_ & 0x00000010) == 0x00000010)) {
         size += com.google.protobuf.CodedOutputStream
-          .computeBytesSize(5, getTypeBytes());
+          .computeBytesSize(5, getDomainBytes());
       }
       if (((bitField0_ & 0x00000020) == 0x00000020)) {
         size += com.google.protobuf.CodedOutputStream
-          .computeEnumSize(6, ownerType_.getNumber());
+          .computeBytesSize(6, getSubjectBytes());
+      }
+      if (((bitField0_ & 0x00000040) == 0x00000040)) {
+        size += com.google.protobuf.CodedOutputStream
+          .computeBytesSize(7, getTypeBytes());
+      }
+      if (((bitField0_ & 0x00000080) == 0x00000080)) {
+        size += com.google.protobuf.CodedOutputStream
+          .computeEnumSize(8, ownerType_.getNumber());
       }
       size += getUnknownFields().getSerializedSize();
       memoizedSerializedSize = size;
@@ -702,18 +876,22 @@ public final class xMsgR {
 
       public Builder clear() {
         super.clear();
-        host_ = "";
+        name_ = "";
         bitField0_ = (bitField0_ & ~0x00000001);
-        port_ = 0;
+        description_ = "undefined";
         bitField0_ = (bitField0_ & ~0x00000002);
-        domain_ = "";
+        host_ = "";
         bitField0_ = (bitField0_ & ~0x00000004);
-        subject_ = "undefined";
+        port_ = 0;
         bitField0_ = (bitField0_ & ~0x00000008);
-        type_ = "undefined";
+        domain_ = "";
         bitField0_ = (bitField0_ & ~0x00000010);
-        ownerType_ = xMsgR.xMsgRegistrationData.OwnerType.PUBLISHER;
+        subject_ = "undefined";
         bitField0_ = (bitField0_ & ~0x00000020);
+        type_ = "undefined";
+        bitField0_ = (bitField0_ & ~0x00000040);
+        ownerType_ = xMsgR.xMsgRegistrationData.OwnerType.PUBLISHER;
+        bitField0_ = (bitField0_ & ~0x00000080);
         return this;
       }
 
@@ -745,25 +923,33 @@ public final class xMsgR {
         if (((from_bitField0_ & 0x00000001) == 0x00000001)) {
           to_bitField0_ |= 0x00000001;
         }
-        result.host_ = host_;
+        result.name_ = name_;
         if (((from_bitField0_ & 0x00000002) == 0x00000002)) {
           to_bitField0_ |= 0x00000002;
         }
-        result.port_ = port_;
+        result.description_ = description_;
         if (((from_bitField0_ & 0x00000004) == 0x00000004)) {
           to_bitField0_ |= 0x00000004;
         }
-        result.domain_ = domain_;
+        result.host_ = host_;
         if (((from_bitField0_ & 0x00000008) == 0x00000008)) {
           to_bitField0_ |= 0x00000008;
         }
-        result.subject_ = subject_;
+        result.port_ = port_;
         if (((from_bitField0_ & 0x00000010) == 0x00000010)) {
           to_bitField0_ |= 0x00000010;
         }
-        result.type_ = type_;
+        result.domain_ = domain_;
         if (((from_bitField0_ & 0x00000020) == 0x00000020)) {
           to_bitField0_ |= 0x00000020;
+        }
+        result.subject_ = subject_;
+        if (((from_bitField0_ & 0x00000040) == 0x00000040)) {
+          to_bitField0_ |= 0x00000040;
+        }
+        result.type_ = type_;
+        if (((from_bitField0_ & 0x00000080) == 0x00000080)) {
+          to_bitField0_ |= 0x00000080;
         }
         result.ownerType_ = ownerType_;
         result.bitField0_ = to_bitField0_;
@@ -782,8 +968,18 @@ public final class xMsgR {
 
       public Builder mergeFrom(xMsgR.xMsgRegistrationData other) {
         if (other == xMsgR.xMsgRegistrationData.getDefaultInstance()) return this;
-        if (other.hasHost()) {
+        if (other.hasName()) {
           bitField0_ |= 0x00000001;
+          name_ = other.name_;
+          onChanged();
+        }
+        if (other.hasDescription()) {
+          bitField0_ |= 0x00000002;
+          description_ = other.description_;
+          onChanged();
+        }
+        if (other.hasHost()) {
+          bitField0_ |= 0x00000004;
           host_ = other.host_;
           onChanged();
         }
@@ -791,17 +987,17 @@ public final class xMsgR {
           setPort(other.getPort());
         }
         if (other.hasDomain()) {
-          bitField0_ |= 0x00000004;
+          bitField0_ |= 0x00000010;
           domain_ = other.domain_;
           onChanged();
         }
         if (other.hasSubject()) {
-          bitField0_ |= 0x00000008;
+          bitField0_ |= 0x00000020;
           subject_ = other.subject_;
           onChanged();
         }
         if (other.hasType()) {
-          bitField0_ |= 0x00000010;
+          bitField0_ |= 0x00000040;
           type_ = other.type_;
           onChanged();
         }
@@ -813,6 +1009,10 @@ public final class xMsgR {
       }
 
       public final boolean isInitialized() {
+        if (!hasName()) {
+          
+          return false;
+        }
         if (!hasHost()) {
           
           return false;
@@ -847,16 +1047,164 @@ public final class xMsgR {
       }
       private int bitField0_;
 
-      // required string host = 1;
-      private java.lang.Object host_ = "";
+      // required string name = 1;
+      private java.lang.Object name_ = "";
       /**
-       * <code>required string host = 1;</code>
+       * <code>required string name = 1;</code>
        */
-      public boolean hasHost() {
+      public boolean hasName() {
         return ((bitField0_ & 0x00000001) == 0x00000001);
       }
       /**
-       * <code>required string host = 1;</code>
+       * <code>required string name = 1;</code>
+       */
+      public java.lang.String getName() {
+        java.lang.Object ref = name_;
+        if (!(ref instanceof java.lang.String)) {
+          java.lang.String s = ((com.google.protobuf.ByteString) ref)
+              .toStringUtf8();
+          name_ = s;
+          return s;
+        } else {
+          return (java.lang.String) ref;
+        }
+      }
+      /**
+       * <code>required string name = 1;</code>
+       */
+      public com.google.protobuf.ByteString
+          getNameBytes() {
+        java.lang.Object ref = name_;
+        if (ref instanceof String) {
+          com.google.protobuf.ByteString b = 
+              com.google.protobuf.ByteString.copyFromUtf8(
+                  (java.lang.String) ref);
+          name_ = b;
+          return b;
+        } else {
+          return (com.google.protobuf.ByteString) ref;
+        }
+      }
+      /**
+       * <code>required string name = 1;</code>
+       */
+      public Builder setName(
+          java.lang.String value) {
+        if (value == null) {
+    throw new NullPointerException();
+  }
+  bitField0_ |= 0x00000001;
+        name_ = value;
+        onChanged();
+        return this;
+      }
+      /**
+       * <code>required string name = 1;</code>
+       */
+      public Builder clearName() {
+        bitField0_ = (bitField0_ & ~0x00000001);
+        name_ = getDefaultInstance().getName();
+        onChanged();
+        return this;
+      }
+      /**
+       * <code>required string name = 1;</code>
+       */
+      public Builder setNameBytes(
+          com.google.protobuf.ByteString value) {
+        if (value == null) {
+    throw new NullPointerException();
+  }
+  bitField0_ |= 0x00000001;
+        name_ = value;
+        onChanged();
+        return this;
+      }
+
+      // optional string description = 2 [default = "undefined"];
+      private java.lang.Object description_ = "undefined";
+      /**
+       * <code>optional string description = 2 [default = "undefined"];</code>
+       */
+      public boolean hasDescription() {
+        return ((bitField0_ & 0x00000002) == 0x00000002);
+      }
+      /**
+       * <code>optional string description = 2 [default = "undefined"];</code>
+       */
+      public java.lang.String getDescription() {
+        java.lang.Object ref = description_;
+        if (!(ref instanceof java.lang.String)) {
+          java.lang.String s = ((com.google.protobuf.ByteString) ref)
+              .toStringUtf8();
+          description_ = s;
+          return s;
+        } else {
+          return (java.lang.String) ref;
+        }
+      }
+      /**
+       * <code>optional string description = 2 [default = "undefined"];</code>
+       */
+      public com.google.protobuf.ByteString
+          getDescriptionBytes() {
+        java.lang.Object ref = description_;
+        if (ref instanceof String) {
+          com.google.protobuf.ByteString b = 
+              com.google.protobuf.ByteString.copyFromUtf8(
+                  (java.lang.String) ref);
+          description_ = b;
+          return b;
+        } else {
+          return (com.google.protobuf.ByteString) ref;
+        }
+      }
+      /**
+       * <code>optional string description = 2 [default = "undefined"];</code>
+       */
+      public Builder setDescription(
+          java.lang.String value) {
+        if (value == null) {
+    throw new NullPointerException();
+  }
+  bitField0_ |= 0x00000002;
+        description_ = value;
+        onChanged();
+        return this;
+      }
+      /**
+       * <code>optional string description = 2 [default = "undefined"];</code>
+       */
+      public Builder clearDescription() {
+        bitField0_ = (bitField0_ & ~0x00000002);
+        description_ = getDefaultInstance().getDescription();
+        onChanged();
+        return this;
+      }
+      /**
+       * <code>optional string description = 2 [default = "undefined"];</code>
+       */
+      public Builder setDescriptionBytes(
+          com.google.protobuf.ByteString value) {
+        if (value == null) {
+    throw new NullPointerException();
+  }
+  bitField0_ |= 0x00000002;
+        description_ = value;
+        onChanged();
+        return this;
+      }
+
+      // required string host = 3;
+      private java.lang.Object host_ = "";
+      /**
+       * <code>required string host = 3;</code>
+       */
+      public boolean hasHost() {
+        return ((bitField0_ & 0x00000004) == 0x00000004);
+      }
+      /**
+       * <code>required string host = 3;</code>
        */
       public java.lang.String getHost() {
         java.lang.Object ref = host_;
@@ -870,7 +1218,7 @@ public final class xMsgR {
         }
       }
       /**
-       * <code>required string host = 1;</code>
+       * <code>required string host = 3;</code>
        */
       public com.google.protobuf.ByteString
           getHostBytes() {
@@ -886,84 +1234,92 @@ public final class xMsgR {
         }
       }
       /**
-       * <code>required string host = 1;</code>
+       * <code>required string host = 3;</code>
        */
       public Builder setHost(
           java.lang.String value) {
         if (value == null) {
     throw new NullPointerException();
   }
-  bitField0_ |= 0x00000001;
+  bitField0_ |= 0x00000004;
         host_ = value;
         onChanged();
         return this;
       }
       /**
-       * <code>required string host = 1;</code>
+       * <code>required string host = 3;</code>
        */
       public Builder clearHost() {
-        bitField0_ = (bitField0_ & ~0x00000001);
+        bitField0_ = (bitField0_ & ~0x00000004);
         host_ = getDefaultInstance().getHost();
         onChanged();
         return this;
       }
       /**
-       * <code>required string host = 1;</code>
+       * <code>required string host = 3;</code>
        */
       public Builder setHostBytes(
           com.google.protobuf.ByteString value) {
         if (value == null) {
     throw new NullPointerException();
   }
-  bitField0_ |= 0x00000001;
+  bitField0_ |= 0x00000004;
         host_ = value;
         onChanged();
         return this;
       }
 
-      // required sfixed32 port = 2;
+      // required sfixed32 port = 4;
       private int port_ ;
       /**
-       * <code>required sfixed32 port = 2;</code>
+       * <code>required sfixed32 port = 4;</code>
        */
       public boolean hasPort() {
-        return ((bitField0_ & 0x00000002) == 0x00000002);
+        return ((bitField0_ & 0x00000008) == 0x00000008);
       }
       /**
-       * <code>required sfixed32 port = 2;</code>
+       * <code>required sfixed32 port = 4;</code>
        */
       public int getPort() {
         return port_;
       }
       /**
-       * <code>required sfixed32 port = 2;</code>
+       * <code>required sfixed32 port = 4;</code>
        */
       public Builder setPort(int value) {
-        bitField0_ |= 0x00000002;
+        bitField0_ |= 0x00000008;
         port_ = value;
         onChanged();
         return this;
       }
       /**
-       * <code>required sfixed32 port = 2;</code>
+       * <code>required sfixed32 port = 4;</code>
        */
       public Builder clearPort() {
-        bitField0_ = (bitField0_ & ~0x00000002);
+        bitField0_ = (bitField0_ & ~0x00000008);
         port_ = 0;
         onChanged();
         return this;
       }
 
-      // required string domain = 3;
+      // required string domain = 5;
       private java.lang.Object domain_ = "";
       /**
-       * <code>required string domain = 3;</code>
+       * <code>required string domain = 5;</code>
+       *
+       * <pre>
+       * xMsg topic definition
+       * </pre>
        */
       public boolean hasDomain() {
-        return ((bitField0_ & 0x00000004) == 0x00000004);
+        return ((bitField0_ & 0x00000010) == 0x00000010);
       }
       /**
-       * <code>required string domain = 3;</code>
+       * <code>required string domain = 5;</code>
+       *
+       * <pre>
+       * xMsg topic definition
+       * </pre>
        */
       public java.lang.String getDomain() {
         java.lang.Object ref = domain_;
@@ -977,7 +1333,11 @@ public final class xMsgR {
         }
       }
       /**
-       * <code>required string domain = 3;</code>
+       * <code>required string domain = 5;</code>
+       *
+       * <pre>
+       * xMsg topic definition
+       * </pre>
        */
       public com.google.protobuf.ByteString
           getDomainBytes() {
@@ -993,51 +1353,63 @@ public final class xMsgR {
         }
       }
       /**
-       * <code>required string domain = 3;</code>
+       * <code>required string domain = 5;</code>
+       *
+       * <pre>
+       * xMsg topic definition
+       * </pre>
        */
       public Builder setDomain(
           java.lang.String value) {
         if (value == null) {
     throw new NullPointerException();
   }
-  bitField0_ |= 0x00000004;
+  bitField0_ |= 0x00000010;
         domain_ = value;
         onChanged();
         return this;
       }
       /**
-       * <code>required string domain = 3;</code>
+       * <code>required string domain = 5;</code>
+       *
+       * <pre>
+       * xMsg topic definition
+       * </pre>
        */
       public Builder clearDomain() {
-        bitField0_ = (bitField0_ & ~0x00000004);
+        bitField0_ = (bitField0_ & ~0x00000010);
         domain_ = getDefaultInstance().getDomain();
         onChanged();
         return this;
       }
       /**
-       * <code>required string domain = 3;</code>
+       * <code>required string domain = 5;</code>
+       *
+       * <pre>
+       * xMsg topic definition
+       * </pre>
        */
       public Builder setDomainBytes(
           com.google.protobuf.ByteString value) {
         if (value == null) {
     throw new NullPointerException();
   }
-  bitField0_ |= 0x00000004;
+  bitField0_ |= 0x00000010;
         domain_ = value;
         onChanged();
         return this;
       }
 
-      // optional string subject = 4 [default = "undefined"];
+      // optional string subject = 6 [default = "undefined"];
       private java.lang.Object subject_ = "undefined";
       /**
-       * <code>optional string subject = 4 [default = "undefined"];</code>
+       * <code>optional string subject = 6 [default = "undefined"];</code>
        */
       public boolean hasSubject() {
-        return ((bitField0_ & 0x00000008) == 0x00000008);
+        return ((bitField0_ & 0x00000020) == 0x00000020);
       }
       /**
-       * <code>optional string subject = 4 [default = "undefined"];</code>
+       * <code>optional string subject = 6 [default = "undefined"];</code>
        */
       public java.lang.String getSubject() {
         java.lang.Object ref = subject_;
@@ -1051,7 +1423,7 @@ public final class xMsgR {
         }
       }
       /**
-       * <code>optional string subject = 4 [default = "undefined"];</code>
+       * <code>optional string subject = 6 [default = "undefined"];</code>
        */
       public com.google.protobuf.ByteString
           getSubjectBytes() {
@@ -1067,51 +1439,51 @@ public final class xMsgR {
         }
       }
       /**
-       * <code>optional string subject = 4 [default = "undefined"];</code>
+       * <code>optional string subject = 6 [default = "undefined"];</code>
        */
       public Builder setSubject(
           java.lang.String value) {
         if (value == null) {
     throw new NullPointerException();
   }
-  bitField0_ |= 0x00000008;
+  bitField0_ |= 0x00000020;
         subject_ = value;
         onChanged();
         return this;
       }
       /**
-       * <code>optional string subject = 4 [default = "undefined"];</code>
+       * <code>optional string subject = 6 [default = "undefined"];</code>
        */
       public Builder clearSubject() {
-        bitField0_ = (bitField0_ & ~0x00000008);
+        bitField0_ = (bitField0_ & ~0x00000020);
         subject_ = getDefaultInstance().getSubject();
         onChanged();
         return this;
       }
       /**
-       * <code>optional string subject = 4 [default = "undefined"];</code>
+       * <code>optional string subject = 6 [default = "undefined"];</code>
        */
       public Builder setSubjectBytes(
           com.google.protobuf.ByteString value) {
         if (value == null) {
     throw new NullPointerException();
   }
-  bitField0_ |= 0x00000008;
+  bitField0_ |= 0x00000020;
         subject_ = value;
         onChanged();
         return this;
       }
 
-      // optional string type = 5 [default = "undefined"];
+      // optional string type = 7 [default = "undefined"];
       private java.lang.Object type_ = "undefined";
       /**
-       * <code>optional string type = 5 [default = "undefined"];</code>
+       * <code>optional string type = 7 [default = "undefined"];</code>
        */
       public boolean hasType() {
-        return ((bitField0_ & 0x00000010) == 0x00000010);
+        return ((bitField0_ & 0x00000040) == 0x00000040);
       }
       /**
-       * <code>optional string type = 5 [default = "undefined"];</code>
+       * <code>optional string type = 7 [default = "undefined"];</code>
        */
       public java.lang.String getType() {
         java.lang.Object ref = type_;
@@ -1125,7 +1497,7 @@ public final class xMsgR {
         }
       }
       /**
-       * <code>optional string type = 5 [default = "undefined"];</code>
+       * <code>optional string type = 7 [default = "undefined"];</code>
        */
       public com.google.protobuf.ByteString
           getTypeBytes() {
@@ -1141,72 +1513,72 @@ public final class xMsgR {
         }
       }
       /**
-       * <code>optional string type = 5 [default = "undefined"];</code>
+       * <code>optional string type = 7 [default = "undefined"];</code>
        */
       public Builder setType(
           java.lang.String value) {
         if (value == null) {
     throw new NullPointerException();
   }
-  bitField0_ |= 0x00000010;
+  bitField0_ |= 0x00000040;
         type_ = value;
         onChanged();
         return this;
       }
       /**
-       * <code>optional string type = 5 [default = "undefined"];</code>
+       * <code>optional string type = 7 [default = "undefined"];</code>
        */
       public Builder clearType() {
-        bitField0_ = (bitField0_ & ~0x00000010);
+        bitField0_ = (bitField0_ & ~0x00000040);
         type_ = getDefaultInstance().getType();
         onChanged();
         return this;
       }
       /**
-       * <code>optional string type = 5 [default = "undefined"];</code>
+       * <code>optional string type = 7 [default = "undefined"];</code>
        */
       public Builder setTypeBytes(
           com.google.protobuf.ByteString value) {
         if (value == null) {
     throw new NullPointerException();
   }
-  bitField0_ |= 0x00000010;
+  bitField0_ |= 0x00000040;
         type_ = value;
         onChanged();
         return this;
       }
 
-      // optional .xMsgRegistrationData.OwnerType ownerType = 6;
+      // optional .xMsgRegistrationData.OwnerType ownerType = 8;
       private xMsgR.xMsgRegistrationData.OwnerType ownerType_ = xMsgR.xMsgRegistrationData.OwnerType.PUBLISHER;
       /**
-       * <code>optional .xMsgRegistrationData.OwnerType ownerType = 6;</code>
+       * <code>optional .xMsgRegistrationData.OwnerType ownerType = 8;</code>
        */
       public boolean hasOwnerType() {
-        return ((bitField0_ & 0x00000020) == 0x00000020);
+        return ((bitField0_ & 0x00000080) == 0x00000080);
       }
       /**
-       * <code>optional .xMsgRegistrationData.OwnerType ownerType = 6;</code>
+       * <code>optional .xMsgRegistrationData.OwnerType ownerType = 8;</code>
        */
       public xMsgR.xMsgRegistrationData.OwnerType getOwnerType() {
         return ownerType_;
       }
       /**
-       * <code>optional .xMsgRegistrationData.OwnerType ownerType = 6;</code>
+       * <code>optional .xMsgRegistrationData.OwnerType ownerType = 8;</code>
        */
       public Builder setOwnerType(xMsgR.xMsgRegistrationData.OwnerType value) {
         if (value == null) {
           throw new NullPointerException();
         }
-        bitField0_ |= 0x00000020;
+        bitField0_ |= 0x00000080;
         ownerType_ = value;
         onChanged();
         return this;
       }
       /**
-       * <code>optional .xMsgRegistrationData.OwnerType ownerType = 6;</code>
+       * <code>optional .xMsgRegistrationData.OwnerType ownerType = 8;</code>
        */
       public Builder clearOwnerType() {
-        bitField0_ = (bitField0_ & ~0x00000020);
+        bitField0_ = (bitField0_ & ~0x00000080);
         ownerType_ = xMsgR.xMsgRegistrationData.OwnerType.PUBLISHER;
         onChanged();
         return this;
@@ -1237,13 +1609,14 @@ public final class xMsgR {
       descriptor;
   static {
     java.lang.String[] descriptorData = {
-      "\n\032xMsgRegistrationData.proto\"\327\001\n\024xMsgReg" +
-      "istrationData\022\014\n\004host\030\001 \002(\t\022\014\n\004port\030\002 \002(" +
-      "\017\022\016\n\006domain\030\003 \002(\t\022\032\n\007subject\030\004 \001(\t:\tunde" +
-      "fined\022\027\n\004type\030\005 \001(\t:\tundefined\0222\n\townerT" +
-      "ype\030\006 \001(\0162\037.xMsgRegistrationData.OwnerTy" +
-      "pe\"*\n\tOwnerType\022\r\n\tPUBLISHER\020\001\022\016\n\nSUBSCR" +
-      "IBER\020\002B\tB\005xMsgRH\001"
+      "\n\032xMsgRegistrationData.proto\"\205\002\n\024xMsgReg" +
+      "istrationData\022\014\n\004name\030\001 \002(\t\022\036\n\013descripti" +
+      "on\030\002 \001(\t:\tundefined\022\014\n\004host\030\003 \002(\t\022\014\n\004por" +
+      "t\030\004 \002(\017\022\016\n\006domain\030\005 \002(\t\022\032\n\007subject\030\006 \001(\t" +
+      ":\tundefined\022\027\n\004type\030\007 \001(\t:\tundefined\0222\n\t" +
+      "ownerType\030\010 \001(\0162\037.xMsgRegistrationData.O" +
+      "wnerType\"*\n\tOwnerType\022\r\n\tPUBLISHER\020\001\022\016\n\n" +
+      "SUBSCRIBER\020\002B\tB\005xMsgRH\001"
     };
     com.google.protobuf.Descriptors.FileDescriptor.InternalDescriptorAssigner assigner =
       new com.google.protobuf.Descriptors.FileDescriptor.InternalDescriptorAssigner() {
@@ -1255,7 +1628,7 @@ public final class xMsgR {
           internal_static_xMsgRegistrationData_fieldAccessorTable = new
             com.google.protobuf.GeneratedMessage.FieldAccessorTable(
               internal_static_xMsgRegistrationData_descriptor,
-              new java.lang.String[] { "Host", "Port", "Domain", "Subject", "Type", "OwnerType", });
+              new java.lang.String[] { "Name", "Description", "Host", "Port", "Domain", "Subject", "Type", "OwnerType", });
           return null;
         }
       };

@@ -13,7 +13,7 @@ package org.jlab.coda.xmsg.core;
 public enum xMsgConstants {
     UNDEFINED(0, "undefined"),
     SUCCESS(1, "success"),
-    ANY_HOST(2, "*"),
+    ANY(2, "*"),
 
     REGISTRAR(3, "xMsg_Registrar"),
 
@@ -30,12 +30,17 @@ public enum xMsgConstants {
     FIND_PUBLISHER(9,"findPublisher"),
     FIND_SUBSCRIBER(10,"findSubscribers"),
 
+    INFO(11,"info"),
+    WARNING(12,"warning"),
+    ERROR(13,"error"),
+
+    NO_RESULT(14,"none"),
+
     BIND(11,"bind"),
     CONNECT(12,"connect"),
 
     DEFAULT_PORT(7771, "defaultPort"),
     REGISTRAR_PORT(8888, "registrarPort");
-
 
 
     private int intValue;

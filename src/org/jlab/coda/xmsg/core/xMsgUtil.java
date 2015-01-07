@@ -106,6 +106,10 @@ public class xMsgUtil {
         }
     }
 
+    public static void keepAlive(){
+        sleep_fe(7);
+    }
+
     /**
      * <p>
      *     Returns the IP address of the specified host
@@ -144,7 +148,17 @@ public class xMsgUtil {
         topic.append(domain);
         if(subject!=null && !subject.equals("*")) {
             topic.append(":").append(subject);
-            if(type!=null && !type.equals("*")) topic.append(":").append(type);
+            if(type!=null && !type.equals("*")) {
+                StringTokenizer st = new StringTokenizer(type,":");
+                while(st.hasMoreTokens()){
+                    String tst = st.nextToken();
+                    if(!tst.contains("*")) {
+                        topic.append(":").append(tst);
+                    } else {
+                        break;
+                    }
+                }
+            }
         }
         return topic.toString();
     }

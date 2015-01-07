@@ -1,4 +1,4 @@
-// Google's protobuf deffinition of the xMsg data structure
+// Google's protobuf definition of the xMsg data structure
 // author: gurjyan
 // date: 10.06.14
 
@@ -7,18 +7,25 @@ option java_outer_classname = "xMsgR";
 
 message xMsgRegistrationData {
 
+    // Type of a an actor that sends the registration data
     enum OwnerType {
         PUBLISHER = 1;
         SUBSCRIBER = 2;
     }
 
-    optional string host = 1 [default = "localhost"];
-    optional sfixed32 port = 2;
+    required string name = 1;
 
-    optional string domain = 3;
-    optional string subject = 4 [default = "undefined"];
-    optional string type = 5 [default = "undefined"];
+    optional string description = 2 [default = "undefined"];
 
-    optional OwnerType ownerType = 6;
+    required string host = 3;
+
+    required sfixed32 port = 4;
+
+    // xMsg topic definition
+    required string domain = 5;
+    optional string subject = 6 [default = "undefined"];
+    optional string type = 7 [default = "undefined"];
+
+    optional OwnerType ownerType = 8;
 
 }

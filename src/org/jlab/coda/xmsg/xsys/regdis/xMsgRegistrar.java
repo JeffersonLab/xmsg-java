@@ -53,7 +53,7 @@ public class xMsgRegistrar extends Thread {
             subscribers_db = new ConcurrentHashMap<>();
 
     // Registrar accepted requests from any host (*)
-    private String host = xMsgConstants.ANY_HOST.getStringValue();
+    private String host = xMsgConstants.ANY.getStringValue();
 
     // Default port of the registrar
     private int port = xMsgConstants.REGISTRAR_PORT.getIntValue();
@@ -195,11 +195,11 @@ public class xMsgRegistrar extends Thread {
                 // actually to perform the request and define the resulting data
                 // Note: requested action is passed throw the xMsg topic field.
                 if (s_topic.equals(xMsgConstants.REGISTER_PUBLISHER.getStringValue())) {
-                    publishers_db.put(key, s_data);
+                    if(s_data!=null) publishers_db.put(key, s_data);
                     reply.addString(xMsgConstants.SUCCESS.getStringValue());
 
                 } else if (s_topic.equals(xMsgConstants.REGISTER_SUBSCRIBER.getStringValue())) {
-                    subscribers_db.put(key, s_data);
+                    if(s_data!=null) subscribers_db.put(key, s_data);
                     reply.addString(xMsgConstants.SUCCESS.getStringValue());
 
                 } else if (s_topic.equals(xMsgConstants.REMOVE_PUBLISHER.getStringValue())) {
@@ -292,28 +292,35 @@ public class xMsgRegistrar extends Thread {
                                                        boolean isPublisher)
             throws xMsgException {
 
-        if(domain.equals(xMsgConstants.UNDEFINED.getStringValue())) {
+        if(domain.equals(xMsgConstants.UNDEFINED.getStringValue()) ||
+                domain.equals("*")) {
             throw new xMsgException("undefined domain");
         }
-
-        // create a list containing defined input key elements
-        List<String> st = new ArrayList<>();
-        st.add(domain);
-        if(!subject.equals(xMsgConstants.UNDEFINED.getStringValue())) st.add(subject);
-        if(!type.equals(xMsgConstants.UNDEFINED.getStringValue())) st.add(type);
 
         Set<xMsgRegistrationData> result = new HashSet<>();
 
         if(isPublisher) {
             for (String k : publishers_db.keySet()) {
-                for (String s : st) {
-                    if (k.contains(s)) result.add(publishers_db.get(k));
+                if((xMsgUtil.getTopicDomain(k).equals(domain)) &&
+                        (xMsgUtil.getTopicSubject(k).equals(subject) ||
+                                subject.equals("*") ||
+                                subject.equals(xMsgConstants.UNDEFINED.name())) &&
+                (xMsgUtil.getTopicType(k).equals(type) ||
+                        type.equals("*") ||
+                        type.equals(xMsgConstants.UNDEFINED.name()))) {
+                    result.add(publishers_db.get(k));
                 }
             }
         } else {
             for (String k : subscribers_db.keySet()) {
-                for (String s : st) {
-                    if (k.contains(s)) result.add(subscribers_db.get(k));
+                if((xMsgUtil.getTopicDomain(k).equals(domain)) &&
+                        (xMsgUtil.getTopicSubject(k).equals(subject) ||
+                                subject.equals("*") ||
+                                subject.equals(xMsgConstants.UNDEFINED.name())) &&
+                        (xMsgUtil.getTopicType(k).equals(type) ||
+                                type.equals("*") ||
+                                type.equals(xMsgConstants.UNDEFINED.name()))) {
+                    result.add(subscribers_db.get(k));
                 }
             }
         }
