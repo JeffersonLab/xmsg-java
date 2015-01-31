@@ -88,7 +88,9 @@
   <property name="project.jdk.home" value="${jdk.home.1.7}"/>
   <property name="project.jdk.bin" value="${jdk.bin.1.7}"/>
   <property name="project.jdk.classpath" value="jdk.classpath.1.7"/>
-  
+
+  <property name="global.jar.location" value="${env.COMMON_JARS}"/>
+
   
   <!-- Project Libraries -->
   
@@ -184,6 +186,10 @@
     <delete dir="${xmsg-1.0.testoutput.dir}"/>
   </target>
 
+  <target name="copy.jar" description="copy xMsg jar to a global location">
+    <copy file="${basedir}/lib/xMsg-1.0.jar" todir="${global.jar.location}"/>
+  </target>
+
   <target name="build.jar" description="build jar file">
     <jar destfile="${basedir}/lib/xMsg-1.0.jar" basedir="${basedir}/out/production/xMsg-1.0"/>
   </target>
@@ -196,5 +202,5 @@
   
   <target name="build.modules" depends="init, clean, compile.module.xmsg-1.0" description="build all modules"/>
   
-  <target name="all" depends="build.modules, build.jar" description="build all"/>
+  <target name="all" depends="build.modules, build.jar, copy.jar" description="build all"/>
 </project>
