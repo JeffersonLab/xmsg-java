@@ -858,6 +858,64 @@ public class xMsg {
      * @param type type of the topic
      * @param publisherName the name of the publisher/sender. Required according to
      *             the xMsg zmq message structure definition. (topic, sender, data)
+     * @param data String object
+     * @throws xMsgPublishingException
+     */
+    public void publish_str(xMsgConnection connection,
+                            String domain,
+                            String subject,
+                            String type,
+                            String publisherName,
+                            String data)
+            throws xMsgException {
+
+        // check connection
+        Socket con = connection.getPubSock();
+        if (con==null) throw new xMsgPublishingException("null connection object");
+
+        // byte array for holding the serialized data object
+        byte[] dt;
+
+        // build a topic
+        String topic = xMsgUtil.buildTopic(domain, subject, type);
+
+
+        // send topic, sender, followed by the data
+        ZMsg msg = new ZMsg();
+        msg.addString(topic);
+        msg.addString(publisherName);
+
+        if(data!=null) {
+            msg.add(data);
+        }
+
+        if (!msg.send(con))throw new xMsgPublishingException("error publishing the message");
+        msg.destroy();
+    }
+
+    /**
+     * <p>
+     *     Publishes data to a specified xMsg topic. 3 elements are defining xMsg topic:
+     *     <ul>
+     *         <li>domain</li>
+     *         <li>subject</li>
+     *         <li>type</li>
+     *     </ul>
+     *     Topic is constructed from these elements separated by <b>:</b>
+     *     Domain is required , however subject and topic can be set to <b>*</b>.
+     *     If subject is set * type will be ignored. Here are examples of
+     *     accepted topic definitions:<br>
+     *         domain:*:* <br>
+     *         domain:subject:*<br>
+     *         domain:subject:type<br>
+     *     This method will perform input data, i.e. xMsgData object serialization.
+     * </p>
+     * @param connection xMsgConnection object.
+     * @param domain domain of the topic
+     * @param subject subject of the topic
+     * @param type type of the topic
+     * @param publisherName the name of the publisher/sender. Required according to
+     *             the xMsg zmq message structure definition. (topic, sender, data)
      * @param data {@link org.jlab.coda.xmsg.data.xMsgD.Data} object
      * @throws xMsgPublishingException
      */
@@ -958,59 +1016,140 @@ public class xMsg {
      *               received and user callback method is returned
      */
     public void subscribe(final xMsgConnection connection,
-                            final String domain,
-                            final String subject,
-                            final String type,
-                            final xMsgCallBack cb,
-                            final boolean isSync) {
-        Thread t1 = new Thread(new Runnable() {
-            public void run() {
-                try {
-                    _subscribe(connection, domain, subject, type, cb, isSync);
-                } catch (xMsgException e) {
-                    e.printStackTrace();
-                }
-            }
-        });
-        t1.start();
+                          final String domain,
+                          final String subject,
+                          final String type,
+                          final xMsgCallBack cb,
+                          final boolean isSync) {
+        try {
+            _subscribe(connection, domain, subject, type, cb, isSync);
+        } catch (xMsgException e) {
+            e.printStackTrace();
+        }
     }
 
-        /**
-         * <p>
-         *     Subscribes to a specified xMsg topic. 3 elements are defining xMsg topic:
-         *     <ul>
-         *         <li>domain</li>
-         *         <li>subject</li>
-         *         <li>type</li>
-         *     </ul>
-         *     Topic is constructed from these elements separated by <b>:</b>
-         *     Domain is required , however subject and topic can be set to <b>*</b>.
-         *     If subject is set * type will be ignored. Here are examples of
-         *     accepted topic definitions:<br>
-         *         domain:*:* <br>
-         *         domain:subject:*<br>
-         *         domain:subject:type<br>
-         *     Supplied user callback object must implement xMsgCallBack interface.
-         *     This method will de-serialize received xMsgData object and pass it
-         *     to the user implemented callback method of thee interface.
-         *     In the case isSync input parameter is set to be false the method will
-         *     utilize private thread pool to run user callback method in a separate thread.
-         * </p>
-         * @param connection socket to a xMsgNode proxy output port.
-         * @param domain domain of the topic
-         * @param subject subject of the topic
-         * @param type type of the topic
-         * @param cb {@link xMsgCallBack} implemented object reference
-         * @param isSync if set to true method will block until subscription method is
-         *               received and user callback method is returned
-         * @throws xMsgSubscribingException
-         */
+    /**
+     * <p>
+     *     Subscribes to a specified xMsg topic. 3 elements are defining xMsg topic:
+     *     <ul>
+     *         <li>domain</li>
+     *         <li>subject</li>
+     *         <li>type</li>
+     *     </ul>
+     *     Topic is constructed from these elements separated by <b>:</b>
+     *     Domain is required , however subject and topic can be set to <b>*</b>.
+     *     If subject is set * type will be ignored. Here are examples of
+     *     accepted topic definitions:<br>
+     *         domain:*:* <br>
+     *         domain:subject:*<br>
+     *         domain:subject:type<br>
+     *     Supplied user callback object must implement xMsgCallBack interface.
+     *     In the case isSync input parameter is set to be false the method will
+     *     utilize private thread pool to run user callback method in a separate thread.
+     * </p>
+     * @param connection socket to a xMsgNode proxy output port.
+     * @param domain domain of the topic
+     * @param subject subject of the topic
+     * @param type type of the topic
+     * @param cb {@link xMsgCallBack} implemented object reference
+     * @param isSync if set to true method will block until subscription method is
+     *               received and user callback method is returned
+     * @throws xMsgSubscribingException
+     */
+    public void subscribe_str(xMsgConnection connection,
+                              String domain,
+                              String subject,
+                              String type,
+                              final xMsgCallBack cb,
+                              boolean isSync)
+            throws xMsgException {
+
+        // check connection
+        Socket con = connection.getSubSock();
+        if (con==null) throw new xMsgSubscribingException("null connection object");
+
+        // subscribe the topic
+        String topic = xMsgUtil.buildTopic(domain, subject, type);
+        con.subscribe(topic.getBytes(ZMQ.CHARSET));
+
+        // wait for messages published to a required topic
+        while (!Thread.currentThread().isInterrupted()) {
+
+            ZMsg msg = ZMsg.recvMsg(con);
+            ZFrame r_topic = msg.pop();
+            ZFrame r_sender = msg.pop();
+            ZFrame r_data = msg.pop();
+
+            // de-serialize received message components
+            String s_topic = new String(r_topic.getData(), ZMQ.CHARSET);
+            String s_sender = new String(r_sender.getData(),ZMQ.CHARSET);
+            String s_data = new String(r_sender.getData(),ZMQ.CHARSET);
+
+            // cleanup the data
+            r_data.destroy();
+
+            // cleanup the rest
+            r_topic.destroy();
+            r_sender.destroy();
+            msg.destroy();
+
+            // Create a message to be passed to the user callback method
+            final xMsgMessage cb_msg = new xMsgMessage(s_sender,
+                    xMsgUtil.getTopicDomain(s_topic),
+                    xMsgUtil.getTopicSubject(s_topic),
+                    xMsgUtil.getTopicType(s_topic),
+                    s_data);
+
+            // Calling user callback method
+            if(isSync){
+                cb.callback(cb_msg);
+            } else {
+                threadPool.submit(new Runnable() {
+                                      public void run() {
+                                          cb.callback(cb_msg);
+                                      }
+                                  }
+                );
+            }
+        }
+    }
+
+    /**
+     * <p>
+     *     Subscribes to a specified xMsg topic. 3 elements are defining xMsg topic:
+     *     <ul>
+     *         <li>domain</li>
+     *         <li>subject</li>
+     *         <li>type</li>
+     *     </ul>
+     *     Topic is constructed from these elements separated by <b>:</b>
+     *     Domain is required , however subject and topic can be set to <b>*</b>.
+     *     If subject is set * type will be ignored. Here are examples of
+     *     accepted topic definitions:<br>
+     *         domain:*:* <br>
+     *         domain:subject:*<br>
+     *         domain:subject:type<br>
+     *     Supplied user callback object must implement xMsgCallBack interface.
+     *     This method will de-serialize received xMsgData object and pass it
+     *     to the user implemented callback method of thee interface.
+     *     In the case isSync input parameter is set to be false the method will
+     *     utilize private thread pool to run user callback method in a separate thread.
+     * </p>
+     * @param connection socket to a xMsgNode proxy output port.
+     * @param domain domain of the topic
+     * @param subject subject of the topic
+     * @param type type of the topic
+     * @param cb {@link xMsgCallBack} implemented object reference
+     * @param isSync if set to true method will block until subscription method is
+     *               received and user callback method is returned
+     * @throws xMsgSubscribingException
+     */
     private void _subscribe(xMsgConnection connection,
-                          String domain,
-                          String subject,
-                          String type,
-                          final xMsgCallBack cb,
-                          boolean isSync)
+                            String domain,
+                            String subject,
+                            String type,
+                            final xMsgCallBack cb,
+                            boolean isSync)
             throws xMsgException {
 
         // check connection
