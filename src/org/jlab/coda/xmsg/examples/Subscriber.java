@@ -7,6 +7,8 @@ import org.jlab.coda.xmsg.core.xMsg;
 import org.jlab.coda.xmsg.core.xMsgCallBack;
 import org.jlab.coda.xmsg.core.xMsgMessage;
 
+import java.net.SocketException;
+
 /**
  * xMsg subscriber that checks the local registration to find
  * out if there is a publisher publishing to a specified
@@ -24,9 +26,10 @@ public class Subscriber extends xMsg {
     private static final String domain = "test_domain";
     private static final String subject = "test_subject";
     private static final String type = "test_type";
+    private static final String description = "test_description";
     private MyCallBack callback;
 
-    public Subscriber() throws xMsgException {
+    public Subscriber() throws xMsgException, SocketException {
         super("localhost");
         callback = new MyCallBack();
     }
@@ -38,8 +41,8 @@ public class Subscriber extends xMsg {
             // Create a socket connections to the xMsg node
             xMsgConnection con =  subscriber.connect();
 
-            // Register this publisher
-            subscriber.registerSubscriber(myName, domain, subject, type);
+            // Register this subscriber
+            subscriber.registerSubscriber(myName, domain, subject, type, description);
 
             // Find a publisher that publishes to requested topic
             // defined as a static variables above
@@ -52,6 +55,8 @@ public class Subscriber extends xMsg {
 
             }
         } catch (xMsgException e) {
+            e.printStackTrace();
+        } catch (SocketException e) {
             e.printStackTrace();
         }
     }

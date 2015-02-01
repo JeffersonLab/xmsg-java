@@ -1,13 +1,15 @@
 package org.jlab.coda.xmsg.core;
 
+import org.jlab.coda.xmsg.data.xMsgD;
 import org.jlab.coda.xmsg.excp.xMsgException;
 import org.jlab.coda.xmsg.excp.xMsgSubscribingException;
 
 import java.net.InetAddress;
+import java.net.NetworkInterface;
+import java.net.SocketException;
 import java.net.UnknownHostException;
 import java.text.DateFormat;
-import java.util.Date;
-import java.util.StringTokenizer;
+import java.util.*;
 
 /**
  * <p>
@@ -119,7 +121,12 @@ public class xMsgUtil {
      * @return dotted notation of the IP address
      * @throws xMsgException
      */
-    public static String host_to_ip(String hostName) throws xMsgException {
+    public static String host_to_ip(String hostName) throws xMsgException, SocketException {
+
+        if(hostName.equals("localhost")){
+            return getLocalHostIps().get(0);
+        }
+
         InetAddress address;
         try {
             address = InetAddress.getByName(hostName);
@@ -235,5 +242,151 @@ public class xMsgUtil {
             else return xMsgConstants.UNDEFINED.getStringValue();
         } else return xMsgConstants.UNDEFINED.getStringValue();
     }
+
+    /**
+     * <p>
+     *     Returns list of IP addresses of a node, that can have
+     *     multiple network cards, i.e. IP addresses. This method
+     *     skip loop-back (127.xxx), ink-local (169.254.xxx),
+     *     multicast (224.xxx through 238.xxx) and
+     *     broadcast (255.255.255.255) addresses.
+     * </p>
+     *
+     * @return List of IP addresses
+     * @throws SocketException
+     */
+    public static List<String> getLocalHostIps() throws SocketException {
+        List<String> out = new ArrayList<>();
+        Enumeration e = NetworkInterface.getNetworkInterfaces();
+        while(e.hasMoreElements()) {
+            NetworkInterface n = (NetworkInterface) e.nextElement();
+            Enumeration ee = n.getInetAddresses();
+            while (ee.hasMoreElements())
+            {
+                InetAddress i = (InetAddress) ee.nextElement();
+                String address = i.getHostAddress();
+                if(address.startsWith("127") || address.contains(":")){
+                } else {
+                    out.add(address);
+                }
+            }
+        }
+        return out;
+    }
+
+    public static xMsgD.Data.Builder getPbBuilder(xMsgD.Data data){
+        xMsgD.Data.Builder trb = xMsgD.Data.newBuilder();
+        trb.setDataVersion(data.getDataVersion());
+        trb.setDataDescription(data.getDataDescription());
+        trb.setDataAuthor(data.getDataAuthor());
+        trb.setDataAuthorState(data.getDataAuthorState());
+        trb.setDataGenerationStatus(data.getDataGenerationStatus());
+        trb.setVLSINT32(data.getVLSINT32());
+        trb.setVLSINT64(data.getVLSINT64());
+        trb.setFLSINT32(data.getFLSINT32());
+        trb.setFLSINT64(data.getFLSINT64());
+        trb.setFLOAT(data.getFLOAT());
+        trb.setDOUBLE(data.getDOUBLE());
+        trb.setSTRING(data.getSTRING());
+        trb.setBYTES(data.getBYTES());
+
+        for(int i= 0; i<data.getVLSINT32AList().size(); i++) {
+            trb.setVLSINT32A(i, data.getVLSINT32A(i));
+        }
+        for(int i= 0; i<data.getVLSINT64AList().size(); i++) {
+            trb.setVLSINT64A(i, data.getVLSINT64A(i));
+        }
+
+        for(int i= 0; i<data.getFLSINT32AList().size(); i++) {
+            trb.setFLSINT32A(i, data.getFLSINT32A(i));
+        }
+        for(int i= 0; i<data.getFLSINT64AList().size(); i++) {
+            trb.setFLSINT64A(i, data.getFLSINT64A(i));
+        }
+
+        for(int i= 0; i<data.getFLOATAList().size(); i++) {
+            trb.setFLOATA(i, data.getFLOATA(i));
+        }
+        for(int i= 0; i<data.getDOUBLEAList().size(); i++) {
+            trb.setDOUBLEA(i, data.getDOUBLEA(i));
+        }
+        for(int i= 0; i<data.getSTRINGAList().size(); i++) {
+            trb.setSTRINGA(i, data.getSTRINGA(i));
+        }
+        for(int i= 0; i<data.getBYTESAList().size(); i++) {
+            trb.setBYTESA(i, data.getBYTESA(i));
+        }
+
+        trb.setDataType(data.getDataType());
+        trb.setByteOrder(data.getByteOrder());
+        trb.setSender(data.getSender());
+        trb.setId(data.getId());
+        trb.setExceptionMonitor(data.getExceptionMonitor());
+        trb.setDoneMonitor(data.getDoneMonitor());
+        trb.setDataMonitor(data.getDataMonitor());
+        trb.setComposition(data.getComposition());
+        trb.setAction(data.getAction());
+        trb.setControlR(data.getControlR());
+        return trb;
+    }
+
+    public static xMsgD.Data.Builder createxMsgData(String author,
+                                            int com_id,
+                                            String description,
+                                            Object d) throws xMsgException {
+        xMsgD.Data.Builder trb = xMsgD.Data.newBuilder();
+
+        trb.setDataAuthor(author);
+        trb.setId(com_id);
+        trb.setDataDescription(description);
+
+        if(d instanceof Integer){
+            Integer in_data = (Integer)d;
+            trb.setDataType(xMsgD.Data.DType.T_FLSINT32);
+            trb.setFLSINT32(in_data);
+
+        } else if (d instanceof Integer[]){
+            Integer[] in_data = (Integer[])d;
+            trb.setDataType(xMsgD.Data.DType.T_FLSINT32A);
+            for(int id:in_data) trb.addFLSINT32A(id);
+
+        } else if (d instanceof Float){
+            Float in_data = (Float)d;
+            trb.setDataType(xMsgD.Data.DType.T_FLOAT);
+            trb.setFLOAT(in_data);
+
+        } else if (d instanceof Float[]){
+            Float[] in_data = (Float[])d;
+            trb.setDataType(xMsgD.Data.DType.T_FLOATA);
+            for(float id:in_data) trb.addFLOATA(id);
+
+        } else if (d instanceof Double){
+            Double in_data = (Double)d;
+            trb.setDataType(xMsgD.Data.DType.T_DOUBLE);
+            trb.setDOUBLE(in_data);
+
+        } else if (d instanceof Double[]){
+            Double[] in_data = (Double[])d;
+            trb.setDataType(xMsgD.Data.DType.T_DOUBLEA);
+            for(double id:in_data) trb.addDOUBLEA(id);
+
+        } else if (d instanceof String){
+            String in_data = (String)d;
+            trb.setDataType(xMsgD.Data.DType.T_STRING);
+            trb.setSTRING(in_data);
+
+        } else if (d instanceof String[]){
+            String[] in_data = (String[])d;
+            trb.setDataType(xMsgD.Data.DType.T_STRINGA);
+            for(String id:in_data) trb.addSTRINGA(id);
+
+        } else {
+            throw new xMsgException("Unsupported data type");
+        }
+
+        return trb;
+
+    }
+
 
 }

@@ -10,6 +10,8 @@ import org.zeromq.ZContext;
 import org.zeromq.ZMQ;
 import org.zeromq.ZMQ.Socket;
 
+import java.net.SocketException;
+
 /**
  * <p>
  *     xMsgNode.
@@ -31,19 +33,13 @@ public class xMsgNode extends xMsgRegDiscDriver {
     /**
      * <p>
      *     Starts a local registrar service.
-     *     Constructor of the {@link org.jlab.coda.xmsg.xsys.regdis.xMsgRegistrar} class
-     *     will start a thread that will periodically report local registration
-     *     database to xMsgFE ({@link org.jlab.coda.xmsg.xsys.xMsgFE}registrar service.
-     *     This ways registration data is distributed/duplicated between xMsgNode
-     *     and xMsgFE registrar services.
-     *     That is the reason we need to pass xMsg front-end host name.
      *     Note: this version assumes that xMsgNode and xMsgFE registrar services
      *           use default registrar port:
-     *           {@link org.jlab.coda.xmsg.core.xMsgConstants#REGISTRAR_PORT}
+     *           {@link xMsgConstants#REGISTRAR_PORT}
      * </p>
      * @throws xMsgException
      */
-    public xMsgNode() throws xMsgException {
+    public xMsgNode() throws xMsgException, SocketException {
 
         super("localhost");
 
@@ -65,7 +61,7 @@ public class xMsgNode extends xMsgRegDiscDriver {
                     super.run();
                     System.out.println(xMsgUtil.currentTime(4) +
                             " Info: Shutting down xMsg local registration and discovery server");
-                    _registrationThread.interrupt();
+                    _registrationThread.stop();
 
                     _context.close();
                     System.out.println("bye...");
@@ -84,9 +80,70 @@ public class xMsgNode extends xMsgRegDiscDriver {
     /**
      * <p>
      *     Starts a local registrar service.
-     *     Constructor of the {@link org.jlab.coda.xmsg.xsys.regdis.xMsgRegistrar} class
+     *     Note: this version assumes that xMsgNode and xMsgFE registrar services
+     *           use default registrar port:
+     *           {@link xMsgConstants#REGISTRAR_PORT}
+     * </p>
+     * @throws xMsgException
+     */
+    public xMsgNode(boolean isStandAlone) throws xMsgException, SocketException {
+
+        super("localhost");
+
+        // Zmq context
+        final ZContext _context = new ZContext();
+
+        try{
+            // Start local registrar service in a separate thread.
+            final Thread _registrationThread = new xMsgRegistrar(_context);
+            _registrationThread.start();
+
+            System.out.println(xMsgUtil.currentTime(4) +
+                    " Info: xMsg local registration and discovery server is started");
+
+            // Shutdown hook, thread that will run jvm before exiting
+            Runtime.getRuntime().addShutdownHook(new Thread(){
+                @Override
+                public void run() {
+                    super.run();
+                    System.out.println(xMsgUtil.currentTime(4) +
+                            " Info: Shutting down xMsg local registration and discovery server");
+                    _registrationThread.stop();
+
+                    _context.close();
+                    System.out.println("bye...");
+                }
+            });
+
+            if(isStandAlone) {
+                // Starting the xMsg proxy on a local host
+                startProxy(_context);
+            } else {
+                Thread t1 = new Thread(new Runnable() {
+                    public void run() {
+                        // Starting the xMsg proxy on a local host
+                        try {
+                            startProxy(_context);
+                        } catch (xMsgException e) {
+                            e.printStackTrace();
+                        }
+                    }
+                });
+                t1.start();
+            }
+
+        } catch (xMsgException e) {
+            System.out.println(e.getMessage());
+            _context.destroy();
+        }
+    }
+
+    /**
+     * <p>
+     *     Starts a local registrar service.
+     *     Constructor of the {@link xMsgRegistrar} class
      *     will start a thread that will periodically report local registration
-     *     database to xMsgFE ({@link org.jlab.coda.xmsg.xsys.xMsgFE}registrar service.
+     *     database to xMsgFE ({@link xMsgFE}registrar service.
      *     This ways registration data is distributed/duplicated between xMsgNode
      *     and xMsgFE registrar services.
      *     That is the reason we need to pass xMsg front-end host name.
@@ -98,7 +155,7 @@ public class xMsgNode extends xMsgRegDiscDriver {
      *               or through the environmental variable: XMSG_FE_HOST
      * @throws xMsgException
      */
-    public xMsgNode(final String feHost) throws xMsgException {
+    public xMsgNode(final String feHost) throws xMsgException, SocketException {
 
         super(feHost);
 
@@ -149,6 +206,86 @@ public class xMsgNode extends xMsgRegDiscDriver {
 
     /**
      * <p>
+     *     Starts a local registrar service.
+     *     Constructor of the {@link xMsgRegistrar} class
+     *     will start a thread that will periodically report local registration
+     *     database to xMsgFE ({@link xMsgFE}registrar service.
+     *     This ways registration data is distributed/duplicated between xMsgNode
+     *     and xMsgFE registrar services.
+     *     That is the reason we need to pass xMsg front-end host name.
+     *     Note: this version assumes that xMsgNode and xMsgFE registrar services
+     *           use default registrar port:
+     *           {@link org.jlab.coda.xmsg.core.xMsgConstants#REGISTRAR_PORT}
+     * </p>
+     * @param feHost xMsg front-end host. Host is passed through command line -h option,
+     *               or through the environmental variable: XMSG_FE_HOST
+     * @throws xMsgException
+     */
+    public xMsgNode(final String feHost, Boolean isStandAlone) throws xMsgException, SocketException {
+
+        super(feHost);
+
+        // Zmq context
+        final ZContext _context = new ZContext();
+        try {
+
+            // Start local registrar service in a separate thread.
+            // In this case this specific constructor starts a thread
+            // that periodically updates front-end registrar database with
+            // the data from the local databases
+            final Thread _registrationThread = new xMsgRegistrar(feHost, _context);
+            _registrationThread.start();
+
+            System.out.println(xMsgUtil.currentTime(4) +
+                    " Info: xMsg local registration and discovery server is started");
+
+            // Shutdown hook, thread that will run jvm before exiting
+            Runtime.getRuntime().addShutdownHook(new Thread(){
+                @Override
+                public void run() {
+                    super.run();
+                    System.out.println(xMsgUtil.currentTime(4) +
+                            " Info: Shutting down xMsg local registration and discovery server");
+                    _registrationThread.interrupt();
+
+                    // Tell front-end registration server to remove all actors from this host
+                    try {
+                        removeAllRegistration_fe(feHost,xMsgConstants.UNDEFINED.getStringValue());
+                    } catch (xMsgRegistrationException e) {
+                        System.out.println(e.getMessage());
+                        _context.close();
+                        System.out.println("bye...");
+                    }
+                    _context.close();
+                    System.out.println("bye...");
+                }
+            });
+
+            if(isStandAlone) {
+                // Starting the xMsg proxy on a local host
+                startProxy(_context);
+            } else {
+                Thread t1 = new Thread(new Runnable() {
+                    public void run() {
+                        // Starting the xMsg proxy on a local host
+                        try {
+                            startProxy(_context);
+                        } catch (xMsgException e) {
+                            e.printStackTrace();
+                        }
+                    }
+                });
+                t1.start();
+            }
+
+        } catch (xMsgException e) {
+            System.out.println(e.getMessage());
+            _context.destroy();
+        }
+    }
+
+    /**
+     * <p>
      *     Starts the proxy server of the xMsgNode on a local host
      * </p>
      * @param _context zeroMQ context object
@@ -176,15 +313,17 @@ public class xMsgNode extends xMsgRegDiscDriver {
     public static void main(String[] args) {
 
         if(args.length == 2){
-            if (args[0].equals("-h")){
+            if (args[0].equals("-fe_host")){
                 try {
                     new xMsgNode(args[1]);
                 } catch (xMsgException e) {
                     System.out.println(e.getMessage());
                     System.out.println("exiting...");
+                } catch (SocketException e) {
+                    e.printStackTrace();
                 }
             } else {
-                System.out.println("wrong option. Accepts -h option only.");
+                System.out.println("wrong option. Accepts -fe_host option only.");
             }
         } else if(args.length == 0){
             try {
@@ -192,6 +331,8 @@ public class xMsgNode extends xMsgRegDiscDriver {
             } catch (xMsgException e) {
                 System.out.println(e.getMessage());
                 System.out.println("exiting...");
+            } catch (SocketException e) {
+                e.printStackTrace();
             }
         }
     }

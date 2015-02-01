@@ -3,6 +3,8 @@ package org.jlab.coda.xmsg.net;
 import org.jlab.coda.xmsg.core.xMsgConstants;
 import org.jlab.coda.xmsg.excp.xMsgException;
 
+import java.net.SocketException;
+
 import static org.jlab.coda.xmsg.core.xMsgUtil.host_to_ip;
 
 /**
@@ -31,7 +33,7 @@ public class xMsgAddress {
      * @param host name
      * @throws xMsgException
      */
-    public xMsgAddress(String host) throws xMsgException {
+    public xMsgAddress(String host) throws xMsgException, SocketException {
         this.host = host_to_ip(host);
         key = this.host+":"+this.port;
     }
@@ -45,7 +47,7 @@ public class xMsgAddress {
      * @param port port number
      * @throws xMsgException
      */
-    public xMsgAddress(String host, int port) throws xMsgException {
+    public xMsgAddress(String host, int port) throws xMsgException, SocketException {
         this.host = host_to_ip(host);
         this.port = port;
         key = this.host+":"+this.port;

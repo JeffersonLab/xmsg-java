@@ -13,6 +13,7 @@ import org.zeromq.ZMQ;
 import org.zeromq.ZMQ.Socket;
 import org.zeromq.ZMsg;
 
+import java.net.SocketException;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -55,7 +56,7 @@ public class xMsgRegDiscDriver {
      * @param feHost front-end host name
      * @throws xMsgException
      */
-    public xMsgRegDiscDriver(String feHost) throws xMsgException {
+    public xMsgRegDiscDriver(String feHost) throws xMsgException, SocketException {
 
         _context = new ZContext();
 
@@ -110,7 +111,6 @@ public class xMsgRegDiscDriver {
         // Data serialization
         if(data.isInitialized()) {
             dt = data.toByteArray(); // serialize data object
-            if (dt == null) throw new xMsgRegistrationException("null serialization: data");
         } else throw new xMsgRegistrationException("some of the data object required fields are not set.");
 
         // Send topic, sender, followed by the data
@@ -134,6 +134,7 @@ public class xMsgRegDiscDriver {
         ZMQ.PollItem items[] = {new ZMQ.PollItem(_connectionSocket, ZMQ.Poller.POLLIN)};
 
         int rc = ZMQ.poll(items, xMsgConstants.REGISTER_REQUEST_TIMEOUT.getIntValue());
+
 
         if (rc != -1 && items[0].isReadable()) {
             //Server responded. It is alive
@@ -162,6 +163,8 @@ public class xMsgRegDiscDriver {
             if (!s_data.equals(xMsgConstants.SUCCESS.getStringValue())) {
                 throw new xMsgRegistrationException("failed");
             }
+            System.out.println(xMsgUtil.currentTime(2)+" " + name+" successfully registered.");
+
         } else {
             throw new xMsgRegistrationException("xMsg actor registration timeout");
         }
@@ -351,7 +354,6 @@ public class xMsgRegDiscDriver {
         // Data serialization
         if(data.isInitialized()) {
             dt = data.toByteArray(); // serialize data object
-            if (dt == null) throw new xMsgDiscoverException("null serialization: data");
         } else throw new xMsgDiscoverException("some of the data object required fields are not set.");
 
         // Send topic, sender, followed by the data

@@ -5,6 +5,8 @@ import org.jlab.coda.xmsg.xsys.regdis.xMsgRegistrar;
 import org.jlab.coda.xmsg.core.xMsgUtil;
 import org.zeromq.ZContext;
 
+import java.net.SocketException;
+
 
 /**
  * <p>
@@ -32,6 +34,8 @@ public class xMsgFE {
         try {
             fe._registrationThread = new xMsgRegistrar(fe.context);
         } catch (xMsgException e) {
+            e.printStackTrace();
+        } catch (SocketException e) {
             e.printStackTrace();
         }
         fe._registrationThread.start();

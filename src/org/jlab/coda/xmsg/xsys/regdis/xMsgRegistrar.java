@@ -10,6 +10,7 @@ import org.zeromq.ZFrame;
 import org.zeromq.ZMQ;
 import org.zeromq.ZMsg;
 
+import java.net.SocketException;
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 
@@ -61,7 +62,7 @@ public class xMsgRegistrar extends Thread {
     // Used as a prefix to the name of this registrar.
     // The name of the registrar is used to set the sender field
     // when it creates a request message to be sent to the requester.
-    private String localhost_ip = xMsgUtil.host_to_ip("localhost");
+    private String localhost_ip;
 
     /**
      * <p>
@@ -70,8 +71,9 @@ public class xMsgRegistrar extends Thread {
      * @param context zmq context
      * @throws xMsgException
      */
-    public xMsgRegistrar(ZContext context) throws xMsgException {
+    public xMsgRegistrar(ZContext context) throws xMsgException, SocketException {
         this.context = context;
+        localhost_ip = xMsgUtil.host_to_ip("localhost");
     }
 
     /**
@@ -89,8 +91,9 @@ public class xMsgRegistrar extends Thread {
      * @param context zmq context
      * @throws xMsgException
      */
-    public xMsgRegistrar(String feHost, ZContext context) throws xMsgException {
+    public xMsgRegistrar(String feHost, ZContext context) throws xMsgException, SocketException {
         this.context = context;
+        localhost_ip = xMsgUtil.host_to_ip("localhost");
 
         /**
          * Start a thread with periodic process (hard-coded 5 sec. interval) that
@@ -131,7 +134,7 @@ public class xMsgRegistrar extends Thread {
              * </ul>
              */
             if (request.size() != 3) {
-                System.out.println(xMsgUtil.currentTime(4) +
+                System.out.println(xMsgUtil.currentTime(2) +
                         "  Warning: xMsg message format violation...");
                 request.destroy();
                 continue;
@@ -145,8 +148,9 @@ public class xMsgRegistrar extends Thread {
             // De-serialize topic and sender fields
             String s_topic = new String(r_topic.getData(), ZMQ.CHARSET);
             String s_sender = new String(r_sender.getData(), ZMQ.CHARSET);
-            System.out.println(xMsgUtil.currentTime(4) +
-                    " Received a request from " + s_sender + " to " + s_topic);
+
+//            System.out.println(xMsgUtil.currentTime(2) +
+//                    " Received a request from " + s_sender + " to " + s_topic);
 
             ZFrame r_data = request.pop(); // get serialize data
 
@@ -265,7 +269,6 @@ public class xMsgRegistrar extends Thread {
             } catch (InvalidProtocolBufferException | xMsgException e) {
                 System.out.println(xMsgUtil.currentTime(4) + " " + e.getMessage());
             }
-
         }
         reg_socket.close();
     }
@@ -298,28 +301,28 @@ public class xMsgRegistrar extends Thread {
         }
 
         Set<xMsgRegistrationData> result = new HashSet<>();
-
         if(isPublisher) {
             for (String k : publishers_db.keySet()) {
                 if((xMsgUtil.getTopicDomain(k).equals(domain)) &&
                         (xMsgUtil.getTopicSubject(k).equals(subject) ||
                                 subject.equals("*") ||
-                                subject.equals(xMsgConstants.UNDEFINED.name())) &&
+                                subject.equals(xMsgConstants.UNDEFINED.getStringValue())) &&
                 (xMsgUtil.getTopicType(k).equals(type) ||
                         type.equals("*") ||
-                        type.equals(xMsgConstants.UNDEFINED.name()))) {
+                        type.equals(xMsgConstants.UNDEFINED.getStringValue()))) {
                     result.add(publishers_db.get(k));
                 }
             }
         } else {
             for (String k : subscribers_db.keySet()) {
+
                 if((xMsgUtil.getTopicDomain(k).equals(domain)) &&
                         (xMsgUtil.getTopicSubject(k).equals(subject) ||
                                 subject.equals("*") ||
-                                subject.equals(xMsgConstants.UNDEFINED.name())) &&
+                                subject.equals(xMsgConstants.UNDEFINED.getStringValue())) &&
                         (xMsgUtil.getTopicType(k).equals(type) ||
                                 type.equals("*") ||
-                                type.equals(xMsgConstants.UNDEFINED.name()))) {
+                                type.equals(xMsgConstants.UNDEFINED.getStringValue()))) {
                     result.add(subscribers_db.get(k));
                 }
             }

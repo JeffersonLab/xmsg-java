@@ -5,6 +5,7 @@ import org.jlab.coda.xmsg.excp.xMsgException;
 import org.jlab.coda.xmsg.excp.xMsgRegistrationException;
 import org.jlab.coda.xmsg.core.xMsgUtil;
 
+import java.net.SocketException;
 import java.util.concurrent.ConcurrentHashMap;
 
 
@@ -53,7 +54,7 @@ public class xMsgFeRegT extends xMsgRegDiscDriver implements Runnable {
     public xMsgFeRegT(String feHost,
                      ConcurrentHashMap<String, xMsgRegistrationData> publishers_db,
                      ConcurrentHashMap<String, xMsgRegistrationData> subscribers_db
-    ) throws xMsgException {
+    ) throws xMsgException, SocketException {
         super(feHost);
         this.publishers_db = publishers_db;
         this.subscribers_db = subscribers_db;

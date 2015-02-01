@@ -89,7 +89,7 @@
   <property name="project.jdk.bin" value="${jdk.bin.1.7}"/>
   <property name="project.jdk.classpath" value="jdk.classpath.1.7"/>
 
-  <property name="global.jar.location" value="${env.COMMON_JARS}"/>
+  <property name="global.jar.location" value="${env.CLARA_JARS}"/>
 
   
   <!-- Project Libraries -->
@@ -143,8 +143,7 @@
     <pathelement location="${xmsg-1.0.output.dir}"/>
     <path refid="library.lib.classpath"/>
   </path>
-  
-  
+
   <patternset id="excluded.from.module.xmsg-1.0">
     <patternset refid="ignored.files"/>
   </patternset>
@@ -158,8 +157,7 @@
       <include name="src"/>
     </dirset>
   </path>
-  
-  
+
   <target name="compile.module.xmsg-1.0" depends="compile.module.xmsg-1.0.production" description="Compile module xMsg-1.0"/>
 
   <target name="compile.module.xmsg-1.0.production" description="Compile module xMsg-1.0; production classes">
@@ -186,6 +184,10 @@
     <delete dir="${xmsg-1.0.testoutput.dir}"/>
   </target>
 
+  <target name="delete.jar" description="delete clara jar in a global location">
+    <delete file="${global.jar.location}/xMsg-1.0.jar"/>
+  </target>
+
   <target name="copy.jar" description="copy xMsg jar to a global location">
     <copy file="${basedir}/lib/xMsg-1.0.jar" todir="${global.jar.location}"/>
   </target>
@@ -198,7 +200,7 @@
     <!-- Perform any build initialization in this target -->
   </target>
   
-  <target name="clean" depends="clean.module.xmsg-1.0" description="cleanup all"/>
+  <target name="clean" depends="delete.jar, clean.module.xmsg-1.0" description="cleanup all"/>
   
   <target name="build.modules" depends="init, clean, compile.module.xmsg-1.0" description="build all modules"/>
   

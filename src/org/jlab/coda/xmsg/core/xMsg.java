@@ -13,6 +13,7 @@ import org.zeromq.ZMQ;
 import org.zeromq.ZMQ.Socket;
 import org.zeromq.ZMsg;
 
+import java.net.SocketException;
 import java.util.HashMap;
 import java.util.List;
 import java.util.concurrent.ExecutorService;
@@ -66,7 +67,7 @@ public class xMsg {
      * @param feHost host name of the FE
      * @throws xMsgException
      */
-    public xMsg(String feHost) throws xMsgException {
+    public xMsg(String feHost) throws xMsgException, SocketException {
         /**
          * <p>
          *     Calls xMsgRegDiscDriver class constructor that creates sockets to
@@ -91,7 +92,7 @@ public class xMsg {
      * @param pool_size thread pool size for servicing subscription callbacks
      * @throws xMsgException
      */
-    public xMsg(String feHost, int pool_size) throws xMsgException {
+    public xMsg(String feHost, int pool_size) throws xMsgException, SocketException {
         /**
          * <p>
          *     Calls xMsgRegDiscDriver class constructor that creates sockets to
@@ -119,7 +120,7 @@ public class xMsg {
      * @return {@link org.jlab.coda.xmsg.net.xMsgConnection} object
      * @throws xMsgException
      */
-    public xMsgConnection connect() throws xMsgException {
+    public xMsgConnection connect() throws xMsgException, SocketException {
         return connect(new xMsgAddress("localhost"));
     }
 
@@ -134,7 +135,7 @@ public class xMsg {
      * @return {@link org.jlab.coda.xmsg.net.xMsgConnection} object
      * @throws xMsgException
      */
-    public xMsgConnection connect(String host) throws xMsgException {
+    public xMsgConnection connect(String host) throws xMsgException, SocketException {
         return connect(new xMsgAddress(host));
     }
 
@@ -150,7 +151,7 @@ public class xMsg {
      * @return {@link org.jlab.coda.xmsg.net.xMsgConnection} object
      * @throws xMsgException\
      */
-    public xMsgConnection connect(String host, int port) throws xMsgException {
+    public xMsgConnection connect(String host, int port) throws xMsgException, SocketException {
         return connect(new xMsgAddress(host, port));
     }
 
@@ -294,6 +295,7 @@ public class xMsg {
      * @param domain domain of the xMsg subscription
      * @param subject subject of the subscription
      * @param type type of the subscription
+     * @param description description
      * @throws xMsgRegistrationException
      */
     public void registerSubscriber(String name,
@@ -301,7 +303,8 @@ public class xMsg {
                                    int port,
                                    String domain,
                                    String subject,
-                                   String type)
+                                   String type,
+                                   String description)
             throws xMsgRegistrationException {
         xMsgRegistrationData.Builder regb= xMsgRegistrationData.newBuilder();
         regb.setName(name);
@@ -311,6 +314,7 @@ public class xMsg {
         regb.setSubject(subject);
         regb.setType(type);
         regb.setOwnerType(xMsgRegistrationData.OwnerType.SUBSCRIBER);
+        regb.setDescription(description);
         xMsgRegistrationData r_data = regb.build();
         driver.register_local(name, r_data, false);
     }
@@ -329,15 +333,19 @@ public class xMsg {
      * @param domain domain of the xMsg subscription
      * @param subject subject of the subscription
      * @param type type of the subscription
+     * @param description description
      * @throws xMsgRegistrationException
      */
     public void registerSubscriber(String name,
                                    String domain,
                                    String subject,
-                                   String type)
+                                   String type,
+                                   String description)
             throws xMsgRegistrationException {
-        registerSubscriber(name, "localhost", xMsgConstants.DEFAULT_PORT.getIntValue(),
-                domain, subject, type);
+        registerSubscriber(name,
+                "localhost",
+                xMsgConstants.DEFAULT_PORT.getIntValue(),
+                domain, subject, type, description);
     }
 
     /**
@@ -408,7 +416,7 @@ public class xMsg {
      * @param domain domain of the xMsg subscription
      * @param subject subject of the subscription
      * @param type type of the subscription
-     * @return list of {@link org.jlab.coda.xmsg.data.xMsgR.xMsgRegistrationData} objects
+     * @return list of {@link xMsgRegistrationData} objects
      * @throws xMsgDiscoverException
      */
     public List<xMsgRegistrationData> findLocalPublishers(String name,
@@ -445,7 +453,7 @@ public class xMsg {
      * @param domain domain of the xMsg subscription
      * @param subject subject of the subscription
      * @param type type of the subscription
-     * @return list of {@link org.jlab.coda.xmsg.data.xMsgR.xMsgRegistrationData} objects
+     * @return list of {@link xMsgRegistrationData} objects
      * @throws xMsgDiscoverException
      */
     public List<xMsgRegistrationData> findLocalPublishers(String name,
@@ -837,37 +845,19 @@ public class xMsg {
 
     /**
      * <p>
-     *     Publishes data to a specified xMsg topic. 3 elements are defining xMsg topic:
-     *     <ul>
-     *         <li>domain</li>
-     *         <li>subject</li>
-     *         <li>type</li>
-     *     </ul>
-     *     Topic is constructed from these elements separated by <b>:</b>
-     *     Domain is required , however subject and topic can be set to <b>*</b>.
-     *     If subject is set * type will be ignored. Here are examples of
-     *     accepted topic definitions:<br>
-     *         domain:*:* <br>
-     *         domain:subject:*<br>
-     *         domain:subject:type<br>
+     *     Publishes data to a specified xMsg topic.
      *     This method will perform input data, i.e. xMsgData object serialization.
      * </p>
      * @param connection xMsgConnection object.
-     * @param domain domain of the topic
-     * @param subject subject of the topic
-     * @param type type of the topic
-     * @param publisherName the name of the publisher/sender. Required according to
-     *             the xMsg zmq message structure definition. (topic, sender, data)
-     * @param data String object
+     * @param topic topic of the communication
+     * @param d data object
      * @throws xMsgPublishingException
      */
-    public void publish_str(xMsgConnection connection,
-                            String domain,
-                            String subject,
-                            String type,
-                            String publisherName,
-                            String data)
+    public void publish(xMsgConnection connection,
+                        String topic,
+                        Object d)
             throws xMsgException {
+
 
         // check connection
         Socket con = connection.getPubSock();
@@ -876,19 +866,28 @@ public class xMsg {
         // byte array for holding the serialized data object
         byte[] dt;
 
-        // build a topic
-        String topic = xMsgUtil.buildTopic(domain, subject, type);
-
-
         // send topic, sender, followed by the data
         ZMsg msg = new ZMsg();
         msg.addString(topic);
-        msg.addString(publisherName);
 
-        if(data!=null) {
+        if(d instanceof xMsgD.Data.Builder) {
+            msg.addString(xMsgConstants.ENVELOPE_DATA_TYPE_XMSGDATA.getStringValue());
+            xMsgD.Data data = ((xMsgD.Data.Builder) d).build();
+
+                // data serialization
+                if (data.isInitialized()) {
+                    dt = data.toByteArray(); // serialize data object
+                } else throw new xMsgPublishingException("some of the data object " +
+                        "required fields are not set.");
+                msg.add(dt);
+
+        } else if(d instanceof String) {
+            String data = (String)d;
+            msg.addString(xMsgConstants.ENVELOPE_DATA_TYPE_STRING.getStringValue());
             msg.add(data);
+        } else {
+            throw new xMsgPublishingException("unsupported data type");
         }
-
         if (!msg.send(con))throw new xMsgPublishingException("error publishing the message");
         msg.destroy();
     }
@@ -914,18 +913,16 @@ public class xMsg {
      * @param domain domain of the topic
      * @param subject subject of the topic
      * @param type type of the topic
-     * @param publisherName the name of the publisher/sender. Required according to
-     *             the xMsg zmq message structure definition. (topic, sender, data)
-     * @param data {@link org.jlab.coda.xmsg.data.xMsgD.Data} object
+     * @param d data object
      * @throws xMsgPublishingException
      */
-    private void _publish(xMsgConnection connection,
-                          String domain,
-                          String subject,
-                          String type,
-                          String publisherName,
-                          xMsgD.Data data)
+    public void publish(xMsgConnection connection,
+                        String domain,
+                        String subject,
+                        String type,
+                        Object d)
             throws xMsgException {
+
 
         // check connection
         Socket con = connection.getPubSock();
@@ -937,21 +934,28 @@ public class xMsg {
         // build a topic
         String topic = xMsgUtil.buildTopic(domain, subject, type);
 
-
         // send topic, sender, followed by the data
         ZMsg msg = new ZMsg();
         msg.addString(topic);
-        msg.addString(publisherName);
 
-        if(data!=null) {
-            // data serialization
-            if (data.isInitialized()) {
-                dt = data.toByteArray(); // serialize data object
-            } else throw new xMsgPublishingException("some of the data object " +
-                    "required fields are not set.");
-            msg.add(dt);
+        if(d instanceof xMsgD.Data.Builder) {
+            msg.addString(xMsgConstants.ENVELOPE_DATA_TYPE_XMSGDATA.getStringValue());
+            xMsgD.Data data = ((xMsgD.Data.Builder) d).build();
+
+                // data serialization
+                if (data.isInitialized()) {
+                    dt = data.toByteArray(); // serialize data object
+                } else throw new xMsgPublishingException("some of the data object " +
+                        "required fields are not set.");
+                msg.add(dt);
+
+        } else if(d instanceof String) {
+            String data = (String)d;
+            msg.addString(xMsgConstants.ENVELOPE_DATA_TYPE_STRING.getStringValue());
+            msg.add(data);
+        } else {
+            throw new xMsgPublishingException("unsupported data type");
         }
-
         if (!msg.send(con))throw new xMsgPublishingException("error publishing the message");
         msg.destroy();
     }
@@ -978,29 +982,16 @@ public class xMsg {
      * @throws xMsgPublishingException
      */
     public void publish(xMsgConnection connection, xMsgMessage msg) throws xMsgException {
-        _publish(connection,
+        publish(connection,
                 msg.getDomain(),
                 msg.getSubject(),
                 msg.getType(),
-                msg.getAuthor(),
                 msg.getData());
     }
 
     /**
      * <p>
-     *     Subscribes to a specified xMsg topic. 3 elements are defining xMsg topic:
-     *     <ul>
-     *         <li>domain</li>
-     *         <li>subject</li>
-     *         <li>type</li>
-     *     </ul>
-     *     Topic is constructed from these elements separated by <b>:</b>
-     *     Domain is required , however subject and topic can be set to <b>*</b>.
-     *     If subject is set * type will be ignored. Here are examples of
-     *     accepted topic definitions:<br>
-     *         domain:*:* <br>
-     *         domain:subject:*<br>
-     *         domain:subject:type<br>
+     *     Subscribes to a specified xMsg topic.
      *     Supplied user callback object must implement xMsgCallBack interface.
      *     This method will de-serialize received xMsgData object and pass it
      *     to the user implemented callback method of thee interface.
@@ -1008,97 +999,66 @@ public class xMsg {
      *     utilize private thread pool to run user callback method in a separate thread.
      * </p>
      * @param connection socket to a xMsgNode proxy output port.
-     * @param domain domain of the topic
-     * @param subject subject of the topic
-     * @param type type of the topic
-     * @param cb {@link xMsgCallBack} implemented object reference
-     * @param isSync if set to true method will block until subscription method is
-     *               received and user callback method is returned
-     */
-    public void subscribe(final xMsgConnection connection,
-                          final String domain,
-                          final String subject,
-                          final String type,
-                          final xMsgCallBack cb,
-                          final boolean isSync) {
-        try {
-            _subscribe(connection, domain, subject, type, cb, isSync);
-        } catch (xMsgException e) {
-            e.printStackTrace();
-        }
-    }
-
-    /**
-     * <p>
-     *     Subscribes to a specified xMsg topic. 3 elements are defining xMsg topic:
-     *     <ul>
-     *         <li>domain</li>
-     *         <li>subject</li>
-     *         <li>type</li>
-     *     </ul>
-     *     Topic is constructed from these elements separated by <b>:</b>
-     *     Domain is required , however subject and topic can be set to <b>*</b>.
-     *     If subject is set * type will be ignored. Here are examples of
-     *     accepted topic definitions:<br>
-     *         domain:*:* <br>
-     *         domain:subject:*<br>
-     *         domain:subject:type<br>
-     *     Supplied user callback object must implement xMsgCallBack interface.
-     *     In the case isSync input parameter is set to be false the method will
-     *     utilize private thread pool to run user callback method in a separate thread.
-     * </p>
-     * @param connection socket to a xMsgNode proxy output port.
-     * @param domain domain of the topic
-     * @param subject subject of the topic
-     * @param type type of the topic
+     * @param topic topic of the subscription
      * @param cb {@link xMsgCallBack} implemented object reference
      * @param isSync if set to true method will block until subscription method is
      *               received and user callback method is returned
      * @throws xMsgSubscribingException
      */
-    public void subscribe_str(xMsgConnection connection,
-                              String domain,
-                              String subject,
-                              String type,
-                              final xMsgCallBack cb,
-                              boolean isSync)
+    public void subscribe(xMsgConnection connection,
+                            String topic,
+                            final xMsgCallBack cb,
+                            boolean isSync)
             throws xMsgException {
 
         // check connection
         Socket con = connection.getSubSock();
         if (con==null) throw new xMsgSubscribingException("null connection object");
 
-        // subscribe the topic
-        String topic = xMsgUtil.buildTopic(domain, subject, type);
         con.subscribe(topic.getBytes(ZMQ.CHARSET));
 
         // wait for messages published to a required topic
         while (!Thread.currentThread().isInterrupted()) {
-
             ZMsg msg = ZMsg.recvMsg(con);
             ZFrame r_topic = msg.pop();
-            ZFrame r_sender = msg.pop();
+            ZFrame r_dataType = msg.pop();
             ZFrame r_data = msg.pop();
 
             // de-serialize received message components
-            String s_topic = new String(r_topic.getData(), ZMQ.CHARSET);
-            String s_sender = new String(r_sender.getData(),ZMQ.CHARSET);
-            String s_data = new String(r_sender.getData(),ZMQ.CHARSET);
+            String ds_topic = new String(r_topic.getData(), ZMQ.CHARSET);
+            String ds_dataType = new String(r_dataType.getData(),ZMQ.CHARSET);
 
-            // cleanup the data
-            r_data.destroy();
+            Object ds_data;
+            if(ds_dataType.equals(xMsgConstants.ENVELOPE_DATA_TYPE_STRING.getStringValue())) {
+                ds_data = new String(r_data.getData(), ZMQ.CHARSET);
+                r_data.destroy();
+            } else {
+
+                // de-serialize passed transient data
+                try {
+                    xMsgD.Data im_data = xMsgD.Data.parseFrom(r_data.getData());
+
+                    // Create a builder object from immutable de-serialized object.
+                    ds_data = xMsgUtil.getPbBuilder(im_data);
+
+                } catch (InvalidProtocolBufferException e) {
+                    throw new xMsgSubscribingException(e.getMessage());
+                }
+                // cleanup the data
+                r_data.destroy();
+            }
 
             // cleanup the rest
             r_topic.destroy();
-            r_sender.destroy();
+            r_dataType.destroy();
             msg.destroy();
 
             // Create a message to be passed to the user callback method
-            final xMsgMessage cb_msg = new xMsgMessage(s_sender,
-                    xMsgUtil.getTopicDomain(s_topic),
-                    xMsgUtil.getTopicSubject(s_topic),
-                    xMsgUtil.getTopicType(s_topic),
-                    s_data);
+            final xMsgMessage cb_msg = new xMsgMessage(ds_dataType,
+                    xMsgUtil.getTopicDomain(ds_topic),
+                    xMsgUtil.getTopicSubject(ds_topic),
+                    xMsgUtil.getTopicType(ds_topic),
+                    ds_data);
 
             // Calling user callback method
             if(isSync){
@@ -1144,7 +1104,7 @@ public class xMsg {
      *               received and user callback method is returned
      * @throws xMsgSubscribingException
      */
-    private void _subscribe(xMsgConnection connection,
+    public void subscribe(xMsgConnection connection,
                             String domain,
                             String subject,
                             String type,
@@ -1165,17 +1125,26 @@ public class xMsg {
 
             ZMsg msg = ZMsg.recvMsg(con);
             ZFrame r_topic = msg.pop();
-            ZFrame r_sender = msg.pop();
+            ZFrame r_dataType = msg.pop();
             ZFrame r_data = msg.pop();
 
             // de-serialize received message components
-            String s_topic = new String(r_topic.getData(), ZMQ.CHARSET);
-            String s_sender = new String(r_sender.getData(),ZMQ.CHARSET);
+            String ds_topic = new String(r_topic.getData(), ZMQ.CHARSET);
+            String ds_dataType = new String(r_dataType.getData(),ZMQ.CHARSET);
 
-            xMsgD.Data s_data = null;
-            if(r_data != null) {
+            Object ds_data;
+            if(ds_dataType.equals(xMsgConstants.ENVELOPE_DATA_TYPE_STRING.getStringValue())) {
+                ds_data = new String(r_data.getData(), ZMQ.CHARSET);
+                r_data.destroy();
+            } else {
+
+                // de-serialize passed transient data
                 try {
-                    s_data = xMsgD.Data.parseFrom(r_data.getData());
+                    xMsgD.Data im_data = xMsgD.Data.parseFrom(r_data.getData());
+
+                    // Create a builder object from immutable de-serialized object.
+                    ds_data = xMsgUtil.getPbBuilder(im_data);
+
                 } catch (InvalidProtocolBufferException e) {
                     throw new xMsgSubscribingException(e.getMessage());
                 }
@@ -1185,15 +1154,15 @@ public class xMsg {
 
             // cleanup the rest
             r_topic.destroy();
-            r_sender.destroy();
+            r_dataType.destroy();
             msg.destroy();
 
             // Create a message to be passed to the user callback method
-            final xMsgMessage cb_msg = new xMsgMessage(s_sender,
-                    xMsgUtil.getTopicDomain(s_topic),
-                    xMsgUtil.getTopicSubject(s_topic),
-                    xMsgUtil.getTopicType(s_topic),
-                    s_data);
+            final xMsgMessage cb_msg = new xMsgMessage(ds_dataType,
+                    xMsgUtil.getTopicDomain(ds_topic),
+                    xMsgUtil.getTopicSubject(ds_topic),
+                    xMsgUtil.getTopicType(ds_topic),
+                    ds_data);
 
             // Calling user callback method
             if(isSync){

@@ -1,5 +1,5 @@
 #!/bin/sh -f
 
-export CLASSPATH="$JXMSG_HOME/lib/*"
+export CLASSPATH="$CLARA_JARS/*"
 
 java  -XX:+UnlockCommercialFeatures -XX:+FlightRecorder org.jlab.coda.xmsg.xsys.xMsgNode

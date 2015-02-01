@@ -33,15 +33,23 @@ public enum xMsgConstants {
     INFO(11,"info"),
     WARNING(12,"warning"),
     ERROR(13,"error"),
+    DONE(14,"done"),
 
-    NO_RESULT(14,"none"),
+    NO_RESULT(15,"none"),
 
-    BIND(11,"bind"),
-    CONNECT(12,"connect"),
+    BIND(16,"bind"),
+    CONNECT(17,"connect"),
 
     DEFAULT_PORT(7771, "defaultPort"),
-    REGISTRAR_PORT(8888, "registrarPort");
+    REGISTRAR_PORT(8888, "registrarPort"),
 
+    // Note: xMsg envelope passed through zmq
+    // consists of three strings:
+    // 1) topic
+    // 2) dataType (accepts two types defined below
+    // 3) actual serialized data
+    ENVELOPE_DATA_TYPE_STRING(18,"string"),
+    ENVELOPE_DATA_TYPE_XMSGDATA(19,"xMsgData");
 
     private int intValue;
     private String stringvalue;

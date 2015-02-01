@@ -1,11 +1,13 @@
 package org.jlab.coda.xmsg.examples;
 
+import org.jlab.coda.xmsg.data.xMsgD;
 import org.jlab.coda.xmsg.excp.xMsgException;
 import org.jlab.coda.xmsg.net.xMsgConnection;
 import org.jlab.coda.xmsg.core.xMsg;
 import org.jlab.coda.xmsg.core.xMsgMessage;
 import org.jlab.coda.xmsg.core.xMsgUtil;
 
+import java.net.SocketException;
 import java.util.Random;
 
 /**
@@ -36,7 +38,7 @@ public class Publisher extends xMsg {
      *
      * @throws org.jlab.coda.xmsg.excp.xMsgException
      */
-    public Publisher() throws xMsgException {
+    public Publisher() throws xMsgException, SocketException {
         super("localhost");
     }
 
@@ -72,6 +74,8 @@ public class Publisher extends xMsg {
             }
 
         } catch (xMsgException e) {
+            e.printStackTrace();
+        } catch (SocketException e) {
             e.printStackTrace();
         }
     }
