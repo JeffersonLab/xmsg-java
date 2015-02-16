@@ -54,9 +54,7 @@ public class Subscriber extends xMsg {
                 xMsgUtil.keepAlive();
 
             }
-        } catch (xMsgException e) {
-            e.printStackTrace();
-        } catch (SocketException e) {
+        } catch (xMsgException | SocketException e) {
             e.printStackTrace();
         }
     }
@@ -64,8 +62,9 @@ public class Subscriber extends xMsg {
     private class MyCallBack implements xMsgCallBack{
 
         @Override
-        public void callback(xMsgMessage msg) {
+        public Object callback(xMsgMessage msg) {
             System.out.println(msg);
+            return msg.getData();
         }
     }
 }

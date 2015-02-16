@@ -923,41 +923,9 @@ public class xMsg {
                         Object d)
             throws xMsgException {
 
-
-        // check connection
-        Socket con = connection.getPubSock();
-        if (con==null) throw new xMsgPublishingException("null connection object");
-
-        // byte array for holding the serialized data object
-        byte[] dt;
-
         // build a topic
         String topic = xMsgUtil.buildTopic(domain, subject, type);
-
-        // send topic, sender, followed by the data
-        ZMsg msg = new ZMsg();
-        msg.addString(topic);
-
-        if(d instanceof xMsgD.Data.Builder) {
-            msg.addString(xMsgConstants.ENVELOPE_DATA_TYPE_XMSGDATA.getStringValue());
-            xMsgD.Data data = ((xMsgD.Data.Builder) d).build();
-
-                // data serialization
-                if (data.isInitialized()) {
-                    dt = data.toByteArray(); // serialize data object
-                } else throw new xMsgPublishingException("some of the data object " +
-                        "required fields are not set.");
-                msg.add(dt);
-
-        } else if(d instanceof String) {
-            String data = (String)d;
-            msg.addString(xMsgConstants.ENVELOPE_DATA_TYPE_STRING.getStringValue());
-            msg.add(data);
-        } else {
-            throw new xMsgPublishingException("unsupported data type");
-        }
-        if (!msg.send(con))throw new xMsgPublishingException("error publishing the message");
-        msg.destroy();
+        publish(connection, topic, d);
     }
 
     /**
@@ -988,6 +956,152 @@ public class xMsg {
                 msg.getType(),
                 msg.getData());
     }
+
+    /**
+     * <p>
+     *     Sync method waits until receiver/subscriber responds back.
+     *     Publishes data to a specified xMsg topic.
+     *     This method will perform input data, i.e. xMsgData object serialization.
+     * </p>
+     * @param connection xMsgConnection object.
+     * @param topic topic of the communication
+     * @param timeOut int in seconds
+     * @param d data object
+     * @throws xMsgException
+     */
+    public Object sync_publish(xMsgConnection connection,
+                        String topic,
+                        Object d,
+                        int timeOut)
+            throws xMsgException {
+
+        // address/topic where the subscriber should send the result
+        String returnAddress = "return:"+ (int) (Math.random() * 100.0);
+
+        // check connection
+        Socket con = connection.getPubSock();
+        if (con==null) throw new xMsgPublishingException("null connection object");
+
+        // byte array for holding the serialized data object
+        byte[] dt;
+
+        // send topic, sender, followed by the data
+        ZMsg msg = new ZMsg();
+        msg.addString(topic);
+
+        if(d instanceof xMsgD.Data.Builder) {
+            msg.addString(xMsgConstants.ENVELOPE_DATA_TYPE_XMSGDATA.getStringValue());
+            xMsgD.Data data = ((xMsgD.Data.Builder) d).build();
+
+                // data serialization
+                if (data.isInitialized()) {
+                    dt = data.toByteArray(); // serialize data object
+                } else throw new xMsgPublishingException("some of the data object " +
+                        "required fields are not set.");
+                msg.add(dt);
+
+        } else if(d instanceof String) {
+            String data = (String)d;
+            msg.addString(xMsgConstants.ENVELOPE_DATA_TYPE_STRING.getStringValue());
+            msg.add(data);
+        } else {
+            throw new xMsgPublishingException("unsupported data type");
+        }
+        msg.addString(returnAddress);
+        if (!msg.send(con))throw new xMsgPublishingException("error publishing the message");
+        msg.destroy();
+
+        // now subscribe to the returnAddress
+        SyncSendCallBack cb = new SyncSendCallBack();
+        subscribe(connection, returnAddress, cb, true);
+
+        int to = 0;
+
+        // Wait until result is received from the
+        // subscriber or time out has been reached.
+        while(!cb.isReceived){
+            if(to>=timeOut) break;
+            xMsgUtil.sleep(1000);
+            to = to+1;
+        }
+        return cb.s_data;
+
+    }
+
+    /**
+     * <p>
+     *     Sync method waits until receiver/subscriber responds back.
+     *     Publishes data to a specified xMsg topic. 3 elements are defining xMsg topic:
+     *     <ul>
+     *         <li>domain</li>
+     *         <li>subject</li>
+     *         <li>type</li>
+     *     </ul>
+     *     Topic is constructed from these elements separated by <b>:</b>
+     *     Domain is required , however subject and topic can be set to <b>*</b>.
+     *     If subject is set * type will be ignored. Here are examples of
+     *     accepted topic definitions:<br>
+     *         domain:*:* <br>
+     *         domain:subject:*<br>
+     *         domain:subject:type<br>
+     *     This method will perform input data, i.e. xMsgData object serialization.
+     * </p>
+     * @param connection xMsgConnection object.
+     * @param domain domain of the topic
+     * @param subject subject of the topic
+     * @param type type of the topic
+     * @param timeOut int in seconds
+     * @param d data object
+     * @throws xMsgPublishingException
+     */
+    public Object sync_publish(xMsgConnection connection,
+                        String domain,
+                        String subject,
+                        String type,
+                        Object d,
+                        int timeOut)
+            throws xMsgException {
+
+        // build a topic
+        String topic = xMsgUtil.buildTopic(domain, subject, type);
+        return  sync_publish(connection, topic, d, timeOut);
+    }
+
+    /**
+     * <p>
+     *     Sync method waits until receiver/subscriber responds back.
+     *     Publishes data to a specified xMsg topic. 3 elements are defining xMsg topic:
+     *     <ul>
+     *         <li>domain</li>
+     *         <li>subject</li>
+     *         <li>type</li>
+     *     </ul>
+     *     Topic is constructed from these elements separated by <b>:</b>
+     *     Domain is required , however subject and topic can be set to <b>*</b>.
+     *     If subject is set * type will be ignored. Here are examples of
+     *     accepted topic definitions:<br>
+     *         domain:*:* <br>
+     *         domain:subject:*<br>
+     *         domain:subject:type<br>
+     *     This method will perform input data, i.e. xMsgData object serialization.
+     * </p>
+     * @param connection xMsgConnection object.
+     * @param msg {@link xMsgMessage} object
+     * @param timeOut int in seconds
+     * @throws xMsgException
+     */
+    public Object sync_publish(xMsgConnection connection,
+                             xMsgMessage msg,
+                             int timeOut)
+            throws xMsgException {
+        return sync_publish(connection,
+                msg.getDomain(),
+                msg.getSubject(),
+                msg.getType(),
+                msg.getData(),
+                timeOut);
+    }
+
 
     /**
      * <p>
@@ -1023,6 +1137,15 @@ public class xMsg {
             ZFrame r_topic = msg.pop();
             ZFrame r_dataType = msg.pop();
             ZFrame r_data = msg.pop();
+
+            // Check to see if this is a sync request
+            // Note for the sync request xMsg envelope has 4 components:
+            // topic, dataType, data, sync_return_address
+            String syncReturnAddress = xMsgConstants.UNDEFINED.getStringValue();
+            if(!msg.isEmpty()){
+                ZFrame r_addr = msg.pop();
+                syncReturnAddress = new String(r_addr.getData(), ZMQ.CHARSET);
+            }
 
             // de-serialize received message components
             String ds_topic = new String(r_topic.getData(), ZMQ.CHARSET);
@@ -1062,7 +1185,11 @@ public class xMsg {
 
             // Calling user callback method
             if(isSync){
-                cb.callback(cb_msg);
+                Object rd = cb.callback(cb_msg);
+                // if it is sync send back to the result
+                if(!syncReturnAddress.equals(xMsgConstants.UNDEFINED.getStringValue())){
+                    publish(connection, syncReturnAddress,rd);
+                }
             } else {
                 threadPool.submit(new Runnable() {
                                       public void run() {
@@ -1112,70 +1239,8 @@ public class xMsg {
                             boolean isSync)
             throws xMsgException {
 
-        // check connection
-        Socket con = connection.getSubSock();
-        if (con==null) throw new xMsgSubscribingException("null connection object");
-
-        // subscribe the topic
         String topic = xMsgUtil.buildTopic(domain, subject, type);
-        con.subscribe(topic.getBytes(ZMQ.CHARSET));
-
-        // wait for messages published to a required topic
-        while (!Thread.currentThread().isInterrupted()) {
-
-            ZMsg msg = ZMsg.recvMsg(con);
-            ZFrame r_topic = msg.pop();
-            ZFrame r_dataType = msg.pop();
-            ZFrame r_data = msg.pop();
-
-            // de-serialize received message components
-            String ds_topic = new String(r_topic.getData(), ZMQ.CHARSET);
-            String ds_dataType = new String(r_dataType.getData(),ZMQ.CHARSET);
-
-            Object ds_data;
-            if(ds_dataType.equals(xMsgConstants.ENVELOPE_DATA_TYPE_STRING.getStringValue())) {
-                ds_data = new String(r_data.getData(), ZMQ.CHARSET);
-                r_data.destroy();
-            } else {
-
-                // de-serialize passed transient data
-                try {
-                    xMsgD.Data im_data = xMsgD.Data.parseFrom(r_data.getData());
-
-                    // Create a builder object from immutable de-serialized object.
-                    ds_data = xMsgUtil.getPbBuilder(im_data);
-
-                } catch (InvalidProtocolBufferException e) {
-                    throw new xMsgSubscribingException(e.getMessage());
-                }
-                // cleanup the data
-                r_data.destroy();
-            }
-
-            // cleanup the rest
-            r_topic.destroy();
-            r_dataType.destroy();
-            msg.destroy();
-
-            // Create a message to be passed to the user callback method
-            final xMsgMessage cb_msg = new xMsgMessage(ds_dataType,
-                    xMsgUtil.getTopicDomain(ds_topic),
-                    xMsgUtil.getTopicSubject(ds_topic),
-                    xMsgUtil.getTopicType(ds_topic),
-                    ds_data);
-
-            // Calling user callback method
-            if(isSync){
-                cb.callback(cb_msg);
-            } else {
-                threadPool.submit(new Runnable() {
-                                      public void run() {
-                                          cb.callback(cb_msg);
-                                      }
-                                  }
-                );
-            }
-        }
+        subscribe(connection, topic, cb, isSync);
     }
 
     /**
@@ -1186,6 +1251,27 @@ public class xMsg {
      */
     public int getPool_size() {
         return pool_size;
+    }
+
+    /**
+     * <p>
+     *     Private inner class used to organize
+     *     sync send/publish communications
+     * </p>
+     */
+    private class SyncSendCallBack implements xMsgCallBack {
+
+        public Object s_data = null;
+        public Boolean isReceived  =false;
+
+        @Override
+        public Object callback(xMsgMessage msg) {
+            isReceived = true;
+            s_data = msg.getData();
+            return s_data;
+        }
+
+
     }
 
 }
