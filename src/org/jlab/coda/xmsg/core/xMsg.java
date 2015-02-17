@@ -1245,6 +1245,47 @@ public class xMsg {
 
     /**
      * <p>
+     *     Un-subscribes a specific topic
+     * </p>
+     * @param connection socket to a xMsgNode proxy output port.
+     * @param topic topic to un-subscribe
+     * @throws xMsgSubscribingException
+     */
+    public void unsubscribe(xMsgConnection connection,
+                          String topic)
+            throws xMsgSubscribingException {
+        // check connection
+        Socket con = connection.getSubSock();
+        if (con==null) throw new xMsgSubscribingException("null connection object");
+
+        con.unsubscribe(topic.getBytes(ZMQ.CHARSET));
+    }
+
+    /**
+     * <p>
+     *     Un-subscribes a specific topic
+     * </p>
+     * @param connection socket to a xMsgNode proxy output port.
+     * @param domain domain of the topic
+     * @param subject subject of the topic
+     * @param type type of the topic
+     * @throws xMsgSubscribingException
+     */
+    public void unsubscribe(xMsgConnection connection,
+                          String domain,
+                          String subject,
+                          String type)
+            throws xMsgException {
+        // check connection
+        Socket con = connection.getSubSock();
+        if (con==null) throw new xMsgSubscribingException("null connection object");
+
+        String topic = xMsgUtil.buildTopic(domain, subject, type);
+        con.unsubscribe(topic.getBytes(ZMQ.CHARSET));
+    }
+
+    /**
+     * <p>
      *     Returns internal thread pool size
      * </p>
      * @return size of the thread pool
