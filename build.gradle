@@ -1,0 +1,66 @@
+apply plugin: 'java'
+apply plugin: 'maven'
+
+apply plugin: 'eclipse'
+apply plugin: 'idea'
+
+eclipse {
+    classpath {
+        defaultOutputDir = file("${buildDir}/eclipse-classes")
+    }
+}
+
+
+sourceSets {
+    main {
+        java {
+            srcDir 'src'
+        }
+    }
+    test {
+        java {
+            srcDir 'test'
+        }
+    }
+}
+
+
+repositories {
+    mavenCentral()
+    maven {
+        url 'https://oss.sonatype.org/content/repositories/snapshots'
+    }
+}
+
+
+dependencies {
+    compile 'org.zeromq:jeromq:0.3.5-SNAPSHOT'
+    compile 'com.google.protobuf:protobuf-java:2.5.0'
+    compile 'com.google.guava:guava:18.0'
+    testCompile 'junit:junit:4.11'
+}
+
+
+task javadocJar(type: Jar) {
+    classifier = 'javadoc'
+    from javadoc
+}
+
+
+task sourcesJar(type: Jar, dependsOn:classes) {
+    classifier = 'sources'
+    from sourceSets.main.allSource
+}
+
+
+artifacts {
+    archives javadocJar
+    archives sourcesJar
+}
+
+
+group = 'org.jlab.coda'
+archivesBaseName = 'xmsg'
+version = '1.0'
+
+defaultTasks 'build'
