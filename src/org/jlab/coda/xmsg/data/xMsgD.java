@@ -705,9 +705,27 @@ public final class xMsgD {
     com.google.protobuf.ByteString
         getCompositionBytes();
 
-    // optional .Data.ControlAction action = 30;
+    // optional sfixed64 executionTime = 30;
     /**
-     * <code>optional .Data.ControlAction action = 30;</code>
+     * <code>optional sfixed64 executionTime = 30;</code>
+     *
+     * <pre>
+     * Service engine execution time
+     * </pre>
+     */
+    boolean hasExecutionTime();
+    /**
+     * <code>optional sfixed64 executionTime = 30;</code>
+     *
+     * <pre>
+     * Service engine execution time
+     * </pre>
+     */
+    long getExecutionTime();
+
+    // optional .Data.ControlAction action = 31;
+    /**
+     * <code>optional .Data.ControlAction action = 31;</code>
      *
      * <pre>
      * Reserved and used to define which of the CLARA interface
@@ -716,7 +734,7 @@ public final class xMsgD {
      */
     boolean hasAction();
     /**
-     * <code>optional .Data.ControlAction action = 30;</code>
+     * <code>optional .Data.ControlAction action = 31;</code>
      *
      * <pre>
      * Reserved and used to define which of the CLARA interface
@@ -725,9 +743,9 @@ public final class xMsgD {
      */
     xMsgD.Data.ControlAction getAction();
 
-    // optional .Data.SubControlAction controlR = 31;
+    // optional .Data.SubControlAction controlR = 32;
     /**
-     * <code>optional .Data.SubControlAction controlR = 31;</code>
+     * <code>optional .Data.SubControlAction controlR = 32;</code>
      *
      * <pre>
      * Reserved control field
@@ -735,7 +753,7 @@ public final class xMsgD {
      */
     boolean hasControlR();
     /**
-     * <code>optional .Data.SubControlAction controlR = 31;</code>
+     * <code>optional .Data.SubControlAction controlR = 32;</code>
      *
      * <pre>
      * Reserved control field
@@ -1057,24 +1075,29 @@ public final class xMsgD {
               composition_ = input.readBytes();
               break;
             }
-            case 240: {
-              int rawValue = input.readEnum();
-              xMsgD.Data.ControlAction value = xMsgD.Data.ControlAction.valueOf(rawValue);
-              if (value == null) {
-                unknownFields.mergeVarintField(30, rawValue);
-              } else {
-                bitField0_ |= 0x00200000;
-                action_ = value;
-              }
+            case 241: {
+              bitField0_ |= 0x00200000;
+              executionTime_ = input.readSFixed64();
               break;
             }
             case 248: {
               int rawValue = input.readEnum();
-              xMsgD.Data.SubControlAction value = xMsgD.Data.SubControlAction.valueOf(rawValue);
+              xMsgD.Data.ControlAction value = xMsgD.Data.ControlAction.valueOf(rawValue);
               if (value == null) {
                 unknownFields.mergeVarintField(31, rawValue);
               } else {
                 bitField0_ |= 0x00400000;
+                action_ = value;
+              }
+              break;
+            }
+            case 256: {
+              int rawValue = input.readEnum();
+              xMsgD.Data.SubControlAction value = xMsgD.Data.SubControlAction.valueOf(rawValue);
+              if (value == null) {
+                unknownFields.mergeVarintField(32, rawValue);
+              } else {
+                bitField0_ |= 0x00800000;
                 controlR_ = value;
               }
               break;
@@ -2963,11 +2986,35 @@ public final class xMsgD {
       }
     }
 
-    // optional .Data.ControlAction action = 30;
-    public static final int ACTION_FIELD_NUMBER = 30;
+    // optional sfixed64 executionTime = 30;
+    public static final int EXECUTIONTIME_FIELD_NUMBER = 30;
+    private long executionTime_;
+    /**
+     * <code>optional sfixed64 executionTime = 30;</code>
+     *
+     * <pre>
+     * Service engine execution time
+     * </pre>
+     */
+    public boolean hasExecutionTime() {
+      return ((bitField0_ & 0x00200000) == 0x00200000);
+    }
+    /**
+     * <code>optional sfixed64 executionTime = 30;</code>
+     *
+     * <pre>
+     * Service engine execution time
+     * </pre>
+     */
+    public long getExecutionTime() {
+      return executionTime_;
+    }
+
+    // optional .Data.ControlAction action = 31;
+    public static final int ACTION_FIELD_NUMBER = 31;
     private xMsgD.Data.ControlAction action_;
     /**
-     * <code>optional .Data.ControlAction action = 30;</code>
+     * <code>optional .Data.ControlAction action = 31;</code>
      *
      * <pre>
      * Reserved and used to define which of the CLARA interface
@@ -2975,10 +3022,10 @@ public final class xMsgD {
      * </pre>
      */
     public boolean hasAction() {
-      return ((bitField0_ & 0x00200000) == 0x00200000);
+      return ((bitField0_ & 0x00400000) == 0x00400000);
     }
     /**
-     * <code>optional .Data.ControlAction action = 30;</code>
+     * <code>optional .Data.ControlAction action = 31;</code>
      *
      * <pre>
      * Reserved and used to define which of the CLARA interface
@@ -2989,21 +3036,21 @@ public final class xMsgD {
       return action_;
     }
 
-    // optional .Data.SubControlAction controlR = 31;
-    public static final int CONTROLR_FIELD_NUMBER = 31;
+    // optional .Data.SubControlAction controlR = 32;
+    public static final int CONTROLR_FIELD_NUMBER = 32;
     private xMsgD.Data.SubControlAction controlR_;
     /**
-     * <code>optional .Data.SubControlAction controlR = 31;</code>
+     * <code>optional .Data.SubControlAction controlR = 32;</code>
      *
      * <pre>
      * Reserved control field
      * </pre>
      */
     public boolean hasControlR() {
-      return ((bitField0_ & 0x00400000) == 0x00400000);
+      return ((bitField0_ & 0x00800000) == 0x00800000);
     }
     /**
-     * <code>optional .Data.SubControlAction controlR = 31;</code>
+     * <code>optional .Data.SubControlAction controlR = 32;</code>
      *
      * <pre>
      * Reserved control field
@@ -3043,6 +3090,7 @@ public final class xMsgD {
       doneMonitor_ = false;
       dataMonitor_ = false;
       composition_ = "";
+      executionTime_ = 0L;
       action_ = xMsgD.Data.ControlAction.EXECUTE;
       controlR_ = xMsgD.Data.SubControlAction.SKIP;
     }
@@ -3146,10 +3194,13 @@ public final class xMsgD {
         output.writeBytes(29, getCompositionBytes());
       }
       if (((bitField0_ & 0x00200000) == 0x00200000)) {
-        output.writeEnum(30, action_.getNumber());
+        output.writeSFixed64(30, executionTime_);
       }
       if (((bitField0_ & 0x00400000) == 0x00400000)) {
-        output.writeEnum(31, controlR_.getNumber());
+        output.writeEnum(31, action_.getNumber());
+      }
+      if (((bitField0_ & 0x00800000) == 0x00800000)) {
+        output.writeEnum(32, controlR_.getNumber());
       }
       getUnknownFields().writeTo(output);
     }
@@ -3306,11 +3357,15 @@ public final class xMsgD {
       }
       if (((bitField0_ & 0x00200000) == 0x00200000)) {
         size += com.google.protobuf.CodedOutputStream
-          .computeEnumSize(30, action_.getNumber());
+          .computeSFixed64Size(30, executionTime_);
       }
       if (((bitField0_ & 0x00400000) == 0x00400000)) {
         size += com.google.protobuf.CodedOutputStream
-          .computeEnumSize(31, controlR_.getNumber());
+          .computeEnumSize(31, action_.getNumber());
+      }
+      if (((bitField0_ & 0x00800000) == 0x00800000)) {
+        size += com.google.protobuf.CodedOutputStream
+          .computeEnumSize(32, controlR_.getNumber());
       }
       size += getUnknownFields().getSerializedSize();
       memoizedSerializedSize = size;
@@ -3490,10 +3545,12 @@ public final class xMsgD {
         bitField0_ = (bitField0_ & ~0x08000000);
         composition_ = "";
         bitField0_ = (bitField0_ & ~0x10000000);
-        action_ = xMsgD.Data.ControlAction.EXECUTE;
+        executionTime_ = 0L;
         bitField0_ = (bitField0_ & ~0x20000000);
-        controlR_ = xMsgD.Data.SubControlAction.SKIP;
+        action_ = xMsgD.Data.ControlAction.EXECUTE;
         bitField0_ = (bitField0_ & ~0x40000000);
+        controlR_ = xMsgD.Data.SubControlAction.SKIP;
+        bitField0_ = (bitField0_ & ~0x80000000);
         return this;
       }
 
@@ -3650,9 +3707,13 @@ public final class xMsgD {
         if (((from_bitField0_ & 0x20000000) == 0x20000000)) {
           to_bitField0_ |= 0x00200000;
         }
-        result.action_ = action_;
+        result.executionTime_ = executionTime_;
         if (((from_bitField0_ & 0x40000000) == 0x40000000)) {
           to_bitField0_ |= 0x00400000;
+        }
+        result.action_ = action_;
+        if (((from_bitField0_ & 0x80000000) == 0x80000000)) {
+          to_bitField0_ |= 0x00800000;
         }
         result.controlR_ = controlR_;
         result.bitField0_ = to_bitField0_;
@@ -3829,6 +3890,9 @@ public final class xMsgD {
           bitField0_ |= 0x10000000;
           composition_ = other.composition_;
           onChanged();
+        }
+        if (other.hasExecutionTime()) {
+          setExecutionTime(other.getExecutionTime());
         }
         if (other.hasAction()) {
           setAction(other.getAction());
@@ -6140,10 +6204,59 @@ public final class xMsgD {
         return this;
       }
 
-      // optional .Data.ControlAction action = 30;
+      // optional sfixed64 executionTime = 30;
+      private long executionTime_ ;
+      /**
+       * <code>optional sfixed64 executionTime = 30;</code>
+       *
+       * <pre>
+       * Service engine execution time
+       * </pre>
+       */
+      public boolean hasExecutionTime() {
+        return ((bitField0_ & 0x20000000) == 0x20000000);
+      }
+      /**
+       * <code>optional sfixed64 executionTime = 30;</code>
+       *
+       * <pre>
+       * Service engine execution time
+       * </pre>
+       */
+      public long getExecutionTime() {
+        return executionTime_;
+      }
+      /**
+       * <code>optional sfixed64 executionTime = 30;</code>
+       *
+       * <pre>
+       * Service engine execution time
+       * </pre>
+       */
+      public Builder setExecutionTime(long value) {
+        bitField0_ |= 0x20000000;
+        executionTime_ = value;
+        onChanged();
+        return this;
+      }
+      /**
+       * <code>optional sfixed64 executionTime = 30;</code>
+       *
+       * <pre>
+       * Service engine execution time
+       * </pre>
+       */
+      public Builder clearExecutionTime() {
+        bitField0_ = (bitField0_ & ~0x20000000);
+        executionTime_ = 0L;
+        onChanged();
+        return this;
+      }
+
+      // optional .Data.ControlAction action = 31;
       private xMsgD.Data.ControlAction action_ = xMsgD.Data.ControlAction.EXECUTE;
       /**
-       * <code>optional .Data.ControlAction action = 30;</code>
+       * <code>optional .Data.ControlAction action = 31;</code>
        *
        * <pre>
        * Reserved and used to define which of the CLARA interface
@@ -6151,10 +6264,10 @@ public final class xMsgD {
        * </pre>
        */
       public boolean hasAction() {
-        return ((bitField0_ & 0x20000000) == 0x20000000);
+        return ((bitField0_ & 0x40000000) == 0x40000000);
       }
       /**
-       * <code>optional .Data.ControlAction action = 30;</code>
+       * <code>optional .Data.ControlAction action = 31;</code>
        *
        * <pre>
        * Reserved and used to define which of the CLARA interface
@@ -6165,7 +6278,7 @@ public final class xMsgD {
         return action_;
       }
       /**
-       * <code>optional .Data.ControlAction action = 30;</code>
+       * <code>optional .Data.ControlAction action = 31;</code>
        *
        * <pre>
        * Reserved and used to define which of the CLARA interface
@@ -6176,13 +6289,13 @@ public final class xMsgD {
         if (value == null) {
           throw new NullPointerException();
         }
-        bitField0_ |= 0x20000000;
+        bitField0_ |= 0x40000000;
         action_ = value;
         onChanged();
         return this;
       }
       /**
-       * <code>optional .Data.ControlAction action = 30;</code>
+       * <code>optional .Data.ControlAction action = 31;</code>
        *
        * <pre>
        * Reserved and used to define which of the CLARA interface
@@ -6190,26 +6303,26 @@ public final class xMsgD {
        * </pre>
        */
       public Builder clearAction() {
-        bitField0_ = (bitField0_ & ~0x20000000);
+        bitField0_ = (bitField0_ & ~0x40000000);
         action_ = xMsgD.Data.ControlAction.EXECUTE;
         onChanged();
         return this;
       }
 
-      // optional .Data.SubControlAction controlR = 31;
+      // optional .Data.SubControlAction controlR = 32;
       private xMsgD.Data.SubControlAction controlR_ = xMsgD.Data.SubControlAction.SKIP;
       /**
-       * <code>optional .Data.SubControlAction controlR = 31;</code>
+       * <code>optional .Data.SubControlAction controlR = 32;</code>
        *
        * <pre>
        * Reserved control field
        * </pre>
        */
       public boolean hasControlR() {
-        return ((bitField0_ & 0x40000000) == 0x40000000);
+        return ((bitField0_ & 0x80000000) == 0x80000000);
       }
       /**
-       * <code>optional .Data.SubControlAction controlR = 31;</code>
+       * <code>optional .Data.SubControlAction controlR = 32;</code>
        *
        * <pre>
        * Reserved control field
@@ -6219,7 +6332,7 @@ public final class xMsgD {
         return controlR_;
       }
       /**
-       * <code>optional .Data.SubControlAction controlR = 31;</code>
+       * <code>optional .Data.SubControlAction controlR = 32;</code>
        *
        * <pre>
        * Reserved control field
@@ -6229,20 +6342,20 @@ public final class xMsgD {
         if (value == null) {
           throw new NullPointerException();
         }
-        bitField0_ |= 0x40000000;
+        bitField0_ |= 0x80000000;
         controlR_ = value;
         onChanged();
         return this;
       }
       /**
-       * <code>optional .Data.SubControlAction controlR = 31;</code>
+       * <code>optional .Data.SubControlAction controlR = 32;</code>
        *
        * <pre>
        * Reserved control field
        * </pre>
        */
       public Builder clearControlR() {
-        bitField0_ = (bitField0_ & ~0x40000000);
+        bitField0_ = (bitField0_ & ~0x80000000);
         controlR_ = xMsgD.Data.SubControlAction.SKIP;
         onChanged();
         return this;
@@ -7764,7 +7877,7 @@ public final class xMsgD {
       descriptor;
   static {
     java.lang.String[] descriptorData = {
-      "\n\016xMsgData.proto\"\241\t\n\004Data\022\023\n\013dataVersion" +
+      "\n\016xMsgData.proto\"\270\t\n\004Data\022\023\n\013dataVersion" +
       "\030\001 \001(\t\022\027\n\017dataDescription\030\002 \001(\t\022\022\n\ndataA" +
       "uthor\030\003 \001(\t\022\027\n\017dataAuthorState\030\004 \001(\t\0222\n\024" +
       "dataGenerationStatus\030\005 \001(\0162\016.Data.Severi" +
@@ -7779,24 +7892,25 @@ public final class xMsgD {
       "yteOrder\030\027 \001(\t\022\016\n\006sender\030\030 \001(\t\022\n\n\002id\030\031 \001" +
       "(\007\022\030\n\020exceptionMonitor\030\032 \001(\010\022\023\n\013doneMoni" +
       "tor\030\033 \001(\010\022\023\n\013dataMonitor\030\034 \001(\010\022\023\n\013compos" +
-      "ition\030\035 \001(\t\022#\n\006action\030\036 \001(\0162\023.Data.Contr" +
-      "olAction\022(\n\010controlR\030\037 \001(\0162\026.Data.SubCon" +
-      "trolAction\"\212\002\n\005DType\022\016\n\nT_VLSINT32\020\001\022\016\n\n" +
-      "T_VLSINT64\020\002\022\016\n\nT_FLSINT32\020\003\022\016\n\nT_FLSINT" +
-      "64\020\004\022\013\n\007T_FLOAT\020\005\022\014\n\010T_DOUBLE\020\006\022\014\n\010T_STR",
-      "ING\020\007\022\013\n\007T_BYTES\020\010\022\017\n\013T_VLSINT32A\020\t\022\017\n\013T" +
-      "_VLSINT64A\020\n\022\017\n\013T_FLSINT32A\020\013\022\017\n\013T_FLSIN" +
-      "T64A\020\014\022\014\n\010T_FLOATA\020\r\022\r\n\tT_DOUBLEA\020\016\022\r\n\tT" +
-      "_STRINGA\020\017\022\014\n\010T_BYTESA\020\020\022\r\n\tT_PAYLOAD\020\021\"" +
-      "D\n\006BAType\022\013\n\007JOBJECT\020\001\022\013\n\007COBJECT\020\002\022\013\n\007P" +
-      "OBJECT\020\003\022\n\n\006NETCDF\020\004\022\007\n\003HDF\020\005\"+\n\rControl" +
-      "Action\022\013\n\007EXECUTE\020\000\022\r\n\tCONFIGURE\020\001\"\034\n\020Su" +
-      "bControlAction\022\010\n\004SKIP\020\000\"b\n\010Severity\022\n\n\006" +
-      "ERROR1\020\001\022\n\n\006ERROR2\020\002\022\n\n\006ERROR3\020\003\022\014\n\010WARN" +
-      "ING1\020\004\022\014\n\010WARNING2\020\005\022\014\n\010WARNING3\020\006\022\010\n\004IN",
-      "FO\020\007\"Q\n\007Payload\022\033\n\004item\030\001 \003(\0132\r.Payload." +
-      "Item\032)\n\004Item\022\014\n\004name\030\001 \002(\t\022\023\n\004data\030\002 \002(\013" +
-      "2\005.DataB\tB\005xMsgDH\001"
+      "ition\030\035 \001(\t\022\025\n\rexecutionTime\030\036 \001(\020\022#\n\006ac" +
+      "tion\030\037 \001(\0162\023.Data.ControlAction\022(\n\010contr" +
+      "olR\030  \001(\0162\026.Data.SubControlAction\"\212\002\n\005DT" +
+      "ype\022\016\n\nT_VLSINT32\020\001\022\016\n\nT_VLSINT64\020\002\022\016\n\nT" +
+      "_FLSINT32\020\003\022\016\n\nT_FLSINT64\020\004\022\013\n\007T_FLOAT\020\005",
+      "\022\014\n\010T_DOUBLE\020\006\022\014\n\010T_STRING\020\007\022\013\n\007T_BYTES\020" +
+      "\010\022\017\n\013T_VLSINT32A\020\t\022\017\n\013T_VLSINT64A\020\n\022\017\n\013T" +
+      "_FLSINT32A\020\013\022\017\n\013T_FLSINT64A\020\014\022\014\n\010T_FLOAT" +
+      "A\020\r\022\r\n\tT_DOUBLEA\020\016\022\r\n\tT_STRINGA\020\017\022\014\n\010T_B" +
+      "YTESA\020\020\022\r\n\tT_PAYLOAD\020\021\"D\n\006BAType\022\013\n\007JOBJ" +
+      "ECT\020\001\022\013\n\007COBJECT\020\002\022\013\n\007POBJECT\020\003\022\n\n\006NETCD" +
+      "F\020\004\022\007\n\003HDF\020\005\"+\n\rControlAction\022\013\n\007EXECUTE" +
+      "\020\000\022\r\n\tCONFIGURE\020\001\"\034\n\020SubControlAction\022\010\n" +
+      "\004SKIP\020\000\"b\n\010Severity\022\n\n\006ERROR1\020\001\022\n\n\006ERROR" +
+      "2\020\002\022\n\n\006ERROR3\020\003\022\014\n\010WARNING1\020\004\022\014\n\010WARNING",
+      "2\020\005\022\014\n\010WARNING3\020\006\022\010\n\004INFO\020\007\"Q\n\007Payload\022\033" +
+      "\n\004item\030\001 \003(\0132\r.Payload.Item\032)\n\004Item\022\014\n\004n" +
+      "ame\030\001 \002(\t\022\023\n\004data\030\002 \002(\0132\005.DataB\tB\005xMsgDH" +
+      "\001"
     };
     com.google.protobuf.Descriptors.FileDescriptor.InternalDescriptorAssigner assigner =
       new com.google.protobuf.Descriptors.FileDescriptor.InternalDescriptorAssigner() {
@@ -7808,7 +7922,7 @@ public final class xMsgD {
           internal_static_Data_fieldAccessorTable = new
             com.google.protobuf.GeneratedMessage.FieldAccessorTable(
               internal_static_Data_descriptor,
-              new java.lang.String[] { "DataVersion", "DataDescription", "DataAuthor", "DataAuthorState", "DataGenerationStatus", "VLSINT32", "VLSINT64", "FLSINT32", "FLSINT64", "FLOAT", "DOUBLE", "STRING", "BYTES", "VLSINT32A", "VLSINT64A", "FLSINT32A", "FLSINT64A", "FLOATA", "DOUBLEA", "STRINGA", "BYTESA", "DataType", "ByteOrder", "Sender", "Id", "ExceptionMonitor", "DoneMonitor", "DataMonitor", "Composition", "Action", "ControlR", });
+              new java.lang.String[] { "DataVersion", "DataDescription", "DataAuthor", "DataAuthorState", "DataGenerationStatus", "VLSINT32", "VLSINT64", "FLSINT32", "FLSINT64", "FLOAT", "DOUBLE", "STRING", "BYTES", "VLSINT32A", "VLSINT64A", "FLSINT32A", "FLSINT64A", "FLOATA", "DOUBLEA", "STRINGA", "BYTESA", "DataType", "ByteOrder", "Sender", "Id", "ExceptionMonitor", "DoneMonitor", "DataMonitor", "Composition", "ExecutionTime", "Action", "ControlR", });
           internal_static_Payload_descriptor =
             getDescriptor().getMessageTypes().get(1);
           internal_static_Payload_fieldAccessorTable = new
