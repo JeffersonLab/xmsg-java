@@ -874,12 +874,12 @@ public class xMsg {
             msg.addString(xMsgConstants.ENVELOPE_DATA_TYPE_XMSGDATA.getStringValue());
             xMsgD.Data data = ((xMsgD.Data.Builder) d).build();
 
-                // data serialization
-                if (data.isInitialized()) {
-                    dt = data.toByteArray(); // serialize data object
-                } else throw new xMsgPublishingException("some of the data object " +
-                        "required fields are not set.");
-                msg.add(dt);
+            // data serialization
+            if (data.isInitialized()) {
+                dt = data.toByteArray(); // serialize data object
+            } else throw new xMsgPublishingException("some of the data object " +
+                    "required fields are not set.");
+            msg.add(dt);
 
         } else if(d instanceof String) {
             String data = (String)d;
@@ -970,9 +970,9 @@ public class xMsg {
      * @throws xMsgException
      */
     public Object sync_publish(xMsgConnection connection,
-                        String topic,
-                        Object d,
-                        int timeOut)
+                               String topic,
+                               Object d,
+                               int timeOut)
             throws xMsgException {
 
         // address/topic where the subscriber should send the result
@@ -993,12 +993,12 @@ public class xMsg {
             msg.addString(xMsgConstants.ENVELOPE_DATA_TYPE_XMSGDATA.getStringValue());
             xMsgD.Data data = ((xMsgD.Data.Builder) d).build();
 
-                // data serialization
-                if (data.isInitialized()) {
-                    dt = data.toByteArray(); // serialize data object
-                } else throw new xMsgPublishingException("some of the data object " +
-                        "required fields are not set.");
-                msg.add(dt);
+            // data serialization
+            if (data.isInitialized()) {
+                dt = data.toByteArray(); // serialize data object
+            } else throw new xMsgPublishingException("some of the data object " +
+                    "required fields are not set.");
+            msg.add(dt);
 
         } else if(d instanceof String) {
             String data = (String)d;
@@ -1013,7 +1013,7 @@ public class xMsg {
 
         // now subscribe to the returnAddress
         SyncSendCallBack cb = new SyncSendCallBack();
-        subscribe(connection, returnAddress, cb, true);
+        subscribe(connection, returnAddress, cb);
 
         int to = 0;
 
@@ -1055,11 +1055,11 @@ public class xMsg {
      * @throws xMsgPublishingException
      */
     public Object sync_publish(xMsgConnection connection,
-                        String domain,
-                        String subject,
-                        String type,
-                        Object d,
-                        int timeOut)
+                               String domain,
+                               String subject,
+                               String type,
+                               Object d,
+                               int timeOut)
             throws xMsgException {
 
         // build a topic
@@ -1091,8 +1091,8 @@ public class xMsg {
      * @throws xMsgException
      */
     public Object sync_publish(xMsgConnection connection,
-                             xMsgMessage msg,
-                             int timeOut)
+                               xMsgMessage msg,
+                               int timeOut)
             throws xMsgException {
         return sync_publish(connection,
                 msg.getDomain(),
@@ -1115,14 +1115,11 @@ public class xMsg {
      * @param connection socket to a xMsgNode proxy output port.
      * @param topic topic of the subscription
      * @param cb {@link xMsgCallBack} implemented object reference
-     * @param isSync if set to true method will block until subscription method is
-     *               received and user callback method is returned
      * @throws xMsgSubscribingException
      */
     public void subscribe(xMsgConnection connection,
-                            String topic,
-                            final xMsgCallBack cb,
-                            boolean isSync)
+                          String topic,
+                          final xMsgCallBack cb)
             throws xMsgException {
 
         // check connection
@@ -1144,7 +1141,9 @@ public class xMsg {
             String syncReturnAddress = xMsgConstants.UNDEFINED.getStringValue();
             if(!msg.isEmpty()){
                 ZFrame r_addr = msg.pop();
-                syncReturnAddress = new String(r_addr.getData(), ZMQ.CHARSET);
+                if(r_addr!=null) {
+                    syncReturnAddress = new String(r_addr.getData(), ZMQ.CHARSET);
+                }
             }
 
             // de-serialize received message components
@@ -1184,12 +1183,10 @@ public class xMsg {
                     ds_data);
 
             // Calling user callback method
-            if(isSync){
+            // if it is sync send back to the result
+            if(!syncReturnAddress.equals(xMsgConstants.UNDEFINED.getStringValue())){
                 Object rd = cb.callback(cb_msg);
-                // if it is sync send back to the result
-                if(!syncReturnAddress.equals(xMsgConstants.UNDEFINED.getStringValue())){
-                    publish(connection, syncReturnAddress,rd);
-                }
+                publish(connection, syncReturnAddress,rd);
             } else {
                 threadPool.submit(new Runnable() {
                                       public void run() {
@@ -1227,20 +1224,17 @@ public class xMsg {
      * @param subject subject of the topic
      * @param type type of the topic
      * @param cb {@link xMsgCallBack} implemented object reference
-     * @param isSync if set to true method will block until subscription method is
-     *               received and user callback method is returned
      * @throws xMsgSubscribingException
      */
     public void subscribe(xMsgConnection connection,
-                            String domain,
-                            String subject,
-                            String type,
-                            final xMsgCallBack cb,
-                            boolean isSync)
+                          String domain,
+                          String subject,
+                          String type,
+                          final xMsgCallBack cb)
             throws xMsgException {
 
         String topic = xMsgUtil.buildTopic(domain, subject, type);
-        subscribe(connection, topic, cb, isSync);
+        subscribe(connection, topic, cb);
     }
 
     /**
@@ -1252,7 +1246,7 @@ public class xMsg {
      * @throws xMsgSubscribingException
      */
     public void unsubscribe(xMsgConnection connection,
-                          String topic)
+                            String topic)
             throws xMsgSubscribingException {
         // check connection
         Socket con = connection.getSubSock();
@@ -1272,9 +1266,9 @@ public class xMsg {
      * @throws xMsgSubscribingException
      */
     public void unsubscribe(xMsgConnection connection,
-                          String domain,
-                          String subject,
-                          String type)
+                            String domain,
+                            String subject,
+                            String type)
             throws xMsgException {
         // check connection
         Socket con = connection.getSubSock();
