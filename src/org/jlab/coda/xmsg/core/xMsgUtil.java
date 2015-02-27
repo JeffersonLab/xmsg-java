@@ -290,32 +290,16 @@ public class xMsgUtil {
         trb.setSTRING(data.getSTRING());
         trb.setBYTES(data.getBYTES());
 
-        for(int i= 0; i<data.getVLSINT32AList().size(); i++) {
-            trb.setVLSINT32A(i, data.getVLSINT32A(i));
-        }
-        for(int i= 0; i<data.getVLSINT64AList().size(); i++) {
-            trb.setVLSINT64A(i, data.getVLSINT64A(i));
-        }
+        trb.addAllVLSINT32A(data.getVLSINT32AList());
+        trb.addAllVLSINT64A(data.getVLSINT64AList());
 
-        for(int i= 0; i<data.getFLSINT32AList().size(); i++) {
-            trb.setFLSINT32A(i, data.getFLSINT32A(i));
-        }
-        for(int i= 0; i<data.getFLSINT64AList().size(); i++) {
-            trb.setFLSINT64A(i, data.getFLSINT64A(i));
-        }
+        trb.addAllFLSINT32A(data.getFLSINT32AList());
+        trb.addAllFLSINT64A(data.getFLSINT64AList());
 
-        for(int i= 0; i<data.getFLOATAList().size(); i++) {
-            trb.setFLOATA(i, data.getFLOATA(i));
-        }
-        for(int i= 0; i<data.getDOUBLEAList().size(); i++) {
-            trb.setDOUBLEA(i, data.getDOUBLEA(i));
-        }
-        for(int i= 0; i<data.getSTRINGAList().size(); i++) {
-            trb.setSTRINGA(i, data.getSTRINGA(i));
-        }
-        for(int i= 0; i<data.getBYTESAList().size(); i++) {
-            trb.setBYTESA(i, data.getBYTESA(i));
-        }
+        trb.addAllFLOATA(data.getFLOATAList());
+        trb.addAllDOUBLEA(data.getDOUBLEAList());
+        trb.addAllSTRINGA(data.getSTRINGAList());
+        trb.addAllBYTESA(data.getBYTESAList());
 
         trb.setDataType(data.getDataType());
         trb.setByteOrder(data.getByteOrder());
