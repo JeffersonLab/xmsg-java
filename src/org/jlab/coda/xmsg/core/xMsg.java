@@ -1186,7 +1186,13 @@ public class xMsg {
             // if it is sync send back to the result
             if(!syncReturnAddress.equals(xMsgConstants.UNDEFINED.getStringValue())){
                 Object rd = cb.callback(cb_msg);
-                publish(connection, syncReturnAddress,rd);
+
+                // create xMsgData
+                if(rd==null){
+                    publish(connection, syncReturnAddress, xMsgConstants.DONE);
+                } else {
+                    publish(connection, syncReturnAddress, rd);
+                }
             } else {
                 threadPool.submit(new Runnable() {
                                       public void run() {
