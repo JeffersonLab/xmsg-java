@@ -49,7 +49,7 @@ public class Subscriber extends xMsg {
             if (subscriber.isThereLocalPublisher(myName, domain, subject, type)){
 
                 // Subscribe by passing a callback to the subscription
-                subscriber.subscribe(con, domain, subject, type, subscriber.callback, true);
+                subscriber.subscribe(con, domain, subject, type, subscriber.callback);
 
                 xMsgUtil.keepAlive();
 
