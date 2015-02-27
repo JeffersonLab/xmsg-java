@@ -16,7 +16,7 @@ message Data {
     // Data textual description
     optional string dataDescription = 2;
 
-    // Author of the data
+    // Author of the data, an additional filed set by the engine
     optional string dataAuthor = 3;
 
     // The state of the message sender
@@ -25,39 +25,53 @@ message Data {
     // Overall status/severity of the data generation process
     optional Severity dataGenerationStatus = 5 [default = INFO];
 
-    // Data itself
-    optional sint32 VLSINT32 = 6; // variable length signed int32
-    optional sint64 VLSINT64 = 7; // variable length signed int64
-    optional sfixed32 FLSINT32 = 8; // fixed length signed int32
-    optional sfixed64 FLSINT64 = 9; // fixed length signed int64
-    optional float FLOAT = 10;
-    optional double DOUBLE = 11;
-    optional string STRING = 12; // contains UTF-8 encoding or 7-bit ASCII text
-    optional bytes BYTES = 13; // contains arbitrary sequence of bytes
+    // Status text
+    optional string statusText = 6;
 
-    repeated sint32 VLSINT32A = 14; // array of variable length signed int32s
-    repeated sint64 VLSINT64A = 15; // array of variable length signed int64s
-    repeated sfixed32 FLSINT32A = 16; // array of fixed length signed int32s
-    repeated sfixed64 FLSINT64A = 17; // array of fixed length signed int64s
-    repeated float FLOATA = 18; // array of floats
-    repeated double DOUBLEA = 19; // array of doubles
-    repeated string STRINGA = 20; // array of UTF-8 encoded or 7-bit ASCII strings
-    repeated bytes BYTESA = 21; // array of arbitrary sequence of bytes
+    // Severity id of the data generaation status
+    optional sfixed32 statusSeverityId = 7;
+
+    // Data itself
+    optional sint32 VLSINT32 = 8; // variable length signed int32
+    optional sint64 VLSINT64 = 9; // variable length signed int64
+    optional sfixed32 FLSINT32 = 10; // fixed length signed int32
+    optional sfixed64 FLSINT64 = 11; // fixed length signed int64
+    optional float FLOAT = 12;
+    optional double DOUBLE = 13;
+    optional string STRING = 14; // contains UTF-8 encoding or 7-bit ASCII text
+    optional bytes BYTES = 15; // contains arbitrary sequence of bytes
+
+    repeated sint32 VLSINT32A = 16; // array of variable length signed int32s
+    repeated sint64 VLSINT64A = 17; // array of variable length signed int64s
+    repeated sfixed32 FLSINT32A = 18; // array of fixed length signed int32s
+    repeated sfixed64 FLSINT64A = 19; // array of fixed length signed int64s
+    repeated float FLOATA = 20; // array of floats
+    repeated double DOUBLEA = 21; // array of doubles
+    repeated string STRINGA = 22; // array of UTF-8 encoded or 7-bit ASCII strings
+    repeated bytes BYTESA = 23; // array of arbitrary sequence of bytes
 
     // Data type. If set to DataTpe.PAYLOAD access data using the "payload"
-    // filed, otherwise "data: filed
-    optional DType dataType = 22;
+    // filed, otherwise "data: filed. In case data is passed as a byteArray this
+    // will define the type of the object serialized to byteArray
+    optional DType dataType = 24;
 
-    // Byte ordering in case data type is BYTES/BYTESA
-    optional string byteOrder = 23;
+    // Additional description of the servialized data object. If data is
+    // a serialized arbutrary Java/C++ object we need to tell the receiver
+    // how to desrialize it.
+    optional string userObjectDescription = 25;
+
+    optional BAType byteArrayType = 26;
 
 
     // ... This section is defined by the message transporter ...
     // The name of the message transporter
-    optional string sender = 24;
+    optional string sender = 27;
 
     // Communication id, used to genetically relate messages
-    optional fixed32 id = 25;
+    optional fixed32 id = 28;
+
+    // Byte ordering in case data type is BYTES/BYTESA
+    optional string byteOrder = 29;
 
     // ... Fields that are used to control message receiver ...
     // If set to true, for example Clara service container will
@@ -65,36 +79,37 @@ message Data {
     // [ exception_<service_name>,
     //             requestId,
     //             exceptionType <Severity>,
+    //             exceptionId,
     //             exceptionString <String> ]
-    optional bool exceptionMonitor = 26;
+    optional bool exceptionMonitor = 30;
 
     // If set to true, for example Clara service container will
     // broadcast "done" string
     // [ done_<service_name>,
     //             requestId]
-    optional bool doneMonitor = 27;
+    optional bool doneMonitor = 31;
 
     // If set to true, for example Clara service container will
     // broadcast resulting data to
     // [ data_<service_name>,
     //             requestId,
     //             transient_data ]
-    optional bool dataMonitor = 28;
+    optional bool dataMonitor = 32;
 
     // Reserved and used for Clara service based application
     // composition i.e. link schema (list of linked service names)
     // e.g. s1+s2;s1+s3,s4,s5+&s6
-    optional string composition = 29;
+    optional string composition = 33;
 
     // Service engine execution time
-    optional sfixed64 executionTime = 30;
+    optional sfixed64 executionTime = 34;
 
     // Reserved and used to define which of the CLARA interface
     // methods must be called on a service engine.
-    optional ControlAction action =31;
+    optional ControlAction action =35;
 
     // Reserved control field
-    optional SubControlAction controlR = 32;
+    optional SubControlAction controlR = 36;
 
     // ... Enumerations ...
     // Data type enumeration
@@ -118,6 +133,7 @@ message Data {
         T_BYTESA = 16;    // array of arbitrary sequence of bytes
 
         T_PAYLOAD = 17;    // payload data type
+        T_OBJECT = 18;     // un-serialized object
     }
 
     // In the case data is passed as a byte[], i.e. DataType = T_BYTESA
@@ -128,6 +144,7 @@ message Data {
         POBJECT = 3;
         NETCDF = 4;
         HDF = 5;
+        EVIO = 6;
     }
 
     // Control actions, used to define service control directive

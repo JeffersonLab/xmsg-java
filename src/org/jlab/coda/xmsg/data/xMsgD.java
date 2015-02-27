@@ -75,7 +75,7 @@ public final class xMsgD {
      * <code>optional string dataAuthor = 3;</code>
      *
      * <pre>
-     * Author of the data
+     * Author of the data, an additional filed set by the engine
      * </pre>
      */
     boolean hasDataAuthor();
@@ -83,7 +83,7 @@ public final class xMsgD {
      * <code>optional string dataAuthor = 3;</code>
      *
      * <pre>
-     * Author of the data
+     * Author of the data, an additional filed set by the engine
      * </pre>
      */
     java.lang.String getDataAuthor();
@@ -91,7 +91,7 @@ public final class xMsgD {
      * <code>optional string dataAuthor = 3;</code>
      *
      * <pre>
-     * Author of the data
+     * Author of the data, an additional filed set by the engine
      * </pre>
      */
     com.google.protobuf.ByteString
@@ -142,9 +142,54 @@ public final class xMsgD {
      */
     xMsgD.Data.Severity getDataGenerationStatus();
 
-    // optional sint32 VLSINT32 = 6;
+    // optional string statusText = 6;
     /**
-     * <code>optional sint32 VLSINT32 = 6;</code>
+     * <code>optional string statusText = 6;</code>
+     *
+     * <pre>
+     * Status text
+     * </pre>
+     */
+    boolean hasStatusText();
+    /**
+     * <code>optional string statusText = 6;</code>
+     *
+     * <pre>
+     * Status text
+     * </pre>
+     */
+    java.lang.String getStatusText();
+    /**
+     * <code>optional string statusText = 6;</code>
+     *
+     * <pre>
+     * Status text
+     * </pre>
+     */
+    com.google.protobuf.ByteString
+        getStatusTextBytes();
+
+    // optional sfixed32 statusSeverityId = 7;
+    /**
+     * <code>optional sfixed32 statusSeverityId = 7;</code>
+     *
+     * <pre>
+     * Severity id of the data generaation status
+     * </pre>
+     */
+    boolean hasStatusSeverityId();
+    /**
+     * <code>optional sfixed32 statusSeverityId = 7;</code>
+     *
+     * <pre>
+     * Severity id of the data generaation status
+     * </pre>
+     */
+    int getStatusSeverityId();
+
+    // optional sint32 VLSINT32 = 8;
+    /**
+     * <code>optional sint32 VLSINT32 = 8;</code>
      *
      * <pre>
      * Data itself
@@ -152,7 +197,7 @@ public final class xMsgD {
      */
     boolean hasVLSINT32();
     /**
-     * <code>optional sint32 VLSINT32 = 6;</code>
+     * <code>optional sint32 VLSINT32 = 8;</code>
      *
      * <pre>
      * Data itself
@@ -160,9 +205,9 @@ public final class xMsgD {
      */
     int getVLSINT32();
 
-    // optional sint64 VLSINT64 = 7;
+    // optional sint64 VLSINT64 = 9;
     /**
-     * <code>optional sint64 VLSINT64 = 7;</code>
+     * <code>optional sint64 VLSINT64 = 9;</code>
      *
      * <pre>
      * variable length signed int64
@@ -170,7 +215,7 @@ public final class xMsgD {
      */
     boolean hasVLSINT64();
     /**
-     * <code>optional sint64 VLSINT64 = 7;</code>
+     * <code>optional sint64 VLSINT64 = 9;</code>
      *
      * <pre>
      * variable length signed int64
@@ -178,9 +223,9 @@ public final class xMsgD {
      */
     long getVLSINT64();
 
-    // optional sfixed32 FLSINT32 = 8;
+    // optional sfixed32 FLSINT32 = 10;
     /**
-     * <code>optional sfixed32 FLSINT32 = 8;</code>
+     * <code>optional sfixed32 FLSINT32 = 10;</code>
      *
      * <pre>
      * fixed length signed int32
@@ -188,7 +233,7 @@ public final class xMsgD {
      */
     boolean hasFLSINT32();
     /**
-     * <code>optional sfixed32 FLSINT32 = 8;</code>
+     * <code>optional sfixed32 FLSINT32 = 10;</code>
      *
      * <pre>
      * fixed length signed int32
@@ -196,9 +241,9 @@ public final class xMsgD {
      */
     int getFLSINT32();
 
-    // optional sfixed64 FLSINT64 = 9;
+    // optional sfixed64 FLSINT64 = 11;
     /**
-     * <code>optional sfixed64 FLSINT64 = 9;</code>
+     * <code>optional sfixed64 FLSINT64 = 11;</code>
      *
      * <pre>
      * fixed length signed int64
@@ -206,7 +251,7 @@ public final class xMsgD {
      */
     boolean hasFLSINT64();
     /**
-     * <code>optional sfixed64 FLSINT64 = 9;</code>
+     * <code>optional sfixed64 FLSINT64 = 11;</code>
      *
      * <pre>
      * fixed length signed int64
@@ -214,29 +259,29 @@ public final class xMsgD {
      */
     long getFLSINT64();
 
-    // optional float FLOAT = 10;
+    // optional float FLOAT = 12;
     /**
-     * <code>optional float FLOAT = 10;</code>
+     * <code>optional float FLOAT = 12;</code>
      */
     boolean hasFLOAT();
     /**
-     * <code>optional float FLOAT = 10;</code>
+     * <code>optional float FLOAT = 12;</code>
      */
     float getFLOAT();
 
-    // optional double DOUBLE = 11;
+    // optional double DOUBLE = 13;
     /**
-     * <code>optional double DOUBLE = 11;</code>
+     * <code>optional double DOUBLE = 13;</code>
      */
     boolean hasDOUBLE();
     /**
-     * <code>optional double DOUBLE = 11;</code>
+     * <code>optional double DOUBLE = 13;</code>
      */
     double getDOUBLE();
 
-    // optional string STRING = 12;
+    // optional string STRING = 14;
     /**
-     * <code>optional string STRING = 12;</code>
+     * <code>optional string STRING = 14;</code>
      *
      * <pre>
      * contains UTF-8 encoding or 7-bit ASCII text
@@ -244,7 +289,7 @@ public final class xMsgD {
      */
     boolean hasSTRING();
     /**
-     * <code>optional string STRING = 12;</code>
+     * <code>optional string STRING = 14;</code>
      *
      * <pre>
      * contains UTF-8 encoding or 7-bit ASCII text
@@ -252,7 +297,7 @@ public final class xMsgD {
      */
     java.lang.String getSTRING();
     /**
-     * <code>optional string STRING = 12;</code>
+     * <code>optional string STRING = 14;</code>
      *
      * <pre>
      * contains UTF-8 encoding or 7-bit ASCII text
@@ -261,9 +306,9 @@ public final class xMsgD {
     com.google.protobuf.ByteString
         getSTRINGBytes();
 
-    // optional bytes BYTES = 13;
+    // optional bytes BYTES = 15;
     /**
-     * <code>optional bytes BYTES = 13;</code>
+     * <code>optional bytes BYTES = 15;</code>
      *
      * <pre>
      * contains arbitrary sequence of bytes
@@ -271,7 +316,7 @@ public final class xMsgD {
      */
     boolean hasBYTES();
     /**
-     * <code>optional bytes BYTES = 13;</code>
+     * <code>optional bytes BYTES = 15;</code>
      *
      * <pre>
      * contains arbitrary sequence of bytes
@@ -279,9 +324,9 @@ public final class xMsgD {
      */
     com.google.protobuf.ByteString getBYTES();
 
-    // repeated sint32 VLSINT32A = 14;
+    // repeated sint32 VLSINT32A = 16;
     /**
-     * <code>repeated sint32 VLSINT32A = 14;</code>
+     * <code>repeated sint32 VLSINT32A = 16;</code>
      *
      * <pre>
      * array of variable length signed int32s
@@ -289,7 +334,7 @@ public final class xMsgD {
      */
     java.util.List<java.lang.Integer> getVLSINT32AList();
     /**
-     * <code>repeated sint32 VLSINT32A = 14;</code>
+     * <code>repeated sint32 VLSINT32A = 16;</code>
      *
      * <pre>
      * array of variable length signed int32s
@@ -297,7 +342,7 @@ public final class xMsgD {
      */
     int getVLSINT32ACount();
     /**
-     * <code>repeated sint32 VLSINT32A = 14;</code>
+     * <code>repeated sint32 VLSINT32A = 16;</code>
      *
      * <pre>
      * array of variable length signed int32s
@@ -305,9 +350,9 @@ public final class xMsgD {
      */
     int getVLSINT32A(int index);
 
-    // repeated sint64 VLSINT64A = 15;
+    // repeated sint64 VLSINT64A = 17;
     /**
-     * <code>repeated sint64 VLSINT64A = 15;</code>
+     * <code>repeated sint64 VLSINT64A = 17;</code>
      *
      * <pre>
      * array of variable length signed int64s
@@ -315,7 +360,7 @@ public final class xMsgD {
      */
     java.util.List<java.lang.Long> getVLSINT64AList();
     /**
-     * <code>repeated sint64 VLSINT64A = 15;</code>
+     * <code>repeated sint64 VLSINT64A = 17;</code>
      *
      * <pre>
      * array of variable length signed int64s
@@ -323,7 +368,7 @@ public final class xMsgD {
      */
     int getVLSINT64ACount();
     /**
-     * <code>repeated sint64 VLSINT64A = 15;</code>
+     * <code>repeated sint64 VLSINT64A = 17;</code>
      *
      * <pre>
      * array of variable length signed int64s
@@ -331,9 +376,9 @@ public final class xMsgD {
      */
     long getVLSINT64A(int index);
 
-    // repeated sfixed32 FLSINT32A = 16;
+    // repeated sfixed32 FLSINT32A = 18;
     /**
-     * <code>repeated sfixed32 FLSINT32A = 16;</code>
+     * <code>repeated sfixed32 FLSINT32A = 18;</code>
      *
      * <pre>
      * array of fixed length signed int32s
@@ -341,7 +386,7 @@ public final class xMsgD {
      */
     java.util.List<java.lang.Integer> getFLSINT32AList();
     /**
-     * <code>repeated sfixed32 FLSINT32A = 16;</code>
+     * <code>repeated sfixed32 FLSINT32A = 18;</code>
      *
      * <pre>
      * array of fixed length signed int32s
@@ -349,7 +394,7 @@ public final class xMsgD {
      */
     int getFLSINT32ACount();
     /**
-     * <code>repeated sfixed32 FLSINT32A = 16;</code>
+     * <code>repeated sfixed32 FLSINT32A = 18;</code>
      *
      * <pre>
      * array of fixed length signed int32s
@@ -357,9 +402,9 @@ public final class xMsgD {
      */
     int getFLSINT32A(int index);
 
-    // repeated sfixed64 FLSINT64A = 17;
+    // repeated sfixed64 FLSINT64A = 19;
     /**
-     * <code>repeated sfixed64 FLSINT64A = 17;</code>
+     * <code>repeated sfixed64 FLSINT64A = 19;</code>
      *
      * <pre>
      * array of fixed length signed int64s
@@ -367,7 +412,7 @@ public final class xMsgD {
      */
     java.util.List<java.lang.Long> getFLSINT64AList();
     /**
-     * <code>repeated sfixed64 FLSINT64A = 17;</code>
+     * <code>repeated sfixed64 FLSINT64A = 19;</code>
      *
      * <pre>
      * array of fixed length signed int64s
@@ -375,7 +420,7 @@ public final class xMsgD {
      */
     int getFLSINT64ACount();
     /**
-     * <code>repeated sfixed64 FLSINT64A = 17;</code>
+     * <code>repeated sfixed64 FLSINT64A = 19;</code>
      *
      * <pre>
      * array of fixed length signed int64s
@@ -383,9 +428,9 @@ public final class xMsgD {
      */
     long getFLSINT64A(int index);
 
-    // repeated float FLOATA = 18;
+    // repeated float FLOATA = 20;
     /**
-     * <code>repeated float FLOATA = 18;</code>
+     * <code>repeated float FLOATA = 20;</code>
      *
      * <pre>
      * array of floats
@@ -393,7 +438,7 @@ public final class xMsgD {
      */
     java.util.List<java.lang.Float> getFLOATAList();
     /**
-     * <code>repeated float FLOATA = 18;</code>
+     * <code>repeated float FLOATA = 20;</code>
      *
      * <pre>
      * array of floats
@@ -401,7 +446,7 @@ public final class xMsgD {
      */
     int getFLOATACount();
     /**
-     * <code>repeated float FLOATA = 18;</code>
+     * <code>repeated float FLOATA = 20;</code>
      *
      * <pre>
      * array of floats
@@ -409,9 +454,9 @@ public final class xMsgD {
      */
     float getFLOATA(int index);
 
-    // repeated double DOUBLEA = 19;
+    // repeated double DOUBLEA = 21;
     /**
-     * <code>repeated double DOUBLEA = 19;</code>
+     * <code>repeated double DOUBLEA = 21;</code>
      *
      * <pre>
      * array of doubles
@@ -419,7 +464,7 @@ public final class xMsgD {
      */
     java.util.List<java.lang.Double> getDOUBLEAList();
     /**
-     * <code>repeated double DOUBLEA = 19;</code>
+     * <code>repeated double DOUBLEA = 21;</code>
      *
      * <pre>
      * array of doubles
@@ -427,7 +472,7 @@ public final class xMsgD {
      */
     int getDOUBLEACount();
     /**
-     * <code>repeated double DOUBLEA = 19;</code>
+     * <code>repeated double DOUBLEA = 21;</code>
      *
      * <pre>
      * array of doubles
@@ -435,9 +480,9 @@ public final class xMsgD {
      */
     double getDOUBLEA(int index);
 
-    // repeated string STRINGA = 20;
+    // repeated string STRINGA = 22;
     /**
-     * <code>repeated string STRINGA = 20;</code>
+     * <code>repeated string STRINGA = 22;</code>
      *
      * <pre>
      * array of UTF-8 encoded or 7-bit ASCII strings
@@ -446,7 +491,7 @@ public final class xMsgD {
     java.util.List<java.lang.String>
     getSTRINGAList();
     /**
-     * <code>repeated string STRINGA = 20;</code>
+     * <code>repeated string STRINGA = 22;</code>
      *
      * <pre>
      * array of UTF-8 encoded or 7-bit ASCII strings
@@ -454,7 +499,7 @@ public final class xMsgD {
      */
     int getSTRINGACount();
     /**
-     * <code>repeated string STRINGA = 20;</code>
+     * <code>repeated string STRINGA = 22;</code>
      *
      * <pre>
      * array of UTF-8 encoded or 7-bit ASCII strings
@@ -462,7 +507,7 @@ public final class xMsgD {
      */
     java.lang.String getSTRINGA(int index);
     /**
-     * <code>repeated string STRINGA = 20;</code>
+     * <code>repeated string STRINGA = 22;</code>
      *
      * <pre>
      * array of UTF-8 encoded or 7-bit ASCII strings
@@ -471,9 +516,9 @@ public final class xMsgD {
     com.google.protobuf.ByteString
         getSTRINGABytes(int index);
 
-    // repeated bytes BYTESA = 21;
+    // repeated bytes BYTESA = 23;
     /**
-     * <code>repeated bytes BYTESA = 21;</code>
+     * <code>repeated bytes BYTESA = 23;</code>
      *
      * <pre>
      * array of arbitrary sequence of bytes
@@ -481,7 +526,7 @@ public final class xMsgD {
      */
     java.util.List<com.google.protobuf.ByteString> getBYTESAList();
     /**
-     * <code>repeated bytes BYTESA = 21;</code>
+     * <code>repeated bytes BYTESA = 23;</code>
      *
      * <pre>
      * array of arbitrary sequence of bytes
@@ -489,7 +534,7 @@ public final class xMsgD {
      */
     int getBYTESACount();
     /**
-     * <code>repeated bytes BYTESA = 21;</code>
+     * <code>repeated bytes BYTESA = 23;</code>
      *
      * <pre>
      * array of arbitrary sequence of bytes
@@ -497,56 +542,74 @@ public final class xMsgD {
      */
     com.google.protobuf.ByteString getBYTESA(int index);
 
-    // optional .Data.DType dataType = 22;
+    // optional .Data.DType dataType = 24;
     /**
-     * <code>optional .Data.DType dataType = 22;</code>
+     * <code>optional .Data.DType dataType = 24;</code>
      *
      * <pre>
      * Data type. If set to DataTpe.PAYLOAD access data using the "payload"
-     * filed, otherwise "data: filed
+     * filed, otherwise "data: filed. In case data is passed as a byteArray this
+     * will define the type of the object serialized to byteArray
      * </pre>
      */
     boolean hasDataType();
     /**
-     * <code>optional .Data.DType dataType = 22;</code>
+     * <code>optional .Data.DType dataType = 24;</code>
      *
      * <pre>
      * Data type. If set to DataTpe.PAYLOAD access data using the "payload"
-     * filed, otherwise "data: filed
+     * filed, otherwise "data: filed. In case data is passed as a byteArray this
+     * will define the type of the object serialized to byteArray
      * </pre>
      */
     xMsgD.Data.DType getDataType();
 
-    // optional string byteOrder = 23;
+    // optional string userObjectDescription = 25;
     /**
-     * <code>optional string byteOrder = 23;</code>
+     * <code>optional string userObjectDescription = 25;</code>
      *
      * <pre>
-     * Byte ordering in case data type is BYTES/BYTESA
+     * Additional description of the servialized data object. If data is
+     * a serialized arbutrary Java/C++ object we need to tell the receiver
+     * how to desrialize it.
      * </pre>
      */
-    boolean hasByteOrder();
+    boolean hasUserObjectDescription();
     /**
-     * <code>optional string byteOrder = 23;</code>
+     * <code>optional string userObjectDescription = 25;</code>
      *
      * <pre>
-     * Byte ordering in case data type is BYTES/BYTESA
+     * Additional description of the servialized data object. If data is
+     * a serialized arbutrary Java/C++ object we need to tell the receiver
+     * how to desrialize it.
      * </pre>
      */
-    java.lang.String getByteOrder();
+    java.lang.String getUserObjectDescription();
     /**
-     * <code>optional string byteOrder = 23;</code>
+     * <code>optional string userObjectDescription = 25;</code>
      *
      * <pre>
-     * Byte ordering in case data type is BYTES/BYTESA
+     * Additional description of the servialized data object. If data is
+     * a serialized arbutrary Java/C++ object we need to tell the receiver
+     * how to desrialize it.
      * </pre>
      */
     com.google.protobuf.ByteString
-        getByteOrderBytes();
+        getUserObjectDescriptionBytes();
 
-    // optional string sender = 24;
+    // optional .Data.BAType byteArrayType = 26;
     /**
-     * <code>optional string sender = 24;</code>
+     * <code>optional .Data.BAType byteArrayType = 26;</code>
+     */
+    boolean hasByteArrayType();
+    /**
+     * <code>optional .Data.BAType byteArrayType = 26;</code>
+     */
+    xMsgD.Data.BAType getByteArrayType();
+
+    // optional string sender = 27;
+    /**
+     * <code>optional string sender = 27;</code>
      *
      * <pre>
      * ... This section is defined by the message transporter ...
@@ -555,7 +618,7 @@ public final class xMsgD {
      */
     boolean hasSender();
     /**
-     * <code>optional string sender = 24;</code>
+     * <code>optional string sender = 27;</code>
      *
      * <pre>
      * ... This section is defined by the message transporter ...
@@ -564,7 +627,7 @@ public final class xMsgD {
      */
     java.lang.String getSender();
     /**
-     * <code>optional string sender = 24;</code>
+     * <code>optional string sender = 27;</code>
      *
      * <pre>
      * ... This section is defined by the message transporter ...
@@ -574,9 +637,9 @@ public final class xMsgD {
     com.google.protobuf.ByteString
         getSenderBytes();
 
-    // optional fixed32 id = 25;
+    // optional fixed32 id = 28;
     /**
-     * <code>optional fixed32 id = 25;</code>
+     * <code>optional fixed32 id = 28;</code>
      *
      * <pre>
      * Communication id, used to genetically relate messages
@@ -584,7 +647,7 @@ public final class xMsgD {
      */
     boolean hasId();
     /**
-     * <code>optional fixed32 id = 25;</code>
+     * <code>optional fixed32 id = 28;</code>
      *
      * <pre>
      * Communication id, used to genetically relate messages
@@ -592,9 +655,36 @@ public final class xMsgD {
      */
     int getId();
 
-    // optional bool exceptionMonitor = 26;
+    // optional string byteOrder = 29;
     /**
-     * <code>optional bool exceptionMonitor = 26;</code>
+     * <code>optional string byteOrder = 29;</code>
+     *
+     * <pre>
+     * Byte ordering in case data type is BYTES/BYTESA
+     * </pre>
+     */
+    boolean hasByteOrder();
+    /**
+     * <code>optional string byteOrder = 29;</code>
+     *
+     * <pre>
+     * Byte ordering in case data type is BYTES/BYTESA
+     * </pre>
+     */
+    java.lang.String getByteOrder();
+    /**
+     * <code>optional string byteOrder = 29;</code>
+     *
+     * <pre>
+     * Byte ordering in case data type is BYTES/BYTESA
+     * </pre>
+     */
+    com.google.protobuf.ByteString
+        getByteOrderBytes();
+
+    // optional bool exceptionMonitor = 30;
+    /**
+     * <code>optional bool exceptionMonitor = 30;</code>
      *
      * <pre>
      * ... Fields that are used to control message receiver ...
@@ -603,12 +693,13 @@ public final class xMsgD {
      * [ exception_&lt;service_name&gt;,
      *             requestId,
      *             exceptionType &lt;Severity&gt;,
+     *             exceptionId,
      *             exceptionString &lt;String&gt; ]
      * </pre>
      */
     boolean hasExceptionMonitor();
     /**
-     * <code>optional bool exceptionMonitor = 26;</code>
+     * <code>optional bool exceptionMonitor = 30;</code>
      *
      * <pre>
      * ... Fields that are used to control message receiver ...
@@ -617,14 +708,15 @@ public final class xMsgD {
      * [ exception_&lt;service_name&gt;,
      *             requestId,
      *             exceptionType &lt;Severity&gt;,
+     *             exceptionId,
      *             exceptionString &lt;String&gt; ]
      * </pre>
      */
     boolean getExceptionMonitor();
 
-    // optional bool doneMonitor = 27;
+    // optional bool doneMonitor = 31;
     /**
-     * <code>optional bool doneMonitor = 27;</code>
+     * <code>optional bool doneMonitor = 31;</code>
      *
      * <pre>
      * If set to true, for example Clara service container will
@@ -635,7 +727,7 @@ public final class xMsgD {
      */
     boolean hasDoneMonitor();
     /**
-     * <code>optional bool doneMonitor = 27;</code>
+     * <code>optional bool doneMonitor = 31;</code>
      *
      * <pre>
      * If set to true, for example Clara service container will
@@ -646,9 +738,9 @@ public final class xMsgD {
      */
     boolean getDoneMonitor();
 
-    // optional bool dataMonitor = 28;
+    // optional bool dataMonitor = 32;
     /**
-     * <code>optional bool dataMonitor = 28;</code>
+     * <code>optional bool dataMonitor = 32;</code>
      *
      * <pre>
      * If set to true, for example Clara service container will
@@ -660,7 +752,7 @@ public final class xMsgD {
      */
     boolean hasDataMonitor();
     /**
-     * <code>optional bool dataMonitor = 28;</code>
+     * <code>optional bool dataMonitor = 32;</code>
      *
      * <pre>
      * If set to true, for example Clara service container will
@@ -672,9 +764,9 @@ public final class xMsgD {
      */
     boolean getDataMonitor();
 
-    // optional string composition = 29;
+    // optional string composition = 33;
     /**
-     * <code>optional string composition = 29;</code>
+     * <code>optional string composition = 33;</code>
      *
      * <pre>
      * Reserved and used for Clara service based application
@@ -684,7 +776,7 @@ public final class xMsgD {
      */
     boolean hasComposition();
     /**
-     * <code>optional string composition = 29;</code>
+     * <code>optional string composition = 33;</code>
      *
      * <pre>
      * Reserved and used for Clara service based application
@@ -694,7 +786,7 @@ public final class xMsgD {
      */
     java.lang.String getComposition();
     /**
-     * <code>optional string composition = 29;</code>
+     * <code>optional string composition = 33;</code>
      *
      * <pre>
      * Reserved and used for Clara service based application
@@ -705,9 +797,9 @@ public final class xMsgD {
     com.google.protobuf.ByteString
         getCompositionBytes();
 
-    // optional sfixed64 executionTime = 30;
+    // optional sfixed64 executionTime = 34;
     /**
-     * <code>optional sfixed64 executionTime = 30;</code>
+     * <code>optional sfixed64 executionTime = 34;</code>
      *
      * <pre>
      * Service engine execution time
@@ -715,7 +807,7 @@ public final class xMsgD {
      */
     boolean hasExecutionTime();
     /**
-     * <code>optional sfixed64 executionTime = 30;</code>
+     * <code>optional sfixed64 executionTime = 34;</code>
      *
      * <pre>
      * Service engine execution time
@@ -723,9 +815,9 @@ public final class xMsgD {
      */
     long getExecutionTime();
 
-    // optional .Data.ControlAction action = 31;
+    // optional .Data.ControlAction action = 35;
     /**
-     * <code>optional .Data.ControlAction action = 31;</code>
+     * <code>optional .Data.ControlAction action = 35;</code>
      *
      * <pre>
      * Reserved and used to define which of the CLARA interface
@@ -734,7 +826,7 @@ public final class xMsgD {
      */
     boolean hasAction();
     /**
-     * <code>optional .Data.ControlAction action = 31;</code>
+     * <code>optional .Data.ControlAction action = 35;</code>
      *
      * <pre>
      * Reserved and used to define which of the CLARA interface
@@ -743,9 +835,9 @@ public final class xMsgD {
      */
     xMsgD.Data.ControlAction getAction();
 
-    // optional .Data.SubControlAction controlR = 32;
+    // optional .Data.SubControlAction controlR = 36;
     /**
-     * <code>optional .Data.SubControlAction controlR = 32;</code>
+     * <code>optional .Data.SubControlAction controlR = 36;</code>
      *
      * <pre>
      * Reserved control field
@@ -753,7 +845,7 @@ public final class xMsgD {
      */
     boolean hasControlR();
     /**
-     * <code>optional .Data.SubControlAction controlR = 32;</code>
+     * <code>optional .Data.SubControlAction controlR = 36;</code>
      *
      * <pre>
      * Reserved control field
@@ -799,6 +891,7 @@ public final class xMsgD {
         throws com.google.protobuf.InvalidProtocolBufferException {
       initFields();
       int mutable_bitField0_ = 0;
+      int mutable_bitField1_ = 0;
       com.google.protobuf.UnknownFieldSet.Builder unknownFields =
           com.google.protobuf.UnknownFieldSet.newBuilder();
       try {
@@ -847,60 +940,70 @@ public final class xMsgD {
               }
               break;
             }
-            case 48: {
+            case 50: {
               bitField0_ |= 0x00000020;
+              statusText_ = input.readBytes();
+              break;
+            }
+            case 61: {
+              bitField0_ |= 0x00000040;
+              statusSeverityId_ = input.readSFixed32();
+              break;
+            }
+            case 64: {
+              bitField0_ |= 0x00000080;
               vLSINT32_ = input.readSInt32();
               break;
             }
-            case 56: {
-              bitField0_ |= 0x00000040;
-              vLSINT64_ = input.readSInt64();
-              break;
-            }
-            case 69: {
-              bitField0_ |= 0x00000080;
-              fLSINT32_ = input.readSFixed32();
-              break;
-            }
-            case 73: {
+            case 72: {
               bitField0_ |= 0x00000100;
-              fLSINT64_ = input.readSFixed64();
+              vLSINT64_ = input.readSInt64();
               break;
             }
             case 85: {
               bitField0_ |= 0x00000200;
-              fLOAT_ = input.readFloat();
+              fLSINT32_ = input.readSFixed32();
               break;
             }
             case 89: {
               bitField0_ |= 0x00000400;
+              fLSINT64_ = input.readSFixed64();
+              break;
+            }
+            case 101: {
+              bitField0_ |= 0x00000800;
+              fLOAT_ = input.readFloat();
+              break;
+            }
+            case 105: {
+              bitField0_ |= 0x00001000;
               dOUBLE_ = input.readDouble();
               break;
             }
-            case 98: {
-              bitField0_ |= 0x00000800;
+            case 114: {
+              bitField0_ |= 0x00002000;
               sTRING_ = input.readBytes();
               break;
             }
-            case 106: {
-              bitField0_ |= 0x00001000;
+            case 122: {
+              bitField0_ |= 0x00004000;
               bYTES_ = input.readBytes();
               break;
             }
-            case 112: {
-              if (!((mutable_bitField0_ & 0x00002000) == 0x00002000)) {
+            case 128: {
+              if (!((mutable_bitField0_ & 0x00008000) == 0x00008000)) {
                 vLSINT32A_ = new java.util.ArrayList<java.lang.Integer>();
-                mutable_bitField0_ |= 0x00002000;
+                mutable_bitField0_ |= 0x00008000;
               }
               vLSINT32A_.add(input.readSInt32());
               break;
             }
-            case 114: {
+            case 130: {
               int length = input.readRawVarint32();
               int limit = input.pushLimit(length);
-              if (!((mutable_bitField0_ & 0x00002000) == 0x00002000) && input.getBytesUntilLimit() > 0) {
+              if (!((mutable_bitField0_ & 0x00008000) == 0x00008000) && input.getBytesUntilLimit() > 0) {
                 vLSINT32A_ = new java.util.ArrayList<java.lang.Integer>();
-                mutable_bitField0_ |= 0x00002000;
+                mutable_bitField0_ |= 0x00008000;
               }
               while (input.getBytesUntilLimit() > 0) {
                 vLSINT32A_.add(input.readSInt32());
@@ -908,20 +1011,20 @@ public final class xMsgD {
               input.popLimit(limit);
               break;
             }
-            case 120: {
-              if (!((mutable_bitField0_ & 0x00004000) == 0x00004000)) {
+            case 136: {
+              if (!((mutable_bitField0_ & 0x00010000) == 0x00010000)) {
                 vLSINT64A_ = new java.util.ArrayList<java.lang.Long>();
-                mutable_bitField0_ |= 0x00004000;
+                mutable_bitField0_ |= 0x00010000;
               }
               vLSINT64A_.add(input.readSInt64());
               break;
             }
-            case 122: {
+            case 138: {
               int length = input.readRawVarint32();
               int limit = input.pushLimit(length);
-              if (!((mutable_bitField0_ & 0x00004000) == 0x00004000) && input.getBytesUntilLimit() > 0) {
+              if (!((mutable_bitField0_ & 0x00010000) == 0x00010000) && input.getBytesUntilLimit() > 0) {
                 vLSINT64A_ = new java.util.ArrayList<java.lang.Long>();
-                mutable_bitField0_ |= 0x00004000;
+                mutable_bitField0_ |= 0x00010000;
               }
               while (input.getBytesUntilLimit() > 0) {
                 vLSINT64A_.add(input.readSInt64());
@@ -929,20 +1032,20 @@ public final class xMsgD {
               input.popLimit(limit);
               break;
             }
-            case 133: {
-              if (!((mutable_bitField0_ & 0x00008000) == 0x00008000)) {
+            case 149: {
+              if (!((mutable_bitField0_ & 0x00020000) == 0x00020000)) {
                 fLSINT32A_ = new java.util.ArrayList<java.lang.Integer>();
-                mutable_bitField0_ |= 0x00008000;
+                mutable_bitField0_ |= 0x00020000;
               }
               fLSINT32A_.add(input.readSFixed32());
               break;
             }
-            case 130: {
+            case 146: {
               int length = input.readRawVarint32();
               int limit = input.pushLimit(length);
-              if (!((mutable_bitField0_ & 0x00008000) == 0x00008000) && input.getBytesUntilLimit() > 0) {
+              if (!((mutable_bitField0_ & 0x00020000) == 0x00020000) && input.getBytesUntilLimit() > 0) {
                 fLSINT32A_ = new java.util.ArrayList<java.lang.Integer>();
-                mutable_bitField0_ |= 0x00008000;
+                mutable_bitField0_ |= 0x00020000;
               }
               while (input.getBytesUntilLimit() > 0) {
                 fLSINT32A_.add(input.readSFixed32());
@@ -950,20 +1053,20 @@ public final class xMsgD {
               input.popLimit(limit);
               break;
             }
-            case 137: {
-              if (!((mutable_bitField0_ & 0x00010000) == 0x00010000)) {
+            case 153: {
+              if (!((mutable_bitField0_ & 0x00040000) == 0x00040000)) {
                 fLSINT64A_ = new java.util.ArrayList<java.lang.Long>();
-                mutable_bitField0_ |= 0x00010000;
+                mutable_bitField0_ |= 0x00040000;
               }
               fLSINT64A_.add(input.readSFixed64());
               break;
             }
-            case 138: {
+            case 154: {
               int length = input.readRawVarint32();
               int limit = input.pushLimit(length);
-              if (!((mutable_bitField0_ & 0x00010000) == 0x00010000) && input.getBytesUntilLimit() > 0) {
+              if (!((mutable_bitField0_ & 0x00040000) == 0x00040000) && input.getBytesUntilLimit() > 0) {
                 fLSINT64A_ = new java.util.ArrayList<java.lang.Long>();
-                mutable_bitField0_ |= 0x00010000;
+                mutable_bitField0_ |= 0x00040000;
               }
               while (input.getBytesUntilLimit() > 0) {
                 fLSINT64A_.add(input.readSFixed64());
@@ -971,20 +1074,20 @@ public final class xMsgD {
               input.popLimit(limit);
               break;
             }
-            case 149: {
-              if (!((mutable_bitField0_ & 0x00020000) == 0x00020000)) {
+            case 165: {
+              if (!((mutable_bitField0_ & 0x00080000) == 0x00080000)) {
                 fLOATA_ = new java.util.ArrayList<java.lang.Float>();
-                mutable_bitField0_ |= 0x00020000;
+                mutable_bitField0_ |= 0x00080000;
               }
               fLOATA_.add(input.readFloat());
               break;
             }
-            case 146: {
+            case 162: {
               int length = input.readRawVarint32();
               int limit = input.pushLimit(length);
-              if (!((mutable_bitField0_ & 0x00020000) == 0x00020000) && input.getBytesUntilLimit() > 0) {
+              if (!((mutable_bitField0_ & 0x00080000) == 0x00080000) && input.getBytesUntilLimit() > 0) {
                 fLOATA_ = new java.util.ArrayList<java.lang.Float>();
-                mutable_bitField0_ |= 0x00020000;
+                mutable_bitField0_ |= 0x00080000;
               }
               while (input.getBytesUntilLimit() > 0) {
                 fLOATA_.add(input.readFloat());
@@ -992,20 +1095,20 @@ public final class xMsgD {
               input.popLimit(limit);
               break;
             }
-            case 153: {
-              if (!((mutable_bitField0_ & 0x00040000) == 0x00040000)) {
+            case 169: {
+              if (!((mutable_bitField0_ & 0x00100000) == 0x00100000)) {
                 dOUBLEA_ = new java.util.ArrayList<java.lang.Double>();
-                mutable_bitField0_ |= 0x00040000;
+                mutable_bitField0_ |= 0x00100000;
               }
               dOUBLEA_.add(input.readDouble());
               break;
             }
-            case 154: {
+            case 170: {
               int length = input.readRawVarint32();
               int limit = input.pushLimit(length);
-              if (!((mutable_bitField0_ & 0x00040000) == 0x00040000) && input.getBytesUntilLimit() > 0) {
+              if (!((mutable_bitField0_ & 0x00100000) == 0x00100000) && input.getBytesUntilLimit() > 0) {
                 dOUBLEA_ = new java.util.ArrayList<java.lang.Double>();
-                mutable_bitField0_ |= 0x00040000;
+                mutable_bitField0_ |= 0x00100000;
               }
               while (input.getBytesUntilLimit() > 0) {
                 dOUBLEA_.add(input.readDouble());
@@ -1013,91 +1116,107 @@ public final class xMsgD {
               input.popLimit(limit);
               break;
             }
-            case 162: {
-              if (!((mutable_bitField0_ & 0x00080000) == 0x00080000)) {
+            case 178: {
+              if (!((mutable_bitField0_ & 0x00200000) == 0x00200000)) {
                 sTRINGA_ = new com.google.protobuf.LazyStringArrayList();
-                mutable_bitField0_ |= 0x00080000;
+                mutable_bitField0_ |= 0x00200000;
               }
               sTRINGA_.add(input.readBytes());
               break;
             }
-            case 170: {
-              if (!((mutable_bitField0_ & 0x00100000) == 0x00100000)) {
+            case 186: {
+              if (!((mutable_bitField0_ & 0x00400000) == 0x00400000)) {
                 bYTESA_ = new java.util.ArrayList<com.google.protobuf.ByteString>();
-                mutable_bitField0_ |= 0x00100000;
+                mutable_bitField0_ |= 0x00400000;
               }
               bYTESA_.add(input.readBytes());
               break;
             }
-            case 176: {
+            case 192: {
               int rawValue = input.readEnum();
               xMsgD.Data.DType value = xMsgD.Data.DType.valueOf(rawValue);
               if (value == null) {
-                unknownFields.mergeVarintField(22, rawValue);
+                unknownFields.mergeVarintField(24, rawValue);
               } else {
-                bitField0_ |= 0x00002000;
+                bitField0_ |= 0x00008000;
                 dataType_ = value;
               }
               break;
             }
-            case 186: {
-              bitField0_ |= 0x00004000;
-              byteOrder_ = input.readBytes();
-              break;
-            }
-            case 194: {
-              bitField0_ |= 0x00008000;
-              sender_ = input.readBytes();
-              break;
-            }
-            case 205: {
+            case 202: {
               bitField0_ |= 0x00010000;
-              id_ = input.readFixed32();
+              userObjectDescription_ = input.readBytes();
               break;
             }
             case 208: {
-              bitField0_ |= 0x00020000;
-              exceptionMonitor_ = input.readBool();
+              int rawValue = input.readEnum();
+              xMsgD.Data.BAType value = xMsgD.Data.BAType.valueOf(rawValue);
+              if (value == null) {
+                unknownFields.mergeVarintField(26, rawValue);
+              } else {
+                bitField0_ |= 0x00020000;
+                byteArrayType_ = value;
+              }
               break;
             }
-            case 216: {
+            case 218: {
               bitField0_ |= 0x00040000;
-              doneMonitor_ = input.readBool();
+              sender_ = input.readBytes();
               break;
             }
-            case 224: {
+            case 229: {
               bitField0_ |= 0x00080000;
-              dataMonitor_ = input.readBool();
+              id_ = input.readFixed32();
               break;
             }
             case 234: {
               bitField0_ |= 0x00100000;
-              composition_ = input.readBytes();
+              byteOrder_ = input.readBytes();
               break;
             }
-            case 241: {
+            case 240: {
               bitField0_ |= 0x00200000;
-              executionTime_ = input.readSFixed64();
+              exceptionMonitor_ = input.readBool();
               break;
             }
             case 248: {
+              bitField0_ |= 0x00400000;
+              doneMonitor_ = input.readBool();
+              break;
+            }
+            case 256: {
+              bitField0_ |= 0x00800000;
+              dataMonitor_ = input.readBool();
+              break;
+            }
+            case 266: {
+              bitField0_ |= 0x01000000;
+              composition_ = input.readBytes();
+              break;
+            }
+            case 273: {
+              bitField0_ |= 0x02000000;
+              executionTime_ = input.readSFixed64();
+              break;
+            }
+            case 280: {
               int rawValue = input.readEnum();
               xMsgD.Data.ControlAction value = xMsgD.Data.ControlAction.valueOf(rawValue);
               if (value == null) {
-                unknownFields.mergeVarintField(31, rawValue);
+                unknownFields.mergeVarintField(35, rawValue);
               } else {
-                bitField0_ |= 0x00400000;
+                bitField0_ |= 0x04000000;
                 action_ = value;
               }
               break;
             }
-            case 256: {
+            case 288: {
               int rawValue = input.readEnum();
               xMsgD.Data.SubControlAction value = xMsgD.Data.SubControlAction.valueOf(rawValue);
               if (value == null) {
-                unknownFields.mergeVarintField(32, rawValue);
+                unknownFields.mergeVarintField(36, rawValue);
               } else {
-                bitField0_ |= 0x00800000;
+                bitField0_ |= 0x08000000;
                 controlR_ = value;
               }
               break;
@@ -1110,28 +1229,28 @@ public final class xMsgD {
         throw new com.google.protobuf.InvalidProtocolBufferException(
             e.getMessage()).setUnfinishedMessage(this);
       } finally {
-        if (((mutable_bitField0_ & 0x00002000) == 0x00002000)) {
+        if (((mutable_bitField0_ & 0x00008000) == 0x00008000)) {
           vLSINT32A_ = java.util.Collections.unmodifiableList(vLSINT32A_);
         }
-        if (((mutable_bitField0_ & 0x00004000) == 0x00004000)) {
+        if (((mutable_bitField0_ & 0x00010000) == 0x00010000)) {
           vLSINT64A_ = java.util.Collections.unmodifiableList(vLSINT64A_);
         }
-        if (((mutable_bitField0_ & 0x00008000) == 0x00008000)) {
+        if (((mutable_bitField0_ & 0x00020000) == 0x00020000)) {
           fLSINT32A_ = java.util.Collections.unmodifiableList(fLSINT32A_);
         }
-        if (((mutable_bitField0_ & 0x00010000) == 0x00010000)) {
+        if (((mutable_bitField0_ & 0x00040000) == 0x00040000)) {
           fLSINT64A_ = java.util.Collections.unmodifiableList(fLSINT64A_);
         }
-        if (((mutable_bitField0_ & 0x00020000) == 0x00020000)) {
+        if (((mutable_bitField0_ & 0x00080000) == 0x00080000)) {
           fLOATA_ = java.util.Collections.unmodifiableList(fLOATA_);
         }
-        if (((mutable_bitField0_ & 0x00040000) == 0x00040000)) {
+        if (((mutable_bitField0_ & 0x00100000) == 0x00100000)) {
           dOUBLEA_ = java.util.Collections.unmodifiableList(dOUBLEA_);
         }
-        if (((mutable_bitField0_ & 0x00080000) == 0x00080000)) {
+        if (((mutable_bitField0_ & 0x00200000) == 0x00200000)) {
           sTRINGA_ = new com.google.protobuf.UnmodifiableLazyStringList(sTRINGA_);
         }
-        if (((mutable_bitField0_ & 0x00100000) == 0x00100000)) {
+        if (((mutable_bitField0_ & 0x00400000) == 0x00400000)) {
           bYTESA_ = java.util.Collections.unmodifiableList(bYTESA_);
         }
         this.unknownFields = unknownFields.build();
@@ -1303,6 +1422,14 @@ public final class xMsgD {
        * </pre>
        */
       T_PAYLOAD(16, 17),
+      /**
+       * <code>T_OBJECT = 18;</code>
+       *
+       * <pre>
+       * un-serialized object
+       * </pre>
+       */
+      T_OBJECT(17, 18),
       ;
 
       /**
@@ -1433,6 +1560,14 @@ public final class xMsgD {
        * </pre>
        */
       public static final int T_PAYLOAD_VALUE = 17;
+      /**
+       * <code>T_OBJECT = 18;</code>
+       *
+       * <pre>
+       * un-serialized object
+       * </pre>
+       */
+      public static final int T_OBJECT_VALUE = 18;
 
 
       public final int getNumber() { return value; }
@@ -1456,6 +1591,7 @@ public final class xMsgD {
           case 15: return T_STRINGA;
           case 16: return T_BYTESA;
           case 17: return T_PAYLOAD;
+          case 18: return T_OBJECT;
           default: return null;
         }
       }
@@ -1537,6 +1673,10 @@ public final class xMsgD {
        * <code>HDF = 5;</code>
        */
       HDF(4, 5),
+      /**
+       * <code>EVIO = 6;</code>
+       */
+      EVIO(5, 6),
       ;
 
       /**
@@ -1559,6 +1699,10 @@ public final class xMsgD {
        * <code>HDF = 5;</code>
        */
       public static final int HDF_VALUE = 5;
+      /**
+       * <code>EVIO = 6;</code>
+       */
+      public static final int EVIO_VALUE = 6;
 
 
       public final int getNumber() { return value; }
@@ -1570,6 +1714,7 @@ public final class xMsgD {
           case 3: return POBJECT;
           case 4: return NETCDF;
           case 5: return HDF;
+          case 6: return EVIO;
           default: return null;
         }
       }
@@ -2039,7 +2184,7 @@ public final class xMsgD {
      * <code>optional string dataAuthor = 3;</code>
      *
      * <pre>
-     * Author of the data
+     * Author of the data, an additional filed set by the engine
      * </pre>
      */
     public boolean hasDataAuthor() {
@@ -2049,7 +2194,7 @@ public final class xMsgD {
      * <code>optional string dataAuthor = 3;</code>
      *
      * <pre>
-     * Author of the data
+     * Author of the data, an additional filed set by the engine
      * </pre>
      */
     public java.lang.String getDataAuthor() {
@@ -2070,7 +2215,7 @@ public final class xMsgD {
      * <code>optional string dataAuthor = 3;</code>
      *
      * <pre>
-     * Author of the data
+     * Author of the data, an additional filed set by the engine
      * </pre>
      */
     public com.google.protobuf.ByteString
@@ -2166,21 +2311,100 @@ public final class xMsgD {
       return dataGenerationStatus_;
     }
 
-    // optional sint32 VLSINT32 = 6;
-    public static final int VLSINT32_FIELD_NUMBER = 6;
+    // optional string statusText = 6;
+    public static final int STATUSTEXT_FIELD_NUMBER = 6;
+    private java.lang.Object statusText_;
+    /**
+     * <code>optional string statusText = 6;</code>
+     *
+     * <pre>
+     * Status text
+     * </pre>
+     */
+    public boolean hasStatusText() {
+      return ((bitField0_ & 0x00000020) == 0x00000020);
+    }
+    /**
+     * <code>optional string statusText = 6;</code>
+     *
+     * <pre>
+     * Status text
+     * </pre>
+     */
+    public java.lang.String getStatusText() {
+      java.lang.Object ref = statusText_;
+      if (ref instanceof java.lang.String) {
+        return (java.lang.String) ref;
+      } else {
+        com.google.protobuf.ByteString bs = 
+            (com.google.protobuf.ByteString) ref;
+        java.lang.String s = bs.toStringUtf8();
+        if (bs.isValidUtf8()) {
+          statusText_ = s;
+        }
+        return s;
+      }
+    }
+    /**
+     * <code>optional string statusText = 6;</code>
+     *
+     * <pre>
+     * Status text
+     * </pre>
+     */
+    public com.google.protobuf.ByteString
+        getStatusTextBytes() {
+      java.lang.Object ref = statusText_;
+      if (ref instanceof java.lang.String) {
+        com.google.protobuf.ByteString b = 
+            com.google.protobuf.ByteString.copyFromUtf8(
+                (java.lang.String) ref);
+        statusText_ = b;
+        return b;
+      } else {
+        return (com.google.protobuf.ByteString) ref;
+      }
+    }
+
+    // optional sfixed32 statusSeverityId = 7;
+    public static final int STATUSSEVERITYID_FIELD_NUMBER = 7;
+    private int statusSeverityId_;
+    /**
+     * <code>optional sfixed32 statusSeverityId = 7;</code>
+     *
+     * <pre>
+     * Severity id of the data generaation status
+     * </pre>
+     */
+    public boolean hasStatusSeverityId() {
+      return ((bitField0_ & 0x00000040) == 0x00000040);
+    }
+    /**
+     * <code>optional sfixed32 statusSeverityId = 7;</code>
+     *
+     * <pre>
+     * Severity id of the data generaation status
+     * </pre>
+     */
+    public int getStatusSeverityId() {
+      return statusSeverityId_;
+    }
+
+    // optional sint32 VLSINT32 = 8;
+    public static final int VLSINT32_FIELD_NUMBER = 8;
     private int vLSINT32_;
     /**
-     * <code>optional sint32 VLSINT32 = 6;</code>
+     * <code>optional sint32 VLSINT32 = 8;</code>
      *
      * <pre>
      * Data itself
      * </pre>
      */
     public boolean hasVLSINT32() {
-      return ((bitField0_ & 0x00000020) == 0x00000020);
+      return ((bitField0_ & 0x00000080) == 0x00000080);
     }
     /**
-     * <code>optional sint32 VLSINT32 = 6;</code>
+     * <code>optional sint32 VLSINT32 = 8;</code>
      *
      * <pre>
      * Data itself
@@ -2190,21 +2414,21 @@ public final class xMsgD {
       return vLSINT32_;
     }
 
-    // optional sint64 VLSINT64 = 7;
-    public static final int VLSINT64_FIELD_NUMBER = 7;
+    // optional sint64 VLSINT64 = 9;
+    public static final int VLSINT64_FIELD_NUMBER = 9;
     private long vLSINT64_;
     /**
-     * <code>optional sint64 VLSINT64 = 7;</code>
+     * <code>optional sint64 VLSINT64 = 9;</code>
      *
      * <pre>
      * variable length signed int64
      * </pre>
      */
     public boolean hasVLSINT64() {
-      return ((bitField0_ & 0x00000040) == 0x00000040);
+      return ((bitField0_ & 0x00000100) == 0x00000100);
     }
     /**
-     * <code>optional sint64 VLSINT64 = 7;</code>
+     * <code>optional sint64 VLSINT64 = 9;</code>
      *
      * <pre>
      * variable length signed int64
@@ -2214,21 +2438,21 @@ public final class xMsgD {
       return vLSINT64_;
     }
 
-    // optional sfixed32 FLSINT32 = 8;
-    public static final int FLSINT32_FIELD_NUMBER = 8;
+    // optional sfixed32 FLSINT32 = 10;
+    public static final int FLSINT32_FIELD_NUMBER = 10;
     private int fLSINT32_;
     /**
-     * <code>optional sfixed32 FLSINT32 = 8;</code>
+     * <code>optional sfixed32 FLSINT32 = 10;</code>
      *
      * <pre>
      * fixed length signed int32
      * </pre>
      */
     public boolean hasFLSINT32() {
-      return ((bitField0_ & 0x00000080) == 0x00000080);
+      return ((bitField0_ & 0x00000200) == 0x00000200);
     }
     /**
-     * <code>optional sfixed32 FLSINT32 = 8;</code>
+     * <code>optional sfixed32 FLSINT32 = 10;</code>
      *
      * <pre>
      * fixed length signed int32
@@ -2238,21 +2462,21 @@ public final class xMsgD {
       return fLSINT32_;
     }
 
-    // optional sfixed64 FLSINT64 = 9;
-    public static final int FLSINT64_FIELD_NUMBER = 9;
+    // optional sfixed64 FLSINT64 = 11;
+    public static final int FLSINT64_FIELD_NUMBER = 11;
     private long fLSINT64_;
     /**
-     * <code>optional sfixed64 FLSINT64 = 9;</code>
+     * <code>optional sfixed64 FLSINT64 = 11;</code>
      *
      * <pre>
      * fixed length signed int64
      * </pre>
      */
     public boolean hasFLSINT64() {
-      return ((bitField0_ & 0x00000100) == 0x00000100);
+      return ((bitField0_ & 0x00000400) == 0x00000400);
     }
     /**
-     * <code>optional sfixed64 FLSINT64 = 9;</code>
+     * <code>optional sfixed64 FLSINT64 = 11;</code>
      *
      * <pre>
      * fixed length signed int64
@@ -2262,53 +2486,53 @@ public final class xMsgD {
       return fLSINT64_;
     }
 
-    // optional float FLOAT = 10;
-    public static final int FLOAT_FIELD_NUMBER = 10;
+    // optional float FLOAT = 12;
+    public static final int FLOAT_FIELD_NUMBER = 12;
     private float fLOAT_;
     /**
-     * <code>optional float FLOAT = 10;</code>
+     * <code>optional float FLOAT = 12;</code>
      */
     public boolean hasFLOAT() {
-      return ((bitField0_ & 0x00000200) == 0x00000200);
+      return ((bitField0_ & 0x00000800) == 0x00000800);
     }
     /**
-     * <code>optional float FLOAT = 10;</code>
+     * <code>optional float FLOAT = 12;</code>
      */
     public float getFLOAT() {
       return fLOAT_;
     }
 
-    // optional double DOUBLE = 11;
-    public static final int DOUBLE_FIELD_NUMBER = 11;
+    // optional double DOUBLE = 13;
+    public static final int DOUBLE_FIELD_NUMBER = 13;
     private double dOUBLE_;
     /**
-     * <code>optional double DOUBLE = 11;</code>
+     * <code>optional double DOUBLE = 13;</code>
      */
     public boolean hasDOUBLE() {
-      return ((bitField0_ & 0x00000400) == 0x00000400);
+      return ((bitField0_ & 0x00001000) == 0x00001000);
     }
     /**
-     * <code>optional double DOUBLE = 11;</code>
+     * <code>optional double DOUBLE = 13;</code>
      */
     public double getDOUBLE() {
       return dOUBLE_;
     }
 
-    // optional string STRING = 12;
-    public static final int STRING_FIELD_NUMBER = 12;
+    // optional string STRING = 14;
+    public static final int STRING_FIELD_NUMBER = 14;
     private java.lang.Object sTRING_;
     /**
-     * <code>optional string STRING = 12;</code>
+     * <code>optional string STRING = 14;</code>
      *
      * <pre>
      * contains UTF-8 encoding or 7-bit ASCII text
      * </pre>
      */
     public boolean hasSTRING() {
-      return ((bitField0_ & 0x00000800) == 0x00000800);
+      return ((bitField0_ & 0x00002000) == 0x00002000);
     }
     /**
-     * <code>optional string STRING = 12;</code>
+     * <code>optional string STRING = 14;</code>
      *
      * <pre>
      * contains UTF-8 encoding or 7-bit ASCII text
@@ -2329,7 +2553,7 @@ public final class xMsgD {
       }
     }
     /**
-     * <code>optional string STRING = 12;</code>
+     * <code>optional string STRING = 14;</code>
      *
      * <pre>
      * contains UTF-8 encoding or 7-bit ASCII text
@@ -2349,21 +2573,21 @@ public final class xMsgD {
       }
     }
 
-    // optional bytes BYTES = 13;
-    public static final int BYTES_FIELD_NUMBER = 13;
+    // optional bytes BYTES = 15;
+    public static final int BYTES_FIELD_NUMBER = 15;
     private com.google.protobuf.ByteString bYTES_;
     /**
-     * <code>optional bytes BYTES = 13;</code>
+     * <code>optional bytes BYTES = 15;</code>
      *
      * <pre>
      * contains arbitrary sequence of bytes
      * </pre>
      */
     public boolean hasBYTES() {
-      return ((bitField0_ & 0x00001000) == 0x00001000);
+      return ((bitField0_ & 0x00004000) == 0x00004000);
     }
     /**
-     * <code>optional bytes BYTES = 13;</code>
+     * <code>optional bytes BYTES = 15;</code>
      *
      * <pre>
      * contains arbitrary sequence of bytes
@@ -2373,11 +2597,11 @@ public final class xMsgD {
       return bYTES_;
     }
 
-    // repeated sint32 VLSINT32A = 14;
-    public static final int VLSINT32A_FIELD_NUMBER = 14;
+    // repeated sint32 VLSINT32A = 16;
+    public static final int VLSINT32A_FIELD_NUMBER = 16;
     private java.util.List<java.lang.Integer> vLSINT32A_;
     /**
-     * <code>repeated sint32 VLSINT32A = 14;</code>
+     * <code>repeated sint32 VLSINT32A = 16;</code>
      *
      * <pre>
      * array of variable length signed int32s
@@ -2388,7 +2612,7 @@ public final class xMsgD {
       return vLSINT32A_;
     }
     /**
-     * <code>repeated sint32 VLSINT32A = 14;</code>
+     * <code>repeated sint32 VLSINT32A = 16;</code>
      *
      * <pre>
      * array of variable length signed int32s
@@ -2398,7 +2622,7 @@ public final class xMsgD {
       return vLSINT32A_.size();
     }
     /**
-     * <code>repeated sint32 VLSINT32A = 14;</code>
+     * <code>repeated sint32 VLSINT32A = 16;</code>
      *
      * <pre>
      * array of variable length signed int32s
@@ -2408,11 +2632,11 @@ public final class xMsgD {
       return vLSINT32A_.get(index);
     }
 
-    // repeated sint64 VLSINT64A = 15;
-    public static final int VLSINT64A_FIELD_NUMBER = 15;
+    // repeated sint64 VLSINT64A = 17;
+    public static final int VLSINT64A_FIELD_NUMBER = 17;
     private java.util.List<java.lang.Long> vLSINT64A_;
     /**
-     * <code>repeated sint64 VLSINT64A = 15;</code>
+     * <code>repeated sint64 VLSINT64A = 17;</code>
      *
      * <pre>
      * array of variable length signed int64s
@@ -2423,7 +2647,7 @@ public final class xMsgD {
       return vLSINT64A_;
     }
     /**
-     * <code>repeated sint64 VLSINT64A = 15;</code>
+     * <code>repeated sint64 VLSINT64A = 17;</code>
      *
      * <pre>
      * array of variable length signed int64s
@@ -2433,7 +2657,7 @@ public final class xMsgD {
       return vLSINT64A_.size();
     }
     /**
-     * <code>repeated sint64 VLSINT64A = 15;</code>
+     * <code>repeated sint64 VLSINT64A = 17;</code>
      *
      * <pre>
      * array of variable length signed int64s
@@ -2443,11 +2667,11 @@ public final class xMsgD {
       return vLSINT64A_.get(index);
     }
 
-    // repeated sfixed32 FLSINT32A = 16;
-    public static final int FLSINT32A_FIELD_NUMBER = 16;
+    // repeated sfixed32 FLSINT32A = 18;
+    public static final int FLSINT32A_FIELD_NUMBER = 18;
     private java.util.List<java.lang.Integer> fLSINT32A_;
     /**
-     * <code>repeated sfixed32 FLSINT32A = 16;</code>
+     * <code>repeated sfixed32 FLSINT32A = 18;</code>
      *
      * <pre>
      * array of fixed length signed int32s
@@ -2458,7 +2682,7 @@ public final class xMsgD {
       return fLSINT32A_;
     }
     /**
-     * <code>repeated sfixed32 FLSINT32A = 16;</code>
+     * <code>repeated sfixed32 FLSINT32A = 18;</code>
      *
      * <pre>
      * array of fixed length signed int32s
@@ -2468,7 +2692,7 @@ public final class xMsgD {
       return fLSINT32A_.size();
     }
     /**
-     * <code>repeated sfixed32 FLSINT32A = 16;</code>
+     * <code>repeated sfixed32 FLSINT32A = 18;</code>
      *
      * <pre>
      * array of fixed length signed int32s
@@ -2478,11 +2702,11 @@ public final class xMsgD {
       return fLSINT32A_.get(index);
     }
 
-    // repeated sfixed64 FLSINT64A = 17;
-    public static final int FLSINT64A_FIELD_NUMBER = 17;
+    // repeated sfixed64 FLSINT64A = 19;
+    public static final int FLSINT64A_FIELD_NUMBER = 19;
     private java.util.List<java.lang.Long> fLSINT64A_;
     /**
-     * <code>repeated sfixed64 FLSINT64A = 17;</code>
+     * <code>repeated sfixed64 FLSINT64A = 19;</code>
      *
      * <pre>
      * array of fixed length signed int64s
@@ -2493,7 +2717,7 @@ public final class xMsgD {
       return fLSINT64A_;
     }
     /**
-     * <code>repeated sfixed64 FLSINT64A = 17;</code>
+     * <code>repeated sfixed64 FLSINT64A = 19;</code>
      *
      * <pre>
      * array of fixed length signed int64s
@@ -2503,7 +2727,7 @@ public final class xMsgD {
       return fLSINT64A_.size();
     }
     /**
-     * <code>repeated sfixed64 FLSINT64A = 17;</code>
+     * <code>repeated sfixed64 FLSINT64A = 19;</code>
      *
      * <pre>
      * array of fixed length signed int64s
@@ -2513,11 +2737,11 @@ public final class xMsgD {
       return fLSINT64A_.get(index);
     }
 
-    // repeated float FLOATA = 18;
-    public static final int FLOATA_FIELD_NUMBER = 18;
+    // repeated float FLOATA = 20;
+    public static final int FLOATA_FIELD_NUMBER = 20;
     private java.util.List<java.lang.Float> fLOATA_;
     /**
-     * <code>repeated float FLOATA = 18;</code>
+     * <code>repeated float FLOATA = 20;</code>
      *
      * <pre>
      * array of floats
@@ -2528,7 +2752,7 @@ public final class xMsgD {
       return fLOATA_;
     }
     /**
-     * <code>repeated float FLOATA = 18;</code>
+     * <code>repeated float FLOATA = 20;</code>
      *
      * <pre>
      * array of floats
@@ -2538,7 +2762,7 @@ public final class xMsgD {
       return fLOATA_.size();
     }
     /**
-     * <code>repeated float FLOATA = 18;</code>
+     * <code>repeated float FLOATA = 20;</code>
      *
      * <pre>
      * array of floats
@@ -2548,11 +2772,11 @@ public final class xMsgD {
       return fLOATA_.get(index);
     }
 
-    // repeated double DOUBLEA = 19;
-    public static final int DOUBLEA_FIELD_NUMBER = 19;
+    // repeated double DOUBLEA = 21;
+    public static final int DOUBLEA_FIELD_NUMBER = 21;
     private java.util.List<java.lang.Double> dOUBLEA_;
     /**
-     * <code>repeated double DOUBLEA = 19;</code>
+     * <code>repeated double DOUBLEA = 21;</code>
      *
      * <pre>
      * array of doubles
@@ -2563,7 +2787,7 @@ public final class xMsgD {
       return dOUBLEA_;
     }
     /**
-     * <code>repeated double DOUBLEA = 19;</code>
+     * <code>repeated double DOUBLEA = 21;</code>
      *
      * <pre>
      * array of doubles
@@ -2573,7 +2797,7 @@ public final class xMsgD {
       return dOUBLEA_.size();
     }
     /**
-     * <code>repeated double DOUBLEA = 19;</code>
+     * <code>repeated double DOUBLEA = 21;</code>
      *
      * <pre>
      * array of doubles
@@ -2583,11 +2807,11 @@ public final class xMsgD {
       return dOUBLEA_.get(index);
     }
 
-    // repeated string STRINGA = 20;
-    public static final int STRINGA_FIELD_NUMBER = 20;
+    // repeated string STRINGA = 22;
+    public static final int STRINGA_FIELD_NUMBER = 22;
     private com.google.protobuf.LazyStringList sTRINGA_;
     /**
-     * <code>repeated string STRINGA = 20;</code>
+     * <code>repeated string STRINGA = 22;</code>
      *
      * <pre>
      * array of UTF-8 encoded or 7-bit ASCII strings
@@ -2598,7 +2822,7 @@ public final class xMsgD {
       return sTRINGA_;
     }
     /**
-     * <code>repeated string STRINGA = 20;</code>
+     * <code>repeated string STRINGA = 22;</code>
      *
      * <pre>
      * array of UTF-8 encoded or 7-bit ASCII strings
@@ -2608,7 +2832,7 @@ public final class xMsgD {
       return sTRINGA_.size();
     }
     /**
-     * <code>repeated string STRINGA = 20;</code>
+     * <code>repeated string STRINGA = 22;</code>
      *
      * <pre>
      * array of UTF-8 encoded or 7-bit ASCII strings
@@ -2618,7 +2842,7 @@ public final class xMsgD {
       return sTRINGA_.get(index);
     }
     /**
-     * <code>repeated string STRINGA = 20;</code>
+     * <code>repeated string STRINGA = 22;</code>
      *
      * <pre>
      * array of UTF-8 encoded or 7-bit ASCII strings
@@ -2629,11 +2853,11 @@ public final class xMsgD {
       return sTRINGA_.getByteString(index);
     }
 
-    // repeated bytes BYTESA = 21;
-    public static final int BYTESA_FIELD_NUMBER = 21;
+    // repeated bytes BYTESA = 23;
+    public static final int BYTESA_FIELD_NUMBER = 23;
     private java.util.List<com.google.protobuf.ByteString> bYTESA_;
     /**
-     * <code>repeated bytes BYTESA = 21;</code>
+     * <code>repeated bytes BYTESA = 23;</code>
      *
      * <pre>
      * array of arbitrary sequence of bytes
@@ -2644,7 +2868,7 @@ public final class xMsgD {
       return bYTESA_;
     }
     /**
-     * <code>repeated bytes BYTESA = 21;</code>
+     * <code>repeated bytes BYTESA = 23;</code>
      *
      * <pre>
      * array of arbitrary sequence of bytes
@@ -2654,7 +2878,7 @@ public final class xMsgD {
       return bYTESA_.size();
     }
     /**
-     * <code>repeated bytes BYTESA = 21;</code>
+     * <code>repeated bytes BYTESA = 23;</code>
      *
      * <pre>
      * array of arbitrary sequence of bytes
@@ -2664,54 +2888,60 @@ public final class xMsgD {
       return bYTESA_.get(index);
     }
 
-    // optional .Data.DType dataType = 22;
-    public static final int DATATYPE_FIELD_NUMBER = 22;
+    // optional .Data.DType dataType = 24;
+    public static final int DATATYPE_FIELD_NUMBER = 24;
     private xMsgD.Data.DType dataType_;
     /**
-     * <code>optional .Data.DType dataType = 22;</code>
+     * <code>optional .Data.DType dataType = 24;</code>
      *
      * <pre>
      * Data type. If set to DataTpe.PAYLOAD access data using the "payload"
-     * filed, otherwise "data: filed
+     * filed, otherwise "data: filed. In case data is passed as a byteArray this
+     * will define the type of the object serialized to byteArray
      * </pre>
      */
     public boolean hasDataType() {
-      return ((bitField0_ & 0x00002000) == 0x00002000);
+      return ((bitField0_ & 0x00008000) == 0x00008000);
     }
     /**
-     * <code>optional .Data.DType dataType = 22;</code>
+     * <code>optional .Data.DType dataType = 24;</code>
      *
      * <pre>
      * Data type. If set to DataTpe.PAYLOAD access data using the "payload"
-     * filed, otherwise "data: filed
+     * filed, otherwise "data: filed. In case data is passed as a byteArray this
+     * will define the type of the object serialized to byteArray
      * </pre>
      */
     public xMsgD.Data.DType getDataType() {
       return dataType_;
     }
 
-    // optional string byteOrder = 23;
-    public static final int BYTEORDER_FIELD_NUMBER = 23;
-    private java.lang.Object byteOrder_;
+    // optional string userObjectDescription = 25;
+    public static final int USEROBJECTDESCRIPTION_FIELD_NUMBER = 25;
+    private java.lang.Object userObjectDescription_;
     /**
-     * <code>optional string byteOrder = 23;</code>
+     * <code>optional string userObjectDescription = 25;</code>
      *
      * <pre>
-     * Byte ordering in case data type is BYTES/BYTESA
+     * Additional description of the servialized data object. If data is
+     * a serialized arbutrary Java/C++ object we need to tell the receiver
+     * how to desrialize it.
      * </pre>
      */
-    public boolean hasByteOrder() {
-      return ((bitField0_ & 0x00004000) == 0x00004000);
+    public boolean hasUserObjectDescription() {
+      return ((bitField0_ & 0x00010000) == 0x00010000);
     }
     /**
-     * <code>optional string byteOrder = 23;</code>
+     * <code>optional string userObjectDescription = 25;</code>
      *
      * <pre>
-     * Byte ordering in case data type is BYTES/BYTESA
+     * Additional description of the servialized data object. If data is
+     * a serialized arbutrary Java/C++ object we need to tell the receiver
+     * how to desrialize it.
      * </pre>
      */
-    public java.lang.String getByteOrder() {
-      java.lang.Object ref = byteOrder_;
+    public java.lang.String getUserObjectDescription() {
+      java.lang.Object ref = userObjectDescription_;
       if (ref instanceof java.lang.String) {
         return (java.lang.String) ref;
       } else {
@@ -2719,37 +2949,55 @@ public final class xMsgD {
             (com.google.protobuf.ByteString) ref;
         java.lang.String s = bs.toStringUtf8();
         if (bs.isValidUtf8()) {
-          byteOrder_ = s;
+          userObjectDescription_ = s;
         }
         return s;
       }
     }
     /**
-     * <code>optional string byteOrder = 23;</code>
+     * <code>optional string userObjectDescription = 25;</code>
      *
      * <pre>
-     * Byte ordering in case data type is BYTES/BYTESA
+     * Additional description of the servialized data object. If data is
+     * a serialized arbutrary Java/C++ object we need to tell the receiver
+     * how to desrialize it.
      * </pre>
      */
     public com.google.protobuf.ByteString
-        getByteOrderBytes() {
-      java.lang.Object ref = byteOrder_;
+        getUserObjectDescriptionBytes() {
+      java.lang.Object ref = userObjectDescription_;
       if (ref instanceof java.lang.String) {
         com.google.protobuf.ByteString b = 
             com.google.protobuf.ByteString.copyFromUtf8(
                 (java.lang.String) ref);
-        byteOrder_ = b;
+        userObjectDescription_ = b;
         return b;
       } else {
         return (com.google.protobuf.ByteString) ref;
       }
     }
 
-    // optional string sender = 24;
-    public static final int SENDER_FIELD_NUMBER = 24;
+    // optional .Data.BAType byteArrayType = 26;
+    public static final int BYTEARRAYTYPE_FIELD_NUMBER = 26;
+    private xMsgD.Data.BAType byteArrayType_;
+    /**
+     * <code>optional .Data.BAType byteArrayType = 26;</code>
+     */
+    public boolean hasByteArrayType() {
+      return ((bitField0_ & 0x00020000) == 0x00020000);
+    }
+    /**
+     * <code>optional .Data.BAType byteArrayType = 26;</code>
+     */
+    public xMsgD.Data.BAType getByteArrayType() {
+      return byteArrayType_;
+    }
+
+    // optional string sender = 27;
+    public static final int SENDER_FIELD_NUMBER = 27;
     private java.lang.Object sender_;
     /**
-     * <code>optional string sender = 24;</code>
+     * <code>optional string sender = 27;</code>
      *
      * <pre>
      * ... This section is defined by the message transporter ...
@@ -2757,10 +3005,10 @@ public final class xMsgD {
      * </pre>
      */
     public boolean hasSender() {
-      return ((bitField0_ & 0x00008000) == 0x00008000);
+      return ((bitField0_ & 0x00040000) == 0x00040000);
     }
     /**
-     * <code>optional string sender = 24;</code>
+     * <code>optional string sender = 27;</code>
      *
      * <pre>
      * ... This section is defined by the message transporter ...
@@ -2782,7 +3030,7 @@ public final class xMsgD {
       }
     }
     /**
-     * <code>optional string sender = 24;</code>
+     * <code>optional string sender = 27;</code>
      *
      * <pre>
      * ... This section is defined by the message transporter ...
@@ -2803,21 +3051,21 @@ public final class xMsgD {
       }
     }
 
-    // optional fixed32 id = 25;
-    public static final int ID_FIELD_NUMBER = 25;
+    // optional fixed32 id = 28;
+    public static final int ID_FIELD_NUMBER = 28;
     private int id_;
     /**
-     * <code>optional fixed32 id = 25;</code>
+     * <code>optional fixed32 id = 28;</code>
      *
      * <pre>
      * Communication id, used to genetically relate messages
      * </pre>
      */
     public boolean hasId() {
-      return ((bitField0_ & 0x00010000) == 0x00010000);
+      return ((bitField0_ & 0x00080000) == 0x00080000);
     }
     /**
-     * <code>optional fixed32 id = 25;</code>
+     * <code>optional fixed32 id = 28;</code>
      *
      * <pre>
      * Communication id, used to genetically relate messages
@@ -2827,11 +3075,66 @@ public final class xMsgD {
       return id_;
     }
 
-    // optional bool exceptionMonitor = 26;
-    public static final int EXCEPTIONMONITOR_FIELD_NUMBER = 26;
+    // optional string byteOrder = 29;
+    public static final int BYTEORDER_FIELD_NUMBER = 29;
+    private java.lang.Object byteOrder_;
+    /**
+     * <code>optional string byteOrder = 29;</code>
+     *
+     * <pre>
+     * Byte ordering in case data type is BYTES/BYTESA
+     * </pre>
+     */
+    public boolean hasByteOrder() {
+      return ((bitField0_ & 0x00100000) == 0x00100000);
+    }
+    /**
+     * <code>optional string byteOrder = 29;</code>
+     *
+     * <pre>
+     * Byte ordering in case data type is BYTES/BYTESA
+     * </pre>
+     */
+    public java.lang.String getByteOrder() {
+      java.lang.Object ref = byteOrder_;
+      if (ref instanceof java.lang.String) {
+        return (java.lang.String) ref;
+      } else {
+        com.google.protobuf.ByteString bs = 
+            (com.google.protobuf.ByteString) ref;
+        java.lang.String s = bs.toStringUtf8();
+        if (bs.isValidUtf8()) {
+          byteOrder_ = s;
+        }
+        return s;
+      }
+    }
+    /**
+     * <code>optional string byteOrder = 29;</code>
+     *
+     * <pre>
+     * Byte ordering in case data type is BYTES/BYTESA
+     * </pre>
+     */
+    public com.google.protobuf.ByteString
+        getByteOrderBytes() {
+      java.lang.Object ref = byteOrder_;
+      if (ref instanceof java.lang.String) {
+        com.google.protobuf.ByteString b = 
+            com.google.protobuf.ByteString.copyFromUtf8(
+                (java.lang.String) ref);
+        byteOrder_ = b;
+        return b;
+      } else {
+        return (com.google.protobuf.ByteString) ref;
+      }
+    }
+
+    // optional bool exceptionMonitor = 30;
+    public static final int EXCEPTIONMONITOR_FIELD_NUMBER = 30;
     private boolean exceptionMonitor_;
     /**
-     * <code>optional bool exceptionMonitor = 26;</code>
+     * <code>optional bool exceptionMonitor = 30;</code>
      *
      * <pre>
      * ... Fields that are used to control message receiver ...
@@ -2840,14 +3143,15 @@ public final class xMsgD {
      * [ exception_&lt;service_name&gt;,
      *             requestId,
      *             exceptionType &lt;Severity&gt;,
+     *             exceptionId,
      *             exceptionString &lt;String&gt; ]
      * </pre>
      */
     public boolean hasExceptionMonitor() {
-      return ((bitField0_ & 0x00020000) == 0x00020000);
+      return ((bitField0_ & 0x00200000) == 0x00200000);
     }
     /**
-     * <code>optional bool exceptionMonitor = 26;</code>
+     * <code>optional bool exceptionMonitor = 30;</code>
      *
      * <pre>
      * ... Fields that are used to control message receiver ...
@@ -2856,6 +3160,7 @@ public final class xMsgD {
      * [ exception_&lt;service_name&gt;,
      *             requestId,
      *             exceptionType &lt;Severity&gt;,
+     *             exceptionId,
      *             exceptionString &lt;String&gt; ]
      * </pre>
      */
@@ -2863,11 +3168,11 @@ public final class xMsgD {
       return exceptionMonitor_;
     }
 
-    // optional bool doneMonitor = 27;
-    public static final int DONEMONITOR_FIELD_NUMBER = 27;
+    // optional bool doneMonitor = 31;
+    public static final int DONEMONITOR_FIELD_NUMBER = 31;
     private boolean doneMonitor_;
     /**
-     * <code>optional bool doneMonitor = 27;</code>
+     * <code>optional bool doneMonitor = 31;</code>
      *
      * <pre>
      * If set to true, for example Clara service container will
@@ -2877,10 +3182,10 @@ public final class xMsgD {
      * </pre>
      */
     public boolean hasDoneMonitor() {
-      return ((bitField0_ & 0x00040000) == 0x00040000);
+      return ((bitField0_ & 0x00400000) == 0x00400000);
     }
     /**
-     * <code>optional bool doneMonitor = 27;</code>
+     * <code>optional bool doneMonitor = 31;</code>
      *
      * <pre>
      * If set to true, for example Clara service container will
@@ -2893,11 +3198,11 @@ public final class xMsgD {
       return doneMonitor_;
     }
 
-    // optional bool dataMonitor = 28;
-    public static final int DATAMONITOR_FIELD_NUMBER = 28;
+    // optional bool dataMonitor = 32;
+    public static final int DATAMONITOR_FIELD_NUMBER = 32;
     private boolean dataMonitor_;
     /**
-     * <code>optional bool dataMonitor = 28;</code>
+     * <code>optional bool dataMonitor = 32;</code>
      *
      * <pre>
      * If set to true, for example Clara service container will
@@ -2908,10 +3213,10 @@ public final class xMsgD {
      * </pre>
      */
     public boolean hasDataMonitor() {
-      return ((bitField0_ & 0x00080000) == 0x00080000);
+      return ((bitField0_ & 0x00800000) == 0x00800000);
     }
     /**
-     * <code>optional bool dataMonitor = 28;</code>
+     * <code>optional bool dataMonitor = 32;</code>
      *
      * <pre>
      * If set to true, for example Clara service container will
@@ -2925,11 +3230,11 @@ public final class xMsgD {
       return dataMonitor_;
     }
 
-    // optional string composition = 29;
-    public static final int COMPOSITION_FIELD_NUMBER = 29;
+    // optional string composition = 33;
+    public static final int COMPOSITION_FIELD_NUMBER = 33;
     private java.lang.Object composition_;
     /**
-     * <code>optional string composition = 29;</code>
+     * <code>optional string composition = 33;</code>
      *
      * <pre>
      * Reserved and used for Clara service based application
@@ -2938,10 +3243,10 @@ public final class xMsgD {
      * </pre>
      */
     public boolean hasComposition() {
-      return ((bitField0_ & 0x00100000) == 0x00100000);
+      return ((bitField0_ & 0x01000000) == 0x01000000);
     }
     /**
-     * <code>optional string composition = 29;</code>
+     * <code>optional string composition = 33;</code>
      *
      * <pre>
      * Reserved and used for Clara service based application
@@ -2964,7 +3269,7 @@ public final class xMsgD {
       }
     }
     /**
-     * <code>optional string composition = 29;</code>
+     * <code>optional string composition = 33;</code>
      *
      * <pre>
      * Reserved and used for Clara service based application
@@ -2986,21 +3291,21 @@ public final class xMsgD {
       }
     }
 
-    // optional sfixed64 executionTime = 30;
-    public static final int EXECUTIONTIME_FIELD_NUMBER = 30;
+    // optional sfixed64 executionTime = 34;
+    public static final int EXECUTIONTIME_FIELD_NUMBER = 34;
     private long executionTime_;
     /**
-     * <code>optional sfixed64 executionTime = 30;</code>
+     * <code>optional sfixed64 executionTime = 34;</code>
      *
      * <pre>
      * Service engine execution time
      * </pre>
      */
     public boolean hasExecutionTime() {
-      return ((bitField0_ & 0x00200000) == 0x00200000);
+      return ((bitField0_ & 0x02000000) == 0x02000000);
     }
     /**
-     * <code>optional sfixed64 executionTime = 30;</code>
+     * <code>optional sfixed64 executionTime = 34;</code>
      *
      * <pre>
      * Service engine execution time
@@ -3010,11 +3315,11 @@ public final class xMsgD {
       return executionTime_;
     }
 
-    // optional .Data.ControlAction action = 31;
-    public static final int ACTION_FIELD_NUMBER = 31;
+    // optional .Data.ControlAction action = 35;
+    public static final int ACTION_FIELD_NUMBER = 35;
     private xMsgD.Data.ControlAction action_;
     /**
-     * <code>optional .Data.ControlAction action = 31;</code>
+     * <code>optional .Data.ControlAction action = 35;</code>
      *
      * <pre>
      * Reserved and used to define which of the CLARA interface
@@ -3022,10 +3327,10 @@ public final class xMsgD {
      * </pre>
      */
     public boolean hasAction() {
-      return ((bitField0_ & 0x00400000) == 0x00400000);
+      return ((bitField0_ & 0x04000000) == 0x04000000);
     }
     /**
-     * <code>optional .Data.ControlAction action = 31;</code>
+     * <code>optional .Data.ControlAction action = 35;</code>
      *
      * <pre>
      * Reserved and used to define which of the CLARA interface
@@ -3036,21 +3341,21 @@ public final class xMsgD {
       return action_;
     }
 
-    // optional .Data.SubControlAction controlR = 32;
-    public static final int CONTROLR_FIELD_NUMBER = 32;
+    // optional .Data.SubControlAction controlR = 36;
+    public static final int CONTROLR_FIELD_NUMBER = 36;
     private xMsgD.Data.SubControlAction controlR_;
     /**
-     * <code>optional .Data.SubControlAction controlR = 32;</code>
+     * <code>optional .Data.SubControlAction controlR = 36;</code>
      *
      * <pre>
      * Reserved control field
      * </pre>
      */
     public boolean hasControlR() {
-      return ((bitField0_ & 0x00800000) == 0x00800000);
+      return ((bitField0_ & 0x08000000) == 0x08000000);
     }
     /**
-     * <code>optional .Data.SubControlAction controlR = 32;</code>
+     * <code>optional .Data.SubControlAction controlR = 36;</code>
      *
      * <pre>
      * Reserved control field
@@ -3066,6 +3371,8 @@ public final class xMsgD {
       dataAuthor_ = "";
       dataAuthorState_ = "";
       dataGenerationStatus_ = xMsgD.Data.Severity.INFO;
+      statusText_ = "";
+      statusSeverityId_ = 0;
       vLSINT32_ = 0;
       vLSINT64_ = 0L;
       fLSINT32_ = 0;
@@ -3083,9 +3390,11 @@ public final class xMsgD {
       sTRINGA_ = com.google.protobuf.LazyStringArrayList.EMPTY;
       bYTESA_ = java.util.Collections.emptyList();
       dataType_ = xMsgD.Data.DType.T_VLSINT32;
-      byteOrder_ = "";
+      userObjectDescription_ = "";
+      byteArrayType_ = xMsgD.Data.BAType.JOBJECT;
       sender_ = "";
       id_ = 0;
+      byteOrder_ = "";
       exceptionMonitor_ = false;
       doneMonitor_ = false;
       dataMonitor_ = false;
@@ -3122,85 +3431,97 @@ public final class xMsgD {
         output.writeEnum(5, dataGenerationStatus_.getNumber());
       }
       if (((bitField0_ & 0x00000020) == 0x00000020)) {
-        output.writeSInt32(6, vLSINT32_);
+        output.writeBytes(6, getStatusTextBytes());
       }
       if (((bitField0_ & 0x00000040) == 0x00000040)) {
-        output.writeSInt64(7, vLSINT64_);
+        output.writeSFixed32(7, statusSeverityId_);
       }
       if (((bitField0_ & 0x00000080) == 0x00000080)) {
-        output.writeSFixed32(8, fLSINT32_);
+        output.writeSInt32(8, vLSINT32_);
       }
       if (((bitField0_ & 0x00000100) == 0x00000100)) {
-        output.writeSFixed64(9, fLSINT64_);
+        output.writeSInt64(9, vLSINT64_);
       }
       if (((bitField0_ & 0x00000200) == 0x00000200)) {
-        output.writeFloat(10, fLOAT_);
+        output.writeSFixed32(10, fLSINT32_);
       }
       if (((bitField0_ & 0x00000400) == 0x00000400)) {
-        output.writeDouble(11, dOUBLE_);
+        output.writeSFixed64(11, fLSINT64_);
       }
       if (((bitField0_ & 0x00000800) == 0x00000800)) {
-        output.writeBytes(12, getSTRINGBytes());
+        output.writeFloat(12, fLOAT_);
       }
       if (((bitField0_ & 0x00001000) == 0x00001000)) {
-        output.writeBytes(13, bYTES_);
-      }
-      for (int i = 0; i < vLSINT32A_.size(); i++) {
-        output.writeSInt32(14, vLSINT32A_.get(i));
-      }
-      for (int i = 0; i < vLSINT64A_.size(); i++) {
-        output.writeSInt64(15, vLSINT64A_.get(i));
-      }
-      for (int i = 0; i < fLSINT32A_.size(); i++) {
-        output.writeSFixed32(16, fLSINT32A_.get(i));
-      }
-      for (int i = 0; i < fLSINT64A_.size(); i++) {
-        output.writeSFixed64(17, fLSINT64A_.get(i));
-      }
-      for (int i = 0; i < fLOATA_.size(); i++) {
-        output.writeFloat(18, fLOATA_.get(i));
-      }
-      for (int i = 0; i < dOUBLEA_.size(); i++) {
-        output.writeDouble(19, dOUBLEA_.get(i));
-      }
-      for (int i = 0; i < sTRINGA_.size(); i++) {
-        output.writeBytes(20, sTRINGA_.getByteString(i));
-      }
-      for (int i = 0; i < bYTESA_.size(); i++) {
-        output.writeBytes(21, bYTESA_.get(i));
+        output.writeDouble(13, dOUBLE_);
       }
       if (((bitField0_ & 0x00002000) == 0x00002000)) {
-        output.writeEnum(22, dataType_.getNumber());
+        output.writeBytes(14, getSTRINGBytes());
       }
       if (((bitField0_ & 0x00004000) == 0x00004000)) {
-        output.writeBytes(23, getByteOrderBytes());
+        output.writeBytes(15, bYTES_);
+      }
+      for (int i = 0; i < vLSINT32A_.size(); i++) {
+        output.writeSInt32(16, vLSINT32A_.get(i));
+      }
+      for (int i = 0; i < vLSINT64A_.size(); i++) {
+        output.writeSInt64(17, vLSINT64A_.get(i));
+      }
+      for (int i = 0; i < fLSINT32A_.size(); i++) {
+        output.writeSFixed32(18, fLSINT32A_.get(i));
+      }
+      for (int i = 0; i < fLSINT64A_.size(); i++) {
+        output.writeSFixed64(19, fLSINT64A_.get(i));
+      }
+      for (int i = 0; i < fLOATA_.size(); i++) {
+        output.writeFloat(20, fLOATA_.get(i));
+      }
+      for (int i = 0; i < dOUBLEA_.size(); i++) {
+        output.writeDouble(21, dOUBLEA_.get(i));
+      }
+      for (int i = 0; i < sTRINGA_.size(); i++) {
+        output.writeBytes(22, sTRINGA_.getByteString(i));
+      }
+      for (int i = 0; i < bYTESA_.size(); i++) {
+        output.writeBytes(23, bYTESA_.get(i));
       }
       if (((bitField0_ & 0x00008000) == 0x00008000)) {
-        output.writeBytes(24, getSenderBytes());
+        output.writeEnum(24, dataType_.getNumber());
       }
       if (((bitField0_ & 0x00010000) == 0x00010000)) {
-        output.writeFixed32(25, id_);
+        output.writeBytes(25, getUserObjectDescriptionBytes());
       }
       if (((bitField0_ & 0x00020000) == 0x00020000)) {
-        output.writeBool(26, exceptionMonitor_);
+        output.writeEnum(26, byteArrayType_.getNumber());
       }
       if (((bitField0_ & 0x00040000) == 0x00040000)) {
-        output.writeBool(27, doneMonitor_);
+        output.writeBytes(27, getSenderBytes());
       }
       if (((bitField0_ & 0x00080000) == 0x00080000)) {
-        output.writeBool(28, dataMonitor_);
+        output.writeFixed32(28, id_);
       }
       if (((bitField0_ & 0x00100000) == 0x00100000)) {
-        output.writeBytes(29, getCompositionBytes());
+        output.writeBytes(29, getByteOrderBytes());
       }
       if (((bitField0_ & 0x00200000) == 0x00200000)) {
-        output.writeSFixed64(30, executionTime_);
+        output.writeBool(30, exceptionMonitor_);
       }
       if (((bitField0_ & 0x00400000) == 0x00400000)) {
-        output.writeEnum(31, action_.getNumber());
+        output.writeBool(31, doneMonitor_);
       }
       if (((bitField0_ & 0x00800000) == 0x00800000)) {
-        output.writeEnum(32, controlR_.getNumber());
+        output.writeBool(32, dataMonitor_);
+      }
+      if (((bitField0_ & 0x01000000) == 0x01000000)) {
+        output.writeBytes(33, getCompositionBytes());
+      }
+      if (((bitField0_ & 0x02000000) == 0x02000000)) {
+        output.writeSFixed64(34, executionTime_);
+      }
+      if (((bitField0_ & 0x04000000) == 0x04000000)) {
+        output.writeEnum(35, action_.getNumber());
+      }
+      if (((bitField0_ & 0x08000000) == 0x08000000)) {
+        output.writeEnum(36, controlR_.getNumber());
       }
       getUnknownFields().writeTo(output);
     }
@@ -3233,35 +3554,43 @@ public final class xMsgD {
       }
       if (((bitField0_ & 0x00000020) == 0x00000020)) {
         size += com.google.protobuf.CodedOutputStream
-          .computeSInt32Size(6, vLSINT32_);
+          .computeBytesSize(6, getStatusTextBytes());
       }
       if (((bitField0_ & 0x00000040) == 0x00000040)) {
         size += com.google.protobuf.CodedOutputStream
-          .computeSInt64Size(7, vLSINT64_);
+          .computeSFixed32Size(7, statusSeverityId_);
       }
       if (((bitField0_ & 0x00000080) == 0x00000080)) {
         size += com.google.protobuf.CodedOutputStream
-          .computeSFixed32Size(8, fLSINT32_);
+          .computeSInt32Size(8, vLSINT32_);
       }
       if (((bitField0_ & 0x00000100) == 0x00000100)) {
         size += com.google.protobuf.CodedOutputStream
-          .computeSFixed64Size(9, fLSINT64_);
+          .computeSInt64Size(9, vLSINT64_);
       }
       if (((bitField0_ & 0x00000200) == 0x00000200)) {
         size += com.google.protobuf.CodedOutputStream
-          .computeFloatSize(10, fLOAT_);
+          .computeSFixed32Size(10, fLSINT32_);
       }
       if (((bitField0_ & 0x00000400) == 0x00000400)) {
         size += com.google.protobuf.CodedOutputStream
-          .computeDoubleSize(11, dOUBLE_);
+          .computeSFixed64Size(11, fLSINT64_);
       }
       if (((bitField0_ & 0x00000800) == 0x00000800)) {
         size += com.google.protobuf.CodedOutputStream
-          .computeBytesSize(12, getSTRINGBytes());
+          .computeFloatSize(12, fLOAT_);
       }
       if (((bitField0_ & 0x00001000) == 0x00001000)) {
         size += com.google.protobuf.CodedOutputStream
-          .computeBytesSize(13, bYTES_);
+          .computeDoubleSize(13, dOUBLE_);
+      }
+      if (((bitField0_ & 0x00002000) == 0x00002000)) {
+        size += com.google.protobuf.CodedOutputStream
+          .computeBytesSize(14, getSTRINGBytes());
+      }
+      if (((bitField0_ & 0x00004000) == 0x00004000)) {
+        size += com.google.protobuf.CodedOutputStream
+          .computeBytesSize(15, bYTES_);
       }
       {
         int dataSize = 0;
@@ -3270,7 +3599,7 @@ public final class xMsgD {
             .computeSInt32SizeNoTag(vLSINT32A_.get(i));
         }
         size += dataSize;
-        size += 1 * getVLSINT32AList().size();
+        size += 2 * getVLSINT32AList().size();
       }
       {
         int dataSize = 0;
@@ -3279,7 +3608,7 @@ public final class xMsgD {
             .computeSInt64SizeNoTag(vLSINT64A_.get(i));
         }
         size += dataSize;
-        size += 1 * getVLSINT64AList().size();
+        size += 2 * getVLSINT64AList().size();
       }
       {
         int dataSize = 0;
@@ -3323,49 +3652,57 @@ public final class xMsgD {
         size += dataSize;
         size += 2 * getBYTESAList().size();
       }
-      if (((bitField0_ & 0x00002000) == 0x00002000)) {
-        size += com.google.protobuf.CodedOutputStream
-          .computeEnumSize(22, dataType_.getNumber());
-      }
-      if (((bitField0_ & 0x00004000) == 0x00004000)) {
-        size += com.google.protobuf.CodedOutputStream
-          .computeBytesSize(23, getByteOrderBytes());
-      }
       if (((bitField0_ & 0x00008000) == 0x00008000)) {
         size += com.google.protobuf.CodedOutputStream
-          .computeBytesSize(24, getSenderBytes());
+          .computeEnumSize(24, dataType_.getNumber());
       }
       if (((bitField0_ & 0x00010000) == 0x00010000)) {
         size += com.google.protobuf.CodedOutputStream
-          .computeFixed32Size(25, id_);
+          .computeBytesSize(25, getUserObjectDescriptionBytes());
       }
       if (((bitField0_ & 0x00020000) == 0x00020000)) {
         size += com.google.protobuf.CodedOutputStream
-          .computeBoolSize(26, exceptionMonitor_);
+          .computeEnumSize(26, byteArrayType_.getNumber());
       }
       if (((bitField0_ & 0x00040000) == 0x00040000)) {
         size += com.google.protobuf.CodedOutputStream
-          .computeBoolSize(27, doneMonitor_);
+          .computeBytesSize(27, getSenderBytes());
       }
       if (((bitField0_ & 0x00080000) == 0x00080000)) {
         size += com.google.protobuf.CodedOutputStream
-          .computeBoolSize(28, dataMonitor_);
+          .computeFixed32Size(28, id_);
       }
       if (((bitField0_ & 0x00100000) == 0x00100000)) {
         size += com.google.protobuf.CodedOutputStream
-          .computeBytesSize(29, getCompositionBytes());
+          .computeBytesSize(29, getByteOrderBytes());
       }
       if (((bitField0_ & 0x00200000) == 0x00200000)) {
         size += com.google.protobuf.CodedOutputStream
-          .computeSFixed64Size(30, executionTime_);
+          .computeBoolSize(30, exceptionMonitor_);
       }
       if (((bitField0_ & 0x00400000) == 0x00400000)) {
         size += com.google.protobuf.CodedOutputStream
-          .computeEnumSize(31, action_.getNumber());
+          .computeBoolSize(31, doneMonitor_);
       }
       if (((bitField0_ & 0x00800000) == 0x00800000)) {
         size += com.google.protobuf.CodedOutputStream
-          .computeEnumSize(32, controlR_.getNumber());
+          .computeBoolSize(32, dataMonitor_);
+      }
+      if (((bitField0_ & 0x01000000) == 0x01000000)) {
+        size += com.google.protobuf.CodedOutputStream
+          .computeBytesSize(33, getCompositionBytes());
+      }
+      if (((bitField0_ & 0x02000000) == 0x02000000)) {
+        size += com.google.protobuf.CodedOutputStream
+          .computeSFixed64Size(34, executionTime_);
+      }
+      if (((bitField0_ & 0x04000000) == 0x04000000)) {
+        size += com.google.protobuf.CodedOutputStream
+          .computeEnumSize(35, action_.getNumber());
+      }
+      if (((bitField0_ & 0x08000000) == 0x08000000)) {
+        size += com.google.protobuf.CodedOutputStream
+          .computeEnumSize(36, controlR_.getNumber());
       }
       size += getUnknownFields().getSerializedSize();
       memoizedSerializedSize = size;
@@ -3497,60 +3834,68 @@ public final class xMsgD {
         bitField0_ = (bitField0_ & ~0x00000008);
         dataGenerationStatus_ = xMsgD.Data.Severity.INFO;
         bitField0_ = (bitField0_ & ~0x00000010);
-        vLSINT32_ = 0;
+        statusText_ = "";
         bitField0_ = (bitField0_ & ~0x00000020);
-        vLSINT64_ = 0L;
+        statusSeverityId_ = 0;
         bitField0_ = (bitField0_ & ~0x00000040);
-        fLSINT32_ = 0;
+        vLSINT32_ = 0;
         bitField0_ = (bitField0_ & ~0x00000080);
-        fLSINT64_ = 0L;
+        vLSINT64_ = 0L;
         bitField0_ = (bitField0_ & ~0x00000100);
-        fLOAT_ = 0F;
+        fLSINT32_ = 0;
         bitField0_ = (bitField0_ & ~0x00000200);
-        dOUBLE_ = 0D;
+        fLSINT64_ = 0L;
         bitField0_ = (bitField0_ & ~0x00000400);
-        sTRING_ = "";
+        fLOAT_ = 0F;
         bitField0_ = (bitField0_ & ~0x00000800);
-        bYTES_ = com.google.protobuf.ByteString.EMPTY;
+        dOUBLE_ = 0D;
         bitField0_ = (bitField0_ & ~0x00001000);
-        vLSINT32A_ = java.util.Collections.emptyList();
+        sTRING_ = "";
         bitField0_ = (bitField0_ & ~0x00002000);
-        vLSINT64A_ = java.util.Collections.emptyList();
+        bYTES_ = com.google.protobuf.ByteString.EMPTY;
         bitField0_ = (bitField0_ & ~0x00004000);
-        fLSINT32A_ = java.util.Collections.emptyList();
+        vLSINT32A_ = java.util.Collections.emptyList();
         bitField0_ = (bitField0_ & ~0x00008000);
-        fLSINT64A_ = java.util.Collections.emptyList();
+        vLSINT64A_ = java.util.Collections.emptyList();
         bitField0_ = (bitField0_ & ~0x00010000);
-        fLOATA_ = java.util.Collections.emptyList();
+        fLSINT32A_ = java.util.Collections.emptyList();
         bitField0_ = (bitField0_ & ~0x00020000);
-        dOUBLEA_ = java.util.Collections.emptyList();
+        fLSINT64A_ = java.util.Collections.emptyList();
         bitField0_ = (bitField0_ & ~0x00040000);
-        sTRINGA_ = com.google.protobuf.LazyStringArrayList.EMPTY;
+        fLOATA_ = java.util.Collections.emptyList();
         bitField0_ = (bitField0_ & ~0x00080000);
-        bYTESA_ = java.util.Collections.emptyList();
+        dOUBLEA_ = java.util.Collections.emptyList();
         bitField0_ = (bitField0_ & ~0x00100000);
-        dataType_ = xMsgD.Data.DType.T_VLSINT32;
+        sTRINGA_ = com.google.protobuf.LazyStringArrayList.EMPTY;
         bitField0_ = (bitField0_ & ~0x00200000);
-        byteOrder_ = "";
+        bYTESA_ = java.util.Collections.emptyList();
         bitField0_ = (bitField0_ & ~0x00400000);
-        sender_ = "";
+        dataType_ = xMsgD.Data.DType.T_VLSINT32;
         bitField0_ = (bitField0_ & ~0x00800000);
-        id_ = 0;
+        userObjectDescription_ = "";
         bitField0_ = (bitField0_ & ~0x01000000);
-        exceptionMonitor_ = false;
+        byteArrayType_ = xMsgD.Data.BAType.JOBJECT;
         bitField0_ = (bitField0_ & ~0x02000000);
-        doneMonitor_ = false;
+        sender_ = "";
         bitField0_ = (bitField0_ & ~0x04000000);
-        dataMonitor_ = false;
+        id_ = 0;
         bitField0_ = (bitField0_ & ~0x08000000);
-        composition_ = "";
+        byteOrder_ = "";
         bitField0_ = (bitField0_ & ~0x10000000);
-        executionTime_ = 0L;
+        exceptionMonitor_ = false;
         bitField0_ = (bitField0_ & ~0x20000000);
-        action_ = xMsgD.Data.ControlAction.EXECUTE;
+        doneMonitor_ = false;
         bitField0_ = (bitField0_ & ~0x40000000);
-        controlR_ = xMsgD.Data.SubControlAction.SKIP;
+        dataMonitor_ = false;
         bitField0_ = (bitField0_ & ~0x80000000);
+        composition_ = "";
+        bitField1_ = (bitField1_ & ~0x00000001);
+        executionTime_ = 0L;
+        bitField1_ = (bitField1_ & ~0x00000002);
+        action_ = xMsgD.Data.ControlAction.EXECUTE;
+        bitField1_ = (bitField1_ & ~0x00000004);
+        controlR_ = xMsgD.Data.SubControlAction.SKIP;
+        bitField1_ = (bitField1_ & ~0x00000008);
         return this;
       }
 
@@ -3578,6 +3923,7 @@ public final class xMsgD {
       public xMsgD.Data buildPartial() {
         xMsgD.Data result = new xMsgD.Data(this);
         int from_bitField0_ = bitField0_;
+        int from_bitField1_ = bitField1_;
         int to_bitField0_ = 0;
         if (((from_bitField0_ & 0x00000001) == 0x00000001)) {
           to_bitField0_ |= 0x00000001;
@@ -3602,118 +3948,134 @@ public final class xMsgD {
         if (((from_bitField0_ & 0x00000020) == 0x00000020)) {
           to_bitField0_ |= 0x00000020;
         }
-        result.vLSINT32_ = vLSINT32_;
+        result.statusText_ = statusText_;
         if (((from_bitField0_ & 0x00000040) == 0x00000040)) {
           to_bitField0_ |= 0x00000040;
         }
-        result.vLSINT64_ = vLSINT64_;
+        result.statusSeverityId_ = statusSeverityId_;
         if (((from_bitField0_ & 0x00000080) == 0x00000080)) {
           to_bitField0_ |= 0x00000080;
         }
-        result.fLSINT32_ = fLSINT32_;
+        result.vLSINT32_ = vLSINT32_;
         if (((from_bitField0_ & 0x00000100) == 0x00000100)) {
           to_bitField0_ |= 0x00000100;
         }
-        result.fLSINT64_ = fLSINT64_;
+        result.vLSINT64_ = vLSINT64_;
         if (((from_bitField0_ & 0x00000200) == 0x00000200)) {
           to_bitField0_ |= 0x00000200;
         }
-        result.fLOAT_ = fLOAT_;
+        result.fLSINT32_ = fLSINT32_;
         if (((from_bitField0_ & 0x00000400) == 0x00000400)) {
           to_bitField0_ |= 0x00000400;
         }
-        result.dOUBLE_ = dOUBLE_;
+        result.fLSINT64_ = fLSINT64_;
         if (((from_bitField0_ & 0x00000800) == 0x00000800)) {
           to_bitField0_ |= 0x00000800;
         }
-        result.sTRING_ = sTRING_;
+        result.fLOAT_ = fLOAT_;
         if (((from_bitField0_ & 0x00001000) == 0x00001000)) {
           to_bitField0_ |= 0x00001000;
         }
-        result.bYTES_ = bYTES_;
-        if (((bitField0_ & 0x00002000) == 0x00002000)) {
-          vLSINT32A_ = java.util.Collections.unmodifiableList(vLSINT32A_);
-          bitField0_ = (bitField0_ & ~0x00002000);
-        }
-        result.vLSINT32A_ = vLSINT32A_;
-        if (((bitField0_ & 0x00004000) == 0x00004000)) {
-          vLSINT64A_ = java.util.Collections.unmodifiableList(vLSINT64A_);
-          bitField0_ = (bitField0_ & ~0x00004000);
-        }
-        result.vLSINT64A_ = vLSINT64A_;
-        if (((bitField0_ & 0x00008000) == 0x00008000)) {
-          fLSINT32A_ = java.util.Collections.unmodifiableList(fLSINT32A_);
-          bitField0_ = (bitField0_ & ~0x00008000);
-        }
-        result.fLSINT32A_ = fLSINT32A_;
-        if (((bitField0_ & 0x00010000) == 0x00010000)) {
-          fLSINT64A_ = java.util.Collections.unmodifiableList(fLSINT64A_);
-          bitField0_ = (bitField0_ & ~0x00010000);
-        }
-        result.fLSINT64A_ = fLSINT64A_;
-        if (((bitField0_ & 0x00020000) == 0x00020000)) {
-          fLOATA_ = java.util.Collections.unmodifiableList(fLOATA_);
-          bitField0_ = (bitField0_ & ~0x00020000);
-        }
-        result.fLOATA_ = fLOATA_;
-        if (((bitField0_ & 0x00040000) == 0x00040000)) {
-          dOUBLEA_ = java.util.Collections.unmodifiableList(dOUBLEA_);
-          bitField0_ = (bitField0_ & ~0x00040000);
-        }
-        result.dOUBLEA_ = dOUBLEA_;
-        if (((bitField0_ & 0x00080000) == 0x00080000)) {
-          sTRINGA_ = new com.google.protobuf.UnmodifiableLazyStringList(
-              sTRINGA_);
-          bitField0_ = (bitField0_ & ~0x00080000);
-        }
-        result.sTRINGA_ = sTRINGA_;
-        if (((bitField0_ & 0x00100000) == 0x00100000)) {
-          bYTESA_ = java.util.Collections.unmodifiableList(bYTESA_);
-          bitField0_ = (bitField0_ & ~0x00100000);
-        }
-        result.bYTESA_ = bYTESA_;
-        if (((from_bitField0_ & 0x00200000) == 0x00200000)) {
+        result.dOUBLE_ = dOUBLE_;
+        if (((from_bitField0_ & 0x00002000) == 0x00002000)) {
           to_bitField0_ |= 0x00002000;
         }
-        result.dataType_ = dataType_;
-        if (((from_bitField0_ & 0x00400000) == 0x00400000)) {
+        result.sTRING_ = sTRING_;
+        if (((from_bitField0_ & 0x00004000) == 0x00004000)) {
           to_bitField0_ |= 0x00004000;
         }
-        result.byteOrder_ = byteOrder_;
+        result.bYTES_ = bYTES_;
+        if (((bitField0_ & 0x00008000) == 0x00008000)) {
+          vLSINT32A_ = java.util.Collections.unmodifiableList(vLSINT32A_);
+          bitField0_ = (bitField0_ & ~0x00008000);
+        }
+        result.vLSINT32A_ = vLSINT32A_;
+        if (((bitField0_ & 0x00010000) == 0x00010000)) {
+          vLSINT64A_ = java.util.Collections.unmodifiableList(vLSINT64A_);
+          bitField0_ = (bitField0_ & ~0x00010000);
+        }
+        result.vLSINT64A_ = vLSINT64A_;
+        if (((bitField0_ & 0x00020000) == 0x00020000)) {
+          fLSINT32A_ = java.util.Collections.unmodifiableList(fLSINT32A_);
+          bitField0_ = (bitField0_ & ~0x00020000);
+        }
+        result.fLSINT32A_ = fLSINT32A_;
+        if (((bitField0_ & 0x00040000) == 0x00040000)) {
+          fLSINT64A_ = java.util.Collections.unmodifiableList(fLSINT64A_);
+          bitField0_ = (bitField0_ & ~0x00040000);
+        }
+        result.fLSINT64A_ = fLSINT64A_;
+        if (((bitField0_ & 0x00080000) == 0x00080000)) {
+          fLOATA_ = java.util.Collections.unmodifiableList(fLOATA_);
+          bitField0_ = (bitField0_ & ~0x00080000);
+        }
+        result.fLOATA_ = fLOATA_;
+        if (((bitField0_ & 0x00100000) == 0x00100000)) {
+          dOUBLEA_ = java.util.Collections.unmodifiableList(dOUBLEA_);
+          bitField0_ = (bitField0_ & ~0x00100000);
+        }
+        result.dOUBLEA_ = dOUBLEA_;
+        if (((bitField0_ & 0x00200000) == 0x00200000)) {
+          sTRINGA_ = new com.google.protobuf.UnmodifiableLazyStringList(
+              sTRINGA_);
+          bitField0_ = (bitField0_ & ~0x00200000);
+        }
+        result.sTRINGA_ = sTRINGA_;
+        if (((bitField0_ & 0x00400000) == 0x00400000)) {
+          bYTESA_ = java.util.Collections.unmodifiableList(bYTESA_);
+          bitField0_ = (bitField0_ & ~0x00400000);
+        }
+        result.bYTESA_ = bYTESA_;
         if (((from_bitField0_ & 0x00800000) == 0x00800000)) {
           to_bitField0_ |= 0x00008000;
         }
-        result.sender_ = sender_;
+        result.dataType_ = dataType_;
         if (((from_bitField0_ & 0x01000000) == 0x01000000)) {
           to_bitField0_ |= 0x00010000;
         }
-        result.id_ = id_;
+        result.userObjectDescription_ = userObjectDescription_;
         if (((from_bitField0_ & 0x02000000) == 0x02000000)) {
           to_bitField0_ |= 0x00020000;
         }
-        result.exceptionMonitor_ = exceptionMonitor_;
+        result.byteArrayType_ = byteArrayType_;
         if (((from_bitField0_ & 0x04000000) == 0x04000000)) {
           to_bitField0_ |= 0x00040000;
         }
-        result.doneMonitor_ = doneMonitor_;
+        result.sender_ = sender_;
         if (((from_bitField0_ & 0x08000000) == 0x08000000)) {
           to_bitField0_ |= 0x00080000;
         }
-        result.dataMonitor_ = dataMonitor_;
+        result.id_ = id_;
         if (((from_bitField0_ & 0x10000000) == 0x10000000)) {
           to_bitField0_ |= 0x00100000;
         }
-        result.composition_ = composition_;
+        result.byteOrder_ = byteOrder_;
         if (((from_bitField0_ & 0x20000000) == 0x20000000)) {
           to_bitField0_ |= 0x00200000;
         }
-        result.executionTime_ = executionTime_;
+        result.exceptionMonitor_ = exceptionMonitor_;
         if (((from_bitField0_ & 0x40000000) == 0x40000000)) {
           to_bitField0_ |= 0x00400000;
         }
-        result.action_ = action_;
+        result.doneMonitor_ = doneMonitor_;
         if (((from_bitField0_ & 0x80000000) == 0x80000000)) {
           to_bitField0_ |= 0x00800000;
+        }
+        result.dataMonitor_ = dataMonitor_;
+        if (((from_bitField1_ & 0x00000001) == 0x00000001)) {
+          to_bitField0_ |= 0x01000000;
+        }
+        result.composition_ = composition_;
+        if (((from_bitField1_ & 0x00000002) == 0x00000002)) {
+          to_bitField0_ |= 0x02000000;
+        }
+        result.executionTime_ = executionTime_;
+        if (((from_bitField1_ & 0x00000004) == 0x00000004)) {
+          to_bitField0_ |= 0x04000000;
+        }
+        result.action_ = action_;
+        if (((from_bitField1_ & 0x00000008) == 0x00000008)) {
+          to_bitField0_ |= 0x08000000;
         }
         result.controlR_ = controlR_;
         result.bitField0_ = to_bitField0_;
@@ -3755,6 +4117,14 @@ public final class xMsgD {
         if (other.hasDataGenerationStatus()) {
           setDataGenerationStatus(other.getDataGenerationStatus());
         }
+        if (other.hasStatusText()) {
+          bitField0_ |= 0x00000020;
+          statusText_ = other.statusText_;
+          onChanged();
+        }
+        if (other.hasStatusSeverityId()) {
+          setStatusSeverityId(other.getStatusSeverityId());
+        }
         if (other.hasVLSINT32()) {
           setVLSINT32(other.getVLSINT32());
         }
@@ -3774,7 +4144,7 @@ public final class xMsgD {
           setDOUBLE(other.getDOUBLE());
         }
         if (other.hasSTRING()) {
-          bitField0_ |= 0x00000800;
+          bitField0_ |= 0x00002000;
           sTRING_ = other.sTRING_;
           onChanged();
         }
@@ -3784,7 +4154,7 @@ public final class xMsgD {
         if (!other.vLSINT32A_.isEmpty()) {
           if (vLSINT32A_.isEmpty()) {
             vLSINT32A_ = other.vLSINT32A_;
-            bitField0_ = (bitField0_ & ~0x00002000);
+            bitField0_ = (bitField0_ & ~0x00008000);
           } else {
             ensureVLSINT32AIsMutable();
             vLSINT32A_.addAll(other.vLSINT32A_);
@@ -3794,7 +4164,7 @@ public final class xMsgD {
         if (!other.vLSINT64A_.isEmpty()) {
           if (vLSINT64A_.isEmpty()) {
             vLSINT64A_ = other.vLSINT64A_;
-            bitField0_ = (bitField0_ & ~0x00004000);
+            bitField0_ = (bitField0_ & ~0x00010000);
           } else {
             ensureVLSINT64AIsMutable();
             vLSINT64A_.addAll(other.vLSINT64A_);
@@ -3804,7 +4174,7 @@ public final class xMsgD {
         if (!other.fLSINT32A_.isEmpty()) {
           if (fLSINT32A_.isEmpty()) {
             fLSINT32A_ = other.fLSINT32A_;
-            bitField0_ = (bitField0_ & ~0x00008000);
+            bitField0_ = (bitField0_ & ~0x00020000);
           } else {
             ensureFLSINT32AIsMutable();
             fLSINT32A_.addAll(other.fLSINT32A_);
@@ -3814,7 +4184,7 @@ public final class xMsgD {
         if (!other.fLSINT64A_.isEmpty()) {
           if (fLSINT64A_.isEmpty()) {
             fLSINT64A_ = other.fLSINT64A_;
-            bitField0_ = (bitField0_ & ~0x00010000);
+            bitField0_ = (bitField0_ & ~0x00040000);
           } else {
             ensureFLSINT64AIsMutable();
             fLSINT64A_.addAll(other.fLSINT64A_);
@@ -3824,7 +4194,7 @@ public final class xMsgD {
         if (!other.fLOATA_.isEmpty()) {
           if (fLOATA_.isEmpty()) {
             fLOATA_ = other.fLOATA_;
-            bitField0_ = (bitField0_ & ~0x00020000);
+            bitField0_ = (bitField0_ & ~0x00080000);
           } else {
             ensureFLOATAIsMutable();
             fLOATA_.addAll(other.fLOATA_);
@@ -3834,7 +4204,7 @@ public final class xMsgD {
         if (!other.dOUBLEA_.isEmpty()) {
           if (dOUBLEA_.isEmpty()) {
             dOUBLEA_ = other.dOUBLEA_;
-            bitField0_ = (bitField0_ & ~0x00040000);
+            bitField0_ = (bitField0_ & ~0x00100000);
           } else {
             ensureDOUBLEAIsMutable();
             dOUBLEA_.addAll(other.dOUBLEA_);
@@ -3844,7 +4214,7 @@ public final class xMsgD {
         if (!other.sTRINGA_.isEmpty()) {
           if (sTRINGA_.isEmpty()) {
             sTRINGA_ = other.sTRINGA_;
-            bitField0_ = (bitField0_ & ~0x00080000);
+            bitField0_ = (bitField0_ & ~0x00200000);
           } else {
             ensureSTRINGAIsMutable();
             sTRINGA_.addAll(other.sTRINGA_);
@@ -3854,7 +4224,7 @@ public final class xMsgD {
         if (!other.bYTESA_.isEmpty()) {
           if (bYTESA_.isEmpty()) {
             bYTESA_ = other.bYTESA_;
-            bitField0_ = (bitField0_ & ~0x00100000);
+            bitField0_ = (bitField0_ & ~0x00400000);
           } else {
             ensureBYTESAIsMutable();
             bYTESA_.addAll(other.bYTESA_);
@@ -3864,18 +4234,26 @@ public final class xMsgD {
         if (other.hasDataType()) {
           setDataType(other.getDataType());
         }
-        if (other.hasByteOrder()) {
-          bitField0_ |= 0x00400000;
-          byteOrder_ = other.byteOrder_;
+        if (other.hasUserObjectDescription()) {
+          bitField0_ |= 0x01000000;
+          userObjectDescription_ = other.userObjectDescription_;
           onChanged();
         }
+        if (other.hasByteArrayType()) {
+          setByteArrayType(other.getByteArrayType());
+        }
         if (other.hasSender()) {
-          bitField0_ |= 0x00800000;
+          bitField0_ |= 0x04000000;
           sender_ = other.sender_;
           onChanged();
         }
         if (other.hasId()) {
           setId(other.getId());
+        }
+        if (other.hasByteOrder()) {
+          bitField0_ |= 0x10000000;
+          byteOrder_ = other.byteOrder_;
+          onChanged();
         }
         if (other.hasExceptionMonitor()) {
           setExceptionMonitor(other.getExceptionMonitor());
@@ -3887,7 +4265,7 @@ public final class xMsgD {
           setDataMonitor(other.getDataMonitor());
         }
         if (other.hasComposition()) {
-          bitField0_ |= 0x10000000;
+          bitField1_ |= 0x00000001;
           composition_ = other.composition_;
           onChanged();
         }
@@ -3926,6 +4304,7 @@ public final class xMsgD {
         return this;
       }
       private int bitField0_;
+      private int bitField1_;
 
       // optional string dataVersion = 1;
       private java.lang.Object dataVersion_ = "";
@@ -4141,7 +4520,7 @@ public final class xMsgD {
        * <code>optional string dataAuthor = 3;</code>
        *
        * <pre>
-       * Author of the data
+       * Author of the data, an additional filed set by the engine
        * </pre>
        */
       public boolean hasDataAuthor() {
@@ -4151,7 +4530,7 @@ public final class xMsgD {
        * <code>optional string dataAuthor = 3;</code>
        *
        * <pre>
-       * Author of the data
+       * Author of the data, an additional filed set by the engine
        * </pre>
        */
       public java.lang.String getDataAuthor() {
@@ -4169,7 +4548,7 @@ public final class xMsgD {
        * <code>optional string dataAuthor = 3;</code>
        *
        * <pre>
-       * Author of the data
+       * Author of the data, an additional filed set by the engine
        * </pre>
        */
       public com.google.protobuf.ByteString
@@ -4189,7 +4568,7 @@ public final class xMsgD {
        * <code>optional string dataAuthor = 3;</code>
        *
        * <pre>
-       * Author of the data
+       * Author of the data, an additional filed set by the engine
        * </pre>
        */
       public Builder setDataAuthor(
@@ -4206,7 +4585,7 @@ public final class xMsgD {
        * <code>optional string dataAuthor = 3;</code>
        *
        * <pre>
-       * Author of the data
+       * Author of the data, an additional filed set by the engine
        * </pre>
        */
       public Builder clearDataAuthor() {
@@ -4219,7 +4598,7 @@ public final class xMsgD {
        * <code>optional string dataAuthor = 3;</code>
        *
        * <pre>
-       * Author of the data
+       * Author of the data, an additional filed set by the engine
        * </pre>
        */
       public Builder setDataAuthorBytes(
@@ -4383,20 +4762,167 @@ public final class xMsgD {
         return this;
       }
 
-      // optional sint32 VLSINT32 = 6;
+      // optional string statusText = 6;
+      private java.lang.Object statusText_ = "";
+      /**
+       * <code>optional string statusText = 6;</code>
+       *
+       * <pre>
+       * Status text
+       * </pre>
+       */
+      public boolean hasStatusText() {
+        return ((bitField0_ & 0x00000020) == 0x00000020);
+      }
+      /**
+       * <code>optional string statusText = 6;</code>
+       *
+       * <pre>
+       * Status text
+       * </pre>
+       */
+      public java.lang.String getStatusText() {
+        java.lang.Object ref = statusText_;
+        if (!(ref instanceof java.lang.String)) {
+          java.lang.String s = ((com.google.protobuf.ByteString) ref)
+              .toStringUtf8();
+          statusText_ = s;
+          return s;
+        } else {
+          return (java.lang.String) ref;
+        }
+      }
+      /**
+       * <code>optional string statusText = 6;</code>
+       *
+       * <pre>
+       * Status text
+       * </pre>
+       */
+      public com.google.protobuf.ByteString
+          getStatusTextBytes() {
+        java.lang.Object ref = statusText_;
+        if (ref instanceof String) {
+          com.google.protobuf.ByteString b = 
+              com.google.protobuf.ByteString.copyFromUtf8(
+                  (java.lang.String) ref);
+          statusText_ = b;
+          return b;
+        } else {
+          return (com.google.protobuf.ByteString) ref;
+        }
+      }
+      /**
+       * <code>optional string statusText = 6;</code>
+       *
+       * <pre>
+       * Status text
+       * </pre>
+       */
+      public Builder setStatusText(
+          java.lang.String value) {
+        if (value == null) {
+    throw new NullPointerException();
+  }
+  bitField0_ |= 0x00000020;
+        statusText_ = value;
+        onChanged();
+        return this;
+      }
+      /**
+       * <code>optional string statusText = 6;</code>
+       *
+       * <pre>
+       * Status text
+       * </pre>
+       */
+      public Builder clearStatusText() {
+        bitField0_ = (bitField0_ & ~0x00000020);
+        statusText_ = getDefaultInstance().getStatusText();
+        onChanged();
+        return this;
+      }
+      /**
+       * <code>optional string statusText = 6;</code>
+       *
+       * <pre>
+       * Status text
+       * </pre>
+       */
+      public Builder setStatusTextBytes(
+          com.google.protobuf.ByteString value) {
+        if (value == null) {
+    throw new NullPointerException();
+  }
+  bitField0_ |= 0x00000020;
+        statusText_ = value;
+        onChanged();
+        return this;
+      }
+
+      // optional sfixed32 statusSeverityId = 7;
+      private int statusSeverityId_ ;
+      /**
+       * <code>optional sfixed32 statusSeverityId = 7;</code>
+       *
+       * <pre>
+       * Severity id of the data generaation status
+       * </pre>
+       */
+      public boolean hasStatusSeverityId() {
+        return ((bitField0_ & 0x00000040) == 0x00000040);
+      }
+      /**
+       * <code>optional sfixed32 statusSeverityId = 7;</code>
+       *
+       * <pre>
+       * Severity id of the data generaation status
+       * </pre>
+       */
+      public int getStatusSeverityId() {
+        return statusSeverityId_;
+      }
+      /**
+       * <code>optional sfixed32 statusSeverityId = 7;</code>
+       *
+       * <pre>
+       * Severity id of the data generaation status
+       * </pre>
+       */
+      public Builder setStatusSeverityId(int value) {
+        bitField0_ |= 0x00000040;
+        statusSeverityId_ = value;
+        onChanged();
+        return this;
+      }
+      /**
+       * <code>optional sfixed32 statusSeverityId = 7;</code>
+       *
+       * <pre>
+       * Severity id of the data generaation status
+       * </pre>
+       */
+      public Builder clearStatusSeverityId() {
+        bitField0_ = (bitField0_ & ~0x00000040);
+        statusSeverityId_ = 0;
+        onChanged();
+        return this;
+      }
+
+      // optional sint32 VLSINT32 = 8;
       private int vLSINT32_ ;
       /**
-       * <code>optional sint32 VLSINT32 = 6;</code>
+       * <code>optional sint32 VLSINT32 = 8;</code>
        *
        * <pre>
        * Data itself
        * </pre>
        */
       public boolean hasVLSINT32() {
-        return ((bitField0_ & 0x00000020) == 0x00000020);
+        return ((bitField0_ & 0x00000080) == 0x00000080);
       }
       /**
-       * <code>optional sint32 VLSINT32 = 6;</code>
+       * <code>optional sint32 VLSINT32 = 8;</code>
        *
        * <pre>
        * Data itself
@@ -4406,46 +4932,46 @@ public final class xMsgD {
         return vLSINT32_;
       }
       /**
-       * <code>optional sint32 VLSINT32 = 6;</code>
+       * <code>optional sint32 VLSINT32 = 8;</code>
        *
        * <pre>
        * Data itself
        * </pre>
        */
       public Builder setVLSINT32(int value) {
-        bitField0_ |= 0x00000020;
+        bitField0_ |= 0x00000080;
         vLSINT32_ = value;
         onChanged();
         return this;
       }
       /**
-       * <code>optional sint32 VLSINT32 = 6;</code>
+       * <code>optional sint32 VLSINT32 = 8;</code>
        *
        * <pre>
        * Data itself
        * </pre>
        */
       public Builder clearVLSINT32() {
-        bitField0_ = (bitField0_ & ~0x00000020);
+        bitField0_ = (bitField0_ & ~0x00000080);
         vLSINT32_ = 0;
         onChanged();
         return this;
       }
 
-      // optional sint64 VLSINT64 = 7;
+      // optional sint64 VLSINT64 = 9;
       private long vLSINT64_ ;
       /**
-       * <code>optional sint64 VLSINT64 = 7;</code>
+       * <code>optional sint64 VLSINT64 = 9;</code>
        *
        * <pre>
        * variable length signed int64
        * </pre>
        */
       public boolean hasVLSINT64() {
-        return ((bitField0_ & 0x00000040) == 0x00000040);
+        return ((bitField0_ & 0x00000100) == 0x00000100);
       }
       /**
-       * <code>optional sint64 VLSINT64 = 7;</code>
+       * <code>optional sint64 VLSINT64 = 9;</code>
        *
        * <pre>
        * variable length signed int64
@@ -4455,46 +4981,46 @@ public final class xMsgD {
         return vLSINT64_;
       }
       /**
-       * <code>optional sint64 VLSINT64 = 7;</code>
+       * <code>optional sint64 VLSINT64 = 9;</code>
        *
        * <pre>
        * variable length signed int64
        * </pre>
        */
       public Builder setVLSINT64(long value) {
-        bitField0_ |= 0x00000040;
+        bitField0_ |= 0x00000100;
         vLSINT64_ = value;
         onChanged();
         return this;
       }
       /**
-       * <code>optional sint64 VLSINT64 = 7;</code>
+       * <code>optional sint64 VLSINT64 = 9;</code>
        *
        * <pre>
        * variable length signed int64
        * </pre>
        */
       public Builder clearVLSINT64() {
-        bitField0_ = (bitField0_ & ~0x00000040);
+        bitField0_ = (bitField0_ & ~0x00000100);
         vLSINT64_ = 0L;
         onChanged();
         return this;
       }
 
-      // optional sfixed32 FLSINT32 = 8;
+      // optional sfixed32 FLSINT32 = 10;
       private int fLSINT32_ ;
       /**
-       * <code>optional sfixed32 FLSINT32 = 8;</code>
+       * <code>optional sfixed32 FLSINT32 = 10;</code>
        *
        * <pre>
        * fixed length signed int32
        * </pre>
        */
       public boolean hasFLSINT32() {
-        return ((bitField0_ & 0x00000080) == 0x00000080);
+        return ((bitField0_ & 0x00000200) == 0x00000200);
       }
       /**
-       * <code>optional sfixed32 FLSINT32 = 8;</code>
+       * <code>optional sfixed32 FLSINT32 = 10;</code>
        *
        * <pre>
        * fixed length signed int32
@@ -4504,46 +5030,46 @@ public final class xMsgD {
         return fLSINT32_;
       }
       /**
-       * <code>optional sfixed32 FLSINT32 = 8;</code>
+       * <code>optional sfixed32 FLSINT32 = 10;</code>
        *
        * <pre>
        * fixed length signed int32
        * </pre>
        */
       public Builder setFLSINT32(int value) {
-        bitField0_ |= 0x00000080;
+        bitField0_ |= 0x00000200;
         fLSINT32_ = value;
         onChanged();
         return this;
       }
       /**
-       * <code>optional sfixed32 FLSINT32 = 8;</code>
+       * <code>optional sfixed32 FLSINT32 = 10;</code>
        *
        * <pre>
        * fixed length signed int32
        * </pre>
        */
       public Builder clearFLSINT32() {
-        bitField0_ = (bitField0_ & ~0x00000080);
+        bitField0_ = (bitField0_ & ~0x00000200);
         fLSINT32_ = 0;
         onChanged();
         return this;
       }
 
-      // optional sfixed64 FLSINT64 = 9;
+      // optional sfixed64 FLSINT64 = 11;
       private long fLSINT64_ ;
       /**
-       * <code>optional sfixed64 FLSINT64 = 9;</code>
+       * <code>optional sfixed64 FLSINT64 = 11;</code>
        *
        * <pre>
        * fixed length signed int64
        * </pre>
        */
       public boolean hasFLSINT64() {
-        return ((bitField0_ & 0x00000100) == 0x00000100);
+        return ((bitField0_ & 0x00000400) == 0x00000400);
       }
       /**
-       * <code>optional sfixed64 FLSINT64 = 9;</code>
+       * <code>optional sfixed64 FLSINT64 = 11;</code>
        *
        * <pre>
        * fixed length signed int64
@@ -4553,112 +5079,112 @@ public final class xMsgD {
         return fLSINT64_;
       }
       /**
-       * <code>optional sfixed64 FLSINT64 = 9;</code>
+       * <code>optional sfixed64 FLSINT64 = 11;</code>
        *
        * <pre>
        * fixed length signed int64
        * </pre>
        */
       public Builder setFLSINT64(long value) {
-        bitField0_ |= 0x00000100;
+        bitField0_ |= 0x00000400;
         fLSINT64_ = value;
         onChanged();
         return this;
       }
       /**
-       * <code>optional sfixed64 FLSINT64 = 9;</code>
+       * <code>optional sfixed64 FLSINT64 = 11;</code>
        *
        * <pre>
        * fixed length signed int64
        * </pre>
        */
       public Builder clearFLSINT64() {
-        bitField0_ = (bitField0_ & ~0x00000100);
+        bitField0_ = (bitField0_ & ~0x00000400);
         fLSINT64_ = 0L;
         onChanged();
         return this;
       }
 
-      // optional float FLOAT = 10;
+      // optional float FLOAT = 12;
       private float fLOAT_ ;
       /**
-       * <code>optional float FLOAT = 10;</code>
+       * <code>optional float FLOAT = 12;</code>
        */
       public boolean hasFLOAT() {
-        return ((bitField0_ & 0x00000200) == 0x00000200);
+        return ((bitField0_ & 0x00000800) == 0x00000800);
       }
       /**
-       * <code>optional float FLOAT = 10;</code>
+       * <code>optional float FLOAT = 12;</code>
        */
       public float getFLOAT() {
         return fLOAT_;
       }
       /**
-       * <code>optional float FLOAT = 10;</code>
+       * <code>optional float FLOAT = 12;</code>
        */
       public Builder setFLOAT(float value) {
-        bitField0_ |= 0x00000200;
+        bitField0_ |= 0x00000800;
         fLOAT_ = value;
         onChanged();
         return this;
       }
       /**
-       * <code>optional float FLOAT = 10;</code>
+       * <code>optional float FLOAT = 12;</code>
        */
       public Builder clearFLOAT() {
-        bitField0_ = (bitField0_ & ~0x00000200);
+        bitField0_ = (bitField0_ & ~0x00000800);
         fLOAT_ = 0F;
         onChanged();
         return this;
       }
 
-      // optional double DOUBLE = 11;
+      // optional double DOUBLE = 13;
       private double dOUBLE_ ;
       /**
-       * <code>optional double DOUBLE = 11;</code>
+       * <code>optional double DOUBLE = 13;</code>
        */
       public boolean hasDOUBLE() {
-        return ((bitField0_ & 0x00000400) == 0x00000400);
+        return ((bitField0_ & 0x00001000) == 0x00001000);
       }
       /**
-       * <code>optional double DOUBLE = 11;</code>
+       * <code>optional double DOUBLE = 13;</code>
        */
       public double getDOUBLE() {
         return dOUBLE_;
       }
       /**
-       * <code>optional double DOUBLE = 11;</code>
+       * <code>optional double DOUBLE = 13;</code>
        */
       public Builder setDOUBLE(double value) {
-        bitField0_ |= 0x00000400;
+        bitField0_ |= 0x00001000;
         dOUBLE_ = value;
         onChanged();
         return this;
       }
       /**
-       * <code>optional double DOUBLE = 11;</code>
+       * <code>optional double DOUBLE = 13;</code>
        */
       public Builder clearDOUBLE() {
-        bitField0_ = (bitField0_ & ~0x00000400);
+        bitField0_ = (bitField0_ & ~0x00001000);
         dOUBLE_ = 0D;
         onChanged();
         return this;
       }
 
-      // optional string STRING = 12;
+      // optional string STRING = 14;
       private java.lang.Object sTRING_ = "";
       /**
-       * <code>optional string STRING = 12;</code>
+       * <code>optional string STRING = 14;</code>
        *
        * <pre>
        * contains UTF-8 encoding or 7-bit ASCII text
        * </pre>
        */
       public boolean hasSTRING() {
-        return ((bitField0_ & 0x00000800) == 0x00000800);
+        return ((bitField0_ & 0x00002000) == 0x00002000);
       }
       /**
-       * <code>optional string STRING = 12;</code>
+       * <code>optional string STRING = 14;</code>
        *
        * <pre>
        * contains UTF-8 encoding or 7-bit ASCII text
@@ -4676,7 +5202,7 @@ public final class xMsgD {
         }
       }
       /**
-       * <code>optional string STRING = 12;</code>
+       * <code>optional string STRING = 14;</code>
        *
        * <pre>
        * contains UTF-8 encoding or 7-bit ASCII text
@@ -4696,7 +5222,7 @@ public final class xMsgD {
         }
       }
       /**
-       * <code>optional string STRING = 12;</code>
+       * <code>optional string STRING = 14;</code>
        *
        * <pre>
        * contains UTF-8 encoding or 7-bit ASCII text
@@ -4707,26 +5233,26 @@ public final class xMsgD {
         if (value == null) {
     throw new NullPointerException();
   }
-  bitField0_ |= 0x00000800;
+  bitField0_ |= 0x00002000;
         sTRING_ = value;
         onChanged();
         return this;
       }
       /**
-       * <code>optional string STRING = 12;</code>
+       * <code>optional string STRING = 14;</code>
        *
        * <pre>
        * contains UTF-8 encoding or 7-bit ASCII text
        * </pre>
        */
       public Builder clearSTRING() {
-        bitField0_ = (bitField0_ & ~0x00000800);
+        bitField0_ = (bitField0_ & ~0x00002000);
         sTRING_ = getDefaultInstance().getSTRING();
         onChanged();
         return this;
       }
       /**
-       * <code>optional string STRING = 12;</code>
+       * <code>optional string STRING = 14;</code>
        *
        * <pre>
        * contains UTF-8 encoding or 7-bit ASCII text
@@ -4737,26 +5263,26 @@ public final class xMsgD {
         if (value == null) {
     throw new NullPointerException();
   }
-  bitField0_ |= 0x00000800;
+  bitField0_ |= 0x00002000;
         sTRING_ = value;
         onChanged();
         return this;
       }
 
-      // optional bytes BYTES = 13;
+      // optional bytes BYTES = 15;
       private com.google.protobuf.ByteString bYTES_ = com.google.protobuf.ByteString.EMPTY;
       /**
-       * <code>optional bytes BYTES = 13;</code>
+       * <code>optional bytes BYTES = 15;</code>
        *
        * <pre>
        * contains arbitrary sequence of bytes
        * </pre>
        */
       public boolean hasBYTES() {
-        return ((bitField0_ & 0x00001000) == 0x00001000);
+        return ((bitField0_ & 0x00004000) == 0x00004000);
       }
       /**
-       * <code>optional bytes BYTES = 13;</code>
+       * <code>optional bytes BYTES = 15;</code>
        *
        * <pre>
        * contains arbitrary sequence of bytes
@@ -4766,7 +5292,7 @@ public final class xMsgD {
         return bYTES_;
       }
       /**
-       * <code>optional bytes BYTES = 13;</code>
+       * <code>optional bytes BYTES = 15;</code>
        *
        * <pre>
        * contains arbitrary sequence of bytes
@@ -4776,35 +5302,35 @@ public final class xMsgD {
         if (value == null) {
     throw new NullPointerException();
   }
-  bitField0_ |= 0x00001000;
+  bitField0_ |= 0x00004000;
         bYTES_ = value;
         onChanged();
         return this;
       }
       /**
-       * <code>optional bytes BYTES = 13;</code>
+       * <code>optional bytes BYTES = 15;</code>
        *
        * <pre>
        * contains arbitrary sequence of bytes
        * </pre>
        */
       public Builder clearBYTES() {
-        bitField0_ = (bitField0_ & ~0x00001000);
+        bitField0_ = (bitField0_ & ~0x00004000);
         bYTES_ = getDefaultInstance().getBYTES();
         onChanged();
         return this;
       }
 
-      // repeated sint32 VLSINT32A = 14;
+      // repeated sint32 VLSINT32A = 16;
       private java.util.List<java.lang.Integer> vLSINT32A_ = java.util.Collections.emptyList();
       private void ensureVLSINT32AIsMutable() {
-        if (!((bitField0_ & 0x00002000) == 0x00002000)) {
+        if (!((bitField0_ & 0x00008000) == 0x00008000)) {
           vLSINT32A_ = new java.util.ArrayList<java.lang.Integer>(vLSINT32A_);
-          bitField0_ |= 0x00002000;
+          bitField0_ |= 0x00008000;
          }
       }
       /**
-       * <code>repeated sint32 VLSINT32A = 14;</code>
+       * <code>repeated sint32 VLSINT32A = 16;</code>
        *
        * <pre>
        * array of variable length signed int32s
@@ -4815,7 +5341,7 @@ public final class xMsgD {
         return java.util.Collections.unmodifiableList(vLSINT32A_);
       }
       /**
-       * <code>repeated sint32 VLSINT32A = 14;</code>
+       * <code>repeated sint32 VLSINT32A = 16;</code>
        *
        * <pre>
        * array of variable length signed int32s
@@ -4825,7 +5351,7 @@ public final class xMsgD {
         return vLSINT32A_.size();
       }
       /**
-       * <code>repeated sint32 VLSINT32A = 14;</code>
+       * <code>repeated sint32 VLSINT32A = 16;</code>
        *
        * <pre>
        * array of variable length signed int32s
@@ -4835,7 +5361,7 @@ public final class xMsgD {
         return vLSINT32A_.get(index);
       }
       /**
-       * <code>repeated sint32 VLSINT32A = 14;</code>
+       * <code>repeated sint32 VLSINT32A = 16;</code>
        *
        * <pre>
        * array of variable length signed int32s
@@ -4849,7 +5375,7 @@ public final class xMsgD {
         return this;
       }
       /**
-       * <code>repeated sint32 VLSINT32A = 14;</code>
+       * <code>repeated sint32 VLSINT32A = 16;</code>
        *
        * <pre>
        * array of variable length signed int32s
@@ -4862,7 +5388,7 @@ public final class xMsgD {
         return this;
       }
       /**
-       * <code>repeated sint32 VLSINT32A = 14;</code>
+       * <code>repeated sint32 VLSINT32A = 16;</code>
        *
        * <pre>
        * array of variable length signed int32s
@@ -4876,7 +5402,7 @@ public final class xMsgD {
         return this;
       }
       /**
-       * <code>repeated sint32 VLSINT32A = 14;</code>
+       * <code>repeated sint32 VLSINT32A = 16;</code>
        *
        * <pre>
        * array of variable length signed int32s
@@ -4884,21 +5410,21 @@ public final class xMsgD {
        */
       public Builder clearVLSINT32A() {
         vLSINT32A_ = java.util.Collections.emptyList();
-        bitField0_ = (bitField0_ & ~0x00002000);
+        bitField0_ = (bitField0_ & ~0x00008000);
         onChanged();
         return this;
       }
 
-      // repeated sint64 VLSINT64A = 15;
+      // repeated sint64 VLSINT64A = 17;
       private java.util.List<java.lang.Long> vLSINT64A_ = java.util.Collections.emptyList();
       private void ensureVLSINT64AIsMutable() {
-        if (!((bitField0_ & 0x00004000) == 0x00004000)) {
+        if (!((bitField0_ & 0x00010000) == 0x00010000)) {
           vLSINT64A_ = new java.util.ArrayList<java.lang.Long>(vLSINT64A_);
-          bitField0_ |= 0x00004000;
+          bitField0_ |= 0x00010000;
          }
       }
       /**
-       * <code>repeated sint64 VLSINT64A = 15;</code>
+       * <code>repeated sint64 VLSINT64A = 17;</code>
        *
        * <pre>
        * array of variable length signed int64s
@@ -4909,7 +5435,7 @@ public final class xMsgD {
         return java.util.Collections.unmodifiableList(vLSINT64A_);
       }
       /**
-       * <code>repeated sint64 VLSINT64A = 15;</code>
+       * <code>repeated sint64 VLSINT64A = 17;</code>
        *
        * <pre>
        * array of variable length signed int64s
@@ -4919,7 +5445,7 @@ public final class xMsgD {
         return vLSINT64A_.size();
       }
       /**
-       * <code>repeated sint64 VLSINT64A = 15;</code>
+       * <code>repeated sint64 VLSINT64A = 17;</code>
        *
        * <pre>
        * array of variable length signed int64s
@@ -4929,7 +5455,7 @@ public final class xMsgD {
         return vLSINT64A_.get(index);
       }
       /**
-       * <code>repeated sint64 VLSINT64A = 15;</code>
+       * <code>repeated sint64 VLSINT64A = 17;</code>
        *
        * <pre>
        * array of variable length signed int64s
@@ -4943,7 +5469,7 @@ public final class xMsgD {
         return this;
       }
       /**
-       * <code>repeated sint64 VLSINT64A = 15;</code>
+       * <code>repeated sint64 VLSINT64A = 17;</code>
        *
        * <pre>
        * array of variable length signed int64s
@@ -4956,7 +5482,7 @@ public final class xMsgD {
         return this;
       }
       /**
-       * <code>repeated sint64 VLSINT64A = 15;</code>
+       * <code>repeated sint64 VLSINT64A = 17;</code>
        *
        * <pre>
        * array of variable length signed int64s
@@ -4970,7 +5496,7 @@ public final class xMsgD {
         return this;
       }
       /**
-       * <code>repeated sint64 VLSINT64A = 15;</code>
+       * <code>repeated sint64 VLSINT64A = 17;</code>
        *
        * <pre>
        * array of variable length signed int64s
@@ -4978,21 +5504,21 @@ public final class xMsgD {
        */
       public Builder clearVLSINT64A() {
         vLSINT64A_ = java.util.Collections.emptyList();
-        bitField0_ = (bitField0_ & ~0x00004000);
+        bitField0_ = (bitField0_ & ~0x00010000);
         onChanged();
         return this;
       }
 
-      // repeated sfixed32 FLSINT32A = 16;
+      // repeated sfixed32 FLSINT32A = 18;
       private java.util.List<java.lang.Integer> fLSINT32A_ = java.util.Collections.emptyList();
       private void ensureFLSINT32AIsMutable() {
-        if (!((bitField0_ & 0x00008000) == 0x00008000)) {
+        if (!((bitField0_ & 0x00020000) == 0x00020000)) {
           fLSINT32A_ = new java.util.ArrayList<java.lang.Integer>(fLSINT32A_);
-          bitField0_ |= 0x00008000;
+          bitField0_ |= 0x00020000;
          }
       }
       /**
-       * <code>repeated sfixed32 FLSINT32A = 16;</code>
+       * <code>repeated sfixed32 FLSINT32A = 18;</code>
        *
        * <pre>
        * array of fixed length signed int32s
@@ -5003,7 +5529,7 @@ public final class xMsgD {
         return java.util.Collections.unmodifiableList(fLSINT32A_);
       }
       /**
-       * <code>repeated sfixed32 FLSINT32A = 16;</code>
+       * <code>repeated sfixed32 FLSINT32A = 18;</code>
        *
        * <pre>
        * array of fixed length signed int32s
@@ -5013,7 +5539,7 @@ public final class xMsgD {
         return fLSINT32A_.size();
       }
       /**
-       * <code>repeated sfixed32 FLSINT32A = 16;</code>
+       * <code>repeated sfixed32 FLSINT32A = 18;</code>
        *
        * <pre>
        * array of fixed length signed int32s
@@ -5023,7 +5549,7 @@ public final class xMsgD {
         return fLSINT32A_.get(index);
       }
       /**
-       * <code>repeated sfixed32 FLSINT32A = 16;</code>
+       * <code>repeated sfixed32 FLSINT32A = 18;</code>
        *
        * <pre>
        * array of fixed length signed int32s
@@ -5037,7 +5563,7 @@ public final class xMsgD {
         return this;
       }
       /**
-       * <code>repeated sfixed32 FLSINT32A = 16;</code>
+       * <code>repeated sfixed32 FLSINT32A = 18;</code>
        *
        * <pre>
        * array of fixed length signed int32s
@@ -5050,7 +5576,7 @@ public final class xMsgD {
         return this;
       }
       /**
-       * <code>repeated sfixed32 FLSINT32A = 16;</code>
+       * <code>repeated sfixed32 FLSINT32A = 18;</code>
        *
        * <pre>
        * array of fixed length signed int32s
@@ -5064,7 +5590,7 @@ public final class xMsgD {
         return this;
       }
       /**
-       * <code>repeated sfixed32 FLSINT32A = 16;</code>
+       * <code>repeated sfixed32 FLSINT32A = 18;</code>
        *
        * <pre>
        * array of fixed length signed int32s
@@ -5072,21 +5598,21 @@ public final class xMsgD {
        */
       public Builder clearFLSINT32A() {
         fLSINT32A_ = java.util.Collections.emptyList();
-        bitField0_ = (bitField0_ & ~0x00008000);
+        bitField0_ = (bitField0_ & ~0x00020000);
         onChanged();
         return this;
       }
 
-      // repeated sfixed64 FLSINT64A = 17;
+      // repeated sfixed64 FLSINT64A = 19;
       private java.util.List<java.lang.Long> fLSINT64A_ = java.util.Collections.emptyList();
       private void ensureFLSINT64AIsMutable() {
-        if (!((bitField0_ & 0x00010000) == 0x00010000)) {
+        if (!((bitField0_ & 0x00040000) == 0x00040000)) {
           fLSINT64A_ = new java.util.ArrayList<java.lang.Long>(fLSINT64A_);
-          bitField0_ |= 0x00010000;
+          bitField0_ |= 0x00040000;
          }
       }
       /**
-       * <code>repeated sfixed64 FLSINT64A = 17;</code>
+       * <code>repeated sfixed64 FLSINT64A = 19;</code>
        *
        * <pre>
        * array of fixed length signed int64s
@@ -5097,7 +5623,7 @@ public final class xMsgD {
         return java.util.Collections.unmodifiableList(fLSINT64A_);
       }
       /**
-       * <code>repeated sfixed64 FLSINT64A = 17;</code>
+       * <code>repeated sfixed64 FLSINT64A = 19;</code>
        *
        * <pre>
        * array of fixed length signed int64s
@@ -5107,7 +5633,7 @@ public final class xMsgD {
         return fLSINT64A_.size();
       }
       /**
-       * <code>repeated sfixed64 FLSINT64A = 17;</code>
+       * <code>repeated sfixed64 FLSINT64A = 19;</code>
        *
        * <pre>
        * array of fixed length signed int64s
@@ -5117,7 +5643,7 @@ public final class xMsgD {
         return fLSINT64A_.get(index);
       }
       /**
-       * <code>repeated sfixed64 FLSINT64A = 17;</code>
+       * <code>repeated sfixed64 FLSINT64A = 19;</code>
        *
        * <pre>
        * array of fixed length signed int64s
@@ -5131,7 +5657,7 @@ public final class xMsgD {
         return this;
       }
       /**
-       * <code>repeated sfixed64 FLSINT64A = 17;</code>
+       * <code>repeated sfixed64 FLSINT64A = 19;</code>
        *
        * <pre>
        * array of fixed length signed int64s
@@ -5144,7 +5670,7 @@ public final class xMsgD {
         return this;
       }
       /**
-       * <code>repeated sfixed64 FLSINT64A = 17;</code>
+       * <code>repeated sfixed64 FLSINT64A = 19;</code>
        *
        * <pre>
        * array of fixed length signed int64s
@@ -5158,7 +5684,7 @@ public final class xMsgD {
         return this;
       }
       /**
-       * <code>repeated sfixed64 FLSINT64A = 17;</code>
+       * <code>repeated sfixed64 FLSINT64A = 19;</code>
        *
        * <pre>
        * array of fixed length signed int64s
@@ -5166,21 +5692,21 @@ public final class xMsgD {
        */
       public Builder clearFLSINT64A() {
         fLSINT64A_ = java.util.Collections.emptyList();
-        bitField0_ = (bitField0_ & ~0x00010000);
+        bitField0_ = (bitField0_ & ~0x00040000);
         onChanged();
         return this;
       }
 
-      // repeated float FLOATA = 18;
+      // repeated float FLOATA = 20;
       private java.util.List<java.lang.Float> fLOATA_ = java.util.Collections.emptyList();
       private void ensureFLOATAIsMutable() {
-        if (!((bitField0_ & 0x00020000) == 0x00020000)) {
+        if (!((bitField0_ & 0x00080000) == 0x00080000)) {
           fLOATA_ = new java.util.ArrayList<java.lang.Float>(fLOATA_);
-          bitField0_ |= 0x00020000;
+          bitField0_ |= 0x00080000;
          }
       }
       /**
-       * <code>repeated float FLOATA = 18;</code>
+       * <code>repeated float FLOATA = 20;</code>
        *
        * <pre>
        * array of floats
@@ -5191,7 +5717,7 @@ public final class xMsgD {
         return java.util.Collections.unmodifiableList(fLOATA_);
       }
       /**
-       * <code>repeated float FLOATA = 18;</code>
+       * <code>repeated float FLOATA = 20;</code>
        *
        * <pre>
        * array of floats
@@ -5201,7 +5727,7 @@ public final class xMsgD {
         return fLOATA_.size();
       }
       /**
-       * <code>repeated float FLOATA = 18;</code>
+       * <code>repeated float FLOATA = 20;</code>
        *
        * <pre>
        * array of floats
@@ -5211,7 +5737,7 @@ public final class xMsgD {
         return fLOATA_.get(index);
       }
       /**
-       * <code>repeated float FLOATA = 18;</code>
+       * <code>repeated float FLOATA = 20;</code>
        *
        * <pre>
        * array of floats
@@ -5225,7 +5751,7 @@ public final class xMsgD {
         return this;
       }
       /**
-       * <code>repeated float FLOATA = 18;</code>
+       * <code>repeated float FLOATA = 20;</code>
        *
        * <pre>
        * array of floats
@@ -5238,7 +5764,7 @@ public final class xMsgD {
         return this;
       }
       /**
-       * <code>repeated float FLOATA = 18;</code>
+       * <code>repeated float FLOATA = 20;</code>
        *
        * <pre>
        * array of floats
@@ -5252,7 +5778,7 @@ public final class xMsgD {
         return this;
       }
       /**
-       * <code>repeated float FLOATA = 18;</code>
+       * <code>repeated float FLOATA = 20;</code>
        *
        * <pre>
        * array of floats
@@ -5260,21 +5786,21 @@ public final class xMsgD {
        */
       public Builder clearFLOATA() {
         fLOATA_ = java.util.Collections.emptyList();
-        bitField0_ = (bitField0_ & ~0x00020000);
+        bitField0_ = (bitField0_ & ~0x00080000);
         onChanged();
         return this;
       }
 
-      // repeated double DOUBLEA = 19;
+      // repeated double DOUBLEA = 21;
       private java.util.List<java.lang.Double> dOUBLEA_ = java.util.Collections.emptyList();
       private void ensureDOUBLEAIsMutable() {
-        if (!((bitField0_ & 0x00040000) == 0x00040000)) {
+        if (!((bitField0_ & 0x00100000) == 0x00100000)) {
           dOUBLEA_ = new java.util.ArrayList<java.lang.Double>(dOUBLEA_);
-          bitField0_ |= 0x00040000;
+          bitField0_ |= 0x00100000;
          }
       }
       /**
-       * <code>repeated double DOUBLEA = 19;</code>
+       * <code>repeated double DOUBLEA = 21;</code>
        *
        * <pre>
        * array of doubles
@@ -5285,7 +5811,7 @@ public final class xMsgD {
         return java.util.Collections.unmodifiableList(dOUBLEA_);
       }
       /**
-       * <code>repeated double DOUBLEA = 19;</code>
+       * <code>repeated double DOUBLEA = 21;</code>
        *
        * <pre>
        * array of doubles
@@ -5295,7 +5821,7 @@ public final class xMsgD {
         return dOUBLEA_.size();
       }
       /**
-       * <code>repeated double DOUBLEA = 19;</code>
+       * <code>repeated double DOUBLEA = 21;</code>
        *
        * <pre>
        * array of doubles
@@ -5305,7 +5831,7 @@ public final class xMsgD {
         return dOUBLEA_.get(index);
       }
       /**
-       * <code>repeated double DOUBLEA = 19;</code>
+       * <code>repeated double DOUBLEA = 21;</code>
        *
        * <pre>
        * array of doubles
@@ -5319,7 +5845,7 @@ public final class xMsgD {
         return this;
       }
       /**
-       * <code>repeated double DOUBLEA = 19;</code>
+       * <code>repeated double DOUBLEA = 21;</code>
        *
        * <pre>
        * array of doubles
@@ -5332,7 +5858,7 @@ public final class xMsgD {
         return this;
       }
       /**
-       * <code>repeated double DOUBLEA = 19;</code>
+       * <code>repeated double DOUBLEA = 21;</code>
        *
        * <pre>
        * array of doubles
@@ -5346,7 +5872,7 @@ public final class xMsgD {
         return this;
       }
       /**
-       * <code>repeated double DOUBLEA = 19;</code>
+       * <code>repeated double DOUBLEA = 21;</code>
        *
        * <pre>
        * array of doubles
@@ -5354,21 +5880,21 @@ public final class xMsgD {
        */
       public Builder clearDOUBLEA() {
         dOUBLEA_ = java.util.Collections.emptyList();
-        bitField0_ = (bitField0_ & ~0x00040000);
+        bitField0_ = (bitField0_ & ~0x00100000);
         onChanged();
         return this;
       }
 
-      // repeated string STRINGA = 20;
+      // repeated string STRINGA = 22;
       private com.google.protobuf.LazyStringList sTRINGA_ = com.google.protobuf.LazyStringArrayList.EMPTY;
       private void ensureSTRINGAIsMutable() {
-        if (!((bitField0_ & 0x00080000) == 0x00080000)) {
+        if (!((bitField0_ & 0x00200000) == 0x00200000)) {
           sTRINGA_ = new com.google.protobuf.LazyStringArrayList(sTRINGA_);
-          bitField0_ |= 0x00080000;
+          bitField0_ |= 0x00200000;
          }
       }
       /**
-       * <code>repeated string STRINGA = 20;</code>
+       * <code>repeated string STRINGA = 22;</code>
        *
        * <pre>
        * array of UTF-8 encoded or 7-bit ASCII strings
@@ -5379,7 +5905,7 @@ public final class xMsgD {
         return java.util.Collections.unmodifiableList(sTRINGA_);
       }
       /**
-       * <code>repeated string STRINGA = 20;</code>
+       * <code>repeated string STRINGA = 22;</code>
        *
        * <pre>
        * array of UTF-8 encoded or 7-bit ASCII strings
@@ -5389,7 +5915,7 @@ public final class xMsgD {
         return sTRINGA_.size();
       }
       /**
-       * <code>repeated string STRINGA = 20;</code>
+       * <code>repeated string STRINGA = 22;</code>
        *
        * <pre>
        * array of UTF-8 encoded or 7-bit ASCII strings
@@ -5399,7 +5925,7 @@ public final class xMsgD {
         return sTRINGA_.get(index);
       }
       /**
-       * <code>repeated string STRINGA = 20;</code>
+       * <code>repeated string STRINGA = 22;</code>
        *
        * <pre>
        * array of UTF-8 encoded or 7-bit ASCII strings
@@ -5410,7 +5936,7 @@ public final class xMsgD {
         return sTRINGA_.getByteString(index);
       }
       /**
-       * <code>repeated string STRINGA = 20;</code>
+       * <code>repeated string STRINGA = 22;</code>
        *
        * <pre>
        * array of UTF-8 encoded or 7-bit ASCII strings
@@ -5427,7 +5953,7 @@ public final class xMsgD {
         return this;
       }
       /**
-       * <code>repeated string STRINGA = 20;</code>
+       * <code>repeated string STRINGA = 22;</code>
        *
        * <pre>
        * array of UTF-8 encoded or 7-bit ASCII strings
@@ -5444,7 +5970,7 @@ public final class xMsgD {
         return this;
       }
       /**
-       * <code>repeated string STRINGA = 20;</code>
+       * <code>repeated string STRINGA = 22;</code>
        *
        * <pre>
        * array of UTF-8 encoded or 7-bit ASCII strings
@@ -5458,7 +5984,7 @@ public final class xMsgD {
         return this;
       }
       /**
-       * <code>repeated string STRINGA = 20;</code>
+       * <code>repeated string STRINGA = 22;</code>
        *
        * <pre>
        * array of UTF-8 encoded or 7-bit ASCII strings
@@ -5466,12 +5992,12 @@ public final class xMsgD {
        */
       public Builder clearSTRINGA() {
         sTRINGA_ = com.google.protobuf.LazyStringArrayList.EMPTY;
-        bitField0_ = (bitField0_ & ~0x00080000);
+        bitField0_ = (bitField0_ & ~0x00200000);
         onChanged();
         return this;
       }
       /**
-       * <code>repeated string STRINGA = 20;</code>
+       * <code>repeated string STRINGA = 22;</code>
        *
        * <pre>
        * array of UTF-8 encoded or 7-bit ASCII strings
@@ -5488,16 +6014,16 @@ public final class xMsgD {
         return this;
       }
 
-      // repeated bytes BYTESA = 21;
+      // repeated bytes BYTESA = 23;
       private java.util.List<com.google.protobuf.ByteString> bYTESA_ = java.util.Collections.emptyList();
       private void ensureBYTESAIsMutable() {
-        if (!((bitField0_ & 0x00100000) == 0x00100000)) {
+        if (!((bitField0_ & 0x00400000) == 0x00400000)) {
           bYTESA_ = new java.util.ArrayList<com.google.protobuf.ByteString>(bYTESA_);
-          bitField0_ |= 0x00100000;
+          bitField0_ |= 0x00400000;
          }
       }
       /**
-       * <code>repeated bytes BYTESA = 21;</code>
+       * <code>repeated bytes BYTESA = 23;</code>
        *
        * <pre>
        * array of arbitrary sequence of bytes
@@ -5508,7 +6034,7 @@ public final class xMsgD {
         return java.util.Collections.unmodifiableList(bYTESA_);
       }
       /**
-       * <code>repeated bytes BYTESA = 21;</code>
+       * <code>repeated bytes BYTESA = 23;</code>
        *
        * <pre>
        * array of arbitrary sequence of bytes
@@ -5518,7 +6044,7 @@ public final class xMsgD {
         return bYTESA_.size();
       }
       /**
-       * <code>repeated bytes BYTESA = 21;</code>
+       * <code>repeated bytes BYTESA = 23;</code>
        *
        * <pre>
        * array of arbitrary sequence of bytes
@@ -5528,7 +6054,7 @@ public final class xMsgD {
         return bYTESA_.get(index);
       }
       /**
-       * <code>repeated bytes BYTESA = 21;</code>
+       * <code>repeated bytes BYTESA = 23;</code>
        *
        * <pre>
        * array of arbitrary sequence of bytes
@@ -5545,7 +6071,7 @@ public final class xMsgD {
         return this;
       }
       /**
-       * <code>repeated bytes BYTESA = 21;</code>
+       * <code>repeated bytes BYTESA = 23;</code>
        *
        * <pre>
        * array of arbitrary sequence of bytes
@@ -5561,7 +6087,7 @@ public final class xMsgD {
         return this;
       }
       /**
-       * <code>repeated bytes BYTESA = 21;</code>
+       * <code>repeated bytes BYTESA = 23;</code>
        *
        * <pre>
        * array of arbitrary sequence of bytes
@@ -5575,7 +6101,7 @@ public final class xMsgD {
         return this;
       }
       /**
-       * <code>repeated bytes BYTESA = 21;</code>
+       * <code>repeated bytes BYTESA = 23;</code>
        *
        * <pre>
        * array of arbitrary sequence of bytes
@@ -5583,169 +6109,221 @@ public final class xMsgD {
        */
       public Builder clearBYTESA() {
         bYTESA_ = java.util.Collections.emptyList();
-        bitField0_ = (bitField0_ & ~0x00100000);
+        bitField0_ = (bitField0_ & ~0x00400000);
         onChanged();
         return this;
       }
 
-      // optional .Data.DType dataType = 22;
+      // optional .Data.DType dataType = 24;
       private xMsgD.Data.DType dataType_ = xMsgD.Data.DType.T_VLSINT32;
       /**
-       * <code>optional .Data.DType dataType = 22;</code>
+       * <code>optional .Data.DType dataType = 24;</code>
        *
        * <pre>
        * Data type. If set to DataTpe.PAYLOAD access data using the "payload"
-       * filed, otherwise "data: filed
+       * filed, otherwise "data: filed. In case data is passed as a byteArray this
+       * will define the type of the object serialized to byteArray
        * </pre>
        */
       public boolean hasDataType() {
-        return ((bitField0_ & 0x00200000) == 0x00200000);
+        return ((bitField0_ & 0x00800000) == 0x00800000);
       }
       /**
-       * <code>optional .Data.DType dataType = 22;</code>
+       * <code>optional .Data.DType dataType = 24;</code>
        *
        * <pre>
        * Data type. If set to DataTpe.PAYLOAD access data using the "payload"
-       * filed, otherwise "data: filed
+       * filed, otherwise "data: filed. In case data is passed as a byteArray this
+       * will define the type of the object serialized to byteArray
        * </pre>
        */
       public xMsgD.Data.DType getDataType() {
         return dataType_;
       }
       /**
-       * <code>optional .Data.DType dataType = 22;</code>
+       * <code>optional .Data.DType dataType = 24;</code>
        *
        * <pre>
        * Data type. If set to DataTpe.PAYLOAD access data using the "payload"
-       * filed, otherwise "data: filed
+       * filed, otherwise "data: filed. In case data is passed as a byteArray this
+       * will define the type of the object serialized to byteArray
        * </pre>
        */
       public Builder setDataType(xMsgD.Data.DType value) {
         if (value == null) {
           throw new NullPointerException();
         }
-        bitField0_ |= 0x00200000;
+        bitField0_ |= 0x00800000;
         dataType_ = value;
         onChanged();
         return this;
       }
       /**
-       * <code>optional .Data.DType dataType = 22;</code>
+       * <code>optional .Data.DType dataType = 24;</code>
        *
        * <pre>
        * Data type. If set to DataTpe.PAYLOAD access data using the "payload"
-       * filed, otherwise "data: filed
+       * filed, otherwise "data: filed. In case data is passed as a byteArray this
+       * will define the type of the object serialized to byteArray
        * </pre>
        */
       public Builder clearDataType() {
-        bitField0_ = (bitField0_ & ~0x00200000);
+        bitField0_ = (bitField0_ & ~0x00800000);
         dataType_ = xMsgD.Data.DType.T_VLSINT32;
         onChanged();
         return this;
       }
 
-      // optional string byteOrder = 23;
-      private java.lang.Object byteOrder_ = "";
+      // optional string userObjectDescription = 25;
+      private java.lang.Object userObjectDescription_ = "";
       /**
-       * <code>optional string byteOrder = 23;</code>
+       * <code>optional string userObjectDescription = 25;</code>
        *
        * <pre>
-       * Byte ordering in case data type is BYTES/BYTESA
+       * Additional description of the servialized data object. If data is
+       * a serialized arbutrary Java/C++ object we need to tell the receiver
+       * how to desrialize it.
        * </pre>
        */
-      public boolean hasByteOrder() {
-        return ((bitField0_ & 0x00400000) == 0x00400000);
+      public boolean hasUserObjectDescription() {
+        return ((bitField0_ & 0x01000000) == 0x01000000);
       }
       /**
-       * <code>optional string byteOrder = 23;</code>
+       * <code>optional string userObjectDescription = 25;</code>
        *
        * <pre>
-       * Byte ordering in case data type is BYTES/BYTESA
+       * Additional description of the servialized data object. If data is
+       * a serialized arbutrary Java/C++ object we need to tell the receiver
+       * how to desrialize it.
        * </pre>
        */
-      public java.lang.String getByteOrder() {
-        java.lang.Object ref = byteOrder_;
+      public java.lang.String getUserObjectDescription() {
+        java.lang.Object ref = userObjectDescription_;
         if (!(ref instanceof java.lang.String)) {
           java.lang.String s = ((com.google.protobuf.ByteString) ref)
               .toStringUtf8();
-          byteOrder_ = s;
+          userObjectDescription_ = s;
           return s;
         } else {
           return (java.lang.String) ref;
         }
       }
       /**
-       * <code>optional string byteOrder = 23;</code>
+       * <code>optional string userObjectDescription = 25;</code>
        *
        * <pre>
-       * Byte ordering in case data type is BYTES/BYTESA
+       * Additional description of the servialized data object. If data is
+       * a serialized arbutrary Java/C++ object we need to tell the receiver
+       * how to desrialize it.
        * </pre>
        */
       public com.google.protobuf.ByteString
-          getByteOrderBytes() {
-        java.lang.Object ref = byteOrder_;
+          getUserObjectDescriptionBytes() {
+        java.lang.Object ref = userObjectDescription_;
         if (ref instanceof String) {
           com.google.protobuf.ByteString b = 
               com.google.protobuf.ByteString.copyFromUtf8(
                   (java.lang.String) ref);
-          byteOrder_ = b;
+          userObjectDescription_ = b;
           return b;
         } else {
           return (com.google.protobuf.ByteString) ref;
         }
       }
       /**
-       * <code>optional string byteOrder = 23;</code>
+       * <code>optional string userObjectDescription = 25;</code>
        *
        * <pre>
-       * Byte ordering in case data type is BYTES/BYTESA
+       * Additional description of the servialized data object. If data is
+       * a serialized arbutrary Java/C++ object we need to tell the receiver
+       * how to desrialize it.
        * </pre>
        */
-      public Builder setByteOrder(
+      public Builder setUserObjectDescription(
           java.lang.String value) {
         if (value == null) {
     throw new NullPointerException();
   }
-  bitField0_ |= 0x00400000;
-        byteOrder_ = value;
+  bitField0_ |= 0x01000000;
+        userObjectDescription_ = value;
         onChanged();
         return this;
       }
       /**
-       * <code>optional string byteOrder = 23;</code>
+       * <code>optional string userObjectDescription = 25;</code>
        *
        * <pre>
-       * Byte ordering in case data type is BYTES/BYTESA
+       * Additional description of the servialized data object. If data is
+       * a serialized arbutrary Java/C++ object we need to tell the receiver
+       * how to desrialize it.
        * </pre>
        */
-      public Builder clearByteOrder() {
-        bitField0_ = (bitField0_ & ~0x00400000);
-        byteOrder_ = getDefaultInstance().getByteOrder();
+      public Builder clearUserObjectDescription() {
+        bitField0_ = (bitField0_ & ~0x01000000);
+        userObjectDescription_ = getDefaultInstance().getUserObjectDescription();
         onChanged();
         return this;
       }
       /**
-       * <code>optional string byteOrder = 23;</code>
+       * <code>optional string userObjectDescription = 25;</code>
        *
        * <pre>
-       * Byte ordering in case data type is BYTES/BYTESA
+       * Additional description of the servialized data object. If data is
+       * a serialized arbutrary Java/C++ object we need to tell the receiver
+       * how to desrialize it.
        * </pre>
        */
-      public Builder setByteOrderBytes(
+      public Builder setUserObjectDescriptionBytes(
           com.google.protobuf.ByteString value) {
         if (value == null) {
     throw new NullPointerException();
   }
-  bitField0_ |= 0x00400000;
-        byteOrder_ = value;
+  bitField0_ |= 0x01000000;
+        userObjectDescription_ = value;
         onChanged();
         return this;
       }
 
-      // optional string sender = 24;
+      // optional .Data.BAType byteArrayType = 26;
+      private xMsgD.Data.BAType byteArrayType_ = xMsgD.Data.BAType.JOBJECT;
+      /**
+       * <code>optional .Data.BAType byteArrayType = 26;</code>
+       */
+      public boolean hasByteArrayType() {
+        return ((bitField0_ & 0x02000000) == 0x02000000);
+      }
+      /**
+       * <code>optional .Data.BAType byteArrayType = 26;</code>
+       */
+      public xMsgD.Data.BAType getByteArrayType() {
+        return byteArrayType_;
+      }
+      /**
+       * <code>optional .Data.BAType byteArrayType = 26;</code>
+       */
+      public Builder setByteArrayType(xMsgD.Data.BAType value) {
+        if (value == null) {
+          throw new NullPointerException();
+        }
+        bitField0_ |= 0x02000000;
+        byteArrayType_ = value;
+        onChanged();
+        return this;
+      }
+      /**
+       * <code>optional .Data.BAType byteArrayType = 26;</code>
+       */
+      public Builder clearByteArrayType() {
+        bitField0_ = (bitField0_ & ~0x02000000);
+        byteArrayType_ = xMsgD.Data.BAType.JOBJECT;
+        onChanged();
+        return this;
+      }
+
+      // optional string sender = 27;
       private java.lang.Object sender_ = "";
       /**
-       * <code>optional string sender = 24;</code>
+       * <code>optional string sender = 27;</code>
        *
        * <pre>
        * ... This section is defined by the message transporter ...
@@ -5753,10 +6331,10 @@ public final class xMsgD {
        * </pre>
        */
       public boolean hasSender() {
-        return ((bitField0_ & 0x00800000) == 0x00800000);
+        return ((bitField0_ & 0x04000000) == 0x04000000);
       }
       /**
-       * <code>optional string sender = 24;</code>
+       * <code>optional string sender = 27;</code>
        *
        * <pre>
        * ... This section is defined by the message transporter ...
@@ -5775,7 +6353,7 @@ public final class xMsgD {
         }
       }
       /**
-       * <code>optional string sender = 24;</code>
+       * <code>optional string sender = 27;</code>
        *
        * <pre>
        * ... This section is defined by the message transporter ...
@@ -5796,7 +6374,7 @@ public final class xMsgD {
         }
       }
       /**
-       * <code>optional string sender = 24;</code>
+       * <code>optional string sender = 27;</code>
        *
        * <pre>
        * ... This section is defined by the message transporter ...
@@ -5808,13 +6386,13 @@ public final class xMsgD {
         if (value == null) {
     throw new NullPointerException();
   }
-  bitField0_ |= 0x00800000;
+  bitField0_ |= 0x04000000;
         sender_ = value;
         onChanged();
         return this;
       }
       /**
-       * <code>optional string sender = 24;</code>
+       * <code>optional string sender = 27;</code>
        *
        * <pre>
        * ... This section is defined by the message transporter ...
@@ -5822,13 +6400,13 @@ public final class xMsgD {
        * </pre>
        */
       public Builder clearSender() {
-        bitField0_ = (bitField0_ & ~0x00800000);
+        bitField0_ = (bitField0_ & ~0x04000000);
         sender_ = getDefaultInstance().getSender();
         onChanged();
         return this;
       }
       /**
-       * <code>optional string sender = 24;</code>
+       * <code>optional string sender = 27;</code>
        *
        * <pre>
        * ... This section is defined by the message transporter ...
@@ -5840,26 +6418,26 @@ public final class xMsgD {
         if (value == null) {
     throw new NullPointerException();
   }
-  bitField0_ |= 0x00800000;
+  bitField0_ |= 0x04000000;
         sender_ = value;
         onChanged();
         return this;
       }
 
-      // optional fixed32 id = 25;
+      // optional fixed32 id = 28;
       private int id_ ;
       /**
-       * <code>optional fixed32 id = 25;</code>
+       * <code>optional fixed32 id = 28;</code>
        *
        * <pre>
        * Communication id, used to genetically relate messages
        * </pre>
        */
       public boolean hasId() {
-        return ((bitField0_ & 0x01000000) == 0x01000000);
+        return ((bitField0_ & 0x08000000) == 0x08000000);
       }
       /**
-       * <code>optional fixed32 id = 25;</code>
+       * <code>optional fixed32 id = 28;</code>
        *
        * <pre>
        * Communication id, used to genetically relate messages
@@ -5869,36 +6447,134 @@ public final class xMsgD {
         return id_;
       }
       /**
-       * <code>optional fixed32 id = 25;</code>
+       * <code>optional fixed32 id = 28;</code>
        *
        * <pre>
        * Communication id, used to genetically relate messages
        * </pre>
        */
       public Builder setId(int value) {
-        bitField0_ |= 0x01000000;
+        bitField0_ |= 0x08000000;
         id_ = value;
         onChanged();
         return this;
       }
       /**
-       * <code>optional fixed32 id = 25;</code>
+       * <code>optional fixed32 id = 28;</code>
        *
        * <pre>
        * Communication id, used to genetically relate messages
        * </pre>
        */
       public Builder clearId() {
-        bitField0_ = (bitField0_ & ~0x01000000);
+        bitField0_ = (bitField0_ & ~0x08000000);
         id_ = 0;
         onChanged();
         return this;
       }
 
-      // optional bool exceptionMonitor = 26;
+      // optional string byteOrder = 29;
+      private java.lang.Object byteOrder_ = "";
+      /**
+       * <code>optional string byteOrder = 29;</code>
+       *
+       * <pre>
+       * Byte ordering in case data type is BYTES/BYTESA
+       * </pre>
+       */
+      public boolean hasByteOrder() {
+        return ((bitField0_ & 0x10000000) == 0x10000000);
+      }
+      /**
+       * <code>optional string byteOrder = 29;</code>
+       *
+       * <pre>
+       * Byte ordering in case data type is BYTES/BYTESA
+       * </pre>
+       */
+      public java.lang.String getByteOrder() {
+        java.lang.Object ref = byteOrder_;
+        if (!(ref instanceof java.lang.String)) {
+          java.lang.String s = ((com.google.protobuf.ByteString) ref)
+              .toStringUtf8();
+          byteOrder_ = s;
+          return s;
+        } else {
+          return (java.lang.String) ref;
+        }
+      }
+      /**
+       * <code>optional string byteOrder = 29;</code>
+       *
+       * <pre>
+       * Byte ordering in case data type is BYTES/BYTESA
+       * </pre>
+       */
+      public com.google.protobuf.ByteString
+          getByteOrderBytes() {
+        java.lang.Object ref = byteOrder_;
+        if (ref instanceof String) {
+          com.google.protobuf.ByteString b = 
+              com.google.protobuf.ByteString.copyFromUtf8(
+                  (java.lang.String) ref);
+          byteOrder_ = b;
+          return b;
+        } else {
+          return (com.google.protobuf.ByteString) ref;
+        }
+      }
+      /**
+       * <code>optional string byteOrder = 29;</code>
+       *
+       * <pre>
+       * Byte ordering in case data type is BYTES/BYTESA
+       * </pre>
+       */
+      public Builder setByteOrder(
+          java.lang.String value) {
+        if (value == null) {
+    throw new NullPointerException();
+  }
+  bitField0_ |= 0x10000000;
+        byteOrder_ = value;
+        onChanged();
+        return this;
+      }
+      /**
+       * <code>optional string byteOrder = 29;</code>
+       *
+       * <pre>
+       * Byte ordering in case data type is BYTES/BYTESA
+       * </pre>
+       */
+      public Builder clearByteOrder() {
+        bitField0_ = (bitField0_ & ~0x10000000);
+        byteOrder_ = getDefaultInstance().getByteOrder();
+        onChanged();
+        return this;
+      }
+      /**
+       * <code>optional string byteOrder = 29;</code>
+       *
+       * <pre>
+       * Byte ordering in case data type is BYTES/BYTESA
+       * </pre>
+       */
+      public Builder setByteOrderBytes(
+          com.google.protobuf.ByteString value) {
+        if (value == null) {
+    throw new NullPointerException();
+  }
+  bitField0_ |= 0x10000000;
+        byteOrder_ = value;
+        onChanged();
+        return this;
+      }
+
+      // optional bool exceptionMonitor = 30;
       private boolean exceptionMonitor_ ;
       /**
-       * <code>optional bool exceptionMonitor = 26;</code>
+       * <code>optional bool exceptionMonitor = 30;</code>
        *
        * <pre>
        * ... Fields that are used to control message receiver ...
@@ -5907,14 +6583,15 @@ public final class xMsgD {
        * [ exception_&lt;service_name&gt;,
        *             requestId,
        *             exceptionType &lt;Severity&gt;,
+       *             exceptionId,
        *             exceptionString &lt;String&gt; ]
        * </pre>
        */
       public boolean hasExceptionMonitor() {
-        return ((bitField0_ & 0x02000000) == 0x02000000);
+        return ((bitField0_ & 0x20000000) == 0x20000000);
       }
       /**
-       * <code>optional bool exceptionMonitor = 26;</code>
+       * <code>optional bool exceptionMonitor = 30;</code>
        *
        * <pre>
        * ... Fields that are used to control message receiver ...
@@ -5923,6 +6600,7 @@ public final class xMsgD {
        * [ exception_&lt;service_name&gt;,
        *             requestId,
        *             exceptionType &lt;Severity&gt;,
+       *             exceptionId,
        *             exceptionString &lt;String&gt; ]
        * </pre>
        */
@@ -5930,7 +6608,7 @@ public final class xMsgD {
         return exceptionMonitor_;
       }
       /**
-       * <code>optional bool exceptionMonitor = 26;</code>
+       * <code>optional bool exceptionMonitor = 30;</code>
        *
        * <pre>
        * ... Fields that are used to control message receiver ...
@@ -5939,17 +6617,18 @@ public final class xMsgD {
        * [ exception_&lt;service_name&gt;,
        *             requestId,
        *             exceptionType &lt;Severity&gt;,
+       *             exceptionId,
        *             exceptionString &lt;String&gt; ]
        * </pre>
        */
       public Builder setExceptionMonitor(boolean value) {
-        bitField0_ |= 0x02000000;
+        bitField0_ |= 0x20000000;
         exceptionMonitor_ = value;
         onChanged();
         return this;
       }
       /**
-       * <code>optional bool exceptionMonitor = 26;</code>
+       * <code>optional bool exceptionMonitor = 30;</code>
        *
        * <pre>
        * ... Fields that are used to control message receiver ...
@@ -5958,20 +6637,21 @@ public final class xMsgD {
        * [ exception_&lt;service_name&gt;,
        *             requestId,
        *             exceptionType &lt;Severity&gt;,
+       *             exceptionId,
        *             exceptionString &lt;String&gt; ]
        * </pre>
        */
       public Builder clearExceptionMonitor() {
-        bitField0_ = (bitField0_ & ~0x02000000);
+        bitField0_ = (bitField0_ & ~0x20000000);
         exceptionMonitor_ = false;
         onChanged();
         return this;
       }
 
-      // optional bool doneMonitor = 27;
+      // optional bool doneMonitor = 31;
       private boolean doneMonitor_ ;
       /**
-       * <code>optional bool doneMonitor = 27;</code>
+       * <code>optional bool doneMonitor = 31;</code>
        *
        * <pre>
        * If set to true, for example Clara service container will
@@ -5981,10 +6661,10 @@ public final class xMsgD {
        * </pre>
        */
       public boolean hasDoneMonitor() {
-        return ((bitField0_ & 0x04000000) == 0x04000000);
+        return ((bitField0_ & 0x40000000) == 0x40000000);
       }
       /**
-       * <code>optional bool doneMonitor = 27;</code>
+       * <code>optional bool doneMonitor = 31;</code>
        *
        * <pre>
        * If set to true, for example Clara service container will
@@ -5997,7 +6677,7 @@ public final class xMsgD {
         return doneMonitor_;
       }
       /**
-       * <code>optional bool doneMonitor = 27;</code>
+       * <code>optional bool doneMonitor = 31;</code>
        *
        * <pre>
        * If set to true, for example Clara service container will
@@ -6007,13 +6687,13 @@ public final class xMsgD {
        * </pre>
        */
       public Builder setDoneMonitor(boolean value) {
-        bitField0_ |= 0x04000000;
+        bitField0_ |= 0x40000000;
         doneMonitor_ = value;
         onChanged();
         return this;
       }
       /**
-       * <code>optional bool doneMonitor = 27;</code>
+       * <code>optional bool doneMonitor = 31;</code>
        *
        * <pre>
        * If set to true, for example Clara service container will
@@ -6023,16 +6703,16 @@ public final class xMsgD {
        * </pre>
        */
       public Builder clearDoneMonitor() {
-        bitField0_ = (bitField0_ & ~0x04000000);
+        bitField0_ = (bitField0_ & ~0x40000000);
         doneMonitor_ = false;
         onChanged();
         return this;
       }
 
-      // optional bool dataMonitor = 28;
+      // optional bool dataMonitor = 32;
       private boolean dataMonitor_ ;
       /**
-       * <code>optional bool dataMonitor = 28;</code>
+       * <code>optional bool dataMonitor = 32;</code>
        *
        * <pre>
        * If set to true, for example Clara service container will
@@ -6043,10 +6723,10 @@ public final class xMsgD {
        * </pre>
        */
       public boolean hasDataMonitor() {
-        return ((bitField0_ & 0x08000000) == 0x08000000);
+        return ((bitField0_ & 0x80000000) == 0x80000000);
       }
       /**
-       * <code>optional bool dataMonitor = 28;</code>
+       * <code>optional bool dataMonitor = 32;</code>
        *
        * <pre>
        * If set to true, for example Clara service container will
@@ -6060,7 +6740,7 @@ public final class xMsgD {
         return dataMonitor_;
       }
       /**
-       * <code>optional bool dataMonitor = 28;</code>
+       * <code>optional bool dataMonitor = 32;</code>
        *
        * <pre>
        * If set to true, for example Clara service container will
@@ -6071,13 +6751,13 @@ public final class xMsgD {
        * </pre>
        */
       public Builder setDataMonitor(boolean value) {
-        bitField0_ |= 0x08000000;
+        bitField0_ |= 0x80000000;
         dataMonitor_ = value;
         onChanged();
         return this;
       }
       /**
-       * <code>optional bool dataMonitor = 28;</code>
+       * <code>optional bool dataMonitor = 32;</code>
        *
        * <pre>
        * If set to true, for example Clara service container will
@@ -6088,16 +6768,16 @@ public final class xMsgD {
        * </pre>
        */
       public Builder clearDataMonitor() {
-        bitField0_ = (bitField0_ & ~0x08000000);
+        bitField0_ = (bitField0_ & ~0x80000000);
         dataMonitor_ = false;
         onChanged();
         return this;
       }
 
-      // optional string composition = 29;
+      // optional string composition = 33;
       private java.lang.Object composition_ = "";
       /**
-       * <code>optional string composition = 29;</code>
+       * <code>optional string composition = 33;</code>
        *
        * <pre>
        * Reserved and used for Clara service based application
@@ -6106,10 +6786,10 @@ public final class xMsgD {
        * </pre>
        */
       public boolean hasComposition() {
-        return ((bitField0_ & 0x10000000) == 0x10000000);
+        return ((bitField1_ & 0x00000001) == 0x00000001);
       }
       /**
-       * <code>optional string composition = 29;</code>
+       * <code>optional string composition = 33;</code>
        *
        * <pre>
        * Reserved and used for Clara service based application
@@ -6129,7 +6809,7 @@ public final class xMsgD {
         }
       }
       /**
-       * <code>optional string composition = 29;</code>
+       * <code>optional string composition = 33;</code>
        *
        * <pre>
        * Reserved and used for Clara service based application
@@ -6151,7 +6831,7 @@ public final class xMsgD {
         }
       }
       /**
-       * <code>optional string composition = 29;</code>
+       * <code>optional string composition = 33;</code>
        *
        * <pre>
        * Reserved and used for Clara service based application
@@ -6164,13 +6844,13 @@ public final class xMsgD {
         if (value == null) {
     throw new NullPointerException();
   }
-  bitField0_ |= 0x10000000;
+  bitField1_ |= 0x00000001;
         composition_ = value;
         onChanged();
         return this;
       }
       /**
-       * <code>optional string composition = 29;</code>
+       * <code>optional string composition = 33;</code>
        *
        * <pre>
        * Reserved and used for Clara service based application
@@ -6179,13 +6859,13 @@ public final class xMsgD {
        * </pre>
        */
       public Builder clearComposition() {
-        bitField0_ = (bitField0_ & ~0x10000000);
+        bitField1_ = (bitField1_ & ~0x00000001);
         composition_ = getDefaultInstance().getComposition();
         onChanged();
         return this;
       }
       /**
-       * <code>optional string composition = 29;</code>
+       * <code>optional string composition = 33;</code>
        *
        * <pre>
        * Reserved and used for Clara service based application
@@ -6198,26 +6878,26 @@ public final class xMsgD {
         if (value == null) {
     throw new NullPointerException();
   }
-  bitField0_ |= 0x10000000;
+  bitField1_ |= 0x00000001;
         composition_ = value;
         onChanged();
         return this;
       }
 
-      // optional sfixed64 executionTime = 30;
+      // optional sfixed64 executionTime = 34;
       private long executionTime_ ;
       /**
-       * <code>optional sfixed64 executionTime = 30;</code>
+       * <code>optional sfixed64 executionTime = 34;</code>
        *
        * <pre>
        * Service engine execution time
        * </pre>
        */
       public boolean hasExecutionTime() {
-        return ((bitField0_ & 0x20000000) == 0x20000000);
+        return ((bitField1_ & 0x00000002) == 0x00000002);
       }
       /**
-       * <code>optional sfixed64 executionTime = 30;</code>
+       * <code>optional sfixed64 executionTime = 34;</code>
        *
        * <pre>
        * Service engine execution time
@@ -6227,36 +6907,36 @@ public final class xMsgD {
         return executionTime_;
       }
       /**
-       * <code>optional sfixed64 executionTime = 30;</code>
+       * <code>optional sfixed64 executionTime = 34;</code>
        *
        * <pre>
        * Service engine execution time
        * </pre>
        */
       public Builder setExecutionTime(long value) {
-        bitField0_ |= 0x20000000;
+        bitField1_ |= 0x00000002;
         executionTime_ = value;
         onChanged();
         return this;
       }
       /**
-       * <code>optional sfixed64 executionTime = 30;</code>
+       * <code>optional sfixed64 executionTime = 34;</code>
        *
        * <pre>
        * Service engine execution time
        * </pre>
        */
       public Builder clearExecutionTime() {
-        bitField0_ = (bitField0_ & ~0x20000000);
+        bitField1_ = (bitField1_ & ~0x00000002);
         executionTime_ = 0L;
         onChanged();
         return this;
       }
 
-      // optional .Data.ControlAction action = 31;
+      // optional .Data.ControlAction action = 35;
       private xMsgD.Data.ControlAction action_ = xMsgD.Data.ControlAction.EXECUTE;
       /**
-       * <code>optional .Data.ControlAction action = 31;</code>
+       * <code>optional .Data.ControlAction action = 35;</code>
        *
        * <pre>
        * Reserved and used to define which of the CLARA interface
@@ -6264,10 +6944,10 @@ public final class xMsgD {
        * </pre>
        */
       public boolean hasAction() {
-        return ((bitField0_ & 0x40000000) == 0x40000000);
+        return ((bitField1_ & 0x00000004) == 0x00000004);
       }
       /**
-       * <code>optional .Data.ControlAction action = 31;</code>
+       * <code>optional .Data.ControlAction action = 35;</code>
        *
        * <pre>
        * Reserved and used to define which of the CLARA interface
@@ -6278,7 +6958,7 @@ public final class xMsgD {
         return action_;
       }
       /**
-       * <code>optional .Data.ControlAction action = 31;</code>
+       * <code>optional .Data.ControlAction action = 35;</code>
        *
        * <pre>
        * Reserved and used to define which of the CLARA interface
@@ -6289,13 +6969,13 @@ public final class xMsgD {
         if (value == null) {
           throw new NullPointerException();
         }
-        bitField0_ |= 0x40000000;
+        bitField1_ |= 0x00000004;
         action_ = value;
         onChanged();
         return this;
       }
       /**
-       * <code>optional .Data.ControlAction action = 31;</code>
+       * <code>optional .Data.ControlAction action = 35;</code>
        *
        * <pre>
        * Reserved and used to define which of the CLARA interface
@@ -6303,26 +6983,26 @@ public final class xMsgD {
        * </pre>
        */
       public Builder clearAction() {
-        bitField0_ = (bitField0_ & ~0x40000000);
+        bitField1_ = (bitField1_ & ~0x00000004);
         action_ = xMsgD.Data.ControlAction.EXECUTE;
         onChanged();
         return this;
       }
 
-      // optional .Data.SubControlAction controlR = 32;
+      // optional .Data.SubControlAction controlR = 36;
       private xMsgD.Data.SubControlAction controlR_ = xMsgD.Data.SubControlAction.SKIP;
       /**
-       * <code>optional .Data.SubControlAction controlR = 32;</code>
+       * <code>optional .Data.SubControlAction controlR = 36;</code>
        *
        * <pre>
        * Reserved control field
        * </pre>
        */
       public boolean hasControlR() {
-        return ((bitField0_ & 0x80000000) == 0x80000000);
+        return ((bitField1_ & 0x00000008) == 0x00000008);
       }
       /**
-       * <code>optional .Data.SubControlAction controlR = 32;</code>
+       * <code>optional .Data.SubControlAction controlR = 36;</code>
        *
        * <pre>
        * Reserved control field
@@ -6332,7 +7012,7 @@ public final class xMsgD {
         return controlR_;
       }
       /**
-       * <code>optional .Data.SubControlAction controlR = 32;</code>
+       * <code>optional .Data.SubControlAction controlR = 36;</code>
        *
        * <pre>
        * Reserved control field
@@ -6342,20 +7022,20 @@ public final class xMsgD {
         if (value == null) {
           throw new NullPointerException();
         }
-        bitField0_ |= 0x80000000;
+        bitField1_ |= 0x00000008;
         controlR_ = value;
         onChanged();
         return this;
       }
       /**
-       * <code>optional .Data.SubControlAction controlR = 32;</code>
+       * <code>optional .Data.SubControlAction controlR = 36;</code>
        *
        * <pre>
        * Reserved control field
        * </pre>
        */
       public Builder clearControlR() {
-        bitField0_ = (bitField0_ & ~0x80000000);
+        bitField1_ = (bitField1_ & ~0x00000008);
         controlR_ = xMsgD.Data.SubControlAction.SKIP;
         onChanged();
         return this;
@@ -7877,40 +8557,43 @@ public final class xMsgD {
       descriptor;
   static {
     java.lang.String[] descriptorData = {
-      "\n\016xMsgData.proto\"\270\t\n\004Data\022\023\n\013dataVersion" +
+      "\n\016xMsgData.proto\"\302\n\n\004Data\022\023\n\013dataVersion" +
       "\030\001 \001(\t\022\027\n\017dataDescription\030\002 \001(\t\022\022\n\ndataA" +
       "uthor\030\003 \001(\t\022\027\n\017dataAuthorState\030\004 \001(\t\0222\n\024" +
       "dataGenerationStatus\030\005 \001(\0162\016.Data.Severi" +
-      "ty:\004INFO\022\020\n\010VLSINT32\030\006 \001(\021\022\020\n\010VLSINT64\030\007" +
-      " \001(\022\022\020\n\010FLSINT32\030\010 \001(\017\022\020\n\010FLSINT64\030\t \001(\020" +
-      "\022\r\n\005FLOAT\030\n \001(\002\022\016\n\006DOUBLE\030\013 \001(\001\022\016\n\006STRIN" +
-      "G\030\014 \001(\t\022\r\n\005BYTES\030\r \001(\014\022\021\n\tVLSINT32A\030\016 \003(" +
-      "\021\022\021\n\tVLSINT64A\030\017 \003(\022\022\021\n\tFLSINT32A\030\020 \003(\017\022" +
-      "\021\n\tFLSINT64A\030\021 \003(\020\022\016\n\006FLOATA\030\022 \003(\002\022\017\n\007DO",
-      "UBLEA\030\023 \003(\001\022\017\n\007STRINGA\030\024 \003(\t\022\016\n\006BYTESA\030\025" +
-      " \003(\014\022\035\n\010dataType\030\026 \001(\0162\013.Data.DType\022\021\n\tb" +
-      "yteOrder\030\027 \001(\t\022\016\n\006sender\030\030 \001(\t\022\n\n\002id\030\031 \001" +
-      "(\007\022\030\n\020exceptionMonitor\030\032 \001(\010\022\023\n\013doneMoni" +
-      "tor\030\033 \001(\010\022\023\n\013dataMonitor\030\034 \001(\010\022\023\n\013compos" +
-      "ition\030\035 \001(\t\022\025\n\rexecutionTime\030\036 \001(\020\022#\n\006ac" +
-      "tion\030\037 \001(\0162\023.Data.ControlAction\022(\n\010contr" +
-      "olR\030  \001(\0162\026.Data.SubControlAction\"\212\002\n\005DT" +
-      "ype\022\016\n\nT_VLSINT32\020\001\022\016\n\nT_VLSINT64\020\002\022\016\n\nT" +
-      "_FLSINT32\020\003\022\016\n\nT_FLSINT64\020\004\022\013\n\007T_FLOAT\020\005",
-      "\022\014\n\010T_DOUBLE\020\006\022\014\n\010T_STRING\020\007\022\013\n\007T_BYTES\020" +
-      "\010\022\017\n\013T_VLSINT32A\020\t\022\017\n\013T_VLSINT64A\020\n\022\017\n\013T" +
-      "_FLSINT32A\020\013\022\017\n\013T_FLSINT64A\020\014\022\014\n\010T_FLOAT" +
-      "A\020\r\022\r\n\tT_DOUBLEA\020\016\022\r\n\tT_STRINGA\020\017\022\014\n\010T_B" +
-      "YTESA\020\020\022\r\n\tT_PAYLOAD\020\021\"D\n\006BAType\022\013\n\007JOBJ" +
-      "ECT\020\001\022\013\n\007COBJECT\020\002\022\013\n\007POBJECT\020\003\022\n\n\006NETCD" +
-      "F\020\004\022\007\n\003HDF\020\005\"+\n\rControlAction\022\013\n\007EXECUTE" +
-      "\020\000\022\r\n\tCONFIGURE\020\001\"\034\n\020SubControlAction\022\010\n" +
-      "\004SKIP\020\000\"b\n\010Severity\022\n\n\006ERROR1\020\001\022\n\n\006ERROR" +
-      "2\020\002\022\n\n\006ERROR3\020\003\022\014\n\010WARNING1\020\004\022\014\n\010WARNING",
-      "2\020\005\022\014\n\010WARNING3\020\006\022\010\n\004INFO\020\007\"Q\n\007Payload\022\033" +
-      "\n\004item\030\001 \003(\0132\r.Payload.Item\032)\n\004Item\022\014\n\004n" +
-      "ame\030\001 \002(\t\022\023\n\004data\030\002 \002(\0132\005.DataB\tB\005xMsgDH" +
-      "\001"
+      "ty:\004INFO\022\022\n\nstatusText\030\006 \001(\t\022\030\n\020statusSe" +
+      "verityId\030\007 \001(\017\022\020\n\010VLSINT32\030\010 \001(\021\022\020\n\010VLSI" +
+      "NT64\030\t \001(\022\022\020\n\010FLSINT32\030\n \001(\017\022\020\n\010FLSINT64" +
+      "\030\013 \001(\020\022\r\n\005FLOAT\030\014 \001(\002\022\016\n\006DOUBLE\030\r \001(\001\022\016\n" +
+      "\006STRING\030\016 \001(\t\022\r\n\005BYTES\030\017 \001(\014\022\021\n\tVLSINT32" +
+      "A\030\020 \003(\021\022\021\n\tVLSINT64A\030\021 \003(\022\022\021\n\tFLSINT32A\030",
+      "\022 \003(\017\022\021\n\tFLSINT64A\030\023 \003(\020\022\016\n\006FLOATA\030\024 \003(\002" +
+      "\022\017\n\007DOUBLEA\030\025 \003(\001\022\017\n\007STRINGA\030\026 \003(\t\022\016\n\006BY" +
+      "TESA\030\027 \003(\014\022\035\n\010dataType\030\030 \001(\0162\013.Data.DTyp" +
+      "e\022\035\n\025userObjectDescription\030\031 \001(\t\022#\n\rbyte" +
+      "ArrayType\030\032 \001(\0162\014.Data.BAType\022\016\n\006sender\030" +
+      "\033 \001(\t\022\n\n\002id\030\034 \001(\007\022\021\n\tbyteOrder\030\035 \001(\t\022\030\n\020" +
+      "exceptionMonitor\030\036 \001(\010\022\023\n\013doneMonitor\030\037 " +
+      "\001(\010\022\023\n\013dataMonitor\030  \001(\010\022\023\n\013composition\030" +
+      "! \001(\t\022\025\n\rexecutionTime\030\" \001(\020\022#\n\006action\030#" +
+      " \001(\0162\023.Data.ControlAction\022(\n\010controlR\030$ ",
+      "\001(\0162\026.Data.SubControlAction\"\230\002\n\005DType\022\016\n" +
+      "\nT_VLSINT32\020\001\022\016\n\nT_VLSINT64\020\002\022\016\n\nT_FLSIN" +
+      "T32\020\003\022\016\n\nT_FLSINT64\020\004\022\013\n\007T_FLOAT\020\005\022\014\n\010T_" +
+      "DOUBLE\020\006\022\014\n\010T_STRING\020\007\022\013\n\007T_BYTES\020\010\022\017\n\013T" +
+      "_VLSINT32A\020\t\022\017\n\013T_VLSINT64A\020\n\022\017\n\013T_FLSIN" +
+      "T32A\020\013\022\017\n\013T_FLSINT64A\020\014\022\014\n\010T_FLOATA\020\r\022\r\n" +
+      "\tT_DOUBLEA\020\016\022\r\n\tT_STRINGA\020\017\022\014\n\010T_BYTESA\020" +
+      "\020\022\r\n\tT_PAYLOAD\020\021\022\014\n\010T_OBJECT\020\022\"N\n\006BAType" +
+      "\022\013\n\007JOBJECT\020\001\022\013\n\007COBJECT\020\002\022\013\n\007POBJECT\020\003\022" +
+      "\n\n\006NETCDF\020\004\022\007\n\003HDF\020\005\022\010\n\004EVIO\020\006\"+\n\rContro",
+      "lAction\022\013\n\007EXECUTE\020\000\022\r\n\tCONFIGURE\020\001\"\034\n\020S" +
+      "ubControlAction\022\010\n\004SKIP\020\000\"b\n\010Severity\022\n\n" +
+      "\006ERROR1\020\001\022\n\n\006ERROR2\020\002\022\n\n\006ERROR3\020\003\022\014\n\010WAR" +
+      "NING1\020\004\022\014\n\010WARNING2\020\005\022\014\n\010WARNING3\020\006\022\010\n\004I" +
+      "NFO\020\007\"Q\n\007Payload\022\033\n\004item\030\001 \003(\0132\r.Payload" +
+      ".Item\032)\n\004Item\022\014\n\004name\030\001 \002(\t\022\023\n\004data\030\002 \002(" +
+      "\0132\005.DataB\tB\005xMsgDH\001"
     };
     com.google.protobuf.Descriptors.FileDescriptor.InternalDescriptorAssigner assigner =
       new com.google.protobuf.Descriptors.FileDescriptor.InternalDescriptorAssigner() {
@@ -7922,7 +8605,7 @@ public final class xMsgD {
           internal_static_Data_fieldAccessorTable = new
             com.google.protobuf.GeneratedMessage.FieldAccessorTable(
               internal_static_Data_descriptor,
-              new java.lang.String[] { "DataVersion", "DataDescription", "DataAuthor", "DataAuthorState", "DataGenerationStatus", "VLSINT32", "VLSINT64", "FLSINT32", "FLSINT64", "FLOAT", "DOUBLE", "STRING", "BYTES", "VLSINT32A", "VLSINT64A", "FLSINT32A", "FLSINT64A", "FLOATA", "DOUBLEA", "STRINGA", "BYTESA", "DataType", "ByteOrder", "Sender", "Id", "ExceptionMonitor", "DoneMonitor", "DataMonitor", "Composition", "ExecutionTime", "Action", "ControlR", });
+              new java.lang.String[] { "DataVersion", "DataDescription", "DataAuthor", "DataAuthorState", "DataGenerationStatus", "StatusText", "StatusSeverityId", "VLSINT32", "VLSINT64", "FLSINT32", "FLSINT64", "FLOAT", "DOUBLE", "STRING", "BYTES", "VLSINT32A", "VLSINT64A", "FLSINT32A", "FLSINT64A", "FLOATA", "DOUBLEA", "STRINGA", "BYTESA", "DataType", "UserObjectDescription", "ByteArrayType", "Sender", "Id", "ByteOrder", "ExceptionMonitor", "DoneMonitor", "DataMonitor", "Composition", "ExecutionTime", "Action", "ControlR", });
           internal_static_Payload_descriptor =
             getDescriptor().getMessageTypes().get(1);
           internal_static_Payload_fieldAccessorTable = new
