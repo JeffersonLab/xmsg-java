@@ -23,10 +23,16 @@ public class xMsgMessage {
     private String domain = xMsgConstants.UNDEFINED.getStringValue();
     private String subject = xMsgConstants.UNDEFINED.getStringValue();
     private String type = xMsgConstants.UNDEFINED.getStringValue();
+    private Boolean isSyncRequest = false;
+    private String syncRequesterAddress = xMsgConstants.UNDEFINED.getStringValue();
     /**
      * Message data section
      */
     private Object data;
+
+    public xMsgMessage(){
+
+    }
 
     public xMsgMessage(String dataType,
                        String domain,
@@ -81,6 +87,21 @@ public class xMsgMessage {
         this.data = data;
     }
 
+    public Boolean getIsSyncRequest() {
+        return isSyncRequest;
+    }
+
+    public void setIsSyncRequest(Boolean isSyncRequest) {
+        this.isSyncRequest = isSyncRequest;
+    }
+
+    public String getSyncRequesterAddress() {
+        return syncRequesterAddress;
+    }
+
+    public void setSyncRequesterAddress(String syncRequesterAddress) {
+        this.syncRequesterAddress = syncRequesterAddress;
+    }
 
     @Override
     public String toString() {
@@ -89,6 +110,8 @@ public class xMsgMessage {
                 ", domain='" + domain + '\'' +
                 ", subject='" + subject + '\'' +
                 ", type='" + type + '\'' +
+                ", isSyncRequest=" + isSyncRequest +
+                ", syncRequesterAddress='" + syncRequesterAddress + '\'' +
                 ", data=" + data +
                 '}';
     }

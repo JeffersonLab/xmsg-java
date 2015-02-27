@@ -1185,12 +1185,10 @@ public class xMsg {
             // Calling user callback method
             // if it is sync send back to the result
             if(!syncReturnAddress.equals(xMsgConstants.UNDEFINED.getStringValue())){
+                cb_msg.setIsSyncRequest(true);
+                cb_msg.setSyncRequesterAddress(syncReturnAddress);
                 Object rd = cb.callback(cb_msg);
-
-                // create xMsgData
-                if(rd==null){
-                    publish(connection, syncReturnAddress, xMsgConstants.DONE);
-                } else {
+                if(rd!=null) {
                     publish(connection, syncReturnAddress, rd);
                 }
             } else {
