@@ -30,9 +30,9 @@ public enum xMsgConstants {
     FIND_PUBLISHER(9,"findPublisher"),
     FIND_SUBSCRIBER(10,"findSubscribers"),
 
-    INFO(11,"info"),
-    WARNING(12,"warning"),
-    ERROR(13,"error"),
+    INFO(11,"INFO"),
+    WARNING(12,"WARNING"),
+    ERROR(13,"ERROR"),
     DONE(14,"done"),
 
     NO_RESULT(15,"none"),
@@ -52,17 +52,17 @@ public enum xMsgConstants {
     ENVELOPE_DATA_TYPE_XMSGDATA(19,"xMsgData");
 
     private int intValue;
-    private String stringvalue;
+    private String stringValue;
 
     private xMsgConstants(int intValue, String stringValue){
         this.intValue = intValue;
-        this.stringvalue = stringValue;
+        this.stringValue = stringValue;
     }
 
     public int getIntValue() {
         return intValue;
     }
     public String getStringValue() {
-        return stringvalue;
+        return stringValue;
     }
 }

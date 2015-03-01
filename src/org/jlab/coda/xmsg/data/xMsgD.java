@@ -1939,76 +1939,40 @@ public final class xMsgD {
     public enum Severity
         implements com.google.protobuf.ProtocolMessageEnum {
       /**
-       * <code>ERROR1 = 1;</code>
+       * <code>ERROR = 1;</code>
        */
-      ERROR1(0, 1),
+      ERROR(0, 1),
       /**
-       * <code>ERROR2 = 2;</code>
+       * <code>WARNING = 2;</code>
        */
-      ERROR2(1, 2),
+      WARNING(1, 2),
       /**
-       * <code>ERROR3 = 3;</code>
+       * <code>INFO = 3;</code>
        */
-      ERROR3(2, 3),
-      /**
-       * <code>WARNING1 = 4;</code>
-       */
-      WARNING1(3, 4),
-      /**
-       * <code>WARNING2 = 5;</code>
-       */
-      WARNING2(4, 5),
-      /**
-       * <code>WARNING3 = 6;</code>
-       */
-      WARNING3(5, 6),
-      /**
-       * <code>INFO = 7;</code>
-       */
-      INFO(6, 7),
+      INFO(2, 3),
       ;
 
       /**
-       * <code>ERROR1 = 1;</code>
+       * <code>ERROR = 1;</code>
        */
-      public static final int ERROR1_VALUE = 1;
+      public static final int ERROR_VALUE = 1;
       /**
-       * <code>ERROR2 = 2;</code>
+       * <code>WARNING = 2;</code>
        */
-      public static final int ERROR2_VALUE = 2;
+      public static final int WARNING_VALUE = 2;
       /**
-       * <code>ERROR3 = 3;</code>
+       * <code>INFO = 3;</code>
        */
-      public static final int ERROR3_VALUE = 3;
-      /**
-       * <code>WARNING1 = 4;</code>
-       */
-      public static final int WARNING1_VALUE = 4;
-      /**
-       * <code>WARNING2 = 5;</code>
-       */
-      public static final int WARNING2_VALUE = 5;
-      /**
-       * <code>WARNING3 = 6;</code>
-       */
-      public static final int WARNING3_VALUE = 6;
-      /**
-       * <code>INFO = 7;</code>
-       */
-      public static final int INFO_VALUE = 7;
+      public static final int INFO_VALUE = 3;
 
 
       public final int getNumber() { return value; }
 
       public static Severity valueOf(int value) {
         switch (value) {
-          case 1: return ERROR1;
-          case 2: return ERROR2;
-          case 3: return ERROR3;
-          case 4: return WARNING1;
-          case 5: return WARNING2;
-          case 6: return WARNING3;
-          case 7: return INFO;
+          case 1: return ERROR;
+          case 2: return WARNING;
+          case 3: return INFO;
           default: return null;
         }
       }
@@ -8557,7 +8521,7 @@ public final class xMsgD {
       descriptor;
   static {
     java.lang.String[] descriptorData = {
-      "\n\016xMsgData.proto\"\302\n\n\004Data\022\023\n\013dataVersion" +
+      "\n\016xMsgData.proto\"\214\n\n\004Data\022\023\n\013dataVersion" +
       "\030\001 \001(\t\022\027\n\017dataDescription\030\002 \001(\t\022\022\n\ndataA" +
       "uthor\030\003 \001(\t\022\027\n\017dataAuthorState\030\004 \001(\t\0222\n\024" +
       "dataGenerationStatus\030\005 \001(\0162\016.Data.Severi" +
@@ -8588,12 +8552,11 @@ public final class xMsgD {
       "\022\013\n\007JOBJECT\020\001\022\013\n\007COBJECT\020\002\022\013\n\007POBJECT\020\003\022" +
       "\n\n\006NETCDF\020\004\022\007\n\003HDF\020\005\022\010\n\004EVIO\020\006\"+\n\rContro",
       "lAction\022\013\n\007EXECUTE\020\000\022\r\n\tCONFIGURE\020\001\"\034\n\020S" +
-      "ubControlAction\022\010\n\004SKIP\020\000\"b\n\010Severity\022\n\n" +
-      "\006ERROR1\020\001\022\n\n\006ERROR2\020\002\022\n\n\006ERROR3\020\003\022\014\n\010WAR" +
-      "NING1\020\004\022\014\n\010WARNING2\020\005\022\014\n\010WARNING3\020\006\022\010\n\004I" +
-      "NFO\020\007\"Q\n\007Payload\022\033\n\004item\030\001 \003(\0132\r.Payload" +
-      ".Item\032)\n\004Item\022\014\n\004name\030\001 \002(\t\022\023\n\004data\030\002 \002(" +
-      "\0132\005.DataB\tB\005xMsgDH\001"
+      "ubControlAction\022\010\n\004SKIP\020\000\",\n\010Severity\022\t\n" +
+      "\005ERROR\020\001\022\013\n\007WARNING\020\002\022\010\n\004INFO\020\003\"Q\n\007Paylo" +
+      "ad\022\033\n\004item\030\001 \003(\0132\r.Payload.Item\032)\n\004Item\022" +
+      "\014\n\004name\030\001 \002(\t\022\023\n\004data\030\002 \002(\0132\005.DataB\tB\005xM" +
+      "sgDH\001"
     };
     com.google.protobuf.Descriptors.FileDescriptor.InternalDescriptorAssigner assigner =
       new com.google.protobuf.Descriptors.FileDescriptor.InternalDescriptorAssigner() {

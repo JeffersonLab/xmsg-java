@@ -160,13 +160,9 @@ message Data {
 
     // Message severity
     enum Severity {
-        ERROR1 = 1;
-        ERROR2 = 2;
-        ERROR3 = 3;
-        WARNING1 = 4;
-        WARNING2 = 5;
-        WARNING3 = 6;
-        INFO = 7;
+        ERROR = 1;
+        WARNING = 2;
+        INFO = 3;
     }
 }
 
