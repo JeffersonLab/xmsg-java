@@ -1,6 +1,7 @@
 package org.jlab.coda.xmsg.core;
 
 import com.google.protobuf.InvalidProtocolBufferException;
+
 import org.jlab.coda.xmsg.data.xMsgD;
 import org.jlab.coda.xmsg.excp.*;
 import org.jlab.coda.xmsg.net.xMsgAddress;
@@ -18,6 +19,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
+import java.util.concurrent.TimeoutException;
 
 import static org.jlab.coda.xmsg.xsys.regdis.xMsgRegDiscDriver.__zmqSocket;
 
@@ -968,12 +970,13 @@ public class xMsg {
      * @param timeOut int in seconds
      * @param d data object
      * @throws xMsgException
+     * @throws TimeoutException
      */
     public Object sync_publish(xMsgConnection connection,
                                String topic,
                                Object d,
                                int timeOut)
-            throws xMsgException {
+            throws xMsgException, TimeoutException {
 
         // address/topic where the subscriber should send the result
         String returnAddress = "return:"+ (int) (Math.random() * 100.0);
@@ -1013,17 +1016,7 @@ public class xMsg {
 
         // now subscribe to the returnAddress
         SyncSendCallBack cb = new SyncSendCallBack();
-        subscribe(connection, returnAddress, cb);
-
-        int to = 0;
-
-        // Wait until result is received from the
-        // subscriber or time out has been reached.
-        while(!cb.isReceived){
-            if(to>=timeOut) break;
-            xMsgUtil.sleep(1000);
-            to = to+1;
-        }
+        sync_subscribe(connection, returnAddress, cb, timeOut);
         return cb.s_data;
 
     }
@@ -1052,6 +1045,7 @@ public class xMsg {
      * @param type type of the topic
      * @param timeOut int in seconds
      * @param d data object
+     * @throws TimeoutException
      * @throws xMsgPublishingException
      */
     public Object sync_publish(xMsgConnection connection,
@@ -1060,7 +1054,7 @@ public class xMsg {
                                String type,
                                Object d,
                                int timeOut)
-            throws xMsgException {
+            throws xMsgException, TimeoutException {
 
         // build a topic
         String topic = xMsgUtil.buildTopic(domain, subject, type);
@@ -1089,11 +1083,12 @@ public class xMsg {
      * @param msg {@link xMsgMessage} object
      * @param timeOut int in seconds
      * @throws xMsgException
+     * @throws TimeoutException
      */
     public Object sync_publish(xMsgConnection connection,
                                xMsgMessage msg,
                                int timeOut)
-            throws xMsgException {
+            throws xMsgException, TimeoutException {
         return sync_publish(connection,
                 msg.getDomain(),
                 msg.getSubject(),
@@ -1240,6 +1235,83 @@ public class xMsg {
         String topic = xMsgUtil.buildTopic(domain, subject, type);
         subscribe(connection, topic, cb);
     }
+
+    /**
+     * <p>
+     *     Subscribes and waits a response from a specified xMsg topic.
+     * </p>
+     * @param connection socket to a xMsgNode proxy output port.
+     * @param topic topic of the subscription
+     * @param cb {@link xMsgCallBack} implemented object reference
+     * @throws TimeoutException
+     * @throws xMsgSubscribingException
+     */
+    private void sync_subscribe(xMsgConnection connection,
+                               String topic,
+                               final xMsgCallBack cb, int timeout)
+            throws xMsgException, TimeoutException {
+
+        // check connection
+        Socket con = connection.getSubSock();
+        if (con==null) throw new xMsgSubscribingException("null connection object");
+
+        con.subscribe(topic.getBytes(ZMQ.CHARSET));
+
+        ZMQ.Poller poller = new ZMQ.Poller(1);
+        poller.register(con, ZMQ.Poller.POLLIN);
+        poller.poll(timeout*1000);
+        if(!poller.pollin(0)) {
+            con.unsubscribe(topic.getBytes(ZMQ.CHARSET));
+            throw new TimeoutException();
+        }
+        ZMsg msg = ZMsg.recvMsg(con);
+        ZFrame r_topic = msg.pop();
+        ZFrame r_dataType = msg.pop();
+        ZFrame r_data = msg.pop();
+
+        con.unsubscribe(topic.getBytes(ZMQ.CHARSET));
+
+        // de-serialize received message components
+        String ds_topic = new String(r_topic.getData(), ZMQ.CHARSET);
+        String ds_dataType = new String(r_dataType.getData(),ZMQ.CHARSET);
+
+        Object ds_data;
+        if(ds_dataType.equals(xMsgConstants.ENVELOPE_DATA_TYPE_STRING.getStringValue())) {
+            ds_data = new String(r_data.getData(), ZMQ.CHARSET);
+            r_data.destroy();
+        } else {
+            // de-serialize passed transient data
+            try {
+                xMsgD.Data im_data = xMsgD.Data.parseFrom(r_data.getData());
+
+                // Create a builder object from immutable de-serialized object.
+                ds_data = xMsgUtil.getPbBuilder(im_data);
+
+            } catch (InvalidProtocolBufferException e) {
+                throw new xMsgSubscribingException(e.getMessage());
+            }
+            // cleanup the data
+            r_data.destroy();
+        }
+
+        // cleanup the rest
+        r_topic.destroy();
+        r_dataType.destroy();
+        msg.destroy();
+
+        // Create a message to be passed to the user callback method
+        final xMsgMessage cb_msg = new xMsgMessage(ds_dataType,
+                xMsgUtil.getTopicDomain(ds_topic),
+                xMsgUtil.getTopicSubject(ds_topic),
+                xMsgUtil.getTopicType(ds_topic),
+                ds_data);
+
+        Object rd = cb.callback(cb_msg);
+        if(rd==null) {
+            throw new xMsgSubscribingException("Null response data");
+        }
+    }
+
 
     /**
      * <p>
