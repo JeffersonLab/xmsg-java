@@ -34,11 +34,12 @@ public enum xMsgConstants {
     WARNING(12,"WARNING"),
     ERROR(13,"ERROR"),
     DONE(14,"done"),
+    DATA(15,"data"),
 
-    NO_RESULT(15,"none"),
+    NO_RESULT(16,"none"),
 
-    BIND(16,"bind"),
-    CONNECT(17,"connect"),
+    BIND(17,"bind"),
+    CONNECT(18,"connect"),
 
     DEFAULT_PORT(7771, "defaultPort"),
     REGISTRAR_PORT(8888, "registrarPort"),
@@ -48,8 +49,8 @@ public enum xMsgConstants {
     // 1) topic
     // 2) dataType (accepts two types defined below
     // 3) actual serialized data
-    ENVELOPE_DATA_TYPE_STRING(18,"string"),
-    ENVELOPE_DATA_TYPE_XMSGDATA(19,"xMsgData");
+    ENVELOPE_DATA_TYPE_STRING(19,"string"),
+    ENVELOPE_DATA_TYPE_XMSGDATA(20,"xMsgData");
 
     private int intValue;
     private String stringValue;
