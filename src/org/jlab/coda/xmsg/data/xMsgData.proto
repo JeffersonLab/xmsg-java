@@ -73,43 +73,32 @@ message Data {
     // Byte ordering in case data type is BYTES/BYTESA
     optional string byteOrder = 29;
 
-    // ... Fields that are used to control message receiver ...
-    // If set to true, for example Clara service container will
-    // broadcast exceptions to
-    // [ exception_<service_name>,
-    //             requestId,
-    //             exceptionType <Severity>,
-    //             exceptionId,
-    //             exceptionString <String> ]
-    optional bool exceptionMonitor = 30;
-
     // If set to true, for example Clara service container will
     // broadcast "done" string
-    // [ done_<service_name>,
-    //             requestId]
-    optional bool doneMonitor = 31;
+    // [ done:<service_name>,
+    //             requestId?engineExecutionTime]
+    optional bool doneMonitor = 30;
 
     // If set to true, for example Clara service container will
     // broadcast resulting data to
-    // [ data_<service_name>,
-    //             requestId,
+    // [ data:<service_name>:generationStatus:severityID,
     //             transient_data ]
-    optional bool dataMonitor = 32;
+    optional bool dataMonitor = 31;
 
     // Reserved and used for Clara service based application
     // composition i.e. link schema (list of linked service names)
     // e.g. s1+s2;s1+s3,s4,s5+&s6
-    optional string composition = 33;
+    optional string composition = 32;
 
     // Service engine execution time
-    optional sfixed64 executionTime = 34;
+    optional sfixed64 executionTime = 33;
 
     // Reserved and used to define which of the CLARA interface
     // methods must be called on a service engine.
-    optional ControlAction action =35;
+    optional ControlAction action =34;
 
     // Reserved control field
-    optional SubControlAction controlR = 36;
+    optional SubControlAction controlR = 35;
 
     // ... Enumerations ...
     // Data type enumeration

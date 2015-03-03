@@ -682,91 +682,57 @@ public final class xMsgD {
     com.google.protobuf.ByteString
         getByteOrderBytes();
 
-    // optional bool exceptionMonitor = 30;
+    // optional bool doneMonitor = 30;
     /**
-     * <code>optional bool exceptionMonitor = 30;</code>
-     *
-     * <pre>
-     * ... Fields that are used to control message receiver ...
-     * If set to true, for example Clara service container will
-     * broadcast exceptions to
-     * [ exception_&lt;service_name&gt;,
-     *             requestId,
-     *             exceptionType &lt;Severity&gt;,
-     *             exceptionId,
-     *             exceptionString &lt;String&gt; ]
-     * </pre>
-     */
-    boolean hasExceptionMonitor();
-    /**
-     * <code>optional bool exceptionMonitor = 30;</code>
-     *
-     * <pre>
-     * ... Fields that are used to control message receiver ...
-     * If set to true, for example Clara service container will
-     * broadcast exceptions to
-     * [ exception_&lt;service_name&gt;,
-     *             requestId,
-     *             exceptionType &lt;Severity&gt;,
-     *             exceptionId,
-     *             exceptionString &lt;String&gt; ]
-     * </pre>
-     */
-    boolean getExceptionMonitor();
-
-    // optional bool doneMonitor = 31;
-    /**
-     * <code>optional bool doneMonitor = 31;</code>
+     * <code>optional bool doneMonitor = 30;</code>
      *
      * <pre>
      * If set to true, for example Clara service container will
      * broadcast "done" string
-     * [ done_&lt;service_name&gt;,
-     *             requestId]
+     * [ done:&lt;service_name&gt;,
+     *             requestId?engineExecutionTime]
      * </pre>
      */
     boolean hasDoneMonitor();
     /**
-     * <code>optional bool doneMonitor = 31;</code>
+     * <code>optional bool doneMonitor = 30;</code>
      *
      * <pre>
      * If set to true, for example Clara service container will
      * broadcast "done" string
-     * [ done_&lt;service_name&gt;,
-     *             requestId]
+     * [ done:&lt;service_name&gt;,
+     *             requestId?engineExecutionTime]
      * </pre>
      */
     boolean getDoneMonitor();
 
-    // optional bool dataMonitor = 32;
+    // optional bool dataMonitor = 31;
     /**
-     * <code>optional bool dataMonitor = 32;</code>
+     * <code>optional bool dataMonitor = 31;</code>
      *
      * <pre>
      * If set to true, for example Clara service container will
      * broadcast resulting data to
-     * [ data_&lt;service_name&gt;,
-     *             requestId,
+     * [ data:&lt;service_name&gt;:generationStatus:severityID,
      *             transient_data ]
      * </pre>
      */
     boolean hasDataMonitor();
     /**
-     * <code>optional bool dataMonitor = 32;</code>
+     * <code>optional bool dataMonitor = 31;</code>
      *
      * <pre>
      * If set to true, for example Clara service container will
      * broadcast resulting data to
-     * [ data_&lt;service_name&gt;,
-     *             requestId,
+     * [ data:&lt;service_name&gt;:generationStatus:severityID,
      *             transient_data ]
      * </pre>
      */
     boolean getDataMonitor();
 
-    // optional string composition = 33;
+    // optional string composition = 32;
     /**
-     * <code>optional string composition = 33;</code>
+     * <code>optional string composition = 32;</code>
      *
      * <pre>
      * Reserved and used for Clara service based application
@@ -776,7 +742,7 @@ public final class xMsgD {
      */
     boolean hasComposition();
     /**
-     * <code>optional string composition = 33;</code>
+     * <code>optional string composition = 32;</code>
      *
      * <pre>
      * Reserved and used for Clara service based application
@@ -786,7 +752,7 @@ public final class xMsgD {
      */
     java.lang.String getComposition();
     /**
-     * <code>optional string composition = 33;</code>
+     * <code>optional string composition = 32;</code>
      *
      * <pre>
      * Reserved and used for Clara service based application
@@ -797,9 +763,9 @@ public final class xMsgD {
     com.google.protobuf.ByteString
         getCompositionBytes();
 
-    // optional sfixed64 executionTime = 34;
+    // optional sfixed64 executionTime = 33;
     /**
-     * <code>optional sfixed64 executionTime = 34;</code>
+     * <code>optional sfixed64 executionTime = 33;</code>
      *
      * <pre>
      * Service engine execution time
@@ -807,7 +773,7 @@ public final class xMsgD {
      */
     boolean hasExecutionTime();
     /**
-     * <code>optional sfixed64 executionTime = 34;</code>
+     * <code>optional sfixed64 executionTime = 33;</code>
      *
      * <pre>
      * Service engine execution time
@@ -815,9 +781,9 @@ public final class xMsgD {
      */
     long getExecutionTime();
 
-    // optional .Data.ControlAction action = 35;
+    // optional .Data.ControlAction action = 34;
     /**
-     * <code>optional .Data.ControlAction action = 35;</code>
+     * <code>optional .Data.ControlAction action = 34;</code>
      *
      * <pre>
      * Reserved and used to define which of the CLARA interface
@@ -826,7 +792,7 @@ public final class xMsgD {
      */
     boolean hasAction();
     /**
-     * <code>optional .Data.ControlAction action = 35;</code>
+     * <code>optional .Data.ControlAction action = 34;</code>
      *
      * <pre>
      * Reserved and used to define which of the CLARA interface
@@ -835,9 +801,9 @@ public final class xMsgD {
      */
     xMsgD.Data.ControlAction getAction();
 
-    // optional .Data.SubControlAction controlR = 36;
+    // optional .Data.SubControlAction controlR = 35;
     /**
-     * <code>optional .Data.SubControlAction controlR = 36;</code>
+     * <code>optional .Data.SubControlAction controlR = 35;</code>
      *
      * <pre>
      * Reserved control field
@@ -845,7 +811,7 @@ public final class xMsgD {
      */
     boolean hasControlR();
     /**
-     * <code>optional .Data.SubControlAction controlR = 36;</code>
+     * <code>optional .Data.SubControlAction controlR = 35;</code>
      *
      * <pre>
      * Reserved control field
@@ -1176,47 +1142,42 @@ public final class xMsgD {
             }
             case 240: {
               bitField0_ |= 0x00200000;
-              exceptionMonitor_ = input.readBool();
+              doneMonitor_ = input.readBool();
               break;
             }
             case 248: {
               bitField0_ |= 0x00400000;
-              doneMonitor_ = input.readBool();
-              break;
-            }
-            case 256: {
-              bitField0_ |= 0x00800000;
               dataMonitor_ = input.readBool();
               break;
             }
-            case 266: {
-              bitField0_ |= 0x01000000;
+            case 258: {
+              bitField0_ |= 0x00800000;
               composition_ = input.readBytes();
               break;
             }
-            case 273: {
-              bitField0_ |= 0x02000000;
+            case 265: {
+              bitField0_ |= 0x01000000;
               executionTime_ = input.readSFixed64();
               break;
             }
-            case 280: {
+            case 272: {
               int rawValue = input.readEnum();
               xMsgD.Data.ControlAction value = xMsgD.Data.ControlAction.valueOf(rawValue);
               if (value == null) {
-                unknownFields.mergeVarintField(35, rawValue);
+                unknownFields.mergeVarintField(34, rawValue);
               } else {
-                bitField0_ |= 0x04000000;
+                bitField0_ |= 0x02000000;
                 action_ = value;
               }
               break;
             }
-            case 288: {
+            case 280: {
               int rawValue = input.readEnum();
               xMsgD.Data.SubControlAction value = xMsgD.Data.SubControlAction.valueOf(rawValue);
               if (value == null) {
-                unknownFields.mergeVarintField(36, rawValue);
+                unknownFields.mergeVarintField(35, rawValue);
               } else {
-                bitField0_ |= 0x08000000;
+                bitField0_ |= 0x04000000;
                 controlR_ = value;
               }
               break;
@@ -3094,99 +3055,59 @@ public final class xMsgD {
       }
     }
 
-    // optional bool exceptionMonitor = 30;
-    public static final int EXCEPTIONMONITOR_FIELD_NUMBER = 30;
-    private boolean exceptionMonitor_;
-    /**
-     * <code>optional bool exceptionMonitor = 30;</code>
-     *
-     * <pre>
-     * ... Fields that are used to control message receiver ...
-     * If set to true, for example Clara service container will
-     * broadcast exceptions to
-     * [ exception_&lt;service_name&gt;,
-     *             requestId,
-     *             exceptionType &lt;Severity&gt;,
-     *             exceptionId,
-     *             exceptionString &lt;String&gt; ]
-     * </pre>
-     */
-    public boolean hasExceptionMonitor() {
-      return ((bitField0_ & 0x00200000) == 0x00200000);
-    }
-    /**
-     * <code>optional bool exceptionMonitor = 30;</code>
-     *
-     * <pre>
-     * ... Fields that are used to control message receiver ...
-     * If set to true, for example Clara service container will
-     * broadcast exceptions to
-     * [ exception_&lt;service_name&gt;,
-     *             requestId,
-     *             exceptionType &lt;Severity&gt;,
-     *             exceptionId,
-     *             exceptionString &lt;String&gt; ]
-     * </pre>
-     */
-    public boolean getExceptionMonitor() {
-      return exceptionMonitor_;
-    }
-
-    // optional bool doneMonitor = 31;
-    public static final int DONEMONITOR_FIELD_NUMBER = 31;
+    // optional bool doneMonitor = 30;
+    public static final int DONEMONITOR_FIELD_NUMBER = 30;
     private boolean doneMonitor_;
     /**
-     * <code>optional bool doneMonitor = 31;</code>
+     * <code>optional bool doneMonitor = 30;</code>
      *
      * <pre>
      * If set to true, for example Clara service container will
      * broadcast "done" string
-     * [ done_&lt;service_name&gt;,
-     *             requestId]
+     * [ done:&lt;service_name&gt;,
+     *             requestId?engineExecutionTime]
      * </pre>
      */
     public boolean hasDoneMonitor() {
-      return ((bitField0_ & 0x00400000) == 0x00400000);
+      return ((bitField0_ & 0x00200000) == 0x00200000);
     }
     /**
-     * <code>optional bool doneMonitor = 31;</code>
+     * <code>optional bool doneMonitor = 30;</code>
      *
      * <pre>
      * If set to true, for example Clara service container will
      * broadcast "done" string
-     * [ done_&lt;service_name&gt;,
-     *             requestId]
+     * [ done:&lt;service_name&gt;,
+     *             requestId?engineExecutionTime]
      * </pre>
      */
     public boolean getDoneMonitor() {
       return doneMonitor_;
     }
 
-    // optional bool dataMonitor = 32;
-    public static final int DATAMONITOR_FIELD_NUMBER = 32;
+    // optional bool dataMonitor = 31;
+    public static final int DATAMONITOR_FIELD_NUMBER = 31;
     private boolean dataMonitor_;
     /**
-     * <code>optional bool dataMonitor = 32;</code>
+     * <code>optional bool dataMonitor = 31;</code>
      *
      * <pre>
      * If set to true, for example Clara service container will
      * broadcast resulting data to
-     * [ data_&lt;service_name&gt;,
-     *             requestId,
+     * [ data:&lt;service_name&gt;:generationStatus:severityID,
      *             transient_data ]
      * </pre>
      */
     public boolean hasDataMonitor() {
-      return ((bitField0_ & 0x00800000) == 0x00800000);
+      return ((bitField0_ & 0x00400000) == 0x00400000);
     }
     /**
-     * <code>optional bool dataMonitor = 32;</code>
+     * <code>optional bool dataMonitor = 31;</code>
      *
      * <pre>
      * If set to true, for example Clara service container will
      * broadcast resulting data to
-     * [ data_&lt;service_name&gt;,
-     *             requestId,
+     * [ data:&lt;service_name&gt;:generationStatus:severityID,
      *             transient_data ]
      * </pre>
      */
@@ -3194,11 +3115,11 @@ public final class xMsgD {
       return dataMonitor_;
     }
 
-    // optional string composition = 33;
-    public static final int COMPOSITION_FIELD_NUMBER = 33;
+    // optional string composition = 32;
+    public static final int COMPOSITION_FIELD_NUMBER = 32;
     private java.lang.Object composition_;
     /**
-     * <code>optional string composition = 33;</code>
+     * <code>optional string composition = 32;</code>
      *
      * <pre>
      * Reserved and used for Clara service based application
@@ -3207,10 +3128,10 @@ public final class xMsgD {
      * </pre>
      */
     public boolean hasComposition() {
-      return ((bitField0_ & 0x01000000) == 0x01000000);
+      return ((bitField0_ & 0x00800000) == 0x00800000);
     }
     /**
-     * <code>optional string composition = 33;</code>
+     * <code>optional string composition = 32;</code>
      *
      * <pre>
      * Reserved and used for Clara service based application
@@ -3233,7 +3154,7 @@ public final class xMsgD {
       }
     }
     /**
-     * <code>optional string composition = 33;</code>
+     * <code>optional string composition = 32;</code>
      *
      * <pre>
      * Reserved and used for Clara service based application
@@ -3255,21 +3176,21 @@ public final class xMsgD {
       }
     }
 
-    // optional sfixed64 executionTime = 34;
-    public static final int EXECUTIONTIME_FIELD_NUMBER = 34;
+    // optional sfixed64 executionTime = 33;
+    public static final int EXECUTIONTIME_FIELD_NUMBER = 33;
     private long executionTime_;
     /**
-     * <code>optional sfixed64 executionTime = 34;</code>
+     * <code>optional sfixed64 executionTime = 33;</code>
      *
      * <pre>
      * Service engine execution time
      * </pre>
      */
     public boolean hasExecutionTime() {
-      return ((bitField0_ & 0x02000000) == 0x02000000);
+      return ((bitField0_ & 0x01000000) == 0x01000000);
     }
     /**
-     * <code>optional sfixed64 executionTime = 34;</code>
+     * <code>optional sfixed64 executionTime = 33;</code>
      *
      * <pre>
      * Service engine execution time
@@ -3279,11 +3200,11 @@ public final class xMsgD {
       return executionTime_;
     }
 
-    // optional .Data.ControlAction action = 35;
-    public static final int ACTION_FIELD_NUMBER = 35;
+    // optional .Data.ControlAction action = 34;
+    public static final int ACTION_FIELD_NUMBER = 34;
     private xMsgD.Data.ControlAction action_;
     /**
-     * <code>optional .Data.ControlAction action = 35;</code>
+     * <code>optional .Data.ControlAction action = 34;</code>
      *
      * <pre>
      * Reserved and used to define which of the CLARA interface
@@ -3291,10 +3212,10 @@ public final class xMsgD {
      * </pre>
      */
     public boolean hasAction() {
-      return ((bitField0_ & 0x04000000) == 0x04000000);
+      return ((bitField0_ & 0x02000000) == 0x02000000);
     }
     /**
-     * <code>optional .Data.ControlAction action = 35;</code>
+     * <code>optional .Data.ControlAction action = 34;</code>
      *
      * <pre>
      * Reserved and used to define which of the CLARA interface
@@ -3305,21 +3226,21 @@ public final class xMsgD {
       return action_;
     }
 
-    // optional .Data.SubControlAction controlR = 36;
-    public static final int CONTROLR_FIELD_NUMBER = 36;
+    // optional .Data.SubControlAction controlR = 35;
+    public static final int CONTROLR_FIELD_NUMBER = 35;
     private xMsgD.Data.SubControlAction controlR_;
     /**
-     * <code>optional .Data.SubControlAction controlR = 36;</code>
+     * <code>optional .Data.SubControlAction controlR = 35;</code>
      *
      * <pre>
      * Reserved control field
      * </pre>
      */
     public boolean hasControlR() {
-      return ((bitField0_ & 0x08000000) == 0x08000000);
+      return ((bitField0_ & 0x04000000) == 0x04000000);
     }
     /**
-     * <code>optional .Data.SubControlAction controlR = 36;</code>
+     * <code>optional .Data.SubControlAction controlR = 35;</code>
      *
      * <pre>
      * Reserved control field
@@ -3359,7 +3280,6 @@ public final class xMsgD {
       sender_ = "";
       id_ = 0;
       byteOrder_ = "";
-      exceptionMonitor_ = false;
       doneMonitor_ = false;
       dataMonitor_ = false;
       composition_ = "";
@@ -3467,25 +3387,22 @@ public final class xMsgD {
         output.writeBytes(29, getByteOrderBytes());
       }
       if (((bitField0_ & 0x00200000) == 0x00200000)) {
-        output.writeBool(30, exceptionMonitor_);
+        output.writeBool(30, doneMonitor_);
       }
       if (((bitField0_ & 0x00400000) == 0x00400000)) {
-        output.writeBool(31, doneMonitor_);
+        output.writeBool(31, dataMonitor_);
       }
       if (((bitField0_ & 0x00800000) == 0x00800000)) {
-        output.writeBool(32, dataMonitor_);
+        output.writeBytes(32, getCompositionBytes());
       }
       if (((bitField0_ & 0x01000000) == 0x01000000)) {
-        output.writeBytes(33, getCompositionBytes());
+        output.writeSFixed64(33, executionTime_);
       }
       if (((bitField0_ & 0x02000000) == 0x02000000)) {
-        output.writeSFixed64(34, executionTime_);
+        output.writeEnum(34, action_.getNumber());
       }
       if (((bitField0_ & 0x04000000) == 0x04000000)) {
-        output.writeEnum(35, action_.getNumber());
-      }
-      if (((bitField0_ & 0x08000000) == 0x08000000)) {
-        output.writeEnum(36, controlR_.getNumber());
+        output.writeEnum(35, controlR_.getNumber());
       }
       getUnknownFields().writeTo(output);
     }
@@ -3642,31 +3559,27 @@ public final class xMsgD {
       }
       if (((bitField0_ & 0x00200000) == 0x00200000)) {
         size += com.google.protobuf.CodedOutputStream
-          .computeBoolSize(30, exceptionMonitor_);
+          .computeBoolSize(30, doneMonitor_);
       }
       if (((bitField0_ & 0x00400000) == 0x00400000)) {
         size += com.google.protobuf.CodedOutputStream
-          .computeBoolSize(31, doneMonitor_);
+          .computeBoolSize(31, dataMonitor_);
       }
       if (((bitField0_ & 0x00800000) == 0x00800000)) {
         size += com.google.protobuf.CodedOutputStream
-          .computeBoolSize(32, dataMonitor_);
+          .computeBytesSize(32, getCompositionBytes());
       }
       if (((bitField0_ & 0x01000000) == 0x01000000)) {
         size += com.google.protobuf.CodedOutputStream
-          .computeBytesSize(33, getCompositionBytes());
+          .computeSFixed64Size(33, executionTime_);
       }
       if (((bitField0_ & 0x02000000) == 0x02000000)) {
         size += com.google.protobuf.CodedOutputStream
-          .computeSFixed64Size(34, executionTime_);
+          .computeEnumSize(34, action_.getNumber());
       }
       if (((bitField0_ & 0x04000000) == 0x04000000)) {
         size += com.google.protobuf.CodedOutputStream
-          .computeEnumSize(35, action_.getNumber());
-      }
-      if (((bitField0_ & 0x08000000) == 0x08000000)) {
-        size += com.google.protobuf.CodedOutputStream
-          .computeEnumSize(36, controlR_.getNumber());
+          .computeEnumSize(35, controlR_.getNumber());
       }
       size += getUnknownFields().getSerializedSize();
       memoizedSerializedSize = size;
@@ -3846,20 +3759,18 @@ public final class xMsgD {
         bitField0_ = (bitField0_ & ~0x08000000);
         byteOrder_ = "";
         bitField0_ = (bitField0_ & ~0x10000000);
-        exceptionMonitor_ = false;
-        bitField0_ = (bitField0_ & ~0x20000000);
         doneMonitor_ = false;
-        bitField0_ = (bitField0_ & ~0x40000000);
+        bitField0_ = (bitField0_ & ~0x20000000);
         dataMonitor_ = false;
-        bitField0_ = (bitField0_ & ~0x80000000);
+        bitField0_ = (bitField0_ & ~0x40000000);
         composition_ = "";
-        bitField1_ = (bitField1_ & ~0x00000001);
+        bitField0_ = (bitField0_ & ~0x80000000);
         executionTime_ = 0L;
-        bitField1_ = (bitField1_ & ~0x00000002);
+        bitField1_ = (bitField1_ & ~0x00000001);
         action_ = xMsgD.Data.ControlAction.EXECUTE;
-        bitField1_ = (bitField1_ & ~0x00000004);
+        bitField1_ = (bitField1_ & ~0x00000002);
         controlR_ = xMsgD.Data.SubControlAction.SKIP;
-        bitField1_ = (bitField1_ & ~0x00000008);
+        bitField1_ = (bitField1_ & ~0x00000004);
         return this;
       }
 
@@ -4017,29 +3928,25 @@ public final class xMsgD {
         if (((from_bitField0_ & 0x20000000) == 0x20000000)) {
           to_bitField0_ |= 0x00200000;
         }
-        result.exceptionMonitor_ = exceptionMonitor_;
+        result.doneMonitor_ = doneMonitor_;
         if (((from_bitField0_ & 0x40000000) == 0x40000000)) {
           to_bitField0_ |= 0x00400000;
         }
-        result.doneMonitor_ = doneMonitor_;
+        result.dataMonitor_ = dataMonitor_;
         if (((from_bitField0_ & 0x80000000) == 0x80000000)) {
           to_bitField0_ |= 0x00800000;
         }
-        result.dataMonitor_ = dataMonitor_;
+        result.composition_ = composition_;
         if (((from_bitField1_ & 0x00000001) == 0x00000001)) {
           to_bitField0_ |= 0x01000000;
         }
-        result.composition_ = composition_;
+        result.executionTime_ = executionTime_;
         if (((from_bitField1_ & 0x00000002) == 0x00000002)) {
           to_bitField0_ |= 0x02000000;
         }
-        result.executionTime_ = executionTime_;
+        result.action_ = action_;
         if (((from_bitField1_ & 0x00000004) == 0x00000004)) {
           to_bitField0_ |= 0x04000000;
-        }
-        result.action_ = action_;
-        if (((from_bitField1_ & 0x00000008) == 0x00000008)) {
-          to_bitField0_ |= 0x08000000;
         }
         result.controlR_ = controlR_;
         result.bitField0_ = to_bitField0_;
@@ -4219,9 +4126,6 @@ public final class xMsgD {
           byteOrder_ = other.byteOrder_;
           onChanged();
         }
-        if (other.hasExceptionMonitor()) {
-          setExceptionMonitor(other.getExceptionMonitor());
-        }
         if (other.hasDoneMonitor()) {
           setDoneMonitor(other.getDoneMonitor());
         }
@@ -4229,7 +4133,7 @@ public final class xMsgD {
           setDataMonitor(other.getDataMonitor());
         }
         if (other.hasComposition()) {
-          bitField1_ |= 0x00000001;
+          bitField0_ |= 0x80000000;
           composition_ = other.composition_;
           onChanged();
         }
@@ -6535,168 +6439,89 @@ public final class xMsgD {
         return this;
       }
 
-      // optional bool exceptionMonitor = 30;
-      private boolean exceptionMonitor_ ;
-      /**
-       * <code>optional bool exceptionMonitor = 30;</code>
-       *
-       * <pre>
-       * ... Fields that are used to control message receiver ...
-       * If set to true, for example Clara service container will
-       * broadcast exceptions to
-       * [ exception_&lt;service_name&gt;,
-       *             requestId,
-       *             exceptionType &lt;Severity&gt;,
-       *             exceptionId,
-       *             exceptionString &lt;String&gt; ]
-       * </pre>
-       */
-      public boolean hasExceptionMonitor() {
-        return ((bitField0_ & 0x20000000) == 0x20000000);
-      }
-      /**
-       * <code>optional bool exceptionMonitor = 30;</code>
-       *
-       * <pre>
-       * ... Fields that are used to control message receiver ...
-       * If set to true, for example Clara service container will
-       * broadcast exceptions to
-       * [ exception_&lt;service_name&gt;,
-       *             requestId,
-       *             exceptionType &lt;Severity&gt;,
-       *             exceptionId,
-       *             exceptionString &lt;String&gt; ]
-       * </pre>
-       */
-      public boolean getExceptionMonitor() {
-        return exceptionMonitor_;
-      }
-      /**
-       * <code>optional bool exceptionMonitor = 30;</code>
-       *
-       * <pre>
-       * ... Fields that are used to control message receiver ...
-       * If set to true, for example Clara service container will
-       * broadcast exceptions to
-       * [ exception_&lt;service_name&gt;,
-       *             requestId,
-       *             exceptionType &lt;Severity&gt;,
-       *             exceptionId,
-       *             exceptionString &lt;String&gt; ]
-       * </pre>
-       */
-      public Builder setExceptionMonitor(boolean value) {
-        bitField0_ |= 0x20000000;
-        exceptionMonitor_ = value;
-        onChanged();
-        return this;
-      }
-      /**
-       * <code>optional bool exceptionMonitor = 30;</code>
-       *
-       * <pre>
-       * ... Fields that are used to control message receiver ...
-       * If set to true, for example Clara service container will
-       * broadcast exceptions to
-       * [ exception_&lt;service_name&gt;,
-       *             requestId,
-       *             exceptionType &lt;Severity&gt;,
-       *             exceptionId,
-       *             exceptionString &lt;String&gt; ]
-       * </pre>
-       */
-      public Builder clearExceptionMonitor() {
-        bitField0_ = (bitField0_ & ~0x20000000);
-        exceptionMonitor_ = false;
-        onChanged();
-        return this;
-      }
-
-      // optional bool doneMonitor = 31;
+      // optional bool doneMonitor = 30;
       private boolean doneMonitor_ ;
       /**
-       * <code>optional bool doneMonitor = 31;</code>
+       * <code>optional bool doneMonitor = 30;</code>
        *
        * <pre>
        * If set to true, for example Clara service container will
        * broadcast "done" string
-       * [ done_&lt;service_name&gt;,
-       *             requestId]
+       * [ done:&lt;service_name&gt;,
+       *             requestId?engineExecutionTime]
        * </pre>
        */
       public boolean hasDoneMonitor() {
-        return ((bitField0_ & 0x40000000) == 0x40000000);
+        return ((bitField0_ & 0x20000000) == 0x20000000);
       }
       /**
-       * <code>optional bool doneMonitor = 31;</code>
+       * <code>optional bool doneMonitor = 30;</code>
        *
        * <pre>
        * If set to true, for example Clara service container will
        * broadcast "done" string
-       * [ done_&lt;service_name&gt;,
-       *             requestId]
+       * [ done:&lt;service_name&gt;,
+       *             requestId?engineExecutionTime]
        * </pre>
        */
       public boolean getDoneMonitor() {
         return doneMonitor_;
       }
       /**
-       * <code>optional bool doneMonitor = 31;</code>
+       * <code>optional bool doneMonitor = 30;</code>
        *
        * <pre>
        * If set to true, for example Clara service container will
        * broadcast "done" string
-       * [ done_&lt;service_name&gt;,
-       *             requestId]
+       * [ done:&lt;service_name&gt;,
+       *             requestId?engineExecutionTime]
        * </pre>
        */
       public Builder setDoneMonitor(boolean value) {
-        bitField0_ |= 0x40000000;
+        bitField0_ |= 0x20000000;
         doneMonitor_ = value;
         onChanged();
         return this;
       }
       /**
-       * <code>optional bool doneMonitor = 31;</code>
+       * <code>optional bool doneMonitor = 30;</code>
        *
        * <pre>
        * If set to true, for example Clara service container will
        * broadcast "done" string
-       * [ done_&lt;service_name&gt;,
-       *             requestId]
+       * [ done:&lt;service_name&gt;,
+       *             requestId?engineExecutionTime]
        * </pre>
        */
       public Builder clearDoneMonitor() {
-        bitField0_ = (bitField0_ & ~0x40000000);
+        bitField0_ = (bitField0_ & ~0x20000000);
         doneMonitor_ = false;
         onChanged();
         return this;
       }
 
-      // optional bool dataMonitor = 32;
+      // optional bool dataMonitor = 31;
       private boolean dataMonitor_ ;
       /**
-       * <code>optional bool dataMonitor = 32;</code>
+       * <code>optional bool dataMonitor = 31;</code>
        *
        * <pre>
        * If set to true, for example Clara service container will
        * broadcast resulting data to
-       * [ data_&lt;service_name&gt;,
-       *             requestId,
+       * [ data:&lt;service_name&gt;:generationStatus:severityID,
        *             transient_data ]
        * </pre>
        */
       public boolean hasDataMonitor() {
-        return ((bitField0_ & 0x80000000) == 0x80000000);
+        return ((bitField0_ & 0x40000000) == 0x40000000);
       }
       /**
-       * <code>optional bool dataMonitor = 32;</code>
+       * <code>optional bool dataMonitor = 31;</code>
        *
        * <pre>
        * If set to true, for example Clara service container will
        * broadcast resulting data to
-       * [ data_&lt;service_name&gt;,
-       *             requestId,
+       * [ data:&lt;service_name&gt;:generationStatus:severityID,
        *             transient_data ]
        * </pre>
        */
@@ -6704,44 +6529,42 @@ public final class xMsgD {
         return dataMonitor_;
       }
       /**
-       * <code>optional bool dataMonitor = 32;</code>
+       * <code>optional bool dataMonitor = 31;</code>
        *
        * <pre>
        * If set to true, for example Clara service container will
        * broadcast resulting data to
-       * [ data_&lt;service_name&gt;,
-       *             requestId,
+       * [ data:&lt;service_name&gt;:generationStatus:severityID,
        *             transient_data ]
        * </pre>
        */
       public Builder setDataMonitor(boolean value) {
-        bitField0_ |= 0x80000000;
+        bitField0_ |= 0x40000000;
         dataMonitor_ = value;
         onChanged();
         return this;
       }
       /**
-       * <code>optional bool dataMonitor = 32;</code>
+       * <code>optional bool dataMonitor = 31;</code>
        *
        * <pre>
        * If set to true, for example Clara service container will
        * broadcast resulting data to
-       * [ data_&lt;service_name&gt;,
-       *             requestId,
+       * [ data:&lt;service_name&gt;:generationStatus:severityID,
        *             transient_data ]
        * </pre>
        */
       public Builder clearDataMonitor() {
-        bitField0_ = (bitField0_ & ~0x80000000);
+        bitField0_ = (bitField0_ & ~0x40000000);
         dataMonitor_ = false;
         onChanged();
         return this;
       }
 
-      // optional string composition = 33;
+      // optional string composition = 32;
       private java.lang.Object composition_ = "";
       /**
-       * <code>optional string composition = 33;</code>
+       * <code>optional string composition = 32;</code>
        *
        * <pre>
        * Reserved and used for Clara service based application
@@ -6750,10 +6573,10 @@ public final class xMsgD {
        * </pre>
        */
       public boolean hasComposition() {
-        return ((bitField1_ & 0x00000001) == 0x00000001);
+        return ((bitField0_ & 0x80000000) == 0x80000000);
       }
       /**
-       * <code>optional string composition = 33;</code>
+       * <code>optional string composition = 32;</code>
        *
        * <pre>
        * Reserved and used for Clara service based application
@@ -6773,7 +6596,7 @@ public final class xMsgD {
         }
       }
       /**
-       * <code>optional string composition = 33;</code>
+       * <code>optional string composition = 32;</code>
        *
        * <pre>
        * Reserved and used for Clara service based application
@@ -6795,7 +6618,7 @@ public final class xMsgD {
         }
       }
       /**
-       * <code>optional string composition = 33;</code>
+       * <code>optional string composition = 32;</code>
        *
        * <pre>
        * Reserved and used for Clara service based application
@@ -6808,13 +6631,13 @@ public final class xMsgD {
         if (value == null) {
     throw new NullPointerException();
   }
-  bitField1_ |= 0x00000001;
+  bitField0_ |= 0x80000000;
         composition_ = value;
         onChanged();
         return this;
       }
       /**
-       * <code>optional string composition = 33;</code>
+       * <code>optional string composition = 32;</code>
        *
        * <pre>
        * Reserved and used for Clara service based application
@@ -6823,13 +6646,13 @@ public final class xMsgD {
        * </pre>
        */
       public Builder clearComposition() {
-        bitField1_ = (bitField1_ & ~0x00000001);
+        bitField0_ = (bitField0_ & ~0x80000000);
         composition_ = getDefaultInstance().getComposition();
         onChanged();
         return this;
       }
       /**
-       * <code>optional string composition = 33;</code>
+       * <code>optional string composition = 32;</code>
        *
        * <pre>
        * Reserved and used for Clara service based application
@@ -6842,26 +6665,26 @@ public final class xMsgD {
         if (value == null) {
     throw new NullPointerException();
   }
-  bitField1_ |= 0x00000001;
+  bitField0_ |= 0x80000000;
         composition_ = value;
         onChanged();
         return this;
       }
 
-      // optional sfixed64 executionTime = 34;
+      // optional sfixed64 executionTime = 33;
       private long executionTime_ ;
       /**
-       * <code>optional sfixed64 executionTime = 34;</code>
+       * <code>optional sfixed64 executionTime = 33;</code>
        *
        * <pre>
        * Service engine execution time
        * </pre>
        */
       public boolean hasExecutionTime() {
-        return ((bitField1_ & 0x00000002) == 0x00000002);
+        return ((bitField1_ & 0x00000001) == 0x00000001);
       }
       /**
-       * <code>optional sfixed64 executionTime = 34;</code>
+       * <code>optional sfixed64 executionTime = 33;</code>
        *
        * <pre>
        * Service engine execution time
@@ -6871,36 +6694,36 @@ public final class xMsgD {
         return executionTime_;
       }
       /**
-       * <code>optional sfixed64 executionTime = 34;</code>
+       * <code>optional sfixed64 executionTime = 33;</code>
        *
        * <pre>
        * Service engine execution time
        * </pre>
        */
       public Builder setExecutionTime(long value) {
-        bitField1_ |= 0x00000002;
+        bitField1_ |= 0x00000001;
         executionTime_ = value;
         onChanged();
         return this;
       }
       /**
-       * <code>optional sfixed64 executionTime = 34;</code>
+       * <code>optional sfixed64 executionTime = 33;</code>
        *
        * <pre>
        * Service engine execution time
        * </pre>
        */
       public Builder clearExecutionTime() {
-        bitField1_ = (bitField1_ & ~0x00000002);
+        bitField1_ = (bitField1_ & ~0x00000001);
         executionTime_ = 0L;
         onChanged();
         return this;
       }
 
-      // optional .Data.ControlAction action = 35;
+      // optional .Data.ControlAction action = 34;
       private xMsgD.Data.ControlAction action_ = xMsgD.Data.ControlAction.EXECUTE;
       /**
-       * <code>optional .Data.ControlAction action = 35;</code>
+       * <code>optional .Data.ControlAction action = 34;</code>
        *
        * <pre>
        * Reserved and used to define which of the CLARA interface
@@ -6908,10 +6731,10 @@ public final class xMsgD {
        * </pre>
        */
       public boolean hasAction() {
-        return ((bitField1_ & 0x00000004) == 0x00000004);
+        return ((bitField1_ & 0x00000002) == 0x00000002);
       }
       /**
-       * <code>optional .Data.ControlAction action = 35;</code>
+       * <code>optional .Data.ControlAction action = 34;</code>
        *
        * <pre>
        * Reserved and used to define which of the CLARA interface
@@ -6922,7 +6745,7 @@ public final class xMsgD {
         return action_;
       }
       /**
-       * <code>optional .Data.ControlAction action = 35;</code>
+       * <code>optional .Data.ControlAction action = 34;</code>
        *
        * <pre>
        * Reserved and used to define which of the CLARA interface
@@ -6933,13 +6756,13 @@ public final class xMsgD {
         if (value == null) {
           throw new NullPointerException();
         }
-        bitField1_ |= 0x00000004;
+        bitField1_ |= 0x00000002;
         action_ = value;
         onChanged();
         return this;
       }
       /**
-       * <code>optional .Data.ControlAction action = 35;</code>
+       * <code>optional .Data.ControlAction action = 34;</code>
        *
        * <pre>
        * Reserved and used to define which of the CLARA interface
@@ -6947,26 +6770,26 @@ public final class xMsgD {
        * </pre>
        */
       public Builder clearAction() {
-        bitField1_ = (bitField1_ & ~0x00000004);
+        bitField1_ = (bitField1_ & ~0x00000002);
         action_ = xMsgD.Data.ControlAction.EXECUTE;
         onChanged();
         return this;
       }
 
-      // optional .Data.SubControlAction controlR = 36;
+      // optional .Data.SubControlAction controlR = 35;
       private xMsgD.Data.SubControlAction controlR_ = xMsgD.Data.SubControlAction.SKIP;
       /**
-       * <code>optional .Data.SubControlAction controlR = 36;</code>
+       * <code>optional .Data.SubControlAction controlR = 35;</code>
        *
        * <pre>
        * Reserved control field
        * </pre>
        */
       public boolean hasControlR() {
-        return ((bitField1_ & 0x00000008) == 0x00000008);
+        return ((bitField1_ & 0x00000004) == 0x00000004);
       }
       /**
-       * <code>optional .Data.SubControlAction controlR = 36;</code>
+       * <code>optional .Data.SubControlAction controlR = 35;</code>
        *
        * <pre>
        * Reserved control field
@@ -6976,7 +6799,7 @@ public final class xMsgD {
         return controlR_;
       }
       /**
-       * <code>optional .Data.SubControlAction controlR = 36;</code>
+       * <code>optional .Data.SubControlAction controlR = 35;</code>
        *
        * <pre>
        * Reserved control field
@@ -6986,20 +6809,20 @@ public final class xMsgD {
         if (value == null) {
           throw new NullPointerException();
         }
-        bitField1_ |= 0x00000008;
+        bitField1_ |= 0x00000004;
         controlR_ = value;
         onChanged();
         return this;
       }
       /**
-       * <code>optional .Data.SubControlAction controlR = 36;</code>
+       * <code>optional .Data.SubControlAction controlR = 35;</code>
        *
        * <pre>
        * Reserved control field
        * </pre>
        */
       public Builder clearControlR() {
-        bitField1_ = (bitField1_ & ~0x00000008);
+        bitField1_ = (bitField1_ & ~0x00000004);
         controlR_ = xMsgD.Data.SubControlAction.SKIP;
         onChanged();
         return this;
@@ -8521,7 +8344,7 @@ public final class xMsgD {
       descriptor;
   static {
     java.lang.String[] descriptorData = {
-      "\n\016xMsgData.proto\"\214\n\n\004Data\022\023\n\013dataVersion" +
+      "\n\016xMsgData.proto\"\362\t\n\004Data\022\023\n\013dataVersion" +
       "\030\001 \001(\t\022\027\n\017dataDescription\030\002 \001(\t\022\022\n\ndataA" +
       "uthor\030\003 \001(\t\022\027\n\017dataAuthorState\030\004 \001(\t\0222\n\024" +
       "dataGenerationStatus\030\005 \001(\0162\016.Data.Severi" +
@@ -8536,27 +8359,26 @@ public final class xMsgD {
       "TESA\030\027 \003(\014\022\035\n\010dataType\030\030 \001(\0162\013.Data.DTyp" +
       "e\022\035\n\025userObjectDescription\030\031 \001(\t\022#\n\rbyte" +
       "ArrayType\030\032 \001(\0162\014.Data.BAType\022\016\n\006sender\030" +
-      "\033 \001(\t\022\n\n\002id\030\034 \001(\007\022\021\n\tbyteOrder\030\035 \001(\t\022\030\n\020" +
-      "exceptionMonitor\030\036 \001(\010\022\023\n\013doneMonitor\030\037 " +
-      "\001(\010\022\023\n\013dataMonitor\030  \001(\010\022\023\n\013composition\030" +
-      "! \001(\t\022\025\n\rexecutionTime\030\" \001(\020\022#\n\006action\030#" +
-      " \001(\0162\023.Data.ControlAction\022(\n\010controlR\030$ ",
-      "\001(\0162\026.Data.SubControlAction\"\230\002\n\005DType\022\016\n" +
-      "\nT_VLSINT32\020\001\022\016\n\nT_VLSINT64\020\002\022\016\n\nT_FLSIN" +
-      "T32\020\003\022\016\n\nT_FLSINT64\020\004\022\013\n\007T_FLOAT\020\005\022\014\n\010T_" +
-      "DOUBLE\020\006\022\014\n\010T_STRING\020\007\022\013\n\007T_BYTES\020\010\022\017\n\013T" +
-      "_VLSINT32A\020\t\022\017\n\013T_VLSINT64A\020\n\022\017\n\013T_FLSIN" +
-      "T32A\020\013\022\017\n\013T_FLSINT64A\020\014\022\014\n\010T_FLOATA\020\r\022\r\n" +
-      "\tT_DOUBLEA\020\016\022\r\n\tT_STRINGA\020\017\022\014\n\010T_BYTESA\020" +
-      "\020\022\r\n\tT_PAYLOAD\020\021\022\014\n\010T_OBJECT\020\022\"N\n\006BAType" +
-      "\022\013\n\007JOBJECT\020\001\022\013\n\007COBJECT\020\002\022\013\n\007POBJECT\020\003\022" +
-      "\n\n\006NETCDF\020\004\022\007\n\003HDF\020\005\022\010\n\004EVIO\020\006\"+\n\rContro",
-      "lAction\022\013\n\007EXECUTE\020\000\022\r\n\tCONFIGURE\020\001\"\034\n\020S" +
-      "ubControlAction\022\010\n\004SKIP\020\000\",\n\010Severity\022\t\n" +
-      "\005ERROR\020\001\022\013\n\007WARNING\020\002\022\010\n\004INFO\020\003\"Q\n\007Paylo" +
-      "ad\022\033\n\004item\030\001 \003(\0132\r.Payload.Item\032)\n\004Item\022" +
-      "\014\n\004name\030\001 \002(\t\022\023\n\004data\030\002 \002(\0132\005.DataB\tB\005xM" +
-      "sgDH\001"
+      "\033 \001(\t\022\n\n\002id\030\034 \001(\007\022\021\n\tbyteOrder\030\035 \001(\t\022\023\n\013" +
+      "doneMonitor\030\036 \001(\010\022\023\n\013dataMonitor\030\037 \001(\010\022\023" +
+      "\n\013composition\030  \001(\t\022\025\n\rexecutionTime\030! \001" +
+      "(\020\022#\n\006action\030\" \001(\0162\023.Data.ControlAction\022" +
+      "(\n\010controlR\030# \001(\0162\026.Data.SubControlActio",
+      "n\"\230\002\n\005DType\022\016\n\nT_VLSINT32\020\001\022\016\n\nT_VLSINT6" +
+      "4\020\002\022\016\n\nT_FLSINT32\020\003\022\016\n\nT_FLSINT64\020\004\022\013\n\007T" +
+      "_FLOAT\020\005\022\014\n\010T_DOUBLE\020\006\022\014\n\010T_STRING\020\007\022\013\n\007" +
+      "T_BYTES\020\010\022\017\n\013T_VLSINT32A\020\t\022\017\n\013T_VLSINT64" +
+      "A\020\n\022\017\n\013T_FLSINT32A\020\013\022\017\n\013T_FLSINT64A\020\014\022\014\n" +
+      "\010T_FLOATA\020\r\022\r\n\tT_DOUBLEA\020\016\022\r\n\tT_STRINGA\020" +
+      "\017\022\014\n\010T_BYTESA\020\020\022\r\n\tT_PAYLOAD\020\021\022\014\n\010T_OBJE" +
+      "CT\020\022\"N\n\006BAType\022\013\n\007JOBJECT\020\001\022\013\n\007COBJECT\020\002" +
+      "\022\013\n\007POBJECT\020\003\022\n\n\006NETCDF\020\004\022\007\n\003HDF\020\005\022\010\n\004EV" +
+      "IO\020\006\"+\n\rControlAction\022\013\n\007EXECUTE\020\000\022\r\n\tCO",
+      "NFIGURE\020\001\"\034\n\020SubControlAction\022\010\n\004SKIP\020\000\"" +
+      ",\n\010Severity\022\t\n\005ERROR\020\001\022\013\n\007WARNING\020\002\022\010\n\004I" +
+      "NFO\020\003\"Q\n\007Payload\022\033\n\004item\030\001 \003(\0132\r.Payload" +
+      ".Item\032)\n\004Item\022\014\n\004name\030\001 \002(\t\022\023\n\004data\030\002 \002(" +
+      "\0132\005.DataB\tB\005xMsgDH\001"
     };
     com.google.protobuf.Descriptors.FileDescriptor.InternalDescriptorAssigner assigner =
       new com.google.protobuf.Descriptors.FileDescriptor.InternalDescriptorAssigner() {
@@ -8568,7 +8390,7 @@ public final class xMsgD {
           internal_static_Data_fieldAccessorTable = new
             com.google.protobuf.GeneratedMessage.FieldAccessorTable(
               internal_static_Data_descriptor,
-              new java.lang.String[] { "DataVersion", "DataDescription", "DataAuthor", "DataAuthorState", "DataGenerationStatus", "StatusText", "StatusSeverityId", "VLSINT32", "VLSINT64", "FLSINT32", "FLSINT64", "FLOAT", "DOUBLE", "STRING", "BYTES", "VLSINT32A", "VLSINT64A", "FLSINT32A", "FLSINT64A", "FLOATA", "DOUBLEA", "STRINGA", "BYTESA", "DataType", "UserObjectDescription", "ByteArrayType", "Sender", "Id", "ByteOrder", "ExceptionMonitor", "DoneMonitor", "DataMonitor", "Composition", "ExecutionTime", "Action", "ControlR", });
+              new java.lang.String[] { "DataVersion", "DataDescription", "DataAuthor", "DataAuthorState", "DataGenerationStatus", "StatusText", "StatusSeverityId", "VLSINT32", "VLSINT64", "FLSINT32", "FLSINT64", "FLOAT", "DOUBLE", "STRING", "BYTES", "VLSINT32A", "VLSINT64A", "FLSINT32A", "FLSINT64A", "FLOATA", "DOUBLEA", "STRINGA", "BYTESA", "DataType", "UserObjectDescription", "ByteArrayType", "Sender", "Id", "ByteOrder", "DoneMonitor", "DataMonitor", "Composition", "ExecutionTime", "Action", "ControlR", });
           internal_static_Payload_descriptor =
             getDescriptor().getMessageTypes().get(1);
           internal_static_Payload_fieldAccessorTable = new
