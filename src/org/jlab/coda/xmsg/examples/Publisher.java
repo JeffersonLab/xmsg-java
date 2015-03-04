@@ -1,6 +1,5 @@
 package org.jlab.coda.xmsg.examples;
 
-import org.jlab.coda.xmsg.data.xMsgD;
 import org.jlab.coda.xmsg.excp.xMsgException;
 import org.jlab.coda.xmsg.net.xMsgConnection;
 import org.jlab.coda.xmsg.core.xMsg;
@@ -53,17 +52,11 @@ public class Publisher extends xMsg {
             // Register this publisher
             publisher.registerPublisher(myName, domain, subject,type);
 
-            // Create array of integers as a message payload.
-            // The only argument defines the payload size.
-            int size = Integer.parseInt(args[0]);
-            Integer[] data = new Integer[size];
-
             // Fill payload with random numbers
             Random rg = new Random();
-            for(int i=0; i<size; i++) data[i] = rg.nextInt();
 
             // Create the message to be published
-            xMsgMessage msg = new xMsgMessage(myName, domain, subject,type, data);
+            xMsgMessage msg = new xMsgMessage(myName, domain, subject,type, String.valueOf(rg.nextInt()));
 
 
             // Publish data for ever...
@@ -71,6 +64,7 @@ public class Publisher extends xMsg {
                 publisher.publish(con, msg);
                 System.out.println("publishing...");
                 xMsgUtil.sleep(1000);
+                msg.setData(String.valueOf(rg.nextInt()));
             }
 
         } catch (xMsgException e) {

@@ -305,7 +305,6 @@ public class xMsgUtil {
         trb.setByteOrder(data.getByteOrder());
         trb.setSender(data.getSender());
         trb.setId(data.getId());
-        trb.setExceptionMonitor(data.getExceptionMonitor());
         trb.setDoneMonitor(data.getDoneMonitor());
         trb.setDataMonitor(data.getDataMonitor());
         trb.setComposition(data.getComposition());

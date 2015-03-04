@@ -2,11 +2,11 @@ package org.jlab.coda.xmsg.xsys.regdis;
 
 import com.google.protobuf.InvalidProtocolBufferException;
 import org.jlab.coda.xmsg.data.xMsgR.xMsgRegistrationData;
+import org.jlab.coda.xmsg.core.xMsgConstants;
+import org.jlab.coda.xmsg.core.xMsgUtil;
 import org.jlab.coda.xmsg.excp.xMsgDiscoverException;
 import org.jlab.coda.xmsg.excp.xMsgException;
 import org.jlab.coda.xmsg.excp.xMsgRegistrationException;
-import org.jlab.coda.xmsg.core.xMsgConstants;
-import org.jlab.coda.xmsg.core.xMsgUtil;
 import org.zeromq.ZContext;
 import org.zeromq.ZFrame;
 import org.zeromq.ZMQ;
