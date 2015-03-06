@@ -1017,6 +1017,7 @@ public class xMsg {
         // now subscribe to the returnAddress
         SyncSendCallBack cb = new SyncSendCallBack();
         sync_subscribe(connection, returnAddress, cb, timeOut);
+        con.unsubscribe(returnAddress.getBytes(ZMQ.CHARSET));
         return cb.s_data;
 
     }
