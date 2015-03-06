@@ -1110,91 +1110,99 @@ public class xMsg {
      * @param connection socket to a xMsgNode proxy output port.
      * @param topic topic of the subscription
      * @param cb {@link xMsgCallBack} implemented object reference
-     * @throws xMsgSubscribingException
+     * @return SubscriptionHandler object reference
+     * @throws xMsgException
      */
-    public void subscribe(xMsgConnection connection,
-                          String topic,
-                          final xMsgCallBack cb)
+    public SubscriptionHandler subscribe(final xMsgConnection connection,
+                                         String topic,
+                                         final xMsgCallBack cb)
             throws xMsgException {
 
         // check connection
-        Socket con = connection.getSubSock();
+        final Socket con = connection.getSubSock();
         if (con==null) throw new xMsgSubscribingException("null connection object");
 
         con.subscribe(topic.getBytes(ZMQ.CHARSET));
 
+        SubscriptionHandler sHandle = new SubscriptionHandler(connection, topic) {
+            @Override
+            public void handle() throws xMsgException {
+                    ZMsg msg = ZMsg.recvMsg(con);
+                    ZFrame r_topic = msg.pop();
+                    ZFrame r_dataType = msg.pop();
+                    ZFrame r_data = msg.pop();
+
+                    // Check to see if this is a sync request
+                    // Note for the sync request xMsg envelope has 4 components:
+                    // topic, dataType, data, sync_return_address
+                    String syncReturnAddress = xMsgConstants.UNDEFINED.getStringValue();
+                    if(!msg.isEmpty()){
+                        ZFrame r_addr = msg.pop();
+                        if(r_addr!=null) {
+                            syncReturnAddress = new String(r_addr.getData(), ZMQ.CHARSET);
+                        }
+                    }
+
+                    // de-serialize received message components
+                    String ds_topic = new String(r_topic.getData(), ZMQ.CHARSET);
+                    String ds_dataType = new String(r_dataType.getData(),ZMQ.CHARSET);
+
+                    Object ds_data;
+                    if(ds_dataType.equals(xMsgConstants.ENVELOPE_DATA_TYPE_STRING.getStringValue())) {
+                        ds_data = new String(r_data.getData(), ZMQ.CHARSET);
+                        r_data.destroy();
+                    } else {
+
+                        // de-serialize passed transient data
+                        try {
+                            xMsgD.Data im_data = xMsgD.Data.parseFrom(r_data.getData());
+
+                            // Create a builder object from immutable de-serialized object.
+                            ds_data = xMsgUtil.getPbBuilder(im_data);
+
+                        } catch (InvalidProtocolBufferException e) {
+                            throw new xMsgSubscribingException(e.getMessage());
+                        }
+                        // cleanup the data
+                        r_data.destroy();
+                    }
+
+                    // cleanup the rest
+                    r_topic.destroy();
+                    r_dataType.destroy();
+                    msg.destroy();
+
+                    // Create a message to be passed to the user callback method
+                    final xMsgMessage cb_msg = new xMsgMessage(ds_dataType,
+                            xMsgUtil.getTopicDomain(ds_topic),
+                            xMsgUtil.getTopicSubject(ds_topic),
+                            xMsgUtil.getTopicType(ds_topic),
+                            ds_data);
+
+                    // Calling user callback method
+                    // if it is sync send back to the result
+                    if(!syncReturnAddress.equals(xMsgConstants.UNDEFINED.getStringValue())){
+                        cb_msg.setIsSyncRequest(true);
+                        cb_msg.setSyncRequesterAddress(syncReturnAddress);
+                        Object rd = cb.callback(cb_msg);
+                        if(rd!=null) {
+                            publish(connection, syncReturnAddress, rd);
+                        }
+                    } else {
+                        threadPool.submit(new Runnable() {
+                                              public void run() {
+                                                  cb.callback(cb_msg);
+                                              }
+                                          }
+                        );
+                    }
+
+            }
+        };
+
         // wait for messages published to a required topic
-        while (!Thread.currentThread().isInterrupted()) {
-            ZMsg msg = ZMsg.recvMsg(con);
-            ZFrame r_topic = msg.pop();
-            ZFrame r_dataType = msg.pop();
-            ZFrame r_data = msg.pop();
-
-            // Check to see if this is a sync request
-            // Note for the sync request xMsg envelope has 4 components:
-            // topic, dataType, data, sync_return_address
-            String syncReturnAddress = xMsgConstants.UNDEFINED.getStringValue();
-            if(!msg.isEmpty()){
-                ZFrame r_addr = msg.pop();
-                if(r_addr!=null) {
-                    syncReturnAddress = new String(r_addr.getData(), ZMQ.CHARSET);
-                }
-            }
-
-            // de-serialize received message components
-            String ds_topic = new String(r_topic.getData(), ZMQ.CHARSET);
-            String ds_dataType = new String(r_dataType.getData(),ZMQ.CHARSET);
-
-            Object ds_data;
-            if(ds_dataType.equals(xMsgConstants.ENVELOPE_DATA_TYPE_STRING.getStringValue())) {
-                ds_data = new String(r_data.getData(), ZMQ.CHARSET);
-                r_data.destroy();
-            } else {
-
-                // de-serialize passed transient data
-                try {
-                    xMsgD.Data im_data = xMsgD.Data.parseFrom(r_data.getData());
-
-                    // Create a builder object from immutable de-serialized object.
-                    ds_data = xMsgUtil.getPbBuilder(im_data);
-
-                } catch (InvalidProtocolBufferException e) {
-                    throw new xMsgSubscribingException(e.getMessage());
-                }
-                // cleanup the data
-                r_data.destroy();
-            }
-
-            // cleanup the rest
-            r_topic.destroy();
-            r_dataType.destroy();
-            msg.destroy();
-
-            // Create a message to be passed to the user callback method
-            final xMsgMessage cb_msg = new xMsgMessage(ds_dataType,
-                    xMsgUtil.getTopicDomain(ds_topic),
-                    xMsgUtil.getTopicSubject(ds_topic),
-                    xMsgUtil.getTopicType(ds_topic),
-                    ds_data);
-
-            // Calling user callback method
-            // if it is sync send back to the result
-            if(!syncReturnAddress.equals(xMsgConstants.UNDEFINED.getStringValue())){
-                cb_msg.setIsSyncRequest(true);
-                cb_msg.setSyncRequesterAddress(syncReturnAddress);
-                Object rd = cb.callback(cb_msg);
-                if(rd!=null) {
-                    publish(connection, syncReturnAddress, rd);
-                }
-            } else {
-                threadPool.submit(new Runnable() {
-                                      public void run() {
-                                          cb.callback(cb_msg);
-                                      }
-                                  }
-                );
-            }
-        }
+        new Thread(sHandle).start();
+        return sHandle;
     }
 
     /**
@@ -1225,7 +1233,7 @@ public class xMsg {
      * @param cb {@link xMsgCallBack} implemented object reference
      * @throws xMsgSubscribingException
      */
-    public void subscribe(xMsgConnection connection,
+    public SubscriptionHandler subscribe(xMsgConnection connection,
                           String domain,
                           String subject,
                           String type,
@@ -1233,7 +1241,20 @@ public class xMsg {
             throws xMsgException {
 
         String topic = xMsgUtil.buildTopic(domain, subject, type);
-        subscribe(connection, topic, cb);
+        return subscribe(connection, topic, cb);
+    }
+
+    /**
+     * <p>
+     *     Un-subscribes  subscription. This will stop
+     *     thread and perform xmq un-subscribe
+     * </p>
+     * @param handle SubscribeHandler object reference
+     * @throws xMsgException
+     */
+    public void unsubscribe(SubscriptionHandler handle)
+            throws xMsgException {
+        handle.unsubscribe();
     }
 
     /**
@@ -1312,47 +1333,6 @@ public class xMsg {
         }
     }
 
-
-    /**
-     * <p>
-     *     Un-subscribes a specific topic
-     * </p>
-     * @param connection socket to a xMsgNode proxy output port.
-     * @param topic topic to un-subscribe
-     * @throws xMsgSubscribingException
-     */
-    public void unsubscribe(xMsgConnection connection,
-                            String topic)
-            throws xMsgSubscribingException {
-        // check connection
-        Socket con = connection.getSubSock();
-        if (con==null) throw new xMsgSubscribingException("null connection object");
-
-        con.unsubscribe(topic.getBytes(ZMQ.CHARSET));
-    }
-
-    /**
-     * <p>
-     *     Un-subscribes a specific topic
-     * </p>
-     * @param connection socket to a xMsgNode proxy output port.
-     * @param domain domain of the topic
-     * @param subject subject of the topic
-     * @param type type of the topic
-     * @throws xMsgSubscribingException
-     */
-    public void unsubscribe(xMsgConnection connection,
-                            String domain,
-                            String subject,
-                            String type)
-            throws xMsgException {
-        // check connection
-        Socket con = connection.getSubSock();
-        if (con==null) throw new xMsgSubscribingException("null connection object");
-
-        String topic = xMsgUtil.buildTopic(domain, subject, type);
-        con.unsubscribe(topic.getBytes(ZMQ.CHARSET));
-    }
 
     /**
      * <p>
