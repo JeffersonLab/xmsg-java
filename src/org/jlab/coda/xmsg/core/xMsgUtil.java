@@ -305,12 +305,6 @@ public class xMsgUtil {
         trb.setByteOrder(data.getByteOrder());
         trb.setSender(data.getSender());
         trb.setId(data.getId());
-        for(int i=0; i <data.getDoneMonitorCount(); i++){
-            trb.setDoneMonitor(i,data.getDoneMonitor(i));
-        }
-        for(int i=0; i<data.getDataMonitorCount(); i++){
-            trb.setDataMonitor(i,data.getDataMonitor(i));
-        }
         trb.setComposition(data.getComposition());
         trb.setAction(data.getAction());
         trb.setControlR(data.getControlR());
