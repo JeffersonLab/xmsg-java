@@ -682,53 +682,101 @@ public final class xMsgD {
     com.google.protobuf.ByteString
         getByteOrderBytes();
 
-    // optional bool doneMonitor = 30;
+    // repeated string doneMonitor = 30;
     /**
-     * <code>optional bool doneMonitor = 30;</code>
+     * <code>repeated string doneMonitor = 30;</code>
      *
      * <pre>
-     * If set to true, for example Clara service container will
-     * broadcast "done" string
+     * List of service names, for all services in the list Clara
+     * service container will broadcast "done" string
      * [ done:&lt;service_name&gt;,
      *             requestId?engineExecutionTime]
      * </pre>
      */
-    boolean hasDoneMonitor();
+    java.util.List<java.lang.String>
+    getDoneMonitorList();
     /**
-     * <code>optional bool doneMonitor = 30;</code>
+     * <code>repeated string doneMonitor = 30;</code>
      *
      * <pre>
-     * If set to true, for example Clara service container will
-     * broadcast "done" string
+     * List of service names, for all services in the list Clara
+     * service container will broadcast "done" string
      * [ done:&lt;service_name&gt;,
      *             requestId?engineExecutionTime]
      * </pre>
      */
-    boolean getDoneMonitor();
+    int getDoneMonitorCount();
+    /**
+     * <code>repeated string doneMonitor = 30;</code>
+     *
+     * <pre>
+     * List of service names, for all services in the list Clara
+     * service container will broadcast "done" string
+     * [ done:&lt;service_name&gt;,
+     *             requestId?engineExecutionTime]
+     * </pre>
+     */
+    java.lang.String getDoneMonitor(int index);
+    /**
+     * <code>repeated string doneMonitor = 30;</code>
+     *
+     * <pre>
+     * List of service names, for all services in the list Clara
+     * service container will broadcast "done" string
+     * [ done:&lt;service_name&gt;,
+     *             requestId?engineExecutionTime]
+     * </pre>
+     */
+    com.google.protobuf.ByteString
+        getDoneMonitorBytes(int index);
 
-    // optional bool dataMonitor = 31;
+    // repeated string dataMonitor = 31;
     /**
-     * <code>optional bool dataMonitor = 31;</code>
+     * <code>repeated string dataMonitor = 31;</code>
      *
      * <pre>
-     * If set to true, for example Clara service container will
-     * broadcast resulting data to
+     * List of service names, for all services in the list Clara
+     * service container will broadcast data to
      * [ data:&lt;service_name&gt;:generationStatus:severityID,
      *             transient_data ]
      * </pre>
      */
-    boolean hasDataMonitor();
+    java.util.List<java.lang.String>
+    getDataMonitorList();
     /**
-     * <code>optional bool dataMonitor = 31;</code>
+     * <code>repeated string dataMonitor = 31;</code>
      *
      * <pre>
-     * If set to true, for example Clara service container will
-     * broadcast resulting data to
+     * List of service names, for all services in the list Clara
+     * service container will broadcast data to
      * [ data:&lt;service_name&gt;:generationStatus:severityID,
      *             transient_data ]
      * </pre>
      */
-    boolean getDataMonitor();
+    int getDataMonitorCount();
+    /**
+     * <code>repeated string dataMonitor = 31;</code>
+     *
+     * <pre>
+     * List of service names, for all services in the list Clara
+     * service container will broadcast data to
+     * [ data:&lt;service_name&gt;:generationStatus:severityID,
+     *             transient_data ]
+     * </pre>
+     */
+    java.lang.String getDataMonitor(int index);
+    /**
+     * <code>repeated string dataMonitor = 31;</code>
+     *
+     * <pre>
+     * List of service names, for all services in the list Clara
+     * service container will broadcast data to
+     * [ data:&lt;service_name&gt;:generationStatus:severityID,
+     *             transient_data ]
+     * </pre>
+     */
+    com.google.protobuf.ByteString
+        getDataMonitorBytes(int index);
 
     // optional string composition = 32;
     /**
@@ -1155,23 +1203,29 @@ public final class xMsgD {
               byteOrder_ = input.readBytes();
               break;
             }
-            case 240: {
-              bitField0_ |= 0x00200000;
-              doneMonitor_ = input.readBool();
+            case 242: {
+              if (!((mutable_bitField0_ & 0x20000000) == 0x20000000)) {
+                doneMonitor_ = new com.google.protobuf.LazyStringArrayList();
+                mutable_bitField0_ |= 0x20000000;
+              }
+              doneMonitor_.add(input.readBytes());
               break;
             }
-            case 248: {
-              bitField0_ |= 0x00400000;
-              dataMonitor_ = input.readBool();
+            case 250: {
+              if (!((mutable_bitField0_ & 0x40000000) == 0x40000000)) {
+                dataMonitor_ = new com.google.protobuf.LazyStringArrayList();
+                mutable_bitField0_ |= 0x40000000;
+              }
+              dataMonitor_.add(input.readBytes());
               break;
             }
             case 258: {
-              bitField0_ |= 0x00800000;
+              bitField0_ |= 0x00200000;
               composition_ = input.readBytes();
               break;
             }
             case 265: {
-              bitField0_ |= 0x01000000;
+              bitField0_ |= 0x00400000;
               executionTime_ = input.readSFixed64();
               break;
             }
@@ -1181,7 +1235,7 @@ public final class xMsgD {
               if (value == null) {
                 unknownFields.mergeVarintField(34, rawValue);
               } else {
-                bitField0_ |= 0x02000000;
+                bitField0_ |= 0x00800000;
                 action_ = value;
               }
               break;
@@ -1192,13 +1246,13 @@ public final class xMsgD {
               if (value == null) {
                 unknownFields.mergeVarintField(35, rawValue);
               } else {
-                bitField0_ |= 0x04000000;
+                bitField0_ |= 0x01000000;
                 controlR_ = value;
               }
               break;
             }
             case 290: {
-              bitField0_ |= 0x08000000;
+              bitField0_ |= 0x02000000;
               state_ = input.readBytes();
               break;
             }
@@ -1233,6 +1287,12 @@ public final class xMsgD {
         }
         if (((mutable_bitField0_ & 0x00400000) == 0x00400000)) {
           bYTESA_ = java.util.Collections.unmodifiableList(bYTESA_);
+        }
+        if (((mutable_bitField0_ & 0x20000000) == 0x20000000)) {
+          doneMonitor_ = new com.google.protobuf.UnmodifiableLazyStringList(doneMonitor_);
+        }
+        if (((mutable_bitField0_ & 0x40000000) == 0x40000000)) {
+          dataMonitor_ = new com.google.protobuf.UnmodifiableLazyStringList(dataMonitor_);
         }
         this.unknownFields = unknownFields.build();
         makeExtensionsImmutable();
@@ -3075,64 +3135,120 @@ public final class xMsgD {
       }
     }
 
-    // optional bool doneMonitor = 30;
+    // repeated string doneMonitor = 30;
     public static final int DONEMONITOR_FIELD_NUMBER = 30;
-    private boolean doneMonitor_;
+    private com.google.protobuf.LazyStringList doneMonitor_;
     /**
-     * <code>optional bool doneMonitor = 30;</code>
+     * <code>repeated string doneMonitor = 30;</code>
      *
      * <pre>
-     * If set to true, for example Clara service container will
-     * broadcast "done" string
+     * List of service names, for all services in the list Clara
+     * service container will broadcast "done" string
      * [ done:&lt;service_name&gt;,
      *             requestId?engineExecutionTime]
      * </pre>
      */
-    public boolean hasDoneMonitor() {
-      return ((bitField0_ & 0x00200000) == 0x00200000);
-    }
-    /**
-     * <code>optional bool doneMonitor = 30;</code>
-     *
-     * <pre>
-     * If set to true, for example Clara service container will
-     * broadcast "done" string
-     * [ done:&lt;service_name&gt;,
-     *             requestId?engineExecutionTime]
-     * </pre>
-     */
-    public boolean getDoneMonitor() {
+    public java.util.List<java.lang.String>
+        getDoneMonitorList() {
       return doneMonitor_;
     }
-
-    // optional bool dataMonitor = 31;
-    public static final int DATAMONITOR_FIELD_NUMBER = 31;
-    private boolean dataMonitor_;
     /**
-     * <code>optional bool dataMonitor = 31;</code>
+     * <code>repeated string doneMonitor = 30;</code>
      *
      * <pre>
-     * If set to true, for example Clara service container will
-     * broadcast resulting data to
-     * [ data:&lt;service_name&gt;:generationStatus:severityID,
-     *             transient_data ]
+     * List of service names, for all services in the list Clara
+     * service container will broadcast "done" string
+     * [ done:&lt;service_name&gt;,
+     *             requestId?engineExecutionTime]
      * </pre>
      */
-    public boolean hasDataMonitor() {
-      return ((bitField0_ & 0x00400000) == 0x00400000);
+    public int getDoneMonitorCount() {
+      return doneMonitor_.size();
     }
     /**
-     * <code>optional bool dataMonitor = 31;</code>
+     * <code>repeated string doneMonitor = 30;</code>
      *
      * <pre>
-     * If set to true, for example Clara service container will
-     * broadcast resulting data to
+     * List of service names, for all services in the list Clara
+     * service container will broadcast "done" string
+     * [ done:&lt;service_name&gt;,
+     *             requestId?engineExecutionTime]
+     * </pre>
+     */
+    public java.lang.String getDoneMonitor(int index) {
+      return doneMonitor_.get(index);
+    }
+    /**
+     * <code>repeated string doneMonitor = 30;</code>
+     *
+     * <pre>
+     * List of service names, for all services in the list Clara
+     * service container will broadcast "done" string
+     * [ done:&lt;service_name&gt;,
+     *             requestId?engineExecutionTime]
+     * </pre>
+     */
+    public com.google.protobuf.ByteString
+        getDoneMonitorBytes(int index) {
+      return doneMonitor_.getByteString(index);
+    }
+
+    // repeated string dataMonitor = 31;
+    public static final int DATAMONITOR_FIELD_NUMBER = 31;
+    private com.google.protobuf.LazyStringList dataMonitor_;
+    /**
+     * <code>repeated string dataMonitor = 31;</code>
+     *
+     * <pre>
+     * List of service names, for all services in the list Clara
+     * service container will broadcast data to
      * [ data:&lt;service_name&gt;:generationStatus:severityID,
      *             transient_data ]
      * </pre>
      */
-    public boolean getDataMonitor() {
+    public java.util.List<java.lang.String>
+        getDataMonitorList() {
       return dataMonitor_;
+    }
+    /**
+     * <code>repeated string dataMonitor = 31;</code>
+     *
+     * <pre>
+     * List of service names, for all services in the list Clara
+     * service container will broadcast data to
+     * [ data:&lt;service_name&gt;:generationStatus:severityID,
+     *             transient_data ]
+     * </pre>
+     */
+    public int getDataMonitorCount() {
+      return dataMonitor_.size();
+    }
+    /**
+     * <code>repeated string dataMonitor = 31;</code>
+     *
+     * <pre>
+     * List of service names, for all services in the list Clara
+     * service container will broadcast data to
+     * [ data:&lt;service_name&gt;:generationStatus:severityID,
+     *             transient_data ]
+     * </pre>
+     */
+    public java.lang.String getDataMonitor(int index) {
+      return dataMonitor_.get(index);
+    }
+    /**
+     * <code>repeated string dataMonitor = 31;</code>
+     *
+     * <pre>
+     * List of service names, for all services in the list Clara
+     * service container will broadcast data to
+     * [ data:&lt;service_name&gt;:generationStatus:severityID,
+     *             transient_data ]
+     * </pre>
+     */
+    public com.google.protobuf.ByteString
+        getDataMonitorBytes(int index) {
+      return dataMonitor_.getByteString(index);
     }
 
     // optional string composition = 32;
@@ -3148,7 +3264,7 @@ public final class xMsgD {
      * </pre>
      */
     public boolean hasComposition() {
-      return ((bitField0_ & 0x00800000) == 0x00800000);
+      return ((bitField0_ & 0x00200000) == 0x00200000);
     }
     /**
      * <code>optional string composition = 32;</code>
@@ -3207,7 +3323,7 @@ public final class xMsgD {
      * </pre>
      */
     public boolean hasExecutionTime() {
-      return ((bitField0_ & 0x01000000) == 0x01000000);
+      return ((bitField0_ & 0x00400000) == 0x00400000);
     }
     /**
      * <code>optional sfixed64 executionTime = 33;</code>
@@ -3232,7 +3348,7 @@ public final class xMsgD {
      * </pre>
      */
     public boolean hasAction() {
-      return ((bitField0_ & 0x02000000) == 0x02000000);
+      return ((bitField0_ & 0x00800000) == 0x00800000);
     }
     /**
      * <code>optional .Data.ControlAction action = 34;</code>
@@ -3257,7 +3373,7 @@ public final class xMsgD {
      * </pre>
      */
     public boolean hasControlR() {
-      return ((bitField0_ & 0x04000000) == 0x04000000);
+      return ((bitField0_ & 0x01000000) == 0x01000000);
     }
     /**
      * <code>optional .Data.SubControlAction controlR = 35;</code>
@@ -3277,7 +3393,7 @@ public final class xMsgD {
      * <code>optional string state = 36;</code>
      */
     public boolean hasState() {
-      return ((bitField0_ & 0x08000000) == 0x08000000);
+      return ((bitField0_ & 0x02000000) == 0x02000000);
     }
     /**
      * <code>optional string state = 36;</code>
@@ -3343,8 +3459,8 @@ public final class xMsgD {
       sender_ = "";
       id_ = 0;
       byteOrder_ = "";
-      doneMonitor_ = false;
-      dataMonitor_ = false;
+      doneMonitor_ = com.google.protobuf.LazyStringArrayList.EMPTY;
+      dataMonitor_ = com.google.protobuf.LazyStringArrayList.EMPTY;
       composition_ = "";
       executionTime_ = 0L;
       action_ = xMsgD.Data.ControlAction.EXECUTE;
@@ -3450,25 +3566,25 @@ public final class xMsgD {
       if (((bitField0_ & 0x00100000) == 0x00100000)) {
         output.writeBytes(29, getByteOrderBytes());
       }
+      for (int i = 0; i < doneMonitor_.size(); i++) {
+        output.writeBytes(30, doneMonitor_.getByteString(i));
+      }
+      for (int i = 0; i < dataMonitor_.size(); i++) {
+        output.writeBytes(31, dataMonitor_.getByteString(i));
+      }
       if (((bitField0_ & 0x00200000) == 0x00200000)) {
-        output.writeBool(30, doneMonitor_);
-      }
-      if (((bitField0_ & 0x00400000) == 0x00400000)) {
-        output.writeBool(31, dataMonitor_);
-      }
-      if (((bitField0_ & 0x00800000) == 0x00800000)) {
         output.writeBytes(32, getCompositionBytes());
       }
-      if (((bitField0_ & 0x01000000) == 0x01000000)) {
+      if (((bitField0_ & 0x00400000) == 0x00400000)) {
         output.writeSFixed64(33, executionTime_);
       }
-      if (((bitField0_ & 0x02000000) == 0x02000000)) {
+      if (((bitField0_ & 0x00800000) == 0x00800000)) {
         output.writeEnum(34, action_.getNumber());
       }
-      if (((bitField0_ & 0x04000000) == 0x04000000)) {
+      if (((bitField0_ & 0x01000000) == 0x01000000)) {
         output.writeEnum(35, controlR_.getNumber());
       }
-      if (((bitField0_ & 0x08000000) == 0x08000000)) {
+      if (((bitField0_ & 0x02000000) == 0x02000000)) {
         output.writeBytes(36, getStateBytes());
       }
       getUnknownFields().writeTo(output);
@@ -3624,31 +3740,41 @@ public final class xMsgD {
         size += com.google.protobuf.CodedOutputStream
           .computeBytesSize(29, getByteOrderBytes());
       }
+      {
+        int dataSize = 0;
+        for (int i = 0; i < doneMonitor_.size(); i++) {
+          dataSize += com.google.protobuf.CodedOutputStream
+            .computeBytesSizeNoTag(doneMonitor_.getByteString(i));
+        }
+        size += dataSize;
+        size += 2 * getDoneMonitorList().size();
+      }
+      {
+        int dataSize = 0;
+        for (int i = 0; i < dataMonitor_.size(); i++) {
+          dataSize += com.google.protobuf.CodedOutputStream
+            .computeBytesSizeNoTag(dataMonitor_.getByteString(i));
+        }
+        size += dataSize;
+        size += 2 * getDataMonitorList().size();
+      }
       if (((bitField0_ & 0x00200000) == 0x00200000)) {
-        size += com.google.protobuf.CodedOutputStream
-          .computeBoolSize(30, doneMonitor_);
-      }
-      if (((bitField0_ & 0x00400000) == 0x00400000)) {
-        size += com.google.protobuf.CodedOutputStream
-          .computeBoolSize(31, dataMonitor_);
-      }
-      if (((bitField0_ & 0x00800000) == 0x00800000)) {
         size += com.google.protobuf.CodedOutputStream
           .computeBytesSize(32, getCompositionBytes());
       }
-      if (((bitField0_ & 0x01000000) == 0x01000000)) {
+      if (((bitField0_ & 0x00400000) == 0x00400000)) {
         size += com.google.protobuf.CodedOutputStream
           .computeSFixed64Size(33, executionTime_);
       }
-      if (((bitField0_ & 0x02000000) == 0x02000000)) {
+      if (((bitField0_ & 0x00800000) == 0x00800000)) {
         size += com.google.protobuf.CodedOutputStream
           .computeEnumSize(34, action_.getNumber());
       }
-      if (((bitField0_ & 0x04000000) == 0x04000000)) {
+      if (((bitField0_ & 0x01000000) == 0x01000000)) {
         size += com.google.protobuf.CodedOutputStream
           .computeEnumSize(35, controlR_.getNumber());
       }
-      if (((bitField0_ & 0x08000000) == 0x08000000)) {
+      if (((bitField0_ & 0x02000000) == 0x02000000)) {
         size += com.google.protobuf.CodedOutputStream
           .computeBytesSize(36, getStateBytes());
       }
@@ -3830,9 +3956,9 @@ public final class xMsgD {
         bitField0_ = (bitField0_ & ~0x08000000);
         byteOrder_ = "";
         bitField0_ = (bitField0_ & ~0x10000000);
-        doneMonitor_ = false;
+        doneMonitor_ = com.google.protobuf.LazyStringArrayList.EMPTY;
         bitField0_ = (bitField0_ & ~0x20000000);
-        dataMonitor_ = false;
+        dataMonitor_ = com.google.protobuf.LazyStringArrayList.EMPTY;
         bitField0_ = (bitField0_ & ~0x40000000);
         composition_ = "";
         bitField0_ = (bitField0_ & ~0x80000000);
@@ -3998,32 +4124,36 @@ public final class xMsgD {
           to_bitField0_ |= 0x00100000;
         }
         result.byteOrder_ = byteOrder_;
-        if (((from_bitField0_ & 0x20000000) == 0x20000000)) {
-          to_bitField0_ |= 0x00200000;
+        if (((bitField0_ & 0x20000000) == 0x20000000)) {
+          doneMonitor_ = new com.google.protobuf.UnmodifiableLazyStringList(
+              doneMonitor_);
+          bitField0_ = (bitField0_ & ~0x20000000);
         }
         result.doneMonitor_ = doneMonitor_;
-        if (((from_bitField0_ & 0x40000000) == 0x40000000)) {
-          to_bitField0_ |= 0x00400000;
+        if (((bitField0_ & 0x40000000) == 0x40000000)) {
+          dataMonitor_ = new com.google.protobuf.UnmodifiableLazyStringList(
+              dataMonitor_);
+          bitField0_ = (bitField0_ & ~0x40000000);
         }
         result.dataMonitor_ = dataMonitor_;
         if (((from_bitField0_ & 0x80000000) == 0x80000000)) {
-          to_bitField0_ |= 0x00800000;
+          to_bitField0_ |= 0x00200000;
         }
         result.composition_ = composition_;
         if (((from_bitField1_ & 0x00000001) == 0x00000001)) {
-          to_bitField0_ |= 0x01000000;
+          to_bitField0_ |= 0x00400000;
         }
         result.executionTime_ = executionTime_;
         if (((from_bitField1_ & 0x00000002) == 0x00000002)) {
-          to_bitField0_ |= 0x02000000;
+          to_bitField0_ |= 0x00800000;
         }
         result.action_ = action_;
         if (((from_bitField1_ & 0x00000004) == 0x00000004)) {
-          to_bitField0_ |= 0x04000000;
+          to_bitField0_ |= 0x01000000;
         }
         result.controlR_ = controlR_;
         if (((from_bitField1_ & 0x00000008) == 0x00000008)) {
-          to_bitField0_ |= 0x08000000;
+          to_bitField0_ |= 0x02000000;
         }
         result.state_ = state_;
         result.bitField0_ = to_bitField0_;
@@ -4203,11 +4333,25 @@ public final class xMsgD {
           byteOrder_ = other.byteOrder_;
           onChanged();
         }
-        if (other.hasDoneMonitor()) {
-          setDoneMonitor(other.getDoneMonitor());
+        if (!other.doneMonitor_.isEmpty()) {
+          if (doneMonitor_.isEmpty()) {
+            doneMonitor_ = other.doneMonitor_;
+            bitField0_ = (bitField0_ & ~0x20000000);
+          } else {
+            ensureDoneMonitorIsMutable();
+            doneMonitor_.addAll(other.doneMonitor_);
+          }
+          onChanged();
         }
-        if (other.hasDataMonitor()) {
-          setDataMonitor(other.getDataMonitor());
+        if (!other.dataMonitor_.isEmpty()) {
+          if (dataMonitor_.isEmpty()) {
+            dataMonitor_ = other.dataMonitor_;
+            bitField0_ = (bitField0_ & ~0x40000000);
+          } else {
+            ensureDataMonitorIsMutable();
+            dataMonitor_.addAll(other.dataMonitor_);
+          }
+          onChanged();
         }
         if (other.hasComposition()) {
           bitField0_ |= 0x80000000;
@@ -6521,124 +6665,314 @@ public final class xMsgD {
         return this;
       }
 
-      // optional bool doneMonitor = 30;
-      private boolean doneMonitor_ ;
-      /**
-       * <code>optional bool doneMonitor = 30;</code>
-       *
-       * <pre>
-       * If set to true, for example Clara service container will
-       * broadcast "done" string
-       * [ done:&lt;service_name&gt;,
-       *             requestId?engineExecutionTime]
-       * </pre>
-       */
-      public boolean hasDoneMonitor() {
-        return ((bitField0_ & 0x20000000) == 0x20000000);
+      // repeated string doneMonitor = 30;
+      private com.google.protobuf.LazyStringList doneMonitor_ = com.google.protobuf.LazyStringArrayList.EMPTY;
+      private void ensureDoneMonitorIsMutable() {
+        if (!((bitField0_ & 0x20000000) == 0x20000000)) {
+          doneMonitor_ = new com.google.protobuf.LazyStringArrayList(doneMonitor_);
+          bitField0_ |= 0x20000000;
+         }
       }
       /**
-       * <code>optional bool doneMonitor = 30;</code>
+       * <code>repeated string doneMonitor = 30;</code>
        *
        * <pre>
-       * If set to true, for example Clara service container will
-       * broadcast "done" string
+       * List of service names, for all services in the list Clara
+       * service container will broadcast "done" string
        * [ done:&lt;service_name&gt;,
        *             requestId?engineExecutionTime]
        * </pre>
        */
-      public boolean getDoneMonitor() {
-        return doneMonitor_;
+      public java.util.List<java.lang.String>
+          getDoneMonitorList() {
+        return java.util.Collections.unmodifiableList(doneMonitor_);
       }
       /**
-       * <code>optional bool doneMonitor = 30;</code>
+       * <code>repeated string doneMonitor = 30;</code>
        *
        * <pre>
-       * If set to true, for example Clara service container will
-       * broadcast "done" string
+       * List of service names, for all services in the list Clara
+       * service container will broadcast "done" string
        * [ done:&lt;service_name&gt;,
        *             requestId?engineExecutionTime]
        * </pre>
        */
-      public Builder setDoneMonitor(boolean value) {
-        bitField0_ |= 0x20000000;
-        doneMonitor_ = value;
+      public int getDoneMonitorCount() {
+        return doneMonitor_.size();
+      }
+      /**
+       * <code>repeated string doneMonitor = 30;</code>
+       *
+       * <pre>
+       * List of service names, for all services in the list Clara
+       * service container will broadcast "done" string
+       * [ done:&lt;service_name&gt;,
+       *             requestId?engineExecutionTime]
+       * </pre>
+       */
+      public java.lang.String getDoneMonitor(int index) {
+        return doneMonitor_.get(index);
+      }
+      /**
+       * <code>repeated string doneMonitor = 30;</code>
+       *
+       * <pre>
+       * List of service names, for all services in the list Clara
+       * service container will broadcast "done" string
+       * [ done:&lt;service_name&gt;,
+       *             requestId?engineExecutionTime]
+       * </pre>
+       */
+      public com.google.protobuf.ByteString
+          getDoneMonitorBytes(int index) {
+        return doneMonitor_.getByteString(index);
+      }
+      /**
+       * <code>repeated string doneMonitor = 30;</code>
+       *
+       * <pre>
+       * List of service names, for all services in the list Clara
+       * service container will broadcast "done" string
+       * [ done:&lt;service_name&gt;,
+       *             requestId?engineExecutionTime]
+       * </pre>
+       */
+      public Builder setDoneMonitor(
+          int index, java.lang.String value) {
+        if (value == null) {
+    throw new NullPointerException();
+  }
+  ensureDoneMonitorIsMutable();
+        doneMonitor_.set(index, value);
         onChanged();
         return this;
       }
       /**
-       * <code>optional bool doneMonitor = 30;</code>
+       * <code>repeated string doneMonitor = 30;</code>
        *
        * <pre>
-       * If set to true, for example Clara service container will
-       * broadcast "done" string
+       * List of service names, for all services in the list Clara
+       * service container will broadcast "done" string
+       * [ done:&lt;service_name&gt;,
+       *             requestId?engineExecutionTime]
+       * </pre>
+       */
+      public Builder addDoneMonitor(
+          java.lang.String value) {
+        if (value == null) {
+    throw new NullPointerException();
+  }
+  ensureDoneMonitorIsMutable();
+        doneMonitor_.add(value);
+        onChanged();
+        return this;
+      }
+      /**
+       * <code>repeated string doneMonitor = 30;</code>
+       *
+       * <pre>
+       * List of service names, for all services in the list Clara
+       * service container will broadcast "done" string
+       * [ done:&lt;service_name&gt;,
+       *             requestId?engineExecutionTime]
+       * </pre>
+       */
+      public Builder addAllDoneMonitor(
+          java.lang.Iterable<java.lang.String> values) {
+        ensureDoneMonitorIsMutable();
+        super.addAll(values, doneMonitor_);
+        onChanged();
+        return this;
+      }
+      /**
+       * <code>repeated string doneMonitor = 30;</code>
+       *
+       * <pre>
+       * List of service names, for all services in the list Clara
+       * service container will broadcast "done" string
        * [ done:&lt;service_name&gt;,
        *             requestId?engineExecutionTime]
        * </pre>
        */
       public Builder clearDoneMonitor() {
+        doneMonitor_ = com.google.protobuf.LazyStringArrayList.EMPTY;
         bitField0_ = (bitField0_ & ~0x20000000);
-        doneMonitor_ = false;
+        onChanged();
+        return this;
+      }
+      /**
+       * <code>repeated string doneMonitor = 30;</code>
+       *
+       * <pre>
+       * List of service names, for all services in the list Clara
+       * service container will broadcast "done" string
+       * [ done:&lt;service_name&gt;,
+       *             requestId?engineExecutionTime]
+       * </pre>
+       */
+      public Builder addDoneMonitorBytes(
+          com.google.protobuf.ByteString value) {
+        if (value == null) {
+    throw new NullPointerException();
+  }
+  ensureDoneMonitorIsMutable();
+        doneMonitor_.add(value);
         onChanged();
         return this;
       }
 
-      // optional bool dataMonitor = 31;
-      private boolean dataMonitor_ ;
-      /**
-       * <code>optional bool dataMonitor = 31;</code>
-       *
-       * <pre>
-       * If set to true, for example Clara service container will
-       * broadcast resulting data to
-       * [ data:&lt;service_name&gt;:generationStatus:severityID,
-       *             transient_data ]
-       * </pre>
-       */
-      public boolean hasDataMonitor() {
-        return ((bitField0_ & 0x40000000) == 0x40000000);
+      // repeated string dataMonitor = 31;
+      private com.google.protobuf.LazyStringList dataMonitor_ = com.google.protobuf.LazyStringArrayList.EMPTY;
+      private void ensureDataMonitorIsMutable() {
+        if (!((bitField0_ & 0x40000000) == 0x40000000)) {
+          dataMonitor_ = new com.google.protobuf.LazyStringArrayList(dataMonitor_);
+          bitField0_ |= 0x40000000;
+         }
       }
       /**
-       * <code>optional bool dataMonitor = 31;</code>
+       * <code>repeated string dataMonitor = 31;</code>
        *
        * <pre>
-       * If set to true, for example Clara service container will
-       * broadcast resulting data to
+       * List of service names, for all services in the list Clara
+       * service container will broadcast data to
        * [ data:&lt;service_name&gt;:generationStatus:severityID,
        *             transient_data ]
        * </pre>
        */
-      public boolean getDataMonitor() {
-        return dataMonitor_;
+      public java.util.List<java.lang.String>
+          getDataMonitorList() {
+        return java.util.Collections.unmodifiableList(dataMonitor_);
       }
       /**
-       * <code>optional bool dataMonitor = 31;</code>
+       * <code>repeated string dataMonitor = 31;</code>
        *
        * <pre>
-       * If set to true, for example Clara service container will
-       * broadcast resulting data to
+       * List of service names, for all services in the list Clara
+       * service container will broadcast data to
        * [ data:&lt;service_name&gt;:generationStatus:severityID,
        *             transient_data ]
        * </pre>
        */
-      public Builder setDataMonitor(boolean value) {
-        bitField0_ |= 0x40000000;
-        dataMonitor_ = value;
+      public int getDataMonitorCount() {
+        return dataMonitor_.size();
+      }
+      /**
+       * <code>repeated string dataMonitor = 31;</code>
+       *
+       * <pre>
+       * List of service names, for all services in the list Clara
+       * service container will broadcast data to
+       * [ data:&lt;service_name&gt;:generationStatus:severityID,
+       *             transient_data ]
+       * </pre>
+       */
+      public java.lang.String getDataMonitor(int index) {
+        return dataMonitor_.get(index);
+      }
+      /**
+       * <code>repeated string dataMonitor = 31;</code>
+       *
+       * <pre>
+       * List of service names, for all services in the list Clara
+       * service container will broadcast data to
+       * [ data:&lt;service_name&gt;:generationStatus:severityID,
+       *             transient_data ]
+       * </pre>
+       */
+      public com.google.protobuf.ByteString
+          getDataMonitorBytes(int index) {
+        return dataMonitor_.getByteString(index);
+      }
+      /**
+       * <code>repeated string dataMonitor = 31;</code>
+       *
+       * <pre>
+       * List of service names, for all services in the list Clara
+       * service container will broadcast data to
+       * [ data:&lt;service_name&gt;:generationStatus:severityID,
+       *             transient_data ]
+       * </pre>
+       */
+      public Builder setDataMonitor(
+          int index, java.lang.String value) {
+        if (value == null) {
+    throw new NullPointerException();
+  }
+  ensureDataMonitorIsMutable();
+        dataMonitor_.set(index, value);
         onChanged();
         return this;
       }
       /**
-       * <code>optional bool dataMonitor = 31;</code>
+       * <code>repeated string dataMonitor = 31;</code>
        *
        * <pre>
-       * If set to true, for example Clara service container will
-       * broadcast resulting data to
+       * List of service names, for all services in the list Clara
+       * service container will broadcast data to
+       * [ data:&lt;service_name&gt;:generationStatus:severityID,
+       *             transient_data ]
+       * </pre>
+       */
+      public Builder addDataMonitor(
+          java.lang.String value) {
+        if (value == null) {
+    throw new NullPointerException();
+  }
+  ensureDataMonitorIsMutable();
+        dataMonitor_.add(value);
+        onChanged();
+        return this;
+      }
+      /**
+       * <code>repeated string dataMonitor = 31;</code>
+       *
+       * <pre>
+       * List of service names, for all services in the list Clara
+       * service container will broadcast data to
+       * [ data:&lt;service_name&gt;:generationStatus:severityID,
+       *             transient_data ]
+       * </pre>
+       */
+      public Builder addAllDataMonitor(
+          java.lang.Iterable<java.lang.String> values) {
+        ensureDataMonitorIsMutable();
+        super.addAll(values, dataMonitor_);
+        onChanged();
+        return this;
+      }
+      /**
+       * <code>repeated string dataMonitor = 31;</code>
+       *
+       * <pre>
+       * List of service names, for all services in the list Clara
+       * service container will broadcast data to
        * [ data:&lt;service_name&gt;:generationStatus:severityID,
        *             transient_data ]
        * </pre>
        */
       public Builder clearDataMonitor() {
+        dataMonitor_ = com.google.protobuf.LazyStringArrayList.EMPTY;
         bitField0_ = (bitField0_ & ~0x40000000);
-        dataMonitor_ = false;
+        onChanged();
+        return this;
+      }
+      /**
+       * <code>repeated string dataMonitor = 31;</code>
+       *
+       * <pre>
+       * List of service names, for all services in the list Clara
+       * service container will broadcast data to
+       * [ data:&lt;service_name&gt;:generationStatus:severityID,
+       *             transient_data ]
+       * </pre>
+       */
+      public Builder addDataMonitorBytes(
+          com.google.protobuf.ByteString value) {
+        if (value == null) {
+    throw new NullPointerException();
+  }
+  ensureDataMonitorIsMutable();
+        dataMonitor_.add(value);
         onChanged();
         return this;
       }
@@ -8516,7 +8850,7 @@ public final class xMsgD {
       "e\022\035\n\025userObjectDescription\030\031 \001(\t\022#\n\rbyte" +
       "ArrayType\030\032 \001(\0162\014.Data.BAType\022\016\n\006sender\030" +
       "\033 \001(\t\022\n\n\002id\030\034 \001(\007\022\021\n\tbyteOrder\030\035 \001(\t\022\023\n\013" +
-      "doneMonitor\030\036 \001(\010\022\023\n\013dataMonitor\030\037 \001(\010\022\023" +
+      "doneMonitor\030\036 \003(\t\022\023\n\013dataMonitor\030\037 \003(\t\022\023" +
       "\n\013composition\030  \001(\t\022\025\n\rexecutionTime\030! \001" +
       "(\020\022#\n\006action\030\" \001(\0162\023.Data.ControlAction\022" +
       "(\n\010controlR\030# \001(\0162\026.Data.SubControlActio",

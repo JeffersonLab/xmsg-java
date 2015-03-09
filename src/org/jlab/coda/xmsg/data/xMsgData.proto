@@ -73,17 +73,17 @@ message Data {
     // Byte ordering in case data type is BYTES/BYTESA
     optional string byteOrder = 29;
 
-    // If set to true, for example Clara service container will
-    // broadcast "done" string
+    // List of service names, for all services in the list Clara
+    // service container will broadcast "done" string
     // [ done:<service_name>,
     //             requestId?engineExecutionTime]
-    optional bool doneMonitor = 30;
+    repeated string doneMonitor = 30;
 
-    // If set to true, for example Clara service container will
-    // broadcast resulting data to
+    // List of service names, for all services in the list Clara
+    // service container will broadcast data to
     // [ data:<service_name>:generationStatus:severityID,
     //             transient_data ]
-    optional bool dataMonitor = 31;
+    repeated string dataMonitor = 31;
 
     // Reserved and used for Clara service based application
     // composition i.e. link schema (list of linked service names)
