@@ -818,6 +818,21 @@ public final class xMsgD {
      * </pre>
      */
     xMsgD.Data.SubControlAction getControlR();
+
+    // optional string state = 36;
+    /**
+     * <code>optional string state = 36;</code>
+     */
+    boolean hasState();
+    /**
+     * <code>optional string state = 36;</code>
+     */
+    java.lang.String getState();
+    /**
+     * <code>optional string state = 36;</code>
+     */
+    com.google.protobuf.ByteString
+        getStateBytes();
   }
   /**
    * Protobuf type {@code Data}
@@ -1182,6 +1197,11 @@ public final class xMsgD {
               }
               break;
             }
+            case 290: {
+              bitField0_ |= 0x08000000;
+              state_ = input.readBytes();
+              break;
+            }
           }
         }
       } catch (com.google.protobuf.InvalidProtocolBufferException e) {
@@ -1384,13 +1404,13 @@ public final class xMsgD {
        */
       T_PAYLOAD(16, 17),
       /**
-       * <code>T_OBJECT = 18;</code>
+       * <code>T_EXTERNAL_OBJECT = 18;</code>
        *
        * <pre>
        * un-serialized object
        * </pre>
        */
-      T_OBJECT(17, 18),
+      T_EXTERNAL_OBJECT(17, 18),
       ;
 
       /**
@@ -1522,13 +1542,13 @@ public final class xMsgD {
        */
       public static final int T_PAYLOAD_VALUE = 17;
       /**
-       * <code>T_OBJECT = 18;</code>
+       * <code>T_EXTERNAL_OBJECT = 18;</code>
        *
        * <pre>
        * un-serialized object
        * </pre>
        */
-      public static final int T_OBJECT_VALUE = 18;
+      public static final int T_EXTERNAL_OBJECT_VALUE = 18;
 
 
       public final int getNumber() { return value; }
@@ -1552,7 +1572,7 @@ public final class xMsgD {
           case 15: return T_STRINGA;
           case 16: return T_BYTESA;
           case 17: return T_PAYLOAD;
-          case 18: return T_OBJECT;
+          case 18: return T_EXTERNAL_OBJECT;
           default: return null;
         }
       }
@@ -3250,6 +3270,49 @@ public final class xMsgD {
       return controlR_;
     }
 
+    // optional string state = 36;
+    public static final int STATE_FIELD_NUMBER = 36;
+    private java.lang.Object state_;
+    /**
+     * <code>optional string state = 36;</code>
+     */
+    public boolean hasState() {
+      return ((bitField0_ & 0x08000000) == 0x08000000);
+    }
+    /**
+     * <code>optional string state = 36;</code>
+     */
+    public java.lang.String getState() {
+      java.lang.Object ref = state_;
+      if (ref instanceof java.lang.String) {
+        return (java.lang.String) ref;
+      } else {
+        com.google.protobuf.ByteString bs = 
+            (com.google.protobuf.ByteString) ref;
+        java.lang.String s = bs.toStringUtf8();
+        if (bs.isValidUtf8()) {
+          state_ = s;
+        }
+        return s;
+      }
+    }
+    /**
+     * <code>optional string state = 36;</code>
+     */
+    public com.google.protobuf.ByteString
+        getStateBytes() {
+      java.lang.Object ref = state_;
+      if (ref instanceof java.lang.String) {
+        com.google.protobuf.ByteString b = 
+            com.google.protobuf.ByteString.copyFromUtf8(
+                (java.lang.String) ref);
+        state_ = b;
+        return b;
+      } else {
+        return (com.google.protobuf.ByteString) ref;
+      }
+    }
+
     private void initFields() {
       dataVersion_ = "";
       dataDescription_ = "";
@@ -3286,6 +3349,7 @@ public final class xMsgD {
       executionTime_ = 0L;
       action_ = xMsgD.Data.ControlAction.EXECUTE;
       controlR_ = xMsgD.Data.SubControlAction.SKIP;
+      state_ = "";
     }
     private byte memoizedIsInitialized = -1;
     public final boolean isInitialized() {
@@ -3403,6 +3467,9 @@ public final class xMsgD {
       }
       if (((bitField0_ & 0x04000000) == 0x04000000)) {
         output.writeEnum(35, controlR_.getNumber());
+      }
+      if (((bitField0_ & 0x08000000) == 0x08000000)) {
+        output.writeBytes(36, getStateBytes());
       }
       getUnknownFields().writeTo(output);
     }
@@ -3580,6 +3647,10 @@ public final class xMsgD {
       if (((bitField0_ & 0x04000000) == 0x04000000)) {
         size += com.google.protobuf.CodedOutputStream
           .computeEnumSize(35, controlR_.getNumber());
+      }
+      if (((bitField0_ & 0x08000000) == 0x08000000)) {
+        size += com.google.protobuf.CodedOutputStream
+          .computeBytesSize(36, getStateBytes());
       }
       size += getUnknownFields().getSerializedSize();
       memoizedSerializedSize = size;
@@ -3771,6 +3842,8 @@ public final class xMsgD {
         bitField1_ = (bitField1_ & ~0x00000002);
         controlR_ = xMsgD.Data.SubControlAction.SKIP;
         bitField1_ = (bitField1_ & ~0x00000004);
+        state_ = "";
+        bitField1_ = (bitField1_ & ~0x00000008);
         return this;
       }
 
@@ -3949,6 +4022,10 @@ public final class xMsgD {
           to_bitField0_ |= 0x04000000;
         }
         result.controlR_ = controlR_;
+        if (((from_bitField1_ & 0x00000008) == 0x00000008)) {
+          to_bitField0_ |= 0x08000000;
+        }
+        result.state_ = state_;
         result.bitField0_ = to_bitField0_;
         onBuilt();
         return result;
@@ -4145,6 +4222,11 @@ public final class xMsgD {
         }
         if (other.hasControlR()) {
           setControlR(other.getControlR());
+        }
+        if (other.hasState()) {
+          bitField1_ |= 0x00000008;
+          state_ = other.state_;
+          onChanged();
         }
         this.mergeUnknownFields(other.getUnknownFields());
         return this;
@@ -6828,6 +6910,80 @@ public final class xMsgD {
         return this;
       }
 
+      // optional string state = 36;
+      private java.lang.Object state_ = "";
+      /**
+       * <code>optional string state = 36;</code>
+       */
+      public boolean hasState() {
+        return ((bitField1_ & 0x00000008) == 0x00000008);
+      }
+      /**
+       * <code>optional string state = 36;</code>
+       */
+      public java.lang.String getState() {
+        java.lang.Object ref = state_;
+        if (!(ref instanceof java.lang.String)) {
+          java.lang.String s = ((com.google.protobuf.ByteString) ref)
+              .toStringUtf8();
+          state_ = s;
+          return s;
+        } else {
+          return (java.lang.String) ref;
+        }
+      }
+      /**
+       * <code>optional string state = 36;</code>
+       */
+      public com.google.protobuf.ByteString
+          getStateBytes() {
+        java.lang.Object ref = state_;
+        if (ref instanceof String) {
+          com.google.protobuf.ByteString b = 
+              com.google.protobuf.ByteString.copyFromUtf8(
+                  (java.lang.String) ref);
+          state_ = b;
+          return b;
+        } else {
+          return (com.google.protobuf.ByteString) ref;
+        }
+      }
+      /**
+       * <code>optional string state = 36;</code>
+       */
+      public Builder setState(
+          java.lang.String value) {
+        if (value == null) {
+    throw new NullPointerException();
+  }
+  bitField1_ |= 0x00000008;
+        state_ = value;
+        onChanged();
+        return this;
+      }
+      /**
+       * <code>optional string state = 36;</code>
+       */
+      public Builder clearState() {
+        bitField1_ = (bitField1_ & ~0x00000008);
+        state_ = getDefaultInstance().getState();
+        onChanged();
+        return this;
+      }
+      /**
+       * <code>optional string state = 36;</code>
+       */
+      public Builder setStateBytes(
+          com.google.protobuf.ByteString value) {
+        if (value == null) {
+    throw new NullPointerException();
+  }
+  bitField1_ |= 0x00000008;
+        state_ = value;
+        onChanged();
+        return this;
+      }
+
       // @@protoc_insertion_point(builder_scope:Data)
     }
 
@@ -8344,7 +8500,7 @@ public final class xMsgD {
       descriptor;
   static {
     java.lang.String[] descriptorData = {
-      "\n\016xMsgData.proto\"\362\t\n\004Data\022\023\n\013dataVersion" +
+      "\n\016xMsgData.proto\"\212\n\n\004Data\022\023\n\013dataVersion" +
       "\030\001 \001(\t\022\027\n\017dataDescription\030\002 \001(\t\022\022\n\ndataA" +
       "uthor\030\003 \001(\t\022\027\n\017dataAuthorState\030\004 \001(\t\0222\n\024" +
       "dataGenerationStatus\030\005 \001(\0162\016.Data.Severi" +
@@ -8364,21 +8520,22 @@ public final class xMsgD {
       "\n\013composition\030  \001(\t\022\025\n\rexecutionTime\030! \001" +
       "(\020\022#\n\006action\030\" \001(\0162\023.Data.ControlAction\022" +
       "(\n\010controlR\030# \001(\0162\026.Data.SubControlActio",
-      "n\"\230\002\n\005DType\022\016\n\nT_VLSINT32\020\001\022\016\n\nT_VLSINT6" +
-      "4\020\002\022\016\n\nT_FLSINT32\020\003\022\016\n\nT_FLSINT64\020\004\022\013\n\007T" +
-      "_FLOAT\020\005\022\014\n\010T_DOUBLE\020\006\022\014\n\010T_STRING\020\007\022\013\n\007" +
-      "T_BYTES\020\010\022\017\n\013T_VLSINT32A\020\t\022\017\n\013T_VLSINT64" +
-      "A\020\n\022\017\n\013T_FLSINT32A\020\013\022\017\n\013T_FLSINT64A\020\014\022\014\n" +
-      "\010T_FLOATA\020\r\022\r\n\tT_DOUBLEA\020\016\022\r\n\tT_STRINGA\020" +
-      "\017\022\014\n\010T_BYTESA\020\020\022\r\n\tT_PAYLOAD\020\021\022\014\n\010T_OBJE" +
-      "CT\020\022\"N\n\006BAType\022\013\n\007JOBJECT\020\001\022\013\n\007COBJECT\020\002" +
-      "\022\013\n\007POBJECT\020\003\022\n\n\006NETCDF\020\004\022\007\n\003HDF\020\005\022\010\n\004EV" +
-      "IO\020\006\"+\n\rControlAction\022\013\n\007EXECUTE\020\000\022\r\n\tCO",
-      "NFIGURE\020\001\"\034\n\020SubControlAction\022\010\n\004SKIP\020\000\"" +
-      ",\n\010Severity\022\t\n\005ERROR\020\001\022\013\n\007WARNING\020\002\022\010\n\004I" +
-      "NFO\020\003\"Q\n\007Payload\022\033\n\004item\030\001 \003(\0132\r.Payload" +
-      ".Item\032)\n\004Item\022\014\n\004name\030\001 \002(\t\022\023\n\004data\030\002 \002(" +
-      "\0132\005.DataB\tB\005xMsgDH\001"
+      "n\022\r\n\005state\030$ \001(\t\"\241\002\n\005DType\022\016\n\nT_VLSINT32" +
+      "\020\001\022\016\n\nT_VLSINT64\020\002\022\016\n\nT_FLSINT32\020\003\022\016\n\nT_" +
+      "FLSINT64\020\004\022\013\n\007T_FLOAT\020\005\022\014\n\010T_DOUBLE\020\006\022\014\n" +
+      "\010T_STRING\020\007\022\013\n\007T_BYTES\020\010\022\017\n\013T_VLSINT32A\020" +
+      "\t\022\017\n\013T_VLSINT64A\020\n\022\017\n\013T_FLSINT32A\020\013\022\017\n\013T" +
+      "_FLSINT64A\020\014\022\014\n\010T_FLOATA\020\r\022\r\n\tT_DOUBLEA\020" +
+      "\016\022\r\n\tT_STRINGA\020\017\022\014\n\010T_BYTESA\020\020\022\r\n\tT_PAYL" +
+      "OAD\020\021\022\025\n\021T_EXTERNAL_OBJECT\020\022\"N\n\006BAType\022\013" +
+      "\n\007JOBJECT\020\001\022\013\n\007COBJECT\020\002\022\013\n\007POBJECT\020\003\022\n\n" +
+      "\006NETCDF\020\004\022\007\n\003HDF\020\005\022\010\n\004EVIO\020\006\"+\n\rControlA",
+      "ction\022\013\n\007EXECUTE\020\000\022\r\n\tCONFIGURE\020\001\"\034\n\020Sub" +
+      "ControlAction\022\010\n\004SKIP\020\000\",\n\010Severity\022\t\n\005E" +
+      "RROR\020\001\022\013\n\007WARNING\020\002\022\010\n\004INFO\020\003\"Q\n\007Payload" +
+      "\022\033\n\004item\030\001 \003(\0132\r.Payload.Item\032)\n\004Item\022\014\n" +
+      "\004name\030\001 \002(\t\022\023\n\004data\030\002 \002(\0132\005.DataB\tB\005xMsg" +
+      "DH\001"
     };
     com.google.protobuf.Descriptors.FileDescriptor.InternalDescriptorAssigner assigner =
       new com.google.protobuf.Descriptors.FileDescriptor.InternalDescriptorAssigner() {
@@ -8390,7 +8547,7 @@ public final class xMsgD {
           internal_static_Data_fieldAccessorTable = new
             com.google.protobuf.GeneratedMessage.FieldAccessorTable(
               internal_static_Data_descriptor,
-              new java.lang.String[] { "DataVersion", "DataDescription", "DataAuthor", "DataAuthorState", "DataGenerationStatus", "StatusText", "StatusSeverityId", "VLSINT32", "VLSINT64", "FLSINT32", "FLSINT64", "FLOAT", "DOUBLE", "STRING", "BYTES", "VLSINT32A", "VLSINT64A", "FLSINT32A", "FLSINT64A", "FLOATA", "DOUBLEA", "STRINGA", "BYTESA", "DataType", "UserObjectDescription", "ByteArrayType", "Sender", "Id", "ByteOrder", "DoneMonitor", "DataMonitor", "Composition", "ExecutionTime", "Action", "ControlR", });
+              new java.lang.String[] { "DataVersion", "DataDescription", "DataAuthor", "DataAuthorState", "DataGenerationStatus", "StatusText", "StatusSeverityId", "VLSINT32", "VLSINT64", "FLSINT32", "FLSINT64", "FLOAT", "DOUBLE", "STRING", "BYTES", "VLSINT32A", "VLSINT64A", "FLSINT32A", "FLSINT64A", "FLOATA", "DOUBLEA", "STRINGA", "BYTESA", "DataType", "UserObjectDescription", "ByteArrayType", "Sender", "Id", "ByteOrder", "DoneMonitor", "DataMonitor", "Composition", "ExecutionTime", "Action", "ControlR", "State", });
           internal_static_Payload_descriptor =
             getDescriptor().getMessageTypes().get(1);
           internal_static_Payload_fieldAccessorTable = new
