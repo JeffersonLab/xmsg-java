@@ -294,7 +294,7 @@ public class xMsgNode extends xMsgRegDiscDriver {
     private void startProxy(ZContext _context) throws xMsgException {
 
         System.out.println(xMsgUtil.currentTime(4) +
-                " Info: Running xMsg proxy server on the localhost...");
+                " Info: Running xMsg proxy server on the localhost..." +"\n");
 
         // setting up the xMsg proxy
         // socket where clients publish their data/messages
