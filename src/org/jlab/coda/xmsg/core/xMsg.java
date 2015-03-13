@@ -1009,6 +1009,11 @@ public class xMsg {
         // byte array for holding the serialized data object
         byte[] dt;
 
+        // subscribe to the returnAddress
+        SyncSendCallBack cb = new SyncSendCallBack();
+       SubscriptionHandler sh = subscribe(connection, returnAddress, cb);
+
+
         // send topic, sender, followed by the data
         ZMsg msg = new ZMsg();
         msg.addString(topic);
@@ -1035,9 +1040,16 @@ public class xMsg {
         if (!msg.send(con))throw new xMsgPublishingException("error publishing the message");
         msg.destroy();
 
-        // now subscribe to the returnAddress
-        SyncSendCallBack cb = new SyncSendCallBack();
-        sync_subscribe(connection, returnAddress, cb, timeOut);
+        int t = 0;
+        while(cb.s_data==null &&
+                t < timeOut*10){
+            t++;
+            xMsgUtil.sleep(100);
+        }
+        if(t >= timeOut*10) {
+            throw new TimeoutException();
+        }
+        unsubscribe(sh);
         return cb.s_data;
 
     }
@@ -1124,7 +1136,7 @@ public class xMsg {
      *     Subscribes to a specified xMsg topic.
      *     Supplied user callback object must implement xMsgCallBack interface.
      *     This method will de-serialize received xMsgData object and pass it
-     *     to the user implemented callback method of thee interface.
+     *     to the user implemented callback method of the interface.
      *     In the case isSync input parameter is set to be false the method will
      *     utilize private thread pool to run user callback method in a separate thread.
      * </p>
