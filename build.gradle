@@ -61,6 +61,6 @@ artifacts {
 
 group = 'org.jlab.coda'
 archivesBaseName = 'xmsg'
-version = '1.0'
+version = '1.0.1'
 
 defaultTasks 'build'
