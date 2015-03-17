@@ -981,9 +981,16 @@ public class xMsg {
         // address/topic where the subscriber should send the result
         String returnAddress = "return:"+ (int) (Math.random() * 100.0);
 
-        // check connection
-        Socket con = connection.getPubSock();
-        if (con==null) throw new xMsgPublishingException("null connection object");
+        // check pub connection
+        Socket pubcon = connection.getPubSock();
+        if (pubcon==null) throw new xMsgPublishingException("null connection object");
+
+        // check sub connection
+        Socket subcon = connection.getSubSock();
+        if (subcon==null) throw new xMsgSubscribingException("null connection object");
+
+        // subscribe to the returnAddress
+        subcon.subscribe(returnAddress.getBytes(ZMQ.CHARSET));
 
         // byte array for holding the serialized data object
         byte[] dt;
@@ -1011,12 +1018,12 @@ public class xMsg {
             throw new xMsgPublishingException("unsupported data type");
         }
         msg.addString(returnAddress);
-        if (!msg.send(con))throw new xMsgPublishingException("error publishing the message");
+        if (!msg.send(pubcon))throw new xMsgPublishingException("error publishing the message");
         msg.destroy();
 
-        // now subscribe to the returnAddress
+        // wait for the response
         SyncSendCallBack cb = new SyncSendCallBack();
-        sync_subscribe(connection, returnAddress, cb, timeOut);
+        sync_subscribe(subcon, returnAddress, cb, timeOut);
         return cb.s_data;
 
     }
@@ -1261,22 +1268,16 @@ public class xMsg {
      * <p>
      *     Subscribes and waits a response from a specified xMsg topic.
      * </p>
-     * @param connection socket to a xMsgNode proxy output port.
+     * @param con subscription socket
      * @param topic topic of the subscription
      * @param cb {@link xMsgCallBack} implemented object reference
      * @throws TimeoutException
      * @throws xMsgSubscribingException
      */
-    private void sync_subscribe(xMsgConnection connection,
+    private void sync_subscribe(Socket con,
                                String topic,
                                final xMsgCallBack cb, int timeout)
             throws xMsgException, TimeoutException {
-
-        // check connection
-        Socket con = connection.getSubSock();
-        if (con==null) throw new xMsgSubscribingException("null connection object");
-
-        con.subscribe(topic.getBytes(ZMQ.CHARSET));
 
         ZMQ.Poller poller = new ZMQ.Poller(1);
         poller.register(con, ZMQ.Poller.POLLIN);
