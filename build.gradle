@@ -63,3 +63,36 @@ archivesBaseName = 'xmsg'
 version = '1.0.2-SNAPSHOT'
 
 defaultTasks 'build'
+
+
+task(startFE, dependsOn: 'classes', type: JavaExec) {
+    main = 'org.jlab.coda.xmsg.xsys.xMsgFE'
+    classpath = sourceSets.main.runtimeClasspath
+}
+
+task(startNode, dependsOn: 'classes', type: JavaExec) {
+    main = 'org.jlab.coda.xmsg.xsys.xMsgNode'
+    classpath = sourceSets.main.runtimeClasspath
+}
+
+
+task(runPub, dependsOn: 'classes', type: JavaExec) {
+    main = 'org.jlab.coda.xmsg.examples.Publisher'
+    classpath = sourceSets.main.runtimeClasspath
+}
+
+task(runSub, dependsOn: 'classes', type: JavaExec) {
+    main = 'org.jlab.coda.xmsg.examples.Subscriber'
+    classpath = sourceSets.main.runtimeClasspath
+}
+
+
+task(runSyncPub, dependsOn: 'classes', type: JavaExec) {
+    main = 'org.jlab.coda.xmsg.examples.RequestPublisher'
+    classpath = sourceSets.main.runtimeClasspath
+}
+
+task(runSyncSub, dependsOn: 'classes', type: JavaExec) {
+    main = 'org.jlab.coda.xmsg.examples.ReplySubscriber'
+    classpath = sourceSets.main.runtimeClasspath
+}
