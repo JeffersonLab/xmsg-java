@@ -1011,7 +1011,9 @@ public class xMsg {
         if (subcon==null) throw new xMsgSubscribingException("null connection object");
 
         // subscribe to the returnAddress
-        subcon.subscribe(returnAddress.getBytes(ZMQ.CHARSET));
+        SyncSendCallBack cb = new SyncSendCallBack();
+        SubscriptionHandler sh = sync_subscribe(connection, returnAddress, cb);
+        cb.setSubscriptionHandler(sh);
 
         // byte array for holding the serialized data object
         byte[] dt;
@@ -1038,15 +1040,95 @@ public class xMsg {
         } else {
             throw new xMsgPublishingException("unsupported data type");
         }
+
         msg.addString(returnAddress);
+
+        xMsgUtil.sleep(100); // added 03.20.15
         if (!msg.send(pubcon))throw new xMsgPublishingException("error publishing the message");
         msg.destroy();
 
         // wait for the response
-        SyncSendCallBack cb = new SyncSendCallBack();
-        wait_4_callback(subcon, returnAddress, cb, timeOut);
-        return cb.s_data;
+        int t = 0;
+        while(cb.s_data==null &&
+                t < timeOut*1000){
+            t++;
+            xMsgUtil.sleep(1);
+        }
+        if(t >= timeOut*1000) {
+            throw new TimeoutException();
+        }
 
+        return cb.s_data;
+    }
+
+    /**
+     * <p>
+     *     Subscribes and waits a response from a specified xMsg topic.
+     * </p>
+     * @param connection xMsgConnection object
+     * @param topic topic of the subscription
+     * @param cb {@link xMsgCallBack} implemented object reference
+     * @throws xMsgSubscribingException
+     */
+    private SubscriptionHandler sync_subscribe(final xMsgConnection connection,
+                                               final String topic,
+                                               final xMsgCallBack cb)
+            throws xMsgException{
+
+        // check connection
+        final Socket con = connection.getSubSock();
+        if (con==null) throw new xMsgSubscribingException("null connection object");
+
+        con.subscribe(topic.getBytes(ZMQ.CHARSET));
+
+        SubscriptionHandler sHandle = new SubscriptionHandler(connection, topic) {
+            @Override
+            public void handle() throws xMsgException, TimeoutException {
+                ZMsg msg = ZMsg.recvMsg(con);
+                ZFrame r_addr = msg.pop();
+                ZFrame r_dataType = msg.pop();
+                ZFrame r_data = msg.pop();
+
+                String ds_dataType = new String(r_dataType.getData(),ZMQ.CHARSET);
+
+                Object ds_data;
+                if(ds_dataType.equals(xMsgConstants.ENVELOPE_DATA_TYPE_STRING.getStringValue())) {
+                    ds_data = new String(r_data.getData(), ZMQ.CHARSET);
+                    r_data.destroy();
+                } else {
+
+                    // de-serialize passed transient data
+                    try {
+                        xMsgD.Data im_data = xMsgD.Data.parseFrom(r_data.getData());
+
+                        // Create a builder object from immutable de-serialized object.
+                        ds_data = xMsgUtil.getPbBuilder(im_data);
+
+                    } catch (InvalidProtocolBufferException e) {
+                        throw new xMsgSubscribingException(e.getMessage());
+                    }
+                    // cleanup the data
+                    r_data.destroy();
+                }
+
+                // cleanup the rest
+                r_addr.destroy();
+                r_dataType.destroy();
+                msg.destroy();
+
+                // Create a message to be passed to the user callback method
+                final xMsgMessage cb_msg = new xMsgMessage();
+                cb_msg.setData(ds_data);
+                cb_msg.setDataType(ds_dataType);
+
+                cb.callback(cb_msg);
+
+            }
+        };
+
+        // wait for messages published to a required topic
+        new Thread(sHandle).start();
+        return sHandle;
     }
 
     /**
@@ -1285,75 +1367,6 @@ public class xMsg {
         handle.unsubscribe();
     }
 
-    /**
-     * <p>
-     *     Subscribes and waits a response from a specified xMsg topic.
-     * </p>
-     * @param con subscription socket
-     * @param topic topic of the subscription
-     * @param cb {@link xMsgCallBack} implemented object reference
-     * @throws TimeoutException
-     * @throws xMsgSubscribingException
-     */
-    private void wait_4_callback(Socket con,
-                                 String topic,
-                                 final xMsgCallBack cb, int timeout)
-            throws xMsgException, TimeoutException {
-
-        ZMQ.Poller poller = new ZMQ.Poller(1);
-        poller.register(con, ZMQ.Poller.POLLIN);
-        poller.poll(timeout*1000);
-        if(!poller.pollin(0)) {
-            con.unsubscribe(topic.getBytes(ZMQ.CHARSET));
-            throw new TimeoutException();
-        }
-        ZMsg msg = ZMsg.recvMsg(con);
-        ZFrame r_topic = msg.pop();
-        ZFrame r_dataType = msg.pop();
-        ZFrame r_data = msg.pop();
-
-        con.unsubscribe(topic.getBytes(ZMQ.CHARSET));
-
-        // de-serialize received message components
-        String ds_topic = new String(r_topic.getData(), ZMQ.CHARSET);
-        String ds_dataType = new String(r_dataType.getData(),ZMQ.CHARSET);
-
-        Object ds_data;
-        if(ds_dataType.equals(xMsgConstants.ENVELOPE_DATA_TYPE_STRING.getStringValue())) {
-            ds_data = new String(r_data.getData(), ZMQ.CHARSET);
-            r_data.destroy();
-        } else {
-            // de-serialize passed transient data
-            try {
-                xMsgD.Data im_data = xMsgD.Data.parseFrom(r_data.getData());
-
-                // Create a builder object from immutable de-serialized object.
-                ds_data = xMsgUtil.getPbBuilder(im_data);
-
-            } catch (InvalidProtocolBufferException e) {
-                throw new xMsgSubscribingException(e.getMessage());
-            }
-            // cleanup the data
-            r_data.destroy();
-        }
-
-        // cleanup the rest
-        r_topic.destroy();
-        r_dataType.destroy();
-        msg.destroy();
-
-        // Create a message to be passed to the user callback method
-        final xMsgMessage cb_msg = new xMsgMessage(ds_dataType,
-                xMsgUtil.getTopicDomain(ds_topic),
-                xMsgUtil.getTopicSubject(ds_topic),
-                xMsgUtil.getTopicType(ds_topic),
-                ds_data);
-
-        Object rd = cb.callback(cb_msg);
-        if(rd==null) {
-            throw new xMsgSubscribingException("Null response data");
-        }
-    }
 
 
     /**
@@ -1377,10 +1390,24 @@ public class xMsg {
         public Object s_data = null;
         public Boolean isReceived  =false;
 
+        private SubscriptionHandler sh = null;
+
+        public void setSubscriptionHandler(SubscriptionHandler sh){
+            this.sh = sh;
+        }
+
         @Override
         public Object callback(xMsgMessage msg) {
             isReceived = true;
             s_data = msg.getData();
+            try {
+                if(sh!=null) {
+                    unsubscribe(sh);
+                }
+            } catch (xMsgException e) {
+                e.printStackTrace();
+            }
+
             return s_data;
         }
 

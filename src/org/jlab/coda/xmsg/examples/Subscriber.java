@@ -67,14 +67,14 @@ public class Subscriber extends xMsg {
 
             // Find a publisher that publishes to requested topic
             // defined as a static variables above
-            if (subscriber.isThereLocalPublisher(myName, domain, subject, type)){
+//            if (subscriber.isThereLocalPublisher(myName, domain, subject, type)){
 
                 // Subscribe by passing a callback to the subscription
                 subscriber.subscribe(con, domain, subject, type, subscriber.callback);
 
                 xMsgUtil.keepAlive();
 
-            }
+//            }
         } catch (xMsgException | SocketException e) {
             e.printStackTrace();
         }

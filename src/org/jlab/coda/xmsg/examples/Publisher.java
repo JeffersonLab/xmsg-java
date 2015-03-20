@@ -88,9 +88,7 @@ public class Publisher extends xMsg {
                 msg.setData(String.valueOf(rg.nextInt()));
             }
 
-        } catch (xMsgException e) {
-            e.printStackTrace();
-        } catch (SocketException e) {
+        } catch (xMsgException | SocketException e) {
             e.printStackTrace();
         }
     }

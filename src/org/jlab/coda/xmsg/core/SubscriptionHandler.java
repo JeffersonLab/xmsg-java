@@ -26,6 +26,8 @@ import org.jlab.coda.xmsg.net.xMsgConnection;
 import org.zeromq.ZMQ;
 import org.zeromq.ZMQ.Socket;
 
+import java.util.concurrent.TimeoutException;
+
 /**
  * <p>
  *     xMsg subscription handler
@@ -36,9 +38,10 @@ import org.zeromq.ZMQ.Socket;
  * @since 3/6/15
  */
 
+
 public abstract class SubscriptionHandler implements Runnable {
 
-    public abstract void handle() throws xMsgException;
+    public abstract void handle() throws xMsgException, TimeoutException;
 
     private boolean isRunning = true;
 
@@ -56,7 +59,7 @@ public abstract class SubscriptionHandler implements Runnable {
         while(isRunning){
             try {
                 handle();
-            } catch (xMsgException e) {
+            } catch (xMsgException | TimeoutException e) {
                 e.printStackTrace();
             }
         }
