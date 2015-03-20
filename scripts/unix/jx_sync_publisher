@@ -1,0 +1,5 @@
+#!/bin/sh -f
+
+export CLASSPATH="$JXMSG_HOME/lib/*"
+
+java  -XX:+UnlockCommercialFeatures -XX:+FlightRecorder org.jlab.coda.xmsg.examples.SyncPublisher

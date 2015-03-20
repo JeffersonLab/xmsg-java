@@ -15,6 +15,7 @@ import org.zeromq.ZMQ.Socket;
  * @since 3/6/15
  */
 
+
 public abstract class SubscriptionHandler implements Runnable {
 
     public abstract void handle() throws xMsgException;
