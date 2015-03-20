@@ -1044,7 +1044,7 @@ public class xMsg {
 
         // wait for the response
         SyncSendCallBack cb = new SyncSendCallBack();
-        sync_subscribe(subcon, returnAddress, cb, timeOut);
+        wait_4_callback(subcon, returnAddress, cb, timeOut);
         return cb.s_data;
 
     }
@@ -1295,9 +1295,9 @@ public class xMsg {
      * @throws TimeoutException
      * @throws xMsgSubscribingException
      */
-    private void sync_subscribe(Socket con,
-                               String topic,
-                               final xMsgCallBack cb, int timeout)
+    private void wait_4_callback(Socket con,
+                                 String topic,
+                                 final xMsgCallBack cb, int timeout)
             throws xMsgException, TimeoutException {
 
         ZMQ.Poller poller = new ZMQ.Poller(1);

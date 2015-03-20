@@ -42,14 +42,21 @@ public class ReplySubscriber extends xMsg {
 
         @Override
         public Object callback(xMsgMessage msg) {
-            String syncReceiver = msg.getSyncRequesterAddress();
-            try {
-                publish(connection, syncReceiver, xMsgConstants.DONE.getStringValue());
-                System.out.println("Published response to " + msg.getData());
-            } catch (xMsgException e) {
-                e.printStackTrace();
+            // processing goes here
+            String result = xMsgConstants.DONE.getStringValue();
+
+            if(msg.getIsSyncRequest()) {
+                // sync request
+                String syncReceiver = msg.getSyncRequesterAddress();
+                try {
+                    publish(connection, syncReceiver, result);
+                    System.out.println("Published response to " + syncReceiver);
+                } catch (xMsgException e) {
+                    e.printStackTrace();
+                }
             }
-            return msg.getData();
+                return result;
+            }
         }
     }
-}
+
