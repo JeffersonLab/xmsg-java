@@ -1043,7 +1043,6 @@ public class xMsg {
 
         msg.addString(returnAddress);
 
-        xMsgUtil.sleep(100); // added 03.20.15
         if (!msg.send(pubcon))throw new xMsgPublishingException("error publishing the message");
         msg.destroy();
 
