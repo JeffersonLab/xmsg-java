@@ -81,18 +81,12 @@ task(runPub, dependsOn: 'classes', type: JavaExec) {
     classpath = sourceSets.main.runtimeClasspath
 }
 
+task(runSyncPub, dependsOn: 'classes', type: JavaExec) {
+    main = 'org.jlab.coda.xmsg.examples.SyncPublisher'
+    classpath = sourceSets.main.runtimeClasspath
+}
+
 task(runSub, dependsOn: 'classes', type: JavaExec) {
     main = 'org.jlab.coda.xmsg.examples.Subscriber'
-    classpath = sourceSets.main.runtimeClasspath
-}
-
-
-task(runSyncPub, dependsOn: 'classes', type: JavaExec) {
-    main = 'org.jlab.coda.xmsg.examples.RequestPublisher'
-    classpath = sourceSets.main.runtimeClasspath
-}
-
-task(runSyncSub, dependsOn: 'classes', type: JavaExec) {
-    main = 'org.jlab.coda.xmsg.examples.ReplySubscriber'
     classpath = sourceSets.main.runtimeClasspath
 }
