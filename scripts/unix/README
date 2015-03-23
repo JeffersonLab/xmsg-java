@@ -5,3 +5,6 @@ Instructions to run simple publisher and subscriber example.
 
 Instructions to run sync_publisher and a subscriber example.
 - start xMsg node   : jx_node
+- start a subscriber: js_subscriber
+- start sync publisher: jx_sync_publisher
+

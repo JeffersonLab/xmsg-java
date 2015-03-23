@@ -22,12 +22,11 @@
 package org.jlab.coda.xmsg.core;
 
 import com.google.protobuf.InvalidProtocolBufferException;
-
 import org.jlab.coda.xmsg.data.xMsgD;
+import org.jlab.coda.xmsg.data.xMsgR.xMsgRegistrationData;
 import org.jlab.coda.xmsg.excp.*;
 import org.jlab.coda.xmsg.net.xMsgAddress;
 import org.jlab.coda.xmsg.net.xMsgConnection;
-import org.jlab.coda.xmsg.data.xMsgR.xMsgRegistrationData;
 import org.jlab.coda.xmsg.xsys.regdis.xMsgRegDiscDriver;
 import org.zeromq.ZContext;
 import org.zeromq.ZFrame;
@@ -75,6 +74,7 @@ public class xMsg {
 
     // Fixed size thread pool
     private ExecutorService threadPool = null;
+    // default thread pool size
     private int pool_size = 2;
 
     private xMsgRegDiscDriver driver;
