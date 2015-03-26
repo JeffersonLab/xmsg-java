@@ -65,6 +65,37 @@ version = '1.0.2-SNAPSHOT'
 defaultTasks 'build'
 
 
+
+def deploySpec = copySpec {
+    into ('lib') {
+        from configurations.runtime
+        from "${jar.archivePath}"
+    }
+
+    from ("${project.rootDir}/scripts/unix") {
+        include "jx_*"
+        into 'bin'
+        fileMode 0755
+    }
+}
+
+
+task deploy(type: Copy, overwrite: true, dependsOn: install) {
+    def dest = "$System.env.CLARA_HOME"
+    def dir = new File(dest)
+    into dir
+    with deploySpec
+
+    doFirst {
+        if (dest == "null") {
+            throw new GradleException('CLARA_HOME not set')
+        }
+        dir.mkdirs()
+    }
+}
+
+
+
 task(startFE, dependsOn: 'classes', type: JavaExec) {
     main = 'org.jlab.coda.xmsg.xsys.xMsgFE'
     classpath = sourceSets.main.runtimeClasspath
