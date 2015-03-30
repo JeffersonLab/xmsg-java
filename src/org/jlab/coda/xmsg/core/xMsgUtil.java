@@ -147,7 +147,6 @@ public class xMsgUtil {
      * @throws xMsgException
      */
     public static String host_to_ip(String hostName) throws xMsgException, SocketException {
-//        System.out.println("DDD-y ");
         if (isIP(hostName)) {
             return hostName;
         }
@@ -171,6 +170,15 @@ public class xMsgUtil {
         }
     }
 
+    /**
+     * <p>
+     * Utility method that checks to see
+     * if passed string is of if decimal form.
+     * </p>
+     *
+     * @param text Host name of the computing node.
+     * @return true if host name has an IP form.
+     */
     public static boolean isIP(String text) {
         Pattern p = Pattern.compile("^(?:(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\\.){3}(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)$");
         Matcher m = p.matcher(text);
