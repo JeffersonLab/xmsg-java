@@ -2,4 +2,4 @@
 
 export CLASSPATH="$JXMSG_HOME/lib/*"
 
-java  -XX:+UnlockCommercialFeatures -XX:+FlightRecorder org.jlab.coda.xmsg.examples.Publisher
+java -XX:+UseNUMA -XX:+UseBiasedLocking org.jlab.coda.xmsg.examples.Publisher

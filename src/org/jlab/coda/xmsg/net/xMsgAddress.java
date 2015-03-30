@@ -45,6 +45,11 @@ public class xMsgAddress {
     private int port = xMsgConstants.DEFAULT_PORT.getIntValue();
     private String key = xMsgConstants.UNDEFINED.getStringValue();
 
+    public xMsgAddress(String host, boolean n) {
+        this.host = host;
+        key = this.host + ":" + this.port;
+
+    }
     /**
      * <p>
      *     Constructor that converts host name into a
@@ -76,11 +81,13 @@ public class xMsgAddress {
 
     /**
      * Returns the host name
-     * @return hostname
+     * @return hostname˜
+
      */
     public String getHost() {
         return host;
     }
+
 
     /**
      * Returns the port number

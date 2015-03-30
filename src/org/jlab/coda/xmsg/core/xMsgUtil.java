@@ -31,6 +31,8 @@ import java.net.SocketException;
 import java.net.UnknownHostException;
 import java.text.DateFormat;
 import java.util.*;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 /**
  * <p>
@@ -44,6 +46,8 @@ import java.util.*;
  */
 
 public class xMsgUtil {
+
+    public static List<String> LOCAL_HOST_IPS = new ArrayList<String>();
 
     /**
      * <p>
@@ -143,18 +147,34 @@ public class xMsgUtil {
      * @throws xMsgException
      */
     public static String host_to_ip(String hostName) throws xMsgException, SocketException {
-
-        if(hostName.equals("localhost")){
-            return getLocalHostIps().get(0);
+//        System.out.println("DDD-y ");
+        if (isIP(hostName)) {
+            return hostName;
         }
 
-        InetAddress address;
-        try {
-            address = InetAddress.getByName(hostName);
-        } catch (UnknownHostException e) {
-            throw new xMsgException(e.getMessage());
+        if (hostName.equals("localhost")) {
+            if (getLocalHostIps().size() > 0) {
+                return getLocalHostIps().get(0);
+            } else {
+                updateLocalHostIps();
+                return getLocalHostIps().get(0);
+            }
+        } else {
+
+            InetAddress address;
+            try {
+                address = InetAddress.getByName(hostName);
+            } catch (UnknownHostException e) {
+                throw new xMsgException(e.getMessage());
+            }
+            return address.getHostAddress();
         }
-        return address.getHostAddress();
+    }
+
+    public static boolean isIP(String text) {
+        Pattern p = Pattern.compile("^(?:(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\\.){3}(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)$");
+        Matcher m = p.matcher(text);
+        return m.find();
     }
 
     /**
@@ -277,22 +297,7 @@ public class xMsgUtil {
      * @throws SocketException
      */
     public static List<String> getLocalHostIps() throws SocketException {
-        List<String> out = new ArrayList<>();
-        Enumeration e = NetworkInterface.getNetworkInterfaces();
-        while(e.hasMoreElements()) {
-            NetworkInterface n = (NetworkInterface) e.nextElement();
-            Enumeration ee = n.getInetAddresses();
-            while (ee.hasMoreElements())
-            {
-                InetAddress i = (InetAddress) ee.nextElement();
-                String address = i.getHostAddress();
-                if(address.startsWith("127") || address.contains(":")){
-                } else {
-                    out.add(address);
-                }
-            }
-        }
-        return out;
+        return LOCAL_HOST_IPS;
     }
 
     public static xMsgD.Data.Builder getPbBuilder(xMsgD.Data data){
@@ -388,6 +393,37 @@ public class xMsgUtil {
 
         return trb;
 
+    }
+
+    /**
+     * <p>
+     * Returns list of IP addresses of a node, that can have
+     * multiple network cards, i.e. IP addresses. This method
+     * skip loop-back (127.xxx), ink-local (169.254.xxx),
+     * multicast (224.xxx through 238.xxx) and
+     * broadcast (255.255.255.255) addresses.
+     * </p>
+     *
+     * @throws SocketException
+     */
+    public static void updateLocalHostIps() throws SocketException {
+
+        List<String> out = new ArrayList<>();
+        Enumeration e = NetworkInterface.getNetworkInterfaces();
+        while (e.hasMoreElements()) {
+            NetworkInterface n = (NetworkInterface) e.nextElement();
+            Enumeration ee = n.getInetAddresses();
+            while (ee.hasMoreElements()) {
+                InetAddress i = (InetAddress) ee.nextElement();
+                String address = i.getHostAddress();
+                if (address.startsWith("127") || address.contains(":")) {
+                } else {
+                    out.add(address);
+                }
+            }
+        }
+
+        LOCAL_HOST_IPS = out;
     }
 
 

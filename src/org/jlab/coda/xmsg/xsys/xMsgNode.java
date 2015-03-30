@@ -21,12 +21,12 @@
 
 package org.jlab.coda.xmsg.xsys;
 
+import org.jlab.coda.xmsg.core.xMsgConstants;
+import org.jlab.coda.xmsg.core.xMsgUtil;
 import org.jlab.coda.xmsg.excp.xMsgException;
 import org.jlab.coda.xmsg.excp.xMsgRegistrationException;
 import org.jlab.coda.xmsg.xsys.regdis.xMsgRegDiscDriver;
 import org.jlab.coda.xmsg.xsys.regdis.xMsgRegistrar;
-import org.jlab.coda.xmsg.core.xMsgConstants;
-import org.jlab.coda.xmsg.core.xMsgUtil;
 import org.zeromq.ZContext;
 import org.zeromq.ZMQ;
 import org.zeromq.ZMQ.Socket;
@@ -51,6 +51,7 @@ import java.net.SocketException;
  */
 public class xMsgNode extends xMsgRegDiscDriver {
 
+
     /**
      * <p>
      *     Starts a local registrar service.
@@ -63,6 +64,10 @@ public class xMsgNode extends xMsgRegDiscDriver {
     public xMsgNode() throws xMsgException, SocketException {
 
         super("localhost");
+
+        // Get local IP addresses in case of multiple network cards.
+        // This list is available through xMsgUtil.LOCAL_HOST_IPS
+        xMsgUtil.updateLocalHostIps();
 
         // Zmq context
         final ZContext _context = new ZContext();
@@ -111,6 +116,10 @@ public class xMsgNode extends xMsgRegDiscDriver {
 
         super("localhost");
 
+        // Get local IP addresses in case of multiple network cards.
+        // This list is available through xMsgUtil.LOCAL_HOST_IPS
+        xMsgUtil.updateLocalHostIps();
+
         // Zmq context
         final ZContext _context = new ZContext();
 
@@ -123,7 +132,7 @@ public class xMsgNode extends xMsgRegDiscDriver {
                     " Info: xMsg local registration and discovery server is started");
 
             // Shutdown hook, thread that will run jvm before exiting
-            Runtime.getRuntime().addShutdownHook(new Thread(){
+            Runtime.getRuntime().addShutdownHook(new Thread() {
                 @Override
                 public void run() {
                     super.run();
@@ -180,6 +189,10 @@ public class xMsgNode extends xMsgRegDiscDriver {
 
         super(feHost);
 
+        // Get local IP addresses in case of multiple network cards.
+        // This list is available through xMsgUtil.LOCAL_HOST_IPS
+        xMsgUtil.updateLocalHostIps();
+
         // Zmq context
         final ZContext _context = new ZContext();
         try {
@@ -195,7 +208,7 @@ public class xMsgNode extends xMsgRegDiscDriver {
                     " Info: xMsg local registration and discovery server is started");
 
             // Shutdown hook, thread that will run jvm before exiting
-            Runtime.getRuntime().addShutdownHook(new Thread(){
+            Runtime.getRuntime().addShutdownHook(new Thread() {
                 @Override
                 public void run() {
                     super.run();
@@ -205,7 +218,7 @@ public class xMsgNode extends xMsgRegDiscDriver {
 
                     // Tell front-end registration server to remove all actors from this host
                     try {
-                        removeAllRegistration_fe(feHost,xMsgConstants.UNDEFINED.getStringValue());
+                        removeAllRegistration_fe(feHost, xMsgConstants.UNDEFINED.getStringValue());
                     } catch (xMsgRegistrationException e) {
                         System.out.println(e.getMessage());
                         _context.close();
@@ -246,6 +259,10 @@ public class xMsgNode extends xMsgRegDiscDriver {
 
         super(feHost);
 
+        // Get local IP addresses in case of multiple network cards.
+        // This list is available through xMsgUtil.LOCAL_HOST_IPS
+        xMsgUtil.updateLocalHostIps();
+
         // Zmq context
         final ZContext _context = new ZContext();
         try {
@@ -261,7 +278,7 @@ public class xMsgNode extends xMsgRegDiscDriver {
                     " Info: xMsg local registration and discovery server is started");
 
             // Shutdown hook, thread that will run jvm before exiting
-            Runtime.getRuntime().addShutdownHook(new Thread(){
+            Runtime.getRuntime().addShutdownHook(new Thread() {
                 @Override
                 public void run() {
                     super.run();
@@ -271,7 +288,7 @@ public class xMsgNode extends xMsgRegDiscDriver {
 
                     // Tell front-end registration server to remove all actors from this host
                     try {
-                        removeAllRegistration_fe(feHost,xMsgConstants.UNDEFINED.getStringValue());
+                        removeAllRegistration_fe(feHost, xMsgConstants.UNDEFINED.getStringValue());
                     } catch (xMsgRegistrationException e) {
                         System.out.println(e.getMessage());
                         _context.close();
@@ -305,32 +322,6 @@ public class xMsgNode extends xMsgRegDiscDriver {
         }
     }
 
-    /**
-     * <p>
-     *     Starts the proxy server of the xMsgNode on a local host
-     * </p>
-     * @param _context zeroMQ context object
-     * @throws xMsgException
-     */
-    private void startProxy(ZContext _context) throws xMsgException {
-
-        System.out.println(xMsgUtil.currentTime(4) +
-                " Info: Running xMsg proxy server on the localhost..." +"\n");
-
-        // setting up the xMsg proxy
-        // socket where clients publish their data/messages
-        Socket in = _context.createSocket(ZMQ.XSUB);
-        in.bind("tcp://*:"+xMsgConstants.DEFAULT_PORT.getIntValue());
-
-        // socket where clients subscribe data/messages
-        Socket out = _context.createSocket(ZMQ.XPUB);
-        out.bind("tcp://*:"+(xMsgConstants.DEFAULT_PORT.getIntValue()+1));
-
-        // start poxy. this will block for ever
-        ZMQ.proxy (in, out, null);
-
-    }
-
     public static void main(String[] args) {
 
         if(args.length == 2){
@@ -356,6 +347,33 @@ public class xMsgNode extends xMsgRegDiscDriver {
                 e.printStackTrace();
             }
         }
+    }
+
+    /**
+     * <p>
+     * Starts the proxy server of the xMsgNode on a local host
+     * </p>
+     *
+     * @param _context zeroMQ context object
+     * @throws xMsgException
+     */
+    private void startProxy(ZContext _context) throws xMsgException {
+
+        System.out.println(xMsgUtil.currentTime(4) +
+                " Info: Running xMsg proxy server on the localhost..." + "\n");
+
+        // setting up the xMsg proxy
+        // socket where clients publish their data/messages
+        Socket in = _context.createSocket(ZMQ.XSUB);
+        in.bind("tcp://*:" + xMsgConstants.DEFAULT_PORT.getIntValue());
+
+        // socket where clients subscribe data/messages
+        Socket out = _context.createSocket(ZMQ.XPUB);
+        out.bind("tcp://*:" + (xMsgConstants.DEFAULT_PORT.getIntValue() + 1));
+
+        // start poxy. this will block for ever
+        ZMQ.proxy(in, out, null);
+
     }
 }
 

@@ -2,4 +2,4 @@
 
 export CLASSPATH="$CLARA_JARS/*"
 
-java  -XX:+UnlockCommercialFeatures -XX:+FlightRecorder org.jlab.coda.xmsg.xsys.xMsgNode
+java -XX:+UseNUMA -XX:+UseBiasedLocking rg.jlab.coda.xmsg.xsys.xMsgNode
