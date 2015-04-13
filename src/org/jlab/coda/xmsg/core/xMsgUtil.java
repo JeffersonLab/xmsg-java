@@ -232,9 +232,10 @@ public class xMsgUtil {
      * not have a proper xMsg topic construct
      */
     public static String getTopicDomain(String topic) throws xMsgException {
-        StringTokenizer st = new StringTokenizer(topic,":");
-        if(st.hasMoreTokens())return st.nextToken();
-        else throw new xMsgException("malformed xMsg topic.");
+        return topic.substring(0, topic.indexOf(":"));
+//        StringTokenizer st = new StringTokenizer(topic,":");
+//        if(st.hasMoreTokens())return st.nextToken();
+//        else throw new xMsgException("malformed xMsg topic.");
     }
 
     /**
