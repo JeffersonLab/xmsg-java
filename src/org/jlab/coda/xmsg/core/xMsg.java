@@ -1282,10 +1282,8 @@ public class xMsg {
                     msg.destroy();
 
                     // Create a message to be passed to the user callback method
-                    final xMsgMessage cb_msg = new xMsgMessage(ds_dataType,
-                            xMsgUtil.getTopicDomain(ds_topic),
-                            xMsgUtil.getTopicSubject(ds_topic),
-                            xMsgUtil.getTopicType(ds_topic),
+                    final xMsgMessage cb_msg = new xMsgMessage(ds_topic,
+                            ds_dataType,
                             ds_data);
 
                     // Calling user callback method

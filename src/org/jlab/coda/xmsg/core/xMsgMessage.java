@@ -21,7 +21,6 @@
 
 package org.jlab.coda.xmsg.core;
 
-import org.jlab.coda.xmsg.data.xMsgD;
 import org.jlab.coda.xmsg.excp.xMsgException;
 
 /**
@@ -40,6 +39,7 @@ public class xMsgMessage {
     /**
      * Message address section
      */
+    private String topic = xMsgConstants.UNDEFINED.getStringValue();
     private String dataType = xMsgConstants.UNDEFINED.getStringValue();
     private String domain = xMsgConstants.UNDEFINED.getStringValue();
     private String subject = xMsgConstants.UNDEFINED.getStringValue();
@@ -55,15 +55,11 @@ public class xMsgMessage {
 
     }
 
-    public xMsgMessage(String dataType,
-                       String domain,
-                       String subject,
-                       String type,
+    public xMsgMessage( String topic,
+                        String dataType,
                        Object data) throws xMsgException {
+        this.topic = topic;
         this.dataType = dataType;
-        this.domain = domain;
-        this.subject = subject;
-        this.type = type;
         this.data = data;
     }
 
@@ -76,7 +72,10 @@ public class xMsgMessage {
         this.dataType = dt;
     }
 
-    public String getDomain() {
+    public String getDomain() throws xMsgException {
+        if(domain.equals(xMsgConstants.UNDEFINED.getStringValue())){
+            domain = xMsgUtil.getTopicDomain(topic);
+        }
         return domain;
     }
 
@@ -84,7 +83,10 @@ public class xMsgMessage {
         this.domain = domain;
     }
 
-    public String getSubject() {
+    public String getSubject() throws xMsgException {
+        if(subject.equals(xMsgConstants.UNDEFINED.getStringValue())){
+            subject = xMsgUtil.getTopicSubject(topic);
+        }
         return subject;
     }
 
@@ -92,7 +94,10 @@ public class xMsgMessage {
         this.subject = subject;
     }
 
-    public String getType() {
+    public String getType() throws xMsgException {
+        if(type.equals(xMsgConstants.UNDEFINED.getStringValue())){
+            type = xMsgUtil.getTopicType(topic);
+        }
         return type;
     }
 
@@ -122,6 +127,14 @@ public class xMsgMessage {
 
     public void setSyncRequesterAddress(String syncRequesterAddress) {
         this.syncRequesterAddress = syncRequesterAddress;
+    }
+
+    public String getTopic() {
+        return topic;
+    }
+
+    public void setTopic(String topic) {
+        this.topic = topic;
     }
 
     @Override

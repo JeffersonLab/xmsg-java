@@ -75,9 +75,10 @@ public class Publisher extends xMsg {
 
             // Fill payload with random numbers
             Random rg = new Random();
+            String topic = xMsgUtil.buildTopic(domain,subject,type);
 
             // Create the message to be published
-            xMsgMessage msg = new xMsgMessage(myName, domain, subject,type, String.valueOf(rg.nextInt()));
+            xMsgMessage msg = new xMsgMessage(topic,"int", String.valueOf(rg.nextInt()));
 
 
             // Publish data for ever...

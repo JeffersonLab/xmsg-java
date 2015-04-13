@@ -27,8 +27,9 @@ public class SyncPublisher extends xMsg {
             xMsgConnection con =  publisher.connect();
 
             publisher.registerPublisher(myName, domain, subject,type);
+            String topic = xMsgUtil.buildTopic(domain,subject,type);
 
-            xMsgMessage msg = new xMsgMessage(myName, domain, subject,type, String.valueOf(1));
+            xMsgMessage msg = new xMsgMessage(topic, "int", String.valueOf(1));
 
             int counter = 1;
             Object recData;
