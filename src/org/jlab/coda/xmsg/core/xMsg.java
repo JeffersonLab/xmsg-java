@@ -429,128 +429,6 @@ public class xMsg {
 
     /**
      * <p>
-     *     Finds all local publishers, publishing  to a specified topic
-     *     Note: xMsg defines a topic as domain:subject:type
-     * </p>
-     * @param name the name of the requester/sender. Required according to
-     *             the xMsg zmq message structure definition. (topic, sender, data)
-     * @param host host of the xMsg node where the caller is running
-     * @param port port of the xMsg node where the caller is running
-     * @param domain domain of the xMsg subscription
-     * @param subject subject of the subscription
-     * @param type type of the subscription
-     * @return list of {@link xMsgRegistrationData} objects
-     * @throws xMsgDiscoverException
-     */
-    public List<xMsgRegistrationData> findLocalPublishers(String name,
-                                                          String host,
-                                                          int port,
-                                                          String domain,
-                                                          String subject,
-                                                          String type)
-            throws xMsgDiscoverException {
-
-        if(domain.equals("*")) throw new xMsgDiscoverException("malformed xMsg topic");
-        if(subject.equals("*")) subject = xMsgConstants.UNDEFINED.getStringValue();
-        if(type.equals("*")) type = xMsgConstants.UNDEFINED.getStringValue();
-
-        xMsgRegistrationData.Builder regb= xMsgRegistrationData.newBuilder();
-        regb.setName(name);
-        regb.setHost(host);
-        regb.setPort(port);
-        regb.setDomain(domain);
-        regb.setSubject(subject);
-        regb.setType(type);
-        regb.setOwnerType(xMsgRegistrationData.OwnerType.PUBLISHER);
-        xMsgRegistrationData r_data = regb.build();
-        return driver.findLocal(name, r_data, true);
-    }
-
-    /**
-     * <p>
-     *     Finds all local publishers, publishing  to a specified topic
-     *     Note: xMsg defines a topic as domain:subject:type
-     * </p>
-     * @param name the name of the requester/sender. Required according to
-     *             the xMsg zmq message structure definition. (topic, sender, data)
-     * @param domain domain of the xMsg subscription
-     * @param subject subject of the subscription
-     * @param type type of the subscription
-     * @return list of {@link xMsgRegistrationData} objects
-     * @throws xMsgDiscoverException
-     */
-    public List<xMsgRegistrationData> findLocalPublishers(String name,
-                                                          String domain,
-                                                          String subject,
-                                                          String type)
-            throws xMsgDiscoverException {
-        return findLocalPublishers(name, "localhost", xMsgConstants.DEFAULT_PORT.getIntValue(),
-                domain, subject, type);
-    }
-
-    /**
-     * <p>
-     *     Finds all local subscribers, subscribing  to a specified topic
-     *     Note: xMsg defines a topic as domain:subject:type
-     * </p>
-     * @param name the name of the requester/sender. Required according to
-     *             the xMsg zmq message structure definition. (topic, sender, data)
-     * @param host host of the xMsg node where the caller is running
-     * @param port port of the xMsg node where the caller is running
-     * @param domain domain of the xMsg subscription
-     * @param subject subject of the subscription
-     * @param type type of the subscription
-     * @return list of {@link org.jlab.coda.xmsg.data.xMsgR.xMsgRegistrationData} objects
-     * @throws xMsgDiscoverException
-     */
-    public List<xMsgRegistrationData> findLocalSubscribers(String name,
-                                                           String host,
-                                                           int port,
-                                                           String domain,
-                                                           String subject,
-                                                           String type)
-            throws xMsgDiscoverException {
-
-        if(domain.equals("*")) throw new xMsgDiscoverException("malformed xMsg topic");
-        if(subject.equals("*")) subject = xMsgConstants.UNDEFINED.getStringValue();
-        if(type.equals("*")) type = xMsgConstants.UNDEFINED.getStringValue();
-
-        xMsgRegistrationData.Builder regb= xMsgRegistrationData.newBuilder();
-        regb.setName(name);
-        regb.setHost(host);
-        regb.setPort(port);
-        regb.setDomain(domain);
-        regb.setSubject(subject);
-        regb.setType(type);
-        regb.setOwnerType(xMsgRegistrationData.OwnerType.SUBSCRIBER);
-        xMsgRegistrationData r_data = regb.build();
-        return driver.findLocal(name, r_data, false);
-    }
-
-    /**
-     * <p>
-     *     Finds all local subscribers, subscribing  to a specified topic
-     *     Note: xMsg defines a topic as domain:subject:type
-     * </p>
-     * @param name the name of the requester/sender. Required according to
-     *             the xMsg zmq message structure definition. (topic, sender, data)
-     * @param domain domain of the xMsg subscription
-     * @param subject subject of the subscription
-     * @param type type of the subscription
-     * @return list of {@link org.jlab.coda.xmsg.data.xMsgR.xMsgRegistrationData} objects
-     * @throws xMsgDiscoverException
-     */
-    public List<xMsgRegistrationData> findLocalSubscribers(String name,
-                                                           String domain,
-                                                           String subject,
-                                                           String type)
-            throws xMsgDiscoverException {
-        return findLocalSubscribers(name, "localhost", xMsgConstants.DEFAULT_PORT.getIntValue(),
-                domain, subject, type);
-    }
-
-    /**
-     * <p>
      *     Finds all global (deployed anywhere in the xMsg cloud, i.e. nodes)
      *     publishers, publishing  to a specified topic
      *     Note: xMsg defines a topic as domain:subject:type
@@ -793,7 +671,7 @@ public class xMsg {
                                          String domain,
                                          String subject,
                                          String type) throws xMsgDiscoverException {
-        return findLocalPublishers(name, host, port, domain, subject, type).size() > 0;
+        return findPublishers(name, host, port, domain, subject, type).size() > 0;
     }
 
     /**
@@ -815,7 +693,7 @@ public class xMsg {
                                          String domain,
                                          String subject,
                                          String type) throws xMsgDiscoverException {
-        return findLocalPublishers(name, domain, subject, type).size() > 0;
+        return findPublishers(name, domain, subject, type).size() > 0;
     }
 
     /**
@@ -841,7 +719,7 @@ public class xMsg {
                                           String domain,
                                           String subject,
                                           String type) throws xMsgDiscoverException {
-        return findLocalSubscribers(name, host, port, domain, subject, type).size() > 0;
+        return findSubscribers(name, host, port, domain, subject, type).size() > 0;
     }
 
     /**
@@ -863,7 +741,7 @@ public class xMsg {
                                           String domain,
                                           String subject,
                                           String type) throws xMsgDiscoverException {
-        return findLocalSubscribers(name, domain, subject, type).size() > 0;
+        return findSubscribers(name, domain, subject, type).size() > 0;
     }
 
     /**
