@@ -21,10 +21,13 @@
 
 package org.jlab.coda.xmsg.core;
 
-import org.jlab.coda.xmsg.data.xMsgD;
+import com.google.protobuf.ByteString;
 import org.jlab.coda.xmsg.excp.xMsgException;
-import org.jlab.coda.xmsg.excp.xMsgSubscribingException;
 
+import java.io.ByteArrayInputStream;
+import java.io.IOException;
+import java.io.ObjectInputStream;
+import java.io.ObjectOutputStream;
 import java.net.InetAddress;
 import java.net.NetworkInterface;
 import java.net.SocketException;
@@ -47,7 +50,7 @@ import java.util.regex.Pattern;
 
 public class xMsgUtil {
 
-    public static List<String> LOCAL_HOST_IPS = new ArrayList<String>();
+    public static List<String> LOCAL_HOST_IPS = new ArrayList<>();
 
     /**
      * <p>
@@ -139,54 +142,6 @@ public class xMsgUtil {
 
     /**
      * <p>
-     *     Returns the IP address of the specified host
-     * </p>
-     *
-     * @param hostName The name of the host (accepts "localhost")
-     * @return dotted notation of the IP address
-     * @throws xMsgException
-     */
-    public static String host_to_ip(String hostName) throws xMsgException, SocketException {
-        if (isIP(hostName)) {
-            return hostName;
-        }
-
-        if (hostName.equals("localhost")) {
-            if (getLocalHostIps().size() > 0) {
-                return getLocalHostIps().get(0);
-            } else {
-                updateLocalHostIps();
-                return getLocalHostIps().get(0);
-            }
-        } else {
-
-            InetAddress address;
-            try {
-                address = InetAddress.getByName(hostName);
-            } catch (UnknownHostException e) {
-                throw new xMsgException(e.getMessage());
-            }
-            return address.getHostAddress();
-        }
-    }
-
-    /**
-     * <p>
-     * Utility method that checks to see
-     * if passed string is of if decimal form.
-     * </p>
-     *
-     * @param text Host name of the computing node.
-     * @return true if host name has an IP form.
-     */
-    public static boolean isIP(String text) {
-        Pattern p = Pattern.compile("^(?:(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\\.){3}(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)$");
-        Matcher m = p.matcher(text);
-        return m.find();
-    }
-
-    /**
-     * <p>
      *     Builds xMsg topic of the form:
      *     domain:subject:type
      * </p>
@@ -194,7 +149,7 @@ public class xMsgUtil {
      * @param subject subject of the message
      * @param type type of the message
      * @return xMsg topic
-     * @throws xMsgSubscribingException
+     * @throws xMsgException
      */
     public static String buildTopic(String domain,
                                     String subject,
@@ -233,9 +188,6 @@ public class xMsgUtil {
      */
     public static String getTopicDomain(String topic) throws xMsgException {
         return topic.substring(0, topic.indexOf(":"));
-//        StringTokenizer st = new StringTokenizer(topic,":");
-//        if(st.hasMoreTokens())return st.nextToken();
-//        else throw new xMsgException("malformed xMsg topic.");
     }
 
     /**
@@ -309,101 +261,6 @@ public class xMsgUtil {
         return LOCAL_HOST_IPS;
     }
 
-    public static xMsgD.Data.Builder getPbBuilder(xMsgD.Data data){
-        xMsgD.Data.Builder trb = xMsgD.Data.newBuilder();
-        trb.setDataVersion(data.getDataVersion());
-        trb.setDataDescription(data.getDataDescription());
-        trb.setDataAuthor(data.getDataAuthor());
-        trb.setDataAuthorState(data.getDataAuthorState());
-        trb.setDataGenerationStatus(data.getDataGenerationStatus());
-        trb.setVLSINT32(data.getVLSINT32());
-        trb.setVLSINT64(data.getVLSINT64());
-        trb.setFLSINT32(data.getFLSINT32());
-        trb.setFLSINT64(data.getFLSINT64());
-        trb.setFLOAT(data.getFLOAT());
-        trb.setDOUBLE(data.getDOUBLE());
-        trb.setSTRING(data.getSTRING());
-        trb.setBYTES(data.getBYTES());
-
-        trb.addAllVLSINT32A(data.getVLSINT32AList());
-        trb.addAllVLSINT64A(data.getVLSINT64AList());
-
-        trb.addAllFLSINT32A(data.getFLSINT32AList());
-        trb.addAllFLSINT64A(data.getFLSINT64AList());
-
-        trb.addAllFLOATA(data.getFLOATAList());
-        trb.addAllDOUBLEA(data.getDOUBLEAList());
-        trb.addAllSTRINGA(data.getSTRINGAList());
-        trb.addAllBYTESA(data.getBYTESAList());
-
-        trb.setDataType(data.getDataType());
-        trb.setByteOrder(data.getByteOrder());
-        trb.setSender(data.getSender());
-        trb.setId(data.getId());
-        trb.setComposition(data.getComposition());
-        trb.setAction(data.getAction());
-        trb.setControlR(data.getControlR());
-        return trb;
-    }
-
-    public static xMsgD.Data.Builder createxMsgData(String author,
-                                            int com_id,
-                                            String description,
-                                            Object d) throws xMsgException {
-        xMsgD.Data.Builder trb = xMsgD.Data.newBuilder();
-
-        trb.setDataAuthor(author);
-        trb.setId(com_id);
-        trb.setDataDescription(description);
-
-        if(d instanceof Integer){
-            Integer in_data = (Integer)d;
-            trb.setDataType(xMsgD.Data.DType.T_FLSINT32);
-            trb.setFLSINT32(in_data);
-
-        } else if (d instanceof Integer[]){
-            Integer[] in_data = (Integer[])d;
-            trb.setDataType(xMsgD.Data.DType.T_FLSINT32A);
-            for(int id:in_data) trb.addFLSINT32A(id);
-
-        } else if (d instanceof Float){
-            Float in_data = (Float)d;
-            trb.setDataType(xMsgD.Data.DType.T_FLOAT);
-            trb.setFLOAT(in_data);
-
-        } else if (d instanceof Float[]){
-            Float[] in_data = (Float[])d;
-            trb.setDataType(xMsgD.Data.DType.T_FLOATA);
-            for(float id:in_data) trb.addFLOATA(id);
-
-        } else if (d instanceof Double){
-            Double in_data = (Double)d;
-            trb.setDataType(xMsgD.Data.DType.T_DOUBLE);
-            trb.setDOUBLE(in_data);
-
-        } else if (d instanceof Double[]){
-            Double[] in_data = (Double[])d;
-            trb.setDataType(xMsgD.Data.DType.T_DOUBLEA);
-            for(double id:in_data) trb.addDOUBLEA(id);
-
-        } else if (d instanceof String){
-            String in_data = (String)d;
-            trb.setDataType(xMsgD.Data.DType.T_STRING);
-            trb.setSTRING(in_data);
-
-        } else if (d instanceof String[]){
-            String[] in_data = (String[])d;
-            trb.setDataType(xMsgD.Data.DType.T_STRINGA);
-            for(String id:in_data) trb.addSTRINGA(id);
-
-        } else {
-            throw new xMsgException("Unsupported data type");
-        }
-
-        return trb;
-
-    }
-
     /**
      * <p>
      * Returns list of IP addresses of a node, that can have
@@ -433,6 +290,120 @@ public class xMsgUtil {
         }
 
         LOCAL_HOST_IPS = out;
+    }
+
+    /**
+     * <p>
+     * Returns the IP address of the specified host
+     * </p>
+     *
+     * @param hostName The name of the host (accepts "localhost")
+     * @return dotted notation of the IP address
+     * @throws xMsgException
+     */
+    public static String host_to_ip(String hostName) throws xMsgException, SocketException {
+        if (isIP(hostName)) {
+            return hostName;
+        }
+
+        if (hostName.equals("localhost")) {
+            if (getLocalHostIps().size() > 0) {
+                return getLocalHostIps().get(0);
+            } else {
+                updateLocalHostIps();
+                return getLocalHostIps().get(0);
+            }
+        } else {
+
+            InetAddress address;
+            try {
+                address = InetAddress.getByName(hostName);
+            } catch (UnknownHostException e) {
+                throw new xMsgException(e.getMessage());
+            }
+            return address.getHostAddress();
+        }
+    }
+
+    /**
+     * <p>
+     * Utility method that checks to see
+     * if passed string is of if decimal form.
+     * </p>
+     *
+     * @param text Host name of the computing node.
+     * @return true if host name has an IP form.
+     */
+    public static boolean isIP(String text) {
+        Pattern p = Pattern.compile("^(?:(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\\.){3}(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)$");
+        Matcher m = p.matcher(text);
+        return m.find();
+    }
+
+    /**
+     * Converts object into a byte array
+     *
+     * @param object to be converted. Probably it must be serializable.
+     * @return ByteString or null in case of error
+     */
+    public static ByteString O2BS(Object object) {
+        if (object instanceof byte[]) {
+            return ByteString.copyFrom((byte[]) object);
+        } else {
+            try (ByteString.Output bs = ByteString.newOutput();
+                 ObjectOutputStream out = new ObjectOutputStream(bs)) {
+                out.writeObject(object);
+                out.flush();
+                return bs.toByteString();
+            } catch (IOException e) {
+                e.printStackTrace();
+                return null;
+            }
+        }
+    }
+
+    /**
+     * Converts object into a byte array
+     *
+     * @param object to be converted. Probably it must be serializable.
+     * @return ByteString or null in case of error
+     */
+    public static byte[] O2B(Object object)
+            throws IOException {
+        if (object instanceof byte[]) return (byte[]) object;
+        java.io.ByteArrayOutputStream bs = new java.io.ByteArrayOutputStream();
+        java.io.ObjectOutputStream out = new java.io.ObjectOutputStream(bs);
+        out.writeObject(object);
+        out.flush();
+        out.close();
+        return bs.toByteArray();
+    }
+
+    /**
+     * Converts byte array into an Object, that can be cast into pre-known class object.
+     *
+     * @param bytes the byte array
+     * @return Object or null in case of error
+     */
+    public static Object B2O(ByteString bytes) {
+        byte[] bb = bytes.toByteArray();
+        return B2O(bb);
+    }
+
+    /**
+     * Converts byte array into an Object, that can be cast into pre-known class object.
+     *
+     * @param bytes the byte array
+     * @return Object or null in case of error
+     */
+    public static Object B2O(byte[] bytes) {
+        try (ByteArrayInputStream bs = new ByteArrayInputStream(bytes);
+             ObjectInputStream in = new ObjectInputStream(bs)) {
+            return in.readObject();
+        } catch (IOException | ClassNotFoundException e) {
+            e.printStackTrace();
+            return null;
+        }
     }
 
 

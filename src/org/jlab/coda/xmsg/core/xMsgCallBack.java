@@ -33,6 +33,6 @@ package org.jlab.coda.xmsg.core;
  */
 public interface xMsgCallBack {
 
-    public Object callback(xMsgMessage msg);
+    public xMsgMessage callback(xMsgMessage msg);
 
 }

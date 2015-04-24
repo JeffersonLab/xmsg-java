@@ -21,12 +21,13 @@
 
 package org.jlab.coda.xmsg.examples;
 
-import org.jlab.coda.xmsg.excp.xMsgException;
-import org.jlab.coda.xmsg.net.xMsgConnection;
 import org.jlab.coda.xmsg.core.xMsg;
 import org.jlab.coda.xmsg.core.xMsgMessage;
 import org.jlab.coda.xmsg.core.xMsgUtil;
+import org.jlab.coda.xmsg.excp.xMsgException;
+import org.jlab.coda.xmsg.net.xMsgConnection;
 
+import java.io.IOException;
 import java.net.SocketException;
 import java.util.Random;
 
@@ -78,18 +79,20 @@ public class Publisher extends xMsg {
             String topic = xMsgUtil.buildTopic(domain,subject,type);
 
             // Create the message to be published
-            xMsgMessage msg = new xMsgMessage(topic,"int", String.valueOf(rg.nextInt()));
-
+            xMsgMessage msg = new xMsgMessage(topic);
+            System.out.println("Byte array size = " + args[0]);
+            byte[] b = new byte[Integer.parseInt(args[0])];
+            msg.setData(b);
 
             // Publish data for ever...
             while(true) {
                 publisher.publish(con, msg);
-                System.out.println("publishing...");
-                xMsgUtil.sleep(1000);
-                msg.setData(String.valueOf(rg.nextInt()));
+//                System.out.println("publishing...");
+//                xMsgUtil.sleep(1000);
+
             }
 
-        } catch (xMsgException | SocketException e) {
+        } catch (xMsgException | IOException e) {
             e.printStackTrace();
         }
     }

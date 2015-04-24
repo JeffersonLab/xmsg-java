@@ -21,112 +21,89 @@
 
 package org.jlab.coda.xmsg.core;
 
-import org.jlab.coda.xmsg.excp.xMsgException;
+import com.google.protobuf.ByteString;
+import org.jlab.coda.xmsg.data.xMsgD.xMsgData;
+import org.jlab.coda.xmsg.data.xMsgM.xMsgMeta;
 
 /**
  * <p>
  *     xMsgMessage class defines a message to be serialized and sent.
+ *
  *     Uses xMsgData class generated as a result of the proto-buffer
- *     description.
+ *     description to pass Java primitive types and arrays of primitive types.
+ *     xMsgData is also used to pass byte[]: the result of a user specific
+ *     object serialization.
+ *
+ *     This class will also contain complete metadata of the message data,
+ *     describing details of the data. In case this class is constructed
+ *     without a metadata, the default metadata will be created and the
+ *     proper data type will set based on the passed data parameter type.
+ *
+ *     Note that data that is an instance of byte[] will be considered
+ *     to be a serialization of a specific user object only in the case
+ *     when a proper
+ *
  * </p>
  *
+ *
  * @author gurjyan
- * @version 1.x
+ * @version 2.x
  * @since 11/5/14
  */
 public class xMsgMessage {
+
 
     /**
      * Message address section
      */
     private String topic = xMsgConstants.UNDEFINED.getStringValue();
-    private String dataType = xMsgConstants.UNDEFINED.getStringValue();
-    private String domain = xMsgConstants.UNDEFINED.getStringValue();
-    private String subject = xMsgConstants.UNDEFINED.getStringValue();
-    private String type = xMsgConstants.UNDEFINED.getStringValue();
-    private Boolean isSyncRequest = false;
-    private String syncRequesterAddress = xMsgConstants.UNDEFINED.getStringValue();
+    private xMsgMeta.Builder metaData = null;
+    private Object data = null;
+
+    public xMsgMessage(String topic) {
+        this.topic = topic;
+        setData(xMsgConstants.UNDEFINED.getStringValue());
+    }
+
     /**
-     * Message data section
+     * <p>
+     * This constructor will auto-create a metadata
+     * object based on the type of the passed data object.
+     * <p/>
+     * </p>
+     *
+     * @param topic of the communication
+     * @param data  of the communication
      */
-    private Object data;
-
-    public xMsgMessage(){
-
+    public xMsgMessage(String topic,
+                       Object data) {
+        this.topic = topic;
+        setData(data);
     }
 
     public xMsgMessage( String topic,
-                        String dataType,
-                       Object data) throws xMsgException {
+                        xMsgMeta.Builder metaData,
+                        Object data) {
         this.topic = topic;
-        this.dataType = dataType;
+        this.metaData = metaData;
         this.data = data;
     }
 
-
-    public String getDataType() {
-        return dataType;
-    }
-
-    public void setDataType(String dt) {
-        this.dataType = dt;
-    }
-
-    public String getDomain() throws xMsgException {
-        if(domain.equals(xMsgConstants.UNDEFINED.getStringValue())){
-            domain = xMsgUtil.getTopicDomain(topic);
+    public boolean getIsDataSerialized() {
+        if (metaData != null) return metaData.getIsDataSerialized();
+        else {
+            metaData = xMsgMeta.newBuilder();
+            return metaData.getIsDataSerialized();
         }
-        return domain;
     }
 
-    public void setDomain(String domain) {
-        this.domain = domain;
-    }
-
-    public String getSubject() throws xMsgException {
-        if(subject.equals(xMsgConstants.UNDEFINED.getStringValue())){
-            subject = xMsgUtil.getTopicSubject(topic);
+    public void setIsDataSerialized(boolean b) {
+        if (metaData == null) {
+            metaData = xMsgMeta.newBuilder();
+            metaData.setIsDataSerialized(b);
+        } else {
+            metaData.setIsDataSerialized(b);
         }
-        return subject;
-    }
-
-    public void setSubject(String subject) {
-        this.subject = subject;
-    }
-
-    public String getType() throws xMsgException {
-        if(type.equals(xMsgConstants.UNDEFINED.getStringValue())){
-            type = xMsgUtil.getTopicType(topic);
-        }
-        return type;
-    }
-
-    public void setType(String type) {
-        this.type = type;
-    }
-
-    public Object getData() {
-        return data;
-    }
-
-    public void setData(Object data) {
-        this.data = data;
-    }
-
-    public Boolean getIsSyncRequest() {
-        return isSyncRequest;
-    }
-
-    public void setIsSyncRequest(Boolean isSyncRequest) {
-        this.isSyncRequest = isSyncRequest;
-    }
-
-    public String getSyncRequesterAddress() {
-        return syncRequesterAddress;
-    }
-
-    public void setSyncRequesterAddress(String syncRequesterAddress) {
-        this.syncRequesterAddress = syncRequesterAddress;
     }
 
     public String getTopic() {
@@ -137,16 +114,159 @@ public class xMsgMessage {
         this.topic = topic;
     }
 
-    @Override
-    public String toString() {
-        return "xMsgMessage{" +
-                "dataType='" + dataType + '\'' +
-                ", domain='" + domain + '\'' +
-                ", subject='" + subject + '\'' +
-                ", type='" + type + '\'' +
-                ", isSyncRequest=" + isSyncRequest +
-                ", syncRequesterAddress='" + syncRequesterAddress + '\'' +
-                ", data=" + data +
-                '}';
+    public xMsgMeta.Builder getMetaData() {
+        return metaData;
     }
+
+    public void setMetaData(xMsgMeta.Builder metaData) {
+        this.metaData = metaData;
+    }
+
+    public Object getData() {
+        return data;
+    }
+
+    /**
+     * <p>
+     * This method will check to see if passed objects are of
+     * primitive types or an array of primitive types, and will assume
+     * transferring them (serializing) through xMsgData object.
+     * Any other Java object will be considered to be passed as
+     * un-serialized J_Object.
+     * Note. if you pass to this method a byte[] as a result of your
+     * own serialization process it will be set as the xMsgData byte[]
+     * with the type T_BYTES. In this case your actual data type will be
+     * lost. This is the mechanism to pass your own serialized byte[]
+     * through xMsgData (type = X_Object).
+     * </p>
+     *
+     * @param data object
+     */
+    public void setData(Object data) {
+        if (metaData == null) {
+            metaData = xMsgMeta.newBuilder();
+        }
+
+        // xMsgData object for all primitive types
+        xMsgData.Builder d = xMsgData.newBuilder();
+        metaData.setDataType(xMsgMeta.DataType.X_Object);
+        if (data instanceof String) {
+            d.setSTRING((String) data);
+            d.setType(xMsgData.Type.T_STRING);
+            this.data = d;
+        } else if (data instanceof Integer) {
+            d.setFLSINT32((Integer) data);
+            d.setType(xMsgData.Type.T_FLSINT32);
+            this.data = d;
+        } else if (data instanceof Long) {
+            d.setFLSINT64((Long) data);
+            d.setType(xMsgData.Type.T_FLSINT64);
+            this.data = d;
+        } else if (data instanceof Float) {
+            d.setFLOAT((Float) data);
+            d.setType(xMsgData.Type.T_FLOAT);
+            this.data = d;
+        } else if (data instanceof Double) {
+            d.setDOUBLE((Double) data);
+            d.setType(xMsgData.Type.T_DOUBLE);
+            this.data = d;
+        } else if (data instanceof Integer[]) {
+            Integer[] a = (Integer[]) data;
+            for (int i = 0; i < a.length; i++) {
+                d.setFLSINT32A(i, a[i]);
+            }
+            d.setType(xMsgData.Type.T_FLSINT32A);
+            this.data = d;
+        } else if (data instanceof Long[]) {
+            Long[] a = (Long[]) data;
+            for (int i = 0; i < a.length; i++) {
+                d.setFLSINT64A(i, a[i]);
+            }
+            d.setType(xMsgData.Type.T_FLSINT64A);
+            this.data = d;
+        } else if (data instanceof Float[]) {
+            Float[] a = (Float[]) data;
+            for (int i = 0; i < a.length; i++) {
+                d.setFLOATA(i, a[i]);
+            }
+            d.setType(xMsgData.Type.T_FLOATA);
+            this.data = d;
+        } else if (data instanceof Double[]) {
+            Double[] a = (Double[]) data;
+            for (int i = 0; i < a.length; i++) {
+                d.setDOUBLEA(i, a[i]);
+            }
+            d.setType(xMsgData.Type.T_DOUBLEA);
+            this.data = d;
+        } else if (data instanceof byte[]) {
+            d.setBYTES(ByteString.copyFrom((byte[]) data));
+            d.setType(xMsgData.Type.T_BYTES);
+            this.data = d;
+
+            // serialized xMsgData (X_Object)
+        } else if (data instanceof xMsgData) {
+            metaData.setIsDataSerialized(true);
+            this.data = data;
+
+            // un-serialized xMsgData object (X_Object)
+        } else if (data instanceof xMsgData.Builder) {
+            metaData.setIsDataSerialized(false);
+            this.data = data;
+
+            // Any Java object (un serialized)
+        } else {
+            metaData.setDataType(xMsgMeta.DataType.J_Object);
+            metaData.setIsDataSerialized(false);
+            this.data = data;
+        }
+    }
+
+    /**
+     * <p>
+     * This method sets the data object using specified data type.
+     * </p>
+     *
+     * @param data object
+     * @param type of the data object
+     */
+    public void setData(Object data, xMsgMeta.DataType type) {
+        if (metaData == null) {
+            metaData = xMsgMeta.newBuilder();
+        }
+
+        // data type defined is xMsgData
+        if (type.equals(xMsgMeta.DataType.X_Object)) {
+            if (data instanceof xMsgData) {
+                metaData.setDataType(xMsgMeta.DataType.X_Object);
+                metaData.setIsDataSerialized(true);
+                this.data = data;
+
+                // un-serialized xMsgData object (X_Object)
+            } else if (data instanceof xMsgData.Builder) {
+                metaData.setDataType(xMsgMeta.DataType.X_Object);
+                metaData.setIsDataSerialized(false);
+                this.data = data;
+            }
+        } else {
+
+            // This is the user defined data type, such as
+            // NETCDFS_Object, P_Object, C_Object, etc.
+            metaData.setDataType(type);
+
+            // If user object has type =  byte[], then it
+            // is considered to be a serialized object.
+            if (data instanceof byte[]) {
+                metaData.setIsDataSerialized(true);
+            } else {
+                metaData.setIsDataSerialized(false);
+            }
+            this.data = data;
+        }
+    }
+
+    public void setData(Object data, xMsgMeta.Builder metadata) {
+        this.data = data;
+        this.metaData = metadata;
+    }
+
 }

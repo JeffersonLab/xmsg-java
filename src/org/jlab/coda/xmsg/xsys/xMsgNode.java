@@ -22,6 +22,7 @@
 package org.jlab.coda.xmsg.xsys;
 
 import org.jlab.coda.xmsg.core.xMsgConstants;
+import org.jlab.coda.xmsg.core.xMsgMessage;
 import org.jlab.coda.xmsg.core.xMsgUtil;
 import org.jlab.coda.xmsg.excp.xMsgException;
 import org.jlab.coda.xmsg.excp.xMsgRegistrationException;
@@ -32,6 +33,7 @@ import org.zeromq.ZMQ;
 import org.zeromq.ZMQ.Socket;
 
 import java.net.SocketException;
+import java.util.concurrent.ConcurrentHashMap;
 
 /**
  * <p>
@@ -50,6 +52,9 @@ import java.net.SocketException;
  * @since 1.0
  */
 public class xMsgNode extends xMsgRegDiscDriver {
+
+    // shared memory of the node (in the language of CLARA it would be DPE)
+    public static final ConcurrentHashMap<String, xMsgMessage> _shared_memory = new ConcurrentHashMap<>();
 
 
     /**

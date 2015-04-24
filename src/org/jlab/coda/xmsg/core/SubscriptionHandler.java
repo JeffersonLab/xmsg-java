@@ -26,6 +26,7 @@ import org.jlab.coda.xmsg.net.xMsgConnection;
 import org.zeromq.ZMQ;
 import org.zeromq.ZMQ.Socket;
 
+import java.io.IOException;
 import java.util.concurrent.TimeoutException;
 
 /**
@@ -41,25 +42,23 @@ import java.util.concurrent.TimeoutException;
 
 public abstract class SubscriptionHandler implements Runnable {
 
-    public abstract void handle() throws xMsgException, TimeoutException;
-
     private boolean isRunning = true;
-
     private Socket con;
     private String topic;
-
     public SubscriptionHandler(xMsgConnection connection,
                                String topic){
         con = connection.getSubSock();
         this.topic = topic;
     }
 
+    public abstract void handle() throws xMsgException, TimeoutException, IOException;
+
     @Override
     public void run() {
         while(isRunning){
             try {
                 handle();
-            } catch (xMsgException | TimeoutException e) {
+            } catch (xMsgException | TimeoutException | IOException e) {
                 e.printStackTrace();
             }
         }

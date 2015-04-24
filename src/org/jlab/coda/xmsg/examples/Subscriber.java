@@ -21,13 +21,12 @@
 
 package org.jlab.coda.xmsg.examples;
 
-import org.jlab.coda.xmsg.core.xMsgUtil;
+import org.jlab.coda.xmsg.core.*;
+import org.jlab.coda.xmsg.data.xMsgD.xMsgData;
 import org.jlab.coda.xmsg.excp.xMsgException;
 import org.jlab.coda.xmsg.net.xMsgConnection;
-import org.jlab.coda.xmsg.core.xMsg;
-import org.jlab.coda.xmsg.core.xMsgCallBack;
-import org.jlab.coda.xmsg.core.xMsgMessage;
 
+import java.io.IOException;
 import java.net.SocketException;
 
 /**
@@ -48,6 +47,7 @@ public class Subscriber extends xMsg {
     private static final String subject = "test_subject";
     private static final String type = "test_type";
     private static final String description = "test_description";
+    private static xMsgConnection con;
     private MyCallBack callback;
 
     public Subscriber() throws xMsgException, SocketException {
@@ -60,7 +60,7 @@ public class Subscriber extends xMsg {
             Subscriber subscriber = new Subscriber();
 
             // Create a socket connections to the xMsg node
-            xMsgConnection con =  subscriber.connect();
+            con = subscriber.connect();
 
             // Register this subscriber
             subscriber.registerSubscriber(myName, domain, subject, type, description);
@@ -70,7 +70,8 @@ public class Subscriber extends xMsg {
 //            if (subscriber.isThereLocalPublisher(myName, domain, subject, type)){
 
                 // Subscribe by passing a callback to the subscription
-                subscriber.subscribe(con, domain, subject, type, subscriber.callback);
+            String topic = xMsgUtil.buildTopic(domain, subject, type);
+            subscriber.subscribe(con, topic, subscriber.callback);
 
                 xMsgUtil.keepAlive();
 
@@ -80,12 +81,47 @@ public class Subscriber extends xMsg {
         }
     }
 
+    public void reply(xMsgMessage msg) {
+        try {
+            publish(con, msg);
+        } catch (xMsgException e) {
+            e.printStackTrace();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+
     private class MyCallBack implements xMsgCallBack{
+        long nr = 0;
+        long t1;
+        long t2;
 
         @Override
-        public Object callback(xMsgMessage msg) {
-            System.out.println(msg);
-            return msg.getData();
+        public xMsgMessage callback(xMsgMessage msg) {
+
+            if (msg.getMetaData().getReplyTo().equals(xMsgConstants.UNDEFINED.getStringValue())) {
+                xMsgData.Builder data = (xMsgData.Builder) msg.getData();
+
+                if (nr == 0) {
+                    t1 = System.currentTimeMillis();
+                }
+                nr = nr + 1;
+                if (nr >= 10000) {
+                    t2 = System.currentTimeMillis();
+                    long dt = t2 - t1;
+                    double pt = (double) dt / (double) nr;
+                    long pr = (nr * 1000) / dt;
+                    System.out.println("transfer time = " + pt + " ms");
+                    System.out.println("transfer rate = " + pr + " Hz");
+                    nr = 0;
+                }
+            } else {
+                // sync request, create/update the xMsgMessage and sen it to the sender
+                reply(msg);
+
+            }
+//            System.out.println(data.getFLSINT32());
+            return msg;
         }
     }
 }

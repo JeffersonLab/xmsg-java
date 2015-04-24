@@ -19,21 +19,27 @@
  * SUPPORT, UPDATES, ENHANCEMENTS, OR MODIFICATIONS.
  */
 
-package org.jlab.coda.xmsg.excp;
+option optimize_for = SPEED;
 
-/**
- *<p>
- *     xMsgSubscribingException class
- *</p>
- * @author gurjyan
- *         Created on 10/6/14
- * @version %I%
- * @since 1.0
- */
-public class xMsgSubscribingException extends xMsgException {
+option java_outer_classname = "xMsgR";
 
-    public xMsgSubscribingException(String message) {
-        super(message);
+message xMsgRegistration {
+
+    required string name = 1;
+    optional string description = 2 [default = "undefined"];
+    required string host = 3;
+    required sfixed32 port = 4;
+
+    // xMsg topic definition
+    required string domain = 5;
+    optional string subject = 6 [default = "undefined"];
+    optional string type = 7 [default = "undefined"];
+    optional OwnerType ownerType = 8;
+
+    // Type of a an actor that sends the registration data
+    enum OwnerType {
+        PUBLISHER = 1;
+        SUBSCRIBER = 2;
     }
 
 }

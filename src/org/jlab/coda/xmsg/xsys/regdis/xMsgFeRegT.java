@@ -21,10 +21,10 @@
 
 package org.jlab.coda.xmsg.xsys.regdis;
 
-import org.jlab.coda.xmsg.data.xMsgR.xMsgRegistrationData;
+import org.jlab.coda.xmsg.core.xMsgUtil;
+import org.jlab.coda.xmsg.data.xMsgR.xMsgRegistration;
 import org.jlab.coda.xmsg.excp.xMsgException;
 import org.jlab.coda.xmsg.excp.xMsgRegistrationException;
-import org.jlab.coda.xmsg.core.xMsgUtil;
 
 import java.net.SocketException;
 import java.util.concurrent.ConcurrentHashMap;
@@ -56,8 +56,8 @@ import java.util.concurrent.ConcurrentHashMap;
 public class xMsgFeRegT extends xMsgRegDiscDriver implements Runnable {
 
     // xMsgNode database references
-    private ConcurrentHashMap<String, xMsgRegistrationData> publishers_db;
-    private ConcurrentHashMap<String, xMsgRegistrationData> subscribers_db;
+    private ConcurrentHashMap<String, xMsgRegistration> publishers_db;
+    private ConcurrentHashMap<String, xMsgRegistration> subscribers_db;
 
     /**
      * <p>
@@ -73,8 +73,8 @@ public class xMsgFeRegT extends xMsgRegDiscDriver implements Runnable {
      * @throws xMsgException
      */
     public xMsgFeRegT(String feHost,
-                     ConcurrentHashMap<String, xMsgRegistrationData> publishers_db,
-                     ConcurrentHashMap<String, xMsgRegistrationData> subscribers_db
+                      ConcurrentHashMap<String, xMsgRegistration> publishers_db,
+                      ConcurrentHashMap<String, xMsgRegistration> subscribers_db
     ) throws xMsgException, SocketException {
         super(feHost);
         this.publishers_db = publishers_db;
