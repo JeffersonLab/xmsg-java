@@ -31,7 +31,7 @@ import org.jlab.coda.xmsg.excp.xMsgRegistrationException;
 import org.jlab.coda.xmsg.net.xMsgAddress;
 import org.jlab.coda.xmsg.net.xMsgConnection;
 import org.jlab.coda.xmsg.xsys.regdis.xMsgRegDiscDriver;
-import org.jlab.coda.xmsg.xsys.xMsgNode;
+import org.jlab.coda.xmsg.xsys.xMsgRegistrar;
 import org.zeromq.ZContext;
 import org.zeromq.ZFrame;
 import org.zeromq.ZMQ;
@@ -55,7 +55,7 @@ import static org.jlab.coda.xmsg.xsys.regdis.xMsgRegDiscDriver.__zmqSocket;
  *     provides a local database of xMsgCommunication
  *     for publishing and/or subscribing messages without
  *     requesting registration information from the local
- *     (running within {@link org.jlab.coda.xmsg.xsys.xMsgNode})
+ *     (running within {@link org.jlab.coda.xmsg.xsys.xMsgRegistrar})
  *     and/or global (running within {@link org.jlab.coda.xmsg.xsys.xMsgFE})
  *     registrar services.
  *     This class also provides a thread pool for servicing
@@ -832,7 +832,7 @@ public class xMsg {
             // Here we define a unique key for this message in the shared memory, using
             // senders unique name and the communication ID set by the user.
             String key = metadata.getSender() + "_" + metadata.getCommunicationId();
-            xMsgNode._shared_memory.put(key, x_msg);
+            xMsgRegistrar._shared_memory.put(key, x_msg);
 
             // add message location frame = 2
             z_msg.add(key);
@@ -874,7 +874,7 @@ public class xMsg {
             xMsgUtil.sleep(1);
         }
         if(t >= timeOut*1000) {
-            throw new TimeoutException("Error: no response for time-out = " + t);
+            throw new TimeoutException("Error: no response for time_out = " + t);
         }
         x_msg.getMetaData().setReplyTo(xMsgConstants.UNDEFINED.getStringValue());
         return cb.r_msg;
@@ -989,7 +989,7 @@ public class xMsg {
                         throw new xMsgException(e.getMessage());
                     }
                 } else {
-                    cb_msg = xMsgNode._shared_memory.get(ds_msgLocation);
+                    cb_msg = xMsgRegistrar._shared_memory.get(ds_msgLocation);
 
                     // Calling user callback method with the received xMsgMessage
                     _callUserCallBack(connection, cb, cb_msg);

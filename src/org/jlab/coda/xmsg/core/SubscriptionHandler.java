@@ -35,7 +35,7 @@ import java.util.concurrent.TimeoutException;
  * </p>
  *
  * @author gurjyan
- * @version 1.x
+ * @version 2.x
  * @since 3/6/15
  */
 

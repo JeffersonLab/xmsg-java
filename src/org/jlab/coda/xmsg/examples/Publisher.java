@@ -29,7 +29,6 @@ import org.jlab.coda.xmsg.net.xMsgConnection;
 
 import java.io.IOException;
 import java.net.SocketException;
-import java.util.Random;
 
 /**
  * An example of a publisher that publishes
@@ -38,7 +37,7 @@ import java.util.Random;
  * data.
  *
  * @author gurjyan
- * @version 1.x
+ * @version 2.x
  * @since 11/4/14
  */
 public class Publisher extends xMsg {
@@ -57,7 +56,7 @@ public class Publisher extends xMsg {
      * Thread pool is relevant for subscribers only.
      * </p>
      *
-     * @throws org.jlab.coda.xmsg.excp.xMsgException
+     * @throws xMsgException
      */
     public Publisher() throws xMsgException, SocketException {
         super("localhost");
@@ -75,7 +74,6 @@ public class Publisher extends xMsg {
             publisher.registerPublisher(myName, domain, subject,type);
 
             // Fill payload with random numbers
-            Random rg = new Random();
             String topic = xMsgUtil.buildTopic(domain,subject,type);
 
             // Create the message to be published
@@ -87,9 +85,6 @@ public class Publisher extends xMsg {
             // Publish data for ever...
             while(true) {
                 publisher.publish(con, msg);
-//                System.out.println("publishing...");
-//                xMsgUtil.sleep(1000);
-
             }
 
         } catch (xMsgException | IOException e) {

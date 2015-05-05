@@ -60,7 +60,7 @@ import java.util.concurrent.ConcurrentHashMap;
  * @since 1.0
  */
 
-public class xMsgRegistrar extends Thread {
+public class xMsgRegistrationService extends Thread {
 
     // zmq context.
     // Note. this class does not own the context.
@@ -92,7 +92,7 @@ public class xMsgRegistrar extends Thread {
      * @param context zmq context
      * @throws xMsgException
      */
-    public xMsgRegistrar(ZContext context) throws xMsgException, SocketException {
+    public xMsgRegistrationService(ZContext context) throws xMsgException, SocketException {
         this.context = context;
         localhost_ip = xMsgUtil.host_to_ip("localhost");
     }
@@ -112,7 +112,7 @@ public class xMsgRegistrar extends Thread {
      * @param context zmq context
      * @throws xMsgException
      */
-    public xMsgRegistrar(String feHost, ZContext context) throws xMsgException, SocketException {
+    public xMsgRegistrationService(String feHost, ZContext context) throws xMsgException, SocketException {
         this.context = context;
         localhost_ip = xMsgUtil.host_to_ip("localhost");
 
@@ -122,12 +122,15 @@ public class xMsgRegistrar extends Thread {
          * @see #publishers_db
          * @see #subscribers_db
          */
-        (new Thread( new xMsgFeRegT(feHost, publishers_db, subscribers_db))).start();
+        (new Thread(new xMsgRegRepT(feHost, publishers_db, subscribers_db))).start();
     }
 
     @Override
     public void run() {
         super.run();
+
+        System.out.println(xMsgUtil.currentTime(4) +
+                " Info: xMsg local registration and discovery server is started");
 
         //  Create registrar REP socket
         ZMQ.Socket reg_socket = context.createSocket(ZMQ.REP);
