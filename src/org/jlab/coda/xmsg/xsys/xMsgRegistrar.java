@@ -80,7 +80,7 @@ public class xMsgRegistrar extends xMsgRegDiscDriver {
      * Starts a local registrar service.
      * Constructor of the {@link org.jlab.coda.xmsg.xsys.regdis.xMsgRegistrationService} class
      * will start a thread that will periodically report local registration
-     * database to xMsgFE ({@link xMsgFE}registrar service.
+     * database to xMsgRegistrar service that is defined to be a master Registrar service (FE).
      * This ways registration data is distributed/duplicated between xMsgNode
      * and xMsgFE registrar services.
      * That is the reason we need to pass xMsg front-end host name.

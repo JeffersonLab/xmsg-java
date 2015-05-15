@@ -55,8 +55,6 @@ import static org.jlab.coda.xmsg.xsys.regdis.xMsgRegDiscDriver.__zmqSocket;
  *     provides a local database of xMsgCommunication
  *     for publishing and/or subscribing messages without
  *     requesting registration information from the local
- *     (running within {@link org.jlab.coda.xmsg.xsys.xMsgRegistrar})
- *     and/or global (running within {@link org.jlab.coda.xmsg.xsys.xMsgFE})
  *     registrar services.
  *     This class also provides a thread pool for servicing
  *     received messages (as a result of a subscription) in

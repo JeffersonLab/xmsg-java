@@ -37,7 +37,7 @@ message xMsgMeta {
     optional string author = 3;
 
     // Status of the data production
-    optional string status = 4;
+    optional Status status = 4;
 
     // Data production status severity id
     optional sfixed32 severityId = 5;
@@ -97,6 +97,13 @@ message xMsgMeta {
         C_Object = 4; // C++ object
         P_Object = 5; // Python Object
         NCDFS_Object = 6; // Streaming NetCDF Object
+    }
+
+    // Data processing status
+    enum Status {
+        INFO = 1;
+        WARNING = 2;
+        ERROR = 3;
     }
 
     // Endianness

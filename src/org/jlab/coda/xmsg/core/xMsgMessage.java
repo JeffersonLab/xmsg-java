@@ -25,6 +25,8 @@ import com.google.protobuf.ByteString;
 import org.jlab.coda.xmsg.data.xMsgD.xMsgData;
 import org.jlab.coda.xmsg.data.xMsgM.xMsgMeta;
 
+import java.util.Arrays;
+
 /**
  * <p>
  *     xMsgMessage class defines a message to be serialized and sent.
@@ -170,34 +172,31 @@ public class xMsgMessage {
             d.setDOUBLE((Double) data);
             d.setType(xMsgData.Type.T_DOUBLE);
             this.data = d;
+
         } else if (data instanceof Integer[]) {
             Integer[] a = (Integer[]) data;
-            for (int i = 0; i < a.length; i++) {
-                d.setFLSINT32A(i, a[i]);
-            }
+            d.addAllFLSINT32A(Arrays.asList(a));
             d.setType(xMsgData.Type.T_FLSINT32A);
             this.data = d;
+
         } else if (data instanceof Long[]) {
             Long[] a = (Long[]) data;
-            for (int i = 0; i < a.length; i++) {
-                d.setFLSINT64A(i, a[i]);
-            }
+            d.addAllFLSINT64A(Arrays.asList(a));
             d.setType(xMsgData.Type.T_FLSINT64A);
             this.data = d;
+
         } else if (data instanceof Float[]) {
             Float[] a = (Float[]) data;
-            for (int i = 0; i < a.length; i++) {
-                d.setFLOATA(i, a[i]);
-            }
+            d.addAllFLOATA(Arrays.asList(a));
             d.setType(xMsgData.Type.T_FLOATA);
             this.data = d;
+
         } else if (data instanceof Double[]) {
             Double[] a = (Double[]) data;
-            for (int i = 0; i < a.length; i++) {
-                d.setDOUBLEA(i, a[i]);
-            }
+            d.addAllDOUBLEA(Arrays.asList(a));
             d.setType(xMsgData.Type.T_DOUBLEA);
             this.data = d;
+
         } else if (data instanceof byte[]) {
             d.setBYTES(ByteString.copyFrom((byte[]) data));
             d.setType(xMsgData.Type.T_BYTES);
