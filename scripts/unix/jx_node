@@ -1,5 +1,0 @@
-#!/bin/sh -f
-
-export CLASSPATH="$CLARA_JARS/*"
-
-java -XX:+UseNUMA -XX:+UseBiasedLocking rg.jlab.coda.xmsg.xsys.xMsgNode

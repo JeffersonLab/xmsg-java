@@ -1,98 +1,52 @@
-// Google's protocol-buffer definition of the xMsg data class
-// author: gurjyan
-// date: 01.07.15
+/*
+ * Copyright (C) 2015. Jefferson Lab, xMsg framework (JLAB). All Rights Reserved.
+ * Permission to use, copy, modify, and distribute this software and its
+ * documentation for educational, research, and not-for-profit purposes,
+ * without fee and without a signed licensing agreement.
+ *
+ * Author Vardan Gyurjyan
+ * Department of Experimental Nuclear Physics, Jefferson Lab.
+ *
+ * IN NO EVENT SHALL JLAB BE LIABLE TO ANY PARTY FOR DIRECT, INDIRECT, SPECIAL,
+ * INCIDENTAL, OR CONSEQUENTIAL DAMAGES, INCLUDING LOST PROFITS, ARISING OUT OF
+ * THE USE OF THIS SOFTWARE AND ITS DOCUMENTATION, EVEN IF JLAB HAS BEEN ADVISED
+ * OF THE POSSIBILITY OF SUCH DAMAGE.
+ *
+ * JLAB SPECIFICALLY DISCLAIMS ANY WARRANTIES, INCLUDING, BUT NOT LIMITED TO,
+ * THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR
+ * PURPOSE. THE CLARA SOFTWARE AND ACCOMPANYING DOCUMENTATION, IF ANY, PROVIDED
+ * HEREUNDER IS PROVIDED "AS IS". JLAB HAS NO OBLIGATION TO PROVIDE MAINTENANCE,
+ * SUPPORT, UPDATES, ENHANCEMENTS, OR MODIFICATIONS.
+ */
 
 option optimize_for = SPEED;
 option java_outer_classname = "xMsgD";
 
 // ... Data class ...
-message Data {
+message xMsgData {
 
-    // ... This section is defined by the message ...
-    // ... data generator, such as service engine ...
-    // Data version
-    optional string dataVersion = 1;
+    optional sint32 VLSINT32 = 1; // variable length signed int32
+    optional sint64 VLSINT64 = 2; // variable length signed int64
+    optional sfixed32 FLSINT32 = 3; // fixed length signed int32
+    optional sfixed64 FLSINT64 = 4; // fixed length signed int64
+    optional float FLOAT = 5;
+    optional double DOUBLE = 6;
+    optional string STRING = 7; // contains UTF-8 encoding or 7-bit ASCII text
+    optional bytes BYTES = 8; // contains arbitrary sequence of bytes
 
-    // Data textual description
-    optional string dataDescription = 2;
+    repeated sint32 VLSINT32A = 9; // array of variable length signed int32s
+    repeated sint64 VLSINT64A = 10; // array of variable length signed int64s
+    repeated sfixed32 FLSINT32A = 11; // array of fixed length signed int32s
+    repeated sfixed64 FLSINT64A = 12; // array of fixed length signed int64s
+    repeated float FLOATA = 13; // array of floats
+    repeated double DOUBLEA = 14; // array of doubles
+    repeated string STRINGA = 15; // array of UTF-8 encoded or 7-bit ASCII strings
+    repeated bytes BYTESA = 16; // array of arbitrary sequence of bytes
 
-    // Author of the data, an additional filed set by the engine
-    optional string dataAuthor = 3;
+    optional Type type = 17;
 
-    // The state of the message sender
-    optional string dataAuthorState = 4;
-
-    // Overall status/severity of the data generation process
-    optional Severity dataGenerationStatus = 5 [default = INFO];
-
-    // Status text
-    optional string statusText = 6;
-
-    // Severity id of the data generaation status
-    optional sfixed32 statusSeverityId = 7;
-
-    // Data itself
-    optional sint32 VLSINT32 = 8; // variable length signed int32
-    optional sint64 VLSINT64 = 9; // variable length signed int64
-    optional sfixed32 FLSINT32 = 10; // fixed length signed int32
-    optional sfixed64 FLSINT64 = 11; // fixed length signed int64
-    optional float FLOAT = 12;
-    optional double DOUBLE = 13;
-    optional string STRING = 14; // contains UTF-8 encoding or 7-bit ASCII text
-    optional bytes BYTES = 15; // contains arbitrary sequence of bytes
-
-    repeated sint32 VLSINT32A = 16; // array of variable length signed int32s
-    repeated sint64 VLSINT64A = 17; // array of variable length signed int64s
-    repeated sfixed32 FLSINT32A = 18; // array of fixed length signed int32s
-    repeated sfixed64 FLSINT64A = 19; // array of fixed length signed int64s
-    repeated float FLOATA = 20; // array of floats
-    repeated double DOUBLEA = 21; // array of doubles
-    repeated string STRINGA = 22; // array of UTF-8 encoded or 7-bit ASCII strings
-    repeated bytes BYTESA = 23; // array of arbitrary sequence of bytes
-
-    // Data type. If set to DataTpe.PAYLOAD access data using the "payload"
-    // filed, otherwise "data: filed. In case data is passed as a byteArray this
-    // will define the type of the object serialized to byteArray
-    optional DType dataType = 24;
-
-    // Additional description of the servialized data object. If data is
-    // a serialized arbutrary Java/C++ object we need to tell the receiver
-    // how to desrialize it.
-    optional string userObjectDescription = 25;
-
-    optional BAType byteArrayType = 26;
-
-
-    // ... This section is defined by the message transporter ...
-    // The name of the message transporter
-    optional string sender = 27;
-
-    // Communication id, used to genetically relate messages
-    optional fixed32 id = 28;
-
-    // Byte ordering in case data type is BYTES/BYTESA
-    optional string byteOrder = 29;
-
-    // Reserved and used for Clara service based application
-    // composition i.e. link schema (list of linked service names)
-    // e.g. s1+s2;s1+s3,s4,s5+&s6
-    optional string composition = 30;
-
-    // Service engine execution time
-    optional sfixed64 executionTime = 31;
-
-    // Reserved and used to define which of the CLARA interface
-    // methods must be called on a service engine.
-    optional ControlAction action =32;
-
-    // Reserved control field
-    optional SubControlAction controlR = 33;
-
-    optional string state = 34;
-
-    // ... Enumerations ...
-    // Data type enumeration
-    enum DType {
+    // Data sub-type
+    enum Type {
         T_VLSINT32 = 1;   // variable length signed int32
         T_VLSINT64 = 2;   // variable length signed int64
         T_FLSINT32 = 3;   // fixed length signed int32
@@ -112,45 +66,15 @@ message Data {
         T_BYTESA = 16;    // array of arbitrary sequence of bytes
 
         T_PAYLOAD = 17;    // payload data type
-        T_EXTERNAL_OBJECT = 18;     // un-serialized object
-    }
-
-    // In the case data is passed as a byte[], i.e. DataType = T_BYTESA
-    // following enum shows how to handle passed byte[]
-    enum BAType {
-        JOBJECT = 1;
-        COBJECT = 2;
-        POBJECT = 3;
-        NETCDF = 4;
-        HDF = 5;
-        EVIO = 6;
-    }
-
-    // Control actions, used to define service control directive
-    enum ControlAction {
-        EXECUTE = 0;
-        CONFIGURE = 1;
-    }
-
-    // Sub control action, used to micromanage service engine activity
-    enum SubControlAction {
-        SKIP = 0;
-    }
-
-    // Message severity
-    enum Severity {
-        ERROR = 1;
-        WARNING = 2;
-        INFO = 3;
     }
 }
 
 //... Payload class ...
-message Payload {
+message xMsgPayload {
 
     message Item {
         required string name =1; // payload name
-        required Data data =2; // data
+        required xMsgData data = 2; // data
     }
 
     repeated Item item = 1;

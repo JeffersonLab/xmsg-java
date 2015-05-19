@@ -22,9 +22,9 @@
 package org.jlab.coda.xmsg.xsys.regdis;
 
 import com.google.protobuf.InvalidProtocolBufferException;
-import org.jlab.coda.xmsg.data.xMsgR.xMsgRegistrationData;
 import org.jlab.coda.xmsg.core.xMsgConstants;
 import org.jlab.coda.xmsg.core.xMsgUtil;
+import org.jlab.coda.xmsg.data.xMsgR.xMsgRegistration;
 import org.jlab.coda.xmsg.excp.xMsgDiscoverException;
 import org.jlab.coda.xmsg.excp.xMsgException;
 import org.jlab.coda.xmsg.excp.xMsgRegistrationException;
@@ -97,6 +97,49 @@ public class xMsgRegDiscDriver {
     }
 
     /**
+     * <p>
+     *     Creates and returns zmq socket object
+     * </p>
+     *
+     * @param context zmq context
+     * @param socket_type the type of the socket (integer defined by zmq)
+     * @param h host name
+     * @param port port number
+     * @param boc if set 0 socket will be bind, otherwise it will connect.
+     *                Note that for xMsg proxies we always connect (boc = 1)
+     *                (proxies are XPUB/XSUB sockets).
+     * @return zmq socket object
+     * @throws org.jlab.coda.xmsg.excp.xMsgException
+     */
+    public static Socket __zmqSocket(ZContext context,
+                                     int socket_type,
+                                     String h,
+                                     int port,
+                                     int boc)
+            throws xMsgException {
+
+        // Create a zmq socket
+        Socket sb = context.createSocket(socket_type);
+        if (sb == null) throw new xMsgException("null zmq socket-base");
+
+        if (boc == xMsgConstants.BIND.getIntValue()) {
+
+            // Bind socket to the host and port
+            int bind_port = sb.bind("tcp://" + h + ":" + port);
+            if (bind_port <= 0) {
+                throw new xMsgException("can not bind to the port = " + bind_port);
+            }
+        } else if (boc == xMsgConstants.CONNECT.getIntValue()) {
+
+            // Connect to the host and port
+            sb.connect("tcp://" + h + ":" + port);
+        } else {
+            throw new xMsgException("unknown socket bind/connect option");
+        }
+        return sb;
+    }
+
+    /**
      * Returns the main zmq socket context
      * @return zmq context
      */
@@ -109,12 +152,12 @@ public class xMsgRegDiscDriver {
      *     Sends registration request to the server. Request is wired using
      *     xMsg message construct, that have 3 part: topic, sender, and data.
      *     Data is the object of the
-     *     {@link org.jlab.coda.xmsg.data.xMsgR.xMsgRegistrationData}
+     *     {@link org.jlab.coda.xmsg.data.xMsgR.xMsgRegistration}
      * </p>
      * @param _connectionSocket connection socket defines the local or
      *                          front-end registration server
      * @param name the name of the sender
-     * @param data {@link org.jlab.coda.xmsg.data.xMsgR.xMsgRegistrationData} object
+     * @param data {@link org.jlab.coda.xmsg.data.xMsgR.xMsgRegistration} object
      * @param isPublisher if set to be true then this is a request to register
      *                    a publisher, otherwise this is a subscriber registration
      *                    request
@@ -122,7 +165,7 @@ public class xMsgRegDiscDriver {
      */
     private void _register(Socket _connectionSocket,
                            String name,
-                           xMsgRegistrationData data,
+                           xMsgRegistration data,
                            boolean isPublisher)
             throws xMsgRegistrationException {
 
@@ -196,19 +239,19 @@ public class xMsgRegDiscDriver {
      *     Sends remove registration request to the server. Request is wired using
      *     xMsg message construct, that have 3 part: topic, sender, and data.
      *     Data is the object of the
-     *     {@link org.jlab.coda.xmsg.data.xMsgR.xMsgRegistrationData}
+     *     {@link org.jlab.coda.xmsg.data.xMsgR.xMsgRegistration}
      * </p>
      * @param _connectionSocket connection socket defines the local or
      *                          front-end registration server
      * @param name the name of the sender
-     * @param data {@link org.jlab.coda.xmsg.data.xMsgR.xMsgRegistrationData} object
+     * @param data {@link org.jlab.coda.xmsg.data.xMsgR.xMsgRegistration} object
      * @param isPublisher if set to be true then this is a request to remove
      *                    a publisher registration, otherwise removes subscriber registration
      * @throws xMsgRegistrationException
      */
     private void _remove_registration(Socket _connectionSocket,
                                       String name,
-                                      xMsgRegistrationData data,
+                                      xMsgRegistration data,
                                       boolean isPublisher)
             throws xMsgRegistrationException {
 
@@ -352,20 +395,20 @@ public class xMsgRegDiscDriver {
      *    Searches registration database (local or global), defined by the
      *    connection socket object, for the publisher or subscriber based
      *    on the xMsg topic components. xMsg topic components, i.e. domain,
-     *    subject and types are defined within the xMsgRegistrationData object.
+     *    subject and types are defined within the xMsgRegistration object.
      * </p>
      * @param _connectionSocket connection socket defines the local or
      *                          front-end registration server
      * @param name the name of the sender
-     * @param data {@link org.jlab.coda.xmsg.data.xMsgR.xMsgRegistrationData} object
+     * @param data {@link org.jlab.coda.xmsg.data.xMsgR.xMsgRegistration} object
      * @param isPublisher if set to be true then this is a request to find
      *                    publishers, otherwise subscribers
      * @return List of publishers or subscribers that publish/subscribe required topic
      * @throws xMsgDiscoverException
      */
-    private List<xMsgRegistrationData> _find(Socket _connectionSocket,
+    private List<xMsgRegistration> _find(Socket _connectionSocket,
                                              String name,
-                                             xMsgRegistrationData data,
+                                             xMsgRegistration data,
                                              boolean isPublisher)
             throws xMsgDiscoverException {
 
@@ -411,15 +454,15 @@ public class xMsgRegDiscDriver {
             String s_topic = new String(r_topic.getData(), ZMQ.CHARSET);
             String s_sender = new String(r_sender.getData(), ZMQ.CHARSET);
 
-            List<xMsgRegistrationData> res = new ArrayList<>();
+            List<xMsgRegistration> res = new ArrayList<>();
             while (!r_msg.isEmpty()) {
                 ZFrame r_data = r_msg.pop();
                 if (r_data == null) throw new xMsgDiscoverException("null xMsg data is received");
 
                 // de-serialize received message components
-                final xMsgRegistrationData s_data;
+                final xMsgRegistration s_data;
                 try {
-                    s_data = xMsgRegistrationData.parseFrom(r_data.getData());
+                    s_data = xMsgRegistration.parseFrom(r_data.getData());
                 } catch (InvalidProtocolBufferException e) {
                     throw new xMsgDiscoverException(e.getMessage());
                 }
@@ -444,14 +487,14 @@ public class xMsgRegDiscDriver {
      *     Registers xMsg actor with the front-end registration and discovery server
      * </p>
      * @param name the name of the requester/sender
-     * @param data {@link org.jlab.coda.xmsg.data.xMsgR.xMsgRegistrationData} object
+     * @param data {@link org.jlab.coda.xmsg.data.xMsgR.xMsgRegistration} object
      * @param isPublisher if set to be true then this is a request to register
      *                    a publisher, otherwise this is a subscriber registration
      *                    request
      * @throws xMsgRegistrationException
      */
     public void register_fe(String name,
-                            xMsgRegistrationData data,
+                            xMsgRegistration data,
                             boolean isPublisher)
             throws xMsgRegistrationException {
         _register(_feConnection, name, data, isPublisher);
@@ -460,17 +503,17 @@ public class xMsgRegDiscDriver {
     /**
      * <p>
      *     Registers xMsg actor with the local registration and discovery server
-     *     @see #_register(org.zeromq.ZMQ.Socket, String, org.jlab.coda.xmsg.data.xMsgR.xMsgRegistrationData, boolean)
+     *     @see #_register(org.zeromq.ZMQ.Socket, String, org.jlab.coda.xmsg.data.xMsgR.xMsgRegistration, boolean)
      * </p>
      * @param name the name of the requester/sender
-     * @param data {@link org.jlab.coda.xmsg.data.xMsgR.xMsgRegistrationData} object
+     * @param data {@link org.jlab.coda.xmsg.data.xMsgR.xMsgRegistration} object
      * @param isPublisher if set to be true then this is a request to register
      *                    a publisher, otherwise this is a subscriber registration
      *                    request
      * @throws xMsgRegistrationException
      */
     public void register_local(String name,
-                               xMsgRegistrationData data,
+                               xMsgRegistration data,
                                boolean isPublisher)
             throws xMsgRegistrationException {
         _register(_lnConnection, name, data, isPublisher);
@@ -481,14 +524,14 @@ public class xMsgRegDiscDriver {
      *     Removes xMsg actor from the front-end registration and discovery server
      * </p>
      * @param name the name of the requester/sender
-     * @param data {@link org.jlab.coda.xmsg.data.xMsgR.xMsgRegistrationData} object
+     * @param data {@link org.jlab.coda.xmsg.data.xMsgR.xMsgRegistration} object
      * @param isPublisher if set to be true then this is a request to remove a
      *                    publisher registration , otherwise remove subscriber
      *                    registration
      * @throws xMsgRegistrationException
      */
     public void removeRegistration_fe(String name,
-                                      xMsgRegistrationData data,
+                                      xMsgRegistration data,
                                       boolean isPublisher)
             throws xMsgRegistrationException {
         _remove_registration(_feConnection, name, data, isPublisher);
@@ -499,14 +542,14 @@ public class xMsgRegDiscDriver {
      *     Removes xMsg actor from the local registration and discovery server
      * </p>
      * @param name the name of the requester/sender
-     * @param data {@link org.jlab.coda.xmsg.data.xMsgR.xMsgRegistrationData} object
+     * @param data {@link org.jlab.coda.xmsg.data.xMsgR.xMsgRegistration} object
      * @param isPublisher if set to be true then this is a request to remove a
      *                    publisher registration , otherwise remove subscriber
      *                    registration
      * @throws xMsgRegistrationException
      */
     public void removeRegistration_local(String name,
-                                         xMsgRegistrationData data,
+                                         xMsgRegistration data,
                                          boolean isPublisher)
             throws xMsgRegistrationException {
         _remove_registration(_lnConnection, name, data, isPublisher);
@@ -516,17 +559,17 @@ public class xMsgRegDiscDriver {
      * <p>
      *     Searches the local registration and discovery databases for an actor
      *     that publishes or subscribes the topic of the interest.
-     *     The search criteria i.e. topic is defined within the xMsgRegistrationData object.
+     *     The search criteria i.e. topic is defined within the xMsgRegistration object.
      * </p>
      * @param name the name of the sender/requester
-     * @param data {@link org.jlab.coda.xmsg.data.xMsgR.xMsgRegistrationData} object
+     * @param data {@link org.jlab.coda.xmsg.data.xMsgR.xMsgRegistration} object
      * @param isPublisher if set to be true then this is a request to find
      *                    publishers, otherwise subscribers
-     * @return List of {@link org.jlab.coda.xmsg.data.xMsgR.xMsgRegistrationData} objects
+     * @return List of {@link org.jlab.coda.xmsg.data.xMsgR.xMsgRegistration} objects
      * @throws xMsgDiscoverException
      */
-    public List<xMsgRegistrationData> findLocal( String name,
-                                                 xMsgRegistrationData data,
+    public List<xMsgRegistration> findLocal(String name,
+                                            xMsgRegistration data,
                                                  boolean isPublisher)
             throws xMsgDiscoverException {
         return _find(_lnConnection, name, data, isPublisher);
@@ -536,63 +579,20 @@ public class xMsgRegDiscDriver {
      * <p>
      *     Searches the front-end registration and discovery databases for an actor
      *     that publishes or subscribes the topic of the interest.
-     *     The search criteria i.e. topic is defined within the xMsgRegistrationData object.
+     *     The search criteria i.e. topic is defined within the xMsgRegistration object.
      * </p>
      * @param name the name of the sender/requester
-     * @param data {@link org.jlab.coda.xmsg.data.xMsgR.xMsgRegistrationData} object
+     * @param data {@link org.jlab.coda.xmsg.data.xMsgR.xMsgRegistration} object
      * @param isPublisher if set to be true then this is a request to find
      *                    publishers, otherwise subscribers
-     * @return List of {@link org.jlab.coda.xmsg.data.xMsgR.xMsgRegistrationData} objects
+     * @return List of {@link org.jlab.coda.xmsg.data.xMsgR.xMsgRegistration} objects
      * @throws xMsgDiscoverException
      */
-    public List<xMsgRegistrationData> findGlobal( String name,
-                                                  xMsgRegistrationData data,
+    public List<xMsgRegistration> findGlobal(String name,
+                                             xMsgRegistration data,
                                                   boolean isPublisher)
             throws xMsgDiscoverException {
         return _find(_feConnection, name, data, isPublisher);
-    }
-
-    /**
-     * <p>
-     *     Creates and returns zmq socket object
-     * </p>
-     *
-     * @param context zmq context
-     * @param socket_type the type of the socket (integer defined by zmq)
-     * @param h host name
-     * @param port port number
-     * @param boc if set 0 socket will be bind, otherwise it will connect.
-     *                Note that for xMsg proxies we always connect (boc = 1)
-     *                (proxies are XPUB/XSUB sockets).
-     * @return zmq socket object
-     * @throws org.jlab.coda.xmsg.excp.xMsgException
-     */
-    public static Socket __zmqSocket(ZContext context,
-                                     int socket_type,
-                                     String h,
-                                     int port,
-                                     int boc)
-            throws xMsgException {
-
-        // Create a zmq socket
-        Socket sb = context.createSocket(socket_type);
-        if(sb == null)throw new xMsgException("null zmq socket-base");
-
-        if (boc == xMsgConstants.BIND.getIntValue()) {
-
-            // Bind socket to the host and port
-            int bind_port = sb.bind("tcp://" + h + ":" + port);
-            if(bind_port <=0){
-                throw new xMsgException("can not bind to the port = "+bind_port);
-            }
-        } else if (boc == xMsgConstants.CONNECT.getIntValue()){
-
-            // Connect to the host and port
-            sb.connect("tcp://" + h + ":" + port);
-        } else{
-            throw new xMsgException("unknown socket bind/connect option");
-        }
-        return sb;
     }
 
 }

@@ -22,10 +22,10 @@
 package org.jlab.coda.xmsg.xsys.regdis;
 
 import com.google.protobuf.InvalidProtocolBufferException;
-import org.jlab.coda.xmsg.data.xMsgR.xMsgRegistrationData;
-import org.jlab.coda.xmsg.excp.xMsgException;
 import org.jlab.coda.xmsg.core.xMsgConstants;
 import org.jlab.coda.xmsg.core.xMsgUtil;
+import org.jlab.coda.xmsg.data.xMsgR.xMsgRegistration;
+import org.jlab.coda.xmsg.excp.xMsgException;
 import org.zeromq.ZContext;
 import org.zeromq.ZFrame;
 import org.zeromq.ZMQ;
@@ -60,18 +60,18 @@ import java.util.concurrent.ConcurrentHashMap;
  * @since 1.0
  */
 
-public class xMsgRegistrar extends Thread {
+public class xMsgRegistrationService extends Thread {
 
     // zmq context.
     // Note. this class does not own the context.
     private ZContext context;
 
     // Database to store publishers
-    private ConcurrentHashMap<String, xMsgRegistrationData>
+    private ConcurrentHashMap<String, xMsgRegistration>
             publishers_db =  new ConcurrentHashMap<>();
 
     // database to store subscribers
-    private ConcurrentHashMap<String, xMsgRegistrationData>
+    private ConcurrentHashMap<String, xMsgRegistration>
             subscribers_db = new ConcurrentHashMap<>();
 
     // Registrar accepted requests from any host (*)
@@ -92,7 +92,7 @@ public class xMsgRegistrar extends Thread {
      * @param context zmq context
      * @throws xMsgException
      */
-    public xMsgRegistrar(ZContext context) throws xMsgException, SocketException {
+    public xMsgRegistrationService(ZContext context) throws xMsgException, SocketException {
         this.context = context;
         localhost_ip = xMsgUtil.host_to_ip("localhost");
     }
@@ -112,7 +112,7 @@ public class xMsgRegistrar extends Thread {
      * @param context zmq context
      * @throws xMsgException
      */
-    public xMsgRegistrar(String feHost, ZContext context) throws xMsgException, SocketException {
+    public xMsgRegistrationService(String feHost, ZContext context) throws xMsgException, SocketException {
         this.context = context;
         localhost_ip = xMsgUtil.host_to_ip("localhost");
 
@@ -122,12 +122,15 @@ public class xMsgRegistrar extends Thread {
          * @see #publishers_db
          * @see #subscribers_db
          */
-        (new Thread( new xMsgFeRegT(feHost, publishers_db, subscribers_db))).start();
+        (new Thread(new xMsgRegRepT(feHost, publishers_db, subscribers_db))).start();
     }
 
     @Override
     public void run() {
         super.run();
+
+        System.out.println(xMsgUtil.currentTime(4) +
+                " Info: xMsg local registration and discovery server is started");
 
         //  Create registrar REP socket
         ZMQ.Socket reg_socket = context.createSocket(ZMQ.REP);
@@ -175,7 +178,7 @@ public class xMsgRegistrar extends Thread {
 
             ZFrame r_data = request.pop(); // get serialize data
 
-            xMsgRegistrationData s_data = null; // registration data
+            xMsgRegistration s_data = null; // registration data
 
             // RemoveAll request data that defines the host name where xMsg actors are registered
             String s_host = xMsgConstants.UNDEFINED.getStringValue();
@@ -188,8 +191,8 @@ public class xMsgRegistrar extends Thread {
                     s_host = new String(r_data.getData(), ZMQ.CHARSET);
 
                 } else {
-                    // De-serialize data using protobuf to get xMsgRegistrationData object
-                    s_data = xMsgRegistrationData.parseFrom(r_data.getData());
+                    // De-serialize data using protobuf to get xMsgRegistration object
+                    s_data = xMsgRegistration.parseFrom(r_data.getData());
 
                     // construct database key (domain:subject:type)
                     key = s_data.getDomain();
@@ -246,12 +249,12 @@ public class xMsgRegistrar extends Thread {
 
                 } else if (s_topic.equals(xMsgConstants.FIND_PUBLISHER.getStringValue())) {
                     assert s_data != null;
-                    Set<xMsgRegistrationData> res = _getRegistration(s_data.getDomain(),
+                    Set<xMsgRegistration> res = _getRegistration(s_data.getDomain(),
                             s_data.getSubject(),
                             s_data.getType(),
                             true);
                     if(!res.isEmpty()){
-                        for(xMsgRegistrationData rd:res){
+                        for (xMsgRegistration rd : res) {
 
                             // Serialize and add to the reply message
                             byte[] _sd = rd.toByteArray();
@@ -261,12 +264,12 @@ public class xMsgRegistrar extends Thread {
 
                 } else if (s_topic.equals(xMsgConstants.FIND_SUBSCRIBER.getStringValue())) {
                     assert s_data != null;
-                    Set<xMsgRegistrationData> res = _getRegistration(s_data.getDomain(),
+                    Set<xMsgRegistration> res = _getRegistration(s_data.getDomain(),
                             s_data.getSubject(),
                             s_data.getType(),
                             false);
                     if(!res.isEmpty()){
-                        for(xMsgRegistrationData rd:res){
+                        for (xMsgRegistration rd : res) {
 
                             // Serialize and add to the reply message
                             byte[] _sd = rd.toByteArray();
@@ -308,9 +311,9 @@ public class xMsgRegistrar extends Thread {
      * @param subject input key subject element
      * @param type input key subject element
      * @param isPublisher defines what database to look for
-     * @return set of {@link org.jlab.coda.xmsg.data.xMsgR.xMsgRegistrationData} objects
+     * @return set of {@link org.jlab.coda.xmsg.data.xMsgR.xMsgRegistration} objects
      */
-    private Set<xMsgRegistrationData> _getRegistration(String domain,
+    private Set<xMsgRegistration> _getRegistration(String domain,
                                                        String subject,
                                                        String type,
                                                        boolean isPublisher)
@@ -321,7 +324,7 @@ public class xMsgRegistrar extends Thread {
             throw new xMsgException("undefined domain");
         }
 
-        Set<xMsgRegistrationData> result = new HashSet<>();
+        Set<xMsgRegistration> result = new HashSet<>();
         if(isPublisher) {
             for (String k : publishers_db.keySet()) {
                 if((xMsgUtil.getTopicDomain(k).equals(domain)) &&
@@ -358,7 +361,7 @@ public class xMsgRegistrar extends Thread {
      * @param host host name
      * @param db reference to the registration database
      */
-    private void _cleanDbByHost(String host, ConcurrentHashMap<String, xMsgRegistrationData> db){
+    private void _cleanDbByHost(String host, ConcurrentHashMap<String, xMsgRegistration> db) {
 
         // First create a list of keys that match the criteria, to
         // be used for removing the registration data for those keys
@@ -366,7 +369,7 @@ public class xMsgRegistrar extends Thread {
 
         // Marshal through publishers data base and remove all
         // publisher registration data on a specified host
-        for(Map.Entry<String, xMsgRegistrationData> entry: db.entrySet()){
+        for (Map.Entry<String, xMsgRegistration> entry : db.entrySet()) {
             if(entry.getValue().getHost().equals(host)) k.add(entry.getKey());
         }
 

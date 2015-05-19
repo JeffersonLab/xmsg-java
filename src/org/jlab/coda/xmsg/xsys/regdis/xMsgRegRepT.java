@@ -21,10 +21,10 @@
 
 package org.jlab.coda.xmsg.xsys.regdis;
 
-import org.jlab.coda.xmsg.data.xMsgR.xMsgRegistrationData;
+import org.jlab.coda.xmsg.core.xMsgUtil;
+import org.jlab.coda.xmsg.data.xMsgR.xMsgRegistration;
 import org.jlab.coda.xmsg.excp.xMsgException;
 import org.jlab.coda.xmsg.excp.xMsgRegistrationException;
-import org.jlab.coda.xmsg.core.xMsgUtil;
 
 import java.net.SocketException;
 import java.util.concurrent.ConcurrentHashMap;
@@ -36,11 +36,11 @@ import java.util.concurrent.ConcurrentHashMap;
  *      registration database with passed publishers and subscribers
  *      database contents. These passed databases (i.e. references)
  *      are xMsgNode resident databases, defined within the xMsgRegistrar class:
- *      {@link org.jlab.coda.xmsg.xsys.regdis.xMsgRegistrar}
+ *      {@link xMsgRegistrationService}
  *
  *      This class will be instantiated by the xMsgRegistrar constructor
  *      executed by the xMsgNode:
- *      {@link org.jlab.coda.xmsg.xsys.xMsgNode}
+ *      {@link org.jlab.coda.xmsg.xsys.xMsgRegistrar}
  *
  *      This class inherits from {@link xMsgRegDiscDriver}
  *      where xMsg database communication methods are defined.
@@ -53,11 +53,11 @@ import java.util.concurrent.ConcurrentHashMap;
  * @version %I%
  * @since 1.0
  */
-public class xMsgFeRegT extends xMsgRegDiscDriver implements Runnable {
+public class xMsgRegRepT extends xMsgRegDiscDriver implements Runnable {
 
     // xMsgNode database references
-    private ConcurrentHashMap<String, xMsgRegistrationData> publishers_db;
-    private ConcurrentHashMap<String, xMsgRegistrationData> subscribers_db;
+    private ConcurrentHashMap<String, xMsgRegistration> publishers_db;
+    private ConcurrentHashMap<String, xMsgRegistration> subscribers_db;
 
     /**
      * <p>
@@ -72,9 +72,9 @@ public class xMsgFeRegT extends xMsgRegDiscDriver implements Runnable {
      *                       subscribers database
      * @throws xMsgException
      */
-    public xMsgFeRegT(String feHost,
-                     ConcurrentHashMap<String, xMsgRegistrationData> publishers_db,
-                     ConcurrentHashMap<String, xMsgRegistrationData> subscribers_db
+    public xMsgRegRepT(String feHost,
+                       ConcurrentHashMap<String, xMsgRegistration> publishers_db,
+                       ConcurrentHashMap<String, xMsgRegistration> subscribers_db
     ) throws xMsgException, SocketException {
         super(feHost);
         this.publishers_db = publishers_db;

@@ -63,15 +63,7 @@ public enum xMsgConstants {
     CONNECT(18,"connect"),
 
     DEFAULT_PORT(7771, "defaultPort"),
-    REGISTRAR_PORT(8888, "registrarPort"),
-
-    // Note: xMsg envelope passed through zmq
-    // consists of three strings:
-    // 1) topic
-    // 2) dataType (accepts two types defined below
-    // 3) actual serialized data
-    ENVELOPE_DATA_TYPE_STRING(19,"string"),
-    ENVELOPE_DATA_TYPE_XMSGDATA(20,"xMsgData");
+    REGISTRAR_PORT(8888, "registrarPort");
 
     private int intValue;
     private String stringValue;
