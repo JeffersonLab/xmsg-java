@@ -2,10 +2,14 @@ package org.jlab.coda.xmsg.core;
 
 import com.google.protobuf.InvalidProtocolBufferException;
 
-import org.jlab.coda.xmsg.data.xMsgD;
-import org.jlab.coda.xmsg.excp.*;
+import org.jlab.coda.xmsg.excp.xMsgDiscoverException;
+import org.jlab.coda.xmsg.excp.xMsgException;
+import org.jlab.coda.xmsg.excp.xMsgPublishingException;
+import org.jlab.coda.xmsg.excp.xMsgRegistrationException;
+import org.jlab.coda.xmsg.excp.xMsgSubscribingException;
 import org.jlab.coda.xmsg.net.xMsgAddress;
 import org.jlab.coda.xmsg.net.xMsgConnection;
+import org.jlab.coda.xmsg.data.xMsgD;
 import org.jlab.coda.xmsg.data.xMsgR.xMsgRegistrationData;
 import org.jlab.coda.xmsg.xsys.regdis.xMsgRegDiscDriver;
 import org.zeromq.ZContext;
@@ -17,8 +21,15 @@ import org.zeromq.ZMsg;
 import java.net.SocketException;
 import java.util.HashMap;
 import java.util.List;
+import java.util.concurrent.BlockingQueue;
+import java.util.concurrent.CancellationException;
+import java.util.concurrent.ExecutionException;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
+import java.util.concurrent.Future;
+import java.util.concurrent.LinkedBlockingQueue;
+import java.util.concurrent.ThreadPoolExecutor;
+import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
 
 import static org.jlab.coda.xmsg.xsys.regdis.xMsgRegDiscDriver.__zmqSocket;
@@ -80,7 +91,7 @@ public class xMsg {
         driver = new xMsgRegDiscDriver(feHost);
         _context = driver.getContext();
 
-        threadPool = Executors.newFixedThreadPool(this.pool_size);
+        threadPool = newFixedThreadPool(this.pool_size);
     }
 
     /**
@@ -107,7 +118,7 @@ public class xMsg {
 
         // create fixed size thread pool
         this.pool_size = pool_size;
-        threadPool = Executors.newFixedThreadPool(this.pool_size);
+        threadPool = newFixedThreadPool(this.pool_size);
     }
 
     /**
@@ -1289,7 +1300,14 @@ public class xMsg {
         };
 
         // wait for messages published to a required topic
-        new Thread(sHandle).start();
+        Thread t = new Thread(sHandle);
+        t.setUncaughtExceptionHandler(new Thread.UncaughtExceptionHandler() {
+            @Override
+            public void uncaughtException(Thread t, Throwable e) {
+                e.printStackTrace();
+            }
+        });
+        t.start();
         return sHandle;
     }
 
@@ -1392,4 +1410,41 @@ public class xMsg {
 
     }
 
+
+    public static ExecutorService newFixedThreadPool(int nThreads) {
+        return new FixedExecutor(nThreads, nThreads,
+                                      0L, TimeUnit.MILLISECONDS,
+                                      new LinkedBlockingQueue<Runnable>());
+    }
+
+
+    private static class FixedExecutor extends ThreadPoolExecutor {
+
+        public FixedExecutor(int corePoolSize, int maximumPoolSize, long keepAliveTime,
+                                TimeUnit unit, BlockingQueue<Runnable> workQueue) {
+            super(corePoolSize, maximumPoolSize, keepAliveTime, unit, workQueue);
+        }
+
+        @Override
+        protected void afterExecute(Runnable r, Throwable t) {
+            super.afterExecute(r, t);
+            if (t == null && r instanceof Future<?>) {
+                try {
+                    Future<?> future = (Future<?>) r;
+                    if (future.isDone()) {
+                        future.get();
+                    }
+                } catch (CancellationException ce) {
+                    t = ce;
+                } catch (ExecutionException ee) {
+                    t = ee.getCause();
+                } catch (InterruptedException ie) {
+                    Thread.currentThread().interrupt(); // ignore/reset
+                }
+            }
+            if (t != null) {
+                t.printStackTrace();
+            }
+        }
+    }
 }
