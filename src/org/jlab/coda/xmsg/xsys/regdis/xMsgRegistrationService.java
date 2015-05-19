@@ -122,7 +122,14 @@ public class xMsgRegistrationService extends Thread {
          * @see #publishers_db
          * @see #subscribers_db
          */
-        (new Thread(new xMsgRegRepT(feHost, publishers_db, subscribers_db))).start();
+        Thread t = new Thread(new xMsgRegRepT(feHost, publishers_db, subscribers_db));
+        t.setUncaughtExceptionHandler(new Thread.UncaughtExceptionHandler() {
+            @Override
+            public void uncaughtException(Thread t, Throwable e) {
+                e.printStackTrace();
+            }
+        });
+        t.start();
     }
 
     @Override
