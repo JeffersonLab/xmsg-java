@@ -1089,10 +1089,7 @@ public class xMsg {
                     // de-serialize passed transient data
                     try {
                         xMsgD.Data im_data = xMsgD.Data.parseFrom(r_data.getData());
-
-                        // Create a builder object from immutable de-serialized object.
-                        ds_data = xMsgUtil.getPbBuilder(im_data);
-
+                        ds_data = im_data.toBuilder();
                     } catch (InvalidProtocolBufferException e) {
                         throw new xMsgSubscribingException(e.getMessage());
                     }
@@ -1255,10 +1252,7 @@ public class xMsg {
                         // de-serialize passed transient data
                         try {
                             xMsgD.Data im_data = xMsgD.Data.parseFrom(r_data.getData());
-
-                            // Create a builder object from immutable de-serialized object.
-                            ds_data = xMsgUtil.getPbBuilder(im_data);
-
+                            ds_data = im_data.toBuilder();
                         } catch (InvalidProtocolBufferException e) {
                             throw new xMsgSubscribingException(e.getMessage());
                         }

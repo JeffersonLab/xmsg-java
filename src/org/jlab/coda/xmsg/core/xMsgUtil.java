@@ -274,45 +274,6 @@ public class xMsgUtil {
         return out;
     }
 
-    public static xMsgD.Data.Builder getPbBuilder(xMsgD.Data data){
-        xMsgD.Data.Builder trb = xMsgD.Data.newBuilder();
-        trb.setDataVersion(data.getDataVersion());
-        trb.setDataDescription(data.getDataDescription());
-        trb.setDataAuthor(data.getDataAuthor());
-        trb.setDataAuthorState(data.getDataAuthorState());
-        trb.setDataGenerationStatus(data.getDataGenerationStatus());
-        trb.setVLSINT32(data.getVLSINT32());
-        trb.setVLSINT64(data.getVLSINT64());
-        trb.setFLSINT32(data.getFLSINT32());
-        trb.setFLSINT64(data.getFLSINT64());
-        trb.setFLOAT(data.getFLOAT());
-        trb.setDOUBLE(data.getDOUBLE());
-        trb.setSTRING(data.getSTRING());
-        trb.setBYTES(data.getBYTES());
-
-        trb.addAllVLSINT32A(data.getVLSINT32AList());
-        trb.addAllVLSINT64A(data.getVLSINT64AList());
-
-        trb.addAllFLSINT32A(data.getFLSINT32AList());
-        trb.addAllFLSINT64A(data.getFLSINT64AList());
-
-        trb.addAllFLOATA(data.getFLOATAList());
-        trb.addAllDOUBLEA(data.getDOUBLEAList());
-        trb.addAllSTRINGA(data.getSTRINGAList());
-        trb.addAllBYTESA(data.getBYTESAList());
-
-        trb.setDataType(data.getDataType());
-        trb.setByteOrder(data.getByteOrder());
-        trb.setSender(data.getSender());
-        trb.setId(data.getId());
-        trb.setDoneMonitor(data.getDoneMonitor());
-        trb.setDataMonitor(data.getDataMonitor());
-        trb.setComposition(data.getComposition());
-        trb.setAction(data.getAction());
-        trb.setControlR(data.getControlR());
-        return trb;
-    }
-
     public static xMsgD.Data.Builder createxMsgData(String author,
                                             int com_id,
                                             String description,
