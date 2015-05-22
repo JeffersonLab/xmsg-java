@@ -180,7 +180,7 @@ public class xMsgNode extends xMsgRegDiscDriver {
                     super.run();
                     System.out.println(xMsgUtil.currentTime(4) +
                             " Info: Shutting down xMsg local registration and discovery server");
-                    _registrationThread.interrupt();
+                    _registrationThread.stop();
 
                     // Tell front-end registration server to remove all actors from this host
                     try {
@@ -246,7 +246,7 @@ public class xMsgNode extends xMsgRegDiscDriver {
                     super.run();
                     System.out.println(xMsgUtil.currentTime(4) +
                             " Info: Shutting down xMsg local registration and discovery server");
-                    _registrationThread.interrupt();
+                    _registrationThread.stop();
 
                     // Tell front-end registration server to remove all actors from this host
                     try {
