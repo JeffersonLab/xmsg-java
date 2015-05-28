@@ -38,6 +38,7 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.Enumeration;
 import java.util.List;
+import java.util.Objects;
 import java.util.StringTokenizer;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -137,20 +138,22 @@ public final class xMsgUtil {
 
     /**
      * Builds xMsg topic of the form: {@code domain:subject:type}.
+     * <p>
+     * The domain cannot be undefined. If the topic should accept any subject or
+     * domain, pass {@code null} or {@code "*"}.
      *
-     * @param domain domain of the message
-     * @param subject subject of the message
-     * @param type type of the message
-     * @return xMsg topic
-     * @throws xMsgException
+     * @param domain domain of the topic
+     * @param subject subject of the topic
+     * @param type type of the topic
+     * @return the constructed xMsg topic
      */
     public static String buildTopic(String domain,
                                     String subject,
-                                    String type) throws xMsgException {
-        StringBuilder topic = new StringBuilder();
+                                    String type) {
         if (domain == null || domain.equals("*")) {
-            throw new xMsgException("domain is not defined");
+            throw new IllegalArgumentException("domain is not defined");
         }
+        StringBuilder topic = new StringBuilder();
         topic.append(domain);
         if (subject != null && !subject.equals("*")) {
             topic.append(":").append(subject);
@@ -176,10 +179,14 @@ public final class xMsgUtil {
      *
      * @param topic xMsg topic
      * @return domain of the topic
-     * @throws xMsgException in case topic does not have a proper xMsg topic construct
      */
-    public static String getTopicDomain(String topic) throws xMsgException {
-        return topic.substring(0, topic.indexOf(":"));
+    public static String getTopicDomain(String topic) {
+        Objects.requireNonNull(topic, "null topic");
+        int firstSep = topic.indexOf(":");
+        if (firstSep < 0) {
+            return topic;
+        }
+        return topic.substring(0, firstSep);
     }
 
     /**
@@ -190,20 +197,18 @@ public final class xMsgUtil {
      * @param topic xMsg topic
      * @return subject of the topic. In case subject is missing in the topic, it
      *         returns {@code xMsgConstants.UNDEFINED}.
-     * @throws xMsgException in case topic does not have a proper xMsg topic construct
      */
-    public static String getTopicSubject(String topic) throws xMsgException {
-        StringTokenizer st = new StringTokenizer(topic, ":");
-        if (st.hasMoreTokens()) {
-            st.nextToken();
-        } else {
-            throw new xMsgException("malformed xMsg topic.");
-        }
-        if (st.hasMoreTokens()) {
-            return st.nextToken();
-        } else {
+    public static String getTopicSubject(String topic) {
+        Objects.requireNonNull(topic, "null topic");
+        int firstSep = topic.indexOf(":");
+        if (firstSep < 0) {
             return xMsgConstants.UNDEFINED.getStringValue();
         }
+        int secondSep = topic.indexOf(":", firstSep + 1);
+        if (secondSep < 0) {
+            return topic.substring(firstSep + 1);
+        }
+        return topic.substring(firstSep + 1, secondSep);
     }
 
     /**
@@ -216,25 +221,18 @@ public final class xMsgUtil {
      *         returns xMsgConstants.UNDEFINED.
      *         Note that type can not be defined if subject is not defined,
      *         i.e. xMsg does not support topic such as: {@code domain:*:type}.
-     * @throws xMsgException in case topic does not have a proper xMsg topic construct
      */
-    public static String getTopicType(String topic) throws xMsgException {
-        StringTokenizer st = new StringTokenizer(topic, ":");
-        if (st.hasMoreTokens()) {
-            st.nextToken();
-        } else {
-            throw new xMsgException("malformed xMsg topic.");
-        }
-        if (st.hasMoreTokens()) {
-            st.nextToken();
-            if (st.hasMoreTokens()) {
-                return st.nextToken();
-            } else {
-                return xMsgConstants.UNDEFINED.getStringValue();
-            }
-        } else {
+    public static String getTopicType(String topic) {
+        Objects.requireNonNull(topic, "null topic");
+        int firstSep = topic.indexOf(":");
+        if (firstSep < 0) {
             return xMsgConstants.UNDEFINED.getStringValue();
         }
+        int secondSep = topic.indexOf(":", firstSep + 1);
+        if (secondSep < 0) {
+            return xMsgConstants.UNDEFINED.getStringValue();
+        }
+        return topic.substring(secondSep + 1);
     }
 
     /**
