@@ -247,6 +247,9 @@ public final class xMsgUtil {
      * @throws SocketException if an I/O error occurs.
      */
     public static List<String> getLocalHostIps() throws SocketException {
+        if (localHostIps.isEmpty()) {
+            updateLocalHostIps();
+        }
         return localHostIps;
     }
 
