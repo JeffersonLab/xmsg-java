@@ -27,6 +27,7 @@ import org.jlab.coda.xmsg.excp.xMsgException;
 import org.jlab.coda.xmsg.excp.xMsgRegistrationException;
 
 import java.net.SocketException;
+import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 
 
@@ -56,8 +57,8 @@ import java.util.concurrent.ConcurrentHashMap;
 public class xMsgRegRepT extends xMsgRegDiscDriver implements Runnable {
 
     // xMsgNode database references
-    private ConcurrentHashMap<String, xMsgRegistration> publishers_db;
-    private ConcurrentHashMap<String, xMsgRegistration> subscribers_db;
+    private ConcurrentHashMap<String, Set<xMsgRegistration>> publishers_db;
+    private ConcurrentHashMap<String, Set<xMsgRegistration>> subscribers_db;
 
     /**
      * <p>
@@ -73,8 +74,8 @@ public class xMsgRegRepT extends xMsgRegDiscDriver implements Runnable {
      * @throws xMsgException
      */
     public xMsgRegRepT(String feHost,
-                       ConcurrentHashMap<String, xMsgRegistration> publishers_db,
-                       ConcurrentHashMap<String, xMsgRegistration> subscribers_db
+                       ConcurrentHashMap<String, Set<xMsgRegistration>> publishers_db,
+                       ConcurrentHashMap<String, Set<xMsgRegistration>> subscribers_db
     ) throws xMsgException, SocketException {
         super(feHost);
         this.publishers_db = publishers_db;
@@ -89,8 +90,10 @@ public class xMsgRegRepT extends xMsgRegDiscDriver implements Runnable {
             // update FE publishers database
             for(String key:publishers_db.keySet()){
                 try {
-                    register_fe(key, publishers_db.get(key), true);
-                    xMsgUtil.sleep(500);
+                    for(xMsgRegistration r:publishers_db.get(key)) {
+                        register_fe(key, r, true);
+                        xMsgUtil.sleep(500);
+                    }
                 } catch (xMsgRegistrationException e) {
                     e.printStackTrace();
                 }
@@ -99,8 +102,10 @@ public class xMsgRegRepT extends xMsgRegDiscDriver implements Runnable {
             // update FE subscribers database
             for(String key:subscribers_db.keySet()){
                 try {
-                    register_fe(key, subscribers_db.get(key), false);
-                    xMsgUtil.sleep(500);
+                    for(xMsgRegistration r:subscribers_db.get(key)) {
+                        register_fe(key, r, false);
+                        xMsgUtil.sleep(500);
+                    }
                 } catch (xMsgRegistrationException e) {
                     e.printStackTrace();
                 }

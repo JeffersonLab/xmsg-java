@@ -400,7 +400,7 @@ public class xMsgRegDiscDriver {
      * @param _connectionSocket connection socket defines the local or
      *                          front-end registration server
      * @param name the name of the sender
-     * @param data {@link org.jlab.coda.xmsg.data.xMsgR.xMsgRegistration} object
+     * @param data {@link xMsgRegistration} object
      * @param isPublisher if set to be true then this is a request to find
      *                    publishers, otherwise subscribers
      * @return List of publishers or subscribers that publish/subscribe required topic

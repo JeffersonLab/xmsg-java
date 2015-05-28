@@ -67,11 +67,11 @@ public class xMsgRegistrationService extends Thread {
     private ZContext context;
 
     // Database to store publishers
-    private ConcurrentHashMap<String, xMsgRegistration>
+    private ConcurrentHashMap<String, Set<xMsgRegistration>>
             publishers_db =  new ConcurrentHashMap<>();
 
     // database to store subscribers
-    private ConcurrentHashMap<String, xMsgRegistration>
+    private ConcurrentHashMap<String, Set<xMsgRegistration>>
             subscribers_db = new ConcurrentHashMap<>();
 
     // Registrar accepted requests from any host (*)
@@ -230,19 +230,45 @@ public class xMsgRegistrationService extends Thread {
                 // actually to perform the request and define the resulting data
                 // Note: requested action is passed throw the xMsg topic field.
                 if (s_topic.equals(xMsgConstants.REGISTER_PUBLISHER.getStringValue())) {
-                    if(s_data!=null) publishers_db.put(key, s_data);
+                    if(s_data!=null) {
+                        if(publishers_db.containsKey(key)) {
+                            publishers_db.get(key).add(s_data);
+                        } else {
+                            Set<xMsgRegistration> tmset = new HashSet<>();
+                            tmset.add(s_data);
+                            publishers_db.put(key,tmset);
+                        }
+                    }
                     reply.addString(xMsgConstants.SUCCESS.getStringValue());
 
                 } else if (s_topic.equals(xMsgConstants.REGISTER_SUBSCRIBER.getStringValue())) {
-                    if(s_data!=null) subscribers_db.put(key, s_data);
+                    if(s_data!=null) {
+                        if(subscribers_db.containsKey(key)) {
+                            subscribers_db.get(key).add(s_data);
+                        } else {
+                            Set<xMsgRegistration> tmset = new HashSet<>();
+                            tmset.add(s_data);
+                            subscribers_db.put(key,tmset);
+                        }
+                    }
                     reply.addString(xMsgConstants.SUCCESS.getStringValue());
 
                 } else if (s_topic.equals(xMsgConstants.REMOVE_PUBLISHER.getStringValue())) {
-                    publishers_db.remove(key);
+                    if(publishers_db.containsKey(key)){
+                        publishers_db.get(key).remove(s_data);
+                        if(publishers_db.get(key).isEmpty()) {
+                            publishers_db.remove(key);
+                        }
+                    }
                     reply.addString(xMsgConstants.SUCCESS.getStringValue());
 
                 } else if (s_topic.equals(xMsgConstants.REMOVE_SUBSCRIBER.getStringValue())) {
-                    subscribers_db.remove(key);
+                    if(subscribers_db.containsKey(key)){
+                        subscribers_db.get(key).remove(s_data);
+                        if(subscribers_db.get(key).isEmpty()) {
+                            subscribers_db.remove(key);
+                        }
+                    }
                     reply.addString(xMsgConstants.SUCCESS.getStringValue());
 
                 } else if (s_topic.equals(xMsgConstants.REMOVE_ALL_REGISTRATION.getStringValue())) {
@@ -316,9 +342,9 @@ public class xMsgRegistrationService extends Thread {
      * </p>
      * @param domain input key domain element
      * @param subject input key subject element
-     * @param type input key subject element
+     * @param type input key type element
      * @param isPublisher defines what database to look for
-     * @return set of {@link org.jlab.coda.xmsg.data.xMsgR.xMsgRegistration} objects
+     * @return set of {@link xMsgRegistration} objects
      */
     private Set<xMsgRegistration> _getRegistration(String domain,
                                                        String subject,
@@ -341,7 +367,7 @@ public class xMsgRegistrationService extends Thread {
                 (xMsgUtil.getTopicType(k).equals(type) ||
                         type.equals("*") ||
                         type.equals(xMsgConstants.UNDEFINED.getStringValue()))) {
-                    result.add(publishers_db.get(k));
+                    result.addAll(publishers_db.get(k));
                 }
             }
         } else {
@@ -354,7 +380,7 @@ public class xMsgRegistrationService extends Thread {
                         (xMsgUtil.getTopicType(k).equals(type) ||
                                 type.equals("*") ||
                                 type.equals(xMsgConstants.UNDEFINED.getStringValue()))) {
-                    result.add(subscribers_db.get(k));
+                    result.addAll(subscribers_db.get(k));
                 }
             }
         }
@@ -368,20 +394,20 @@ public class xMsgRegistrationService extends Thread {
      * @param host host name
      * @param db reference to the registration database
      */
-    private void _cleanDbByHost(String host, ConcurrentHashMap<String, xMsgRegistration> db) {
+    private void _cleanDbByHost(String host, ConcurrentHashMap<String, Set<xMsgRegistration>> db) {
 
-        // First create a list of keys that match the criteria, to
-        // be used for removing the registration data for those keys
-        List<String> k = new ArrayList<>();
+        Set<xMsgRegistration> tmps = new HashSet<>();
 
         // Marshal through publishers data base and remove all
         // publisher registration data on a specified host
-        for (Map.Entry<String, xMsgRegistration> entry : db.entrySet()) {
-            if(entry.getValue().getHost().equals(host)) k.add(entry.getKey());
+        for (String key: db.keySet()) {
+            for(xMsgRegistration r:db.get(key)) {
+                if (r.getHost().equals(host)) {
+                     tmps.add(r);
+                }
+            }
+            db.get(key).removeAll(tmps);
+            tmps.clear();
         }
-
-        //Remove all identified keys
-        for(String rk:k) db.remove(rk);
-
     }
 }
