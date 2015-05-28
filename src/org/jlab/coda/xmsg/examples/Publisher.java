@@ -55,6 +55,13 @@ public class Publisher extends xMsg {
 
     public static void main(String[] args) {
         try {
+            if (args.length != 1) {
+                System.err.println("Usage: Publisher <data_size_kb>");
+                System.exit(1);
+            }
+
+            int dataSize = Integer.parseInt(args[0]);
+
             final String name = "test_publisher";
             final String domain = "test_domain";
             final String subject = "test_subject";
@@ -73,8 +80,8 @@ public class Publisher extends xMsg {
             xMsgMessage msg = new xMsgMessage(topic);
 
             // Fill data with a byte array the required size
-            System.out.println("Byte array size = " + args[0]);
-            byte[] b = new byte[Integer.parseInt(args[0])];
+            System.out.println("Byte array size = " + dataSize);
+            byte[] b = new byte[dataSize];
             msg.setData(b);
 
             // Publish data for ever...
@@ -84,6 +91,10 @@ public class Publisher extends xMsg {
 
         } catch (xMsgException | IOException e) {
             e.printStackTrace();
+            System.exit(1);
+        } catch (NumberFormatException e) {
+            System.err.println("Parameter must be an integer (the data size in KB)!!");
+            System.exit(1);
         }
     }
 }
