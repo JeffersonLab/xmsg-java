@@ -1,0 +1,192 @@
+/*
+ * Copyright (C) 2015. Jefferson Lab, xMsg framework (JLAB). All Rights Reserved.
+ * Permission to use, copy, modify, and distribute this software and its
+ * documentation for educational, research, and not-for-profit purposes,
+ * without fee and without a signed licensing agreement.
+ *
+ * Author Vardan Gyurjyan
+ * Department of Experimental Nuclear Physics, Jefferson Lab.
+ *
+ * IN NO EVENT SHALL JLAB BE LIABLE TO ANY PARTY FOR DIRECT, INDIRECT, SPECIAL,
+ * INCIDENTAL, OR CONSEQUENTIAL DAMAGES, INCLUDING LOST PROFITS, ARISING OUT OF
+ * THE USE OF THIS SOFTWARE AND ITS DOCUMENTATION, EVEN IF JLAB HAS BEEN ADVISED
+ * OF THE POSSIBILITY OF SUCH DAMAGE.
+ *
+ * JLAB SPECIFICALLY DISCLAIMS ANY WARRANTIES, INCLUDING, BUT NOT LIMITED TO,
+ * THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR
+ * PURPOSE. THE CLARA SOFTWARE AND ACCOMPANYING DOCUMENTATION, IF ANY, PROVIDED
+ * HEREUNDER IS PROVIDED "AS IS". JLAB HAS NO OBLIGATION TO PROVIDE MAINTENANCE,
+ * SUPPORT, UPDATES, ENHANCEMENTS, OR MODIFICATIONS.
+ */
+
+package org.jlab.coda.xmsg.xsys.regdis;
+
+import java.util.HashSet;
+import java.util.Iterator;
+import java.util.Map.Entry;
+import java.util.Set;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.ConcurrentMap;
+
+import org.jlab.coda.xmsg.core.xMsgConstants;
+import org.jlab.coda.xmsg.core.xMsgUtil;
+import org.jlab.coda.xmsg.data.xMsgR.xMsgRegistration;
+
+/**
+ * A registration database of xMsg actors.
+ * <p>
+ * Actors are grouped by topic, i.e., actors registered with the same topic will
+ * be in the same group.
+ */
+public class xMsgRegDatabase {
+
+    private final ConcurrentMap<String, Set<xMsgRegistration>> db =  new ConcurrentHashMap<>();
+
+    /**
+     * Adds a new xMsg actor to the registration.
+     * The actor will be grouped along with all other actors with the same
+     * topic. If the actor is already registered, nothing is changed.
+     *
+     * @param regData the description of the actor
+     */
+    public void register(xMsgRegistration regData) {
+        String key = generateKey(regData);
+        if (db.containsKey(key)) {
+            db.get(key).add(regData);
+        } else {
+            Set<xMsgRegistration> regSet = new HashSet<>();
+            regSet.remove(null);
+            regSet.add(regData);
+            db.put(key, regSet);
+
+        }
+    }
+
+
+    /**
+     * Removes the given actor from the registration.
+     *
+     * @param regData the description of the actor
+     */
+    public void remove(xMsgRegistration regData) {
+        String key = generateKey(regData);
+        if (db.containsKey(key)) {
+            Set<xMsgRegistration> set = db.get(key);
+            for (Iterator<xMsgRegistration> i = set.iterator(); i.hasNext();) {
+                xMsgRegistration r = i.next();
+                if (r.getName().equals(regData.getName()) &&
+                        r.getHost().equals(regData.getHost())) {
+                    i.remove();
+                }
+            }
+            if (set.isEmpty()) {
+                db.remove(key);
+            }
+        }
+    }
+
+
+    /**
+     * Removes all actors on the given host from the registration.
+     * Useful when a xMsg node will be shutdown, so all actors running in the
+     * node have to be unregistered.
+     *
+     * @param host the host of the actors that should be removed
+     */
+    public void remove(String host) {
+        Iterator<Entry<String, Set<xMsgRegistration>>> dbIt = db.entrySet().iterator();
+        while (dbIt.hasNext()) {
+            Entry<String, Set<xMsgRegistration>> dbEntry = dbIt.next();
+            Iterator<xMsgRegistration> regIt = dbEntry.getValue().iterator();
+            while (regIt.hasNext()) {
+                xMsgRegistration reg = regIt.next();
+                if (reg.getHost().equals(host)) {
+                    regIt.remove();
+                }
+            }
+            if (dbEntry.getValue().isEmpty()) {
+                dbIt.remove();
+            }
+        }
+    }
+
+
+    private String generateKey(xMsgRegistration regData) {
+        StringBuilder kb = new StringBuilder();
+        kb.append(regData.getDomain());
+
+        String subject = regData.getSubject();
+        if (!subject.equals(xMsgConstants.UNDEFINED.getStringValue())
+                && !subject.equals(xMsgConstants.ANY.getStringValue())) {
+            kb.append(":").append(subject);
+        }
+
+        String type = regData.getType();
+        if (!type.equals(xMsgConstants.UNDEFINED.getStringValue())
+                && !type.equals(xMsgConstants.ANY.getStringValue())) {
+            kb.append(":").append(type);
+        }
+
+        return kb.toString();
+    }
+
+
+    /**
+     * Returns a set with all actors registered to the given topic. Empty if no
+     * actor is found.
+     * <p>
+     * The rules to match topics are the following.
+     * If we have actors registered to these topics:
+     * <ol>
+     * <li>{@code "DOMAIN:SUBJECT:TYPE"}
+     * <li>{@code "DOMAIN:SUBJECT"}
+     * <li>{@code "DOMAIN"}
+     * </ol>
+     * then this will be returned:
+     * <pre>
+     * find("DOMAIN", "*", "*")           -->  1, 2, 3
+     * find("DOMAIN", "SUBJECT", "*")     -->  1, 2
+     * find("DOMAIN", "SUBJECT", "TYPE")  -->  1
+     * </pre>
+     *
+     * @param domain the searched domain
+     * @param subject the searched type (it can be undefined)
+     * @param type the searched type (it can be undefined)
+     * @return a set of all actors registered to the topic
+     */
+    public Set<xMsgRegistration> find(String domain, String subject, String type) {
+        Set<xMsgRegistration> result = new HashSet<>();
+        for (String k : db.keySet()) {
+            if ((xMsgUtil.getTopicDomain(k).equals(domain)) &&
+                    (xMsgUtil.getTopicSubject(k).equals(subject) ||
+                            subject.equals("*") ||
+                            subject.equals(xMsgConstants.UNDEFINED.getStringValue())) &&
+                    (xMsgUtil.getTopicType(k).equals(type) ||
+                            type.equals("*") ||
+                            type.equals(xMsgConstants.UNDEFINED.getStringValue()))) {
+                result.addAll(db.get(k));
+            }
+        }
+        return result;
+    }
+
+
+    /**
+     * Returns all registered topics.
+     *
+     * @see #get
+     */
+    Set<String> topics() {
+        return db.keySet();
+    }
+
+
+    /**
+     * Returns all actors registered with the specific known topic.
+     *
+     * @see #topics
+     */
+    Set<xMsgRegistration> get(String topic) {
+        return db.get(topic);
+    }
+}
