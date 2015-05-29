@@ -31,6 +31,7 @@ import org.zeromq.ZFrame;
 import org.zeromq.ZMsg;
 
 import java.io.IOException;
+import java.io.UncheckedIOException;
 import java.util.Arrays;
 import java.util.List;
 
@@ -336,7 +337,11 @@ public class xMsgMessage {
                 }
 
             } else if (dataType.equals(Object.class)) {
-                return dataType.cast(xMsgUtil.deserialize(data));
+                try {
+                    return dataType.cast(xMsgUtil.deserialize(data));
+                } catch (ClassNotFoundException | IOException e) {
+                    throw new RuntimeException("Could not deserialize data", e);
+                }
             }
 
             throw new IllegalArgumentException("Invalid data type: " + dataType);

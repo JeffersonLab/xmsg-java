@@ -25,6 +25,7 @@ package org.jlab.coda.xmsg.core;
 import com.google.protobuf.ByteString;
 
 import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
@@ -288,9 +289,9 @@ public final class xMsgUtil {
      *
      * @param object a serializable object
      * @return the serialization of the object as a ByteString
-     *         or null in case of error
+     * @throws IOException if there was an error
      */
-    public static ByteString serializeToByteString(Object object) {
+    public static ByteString serializeToByteString(Object object) throws IOException {
         if (object instanceof byte[]) {
             return ByteString.copyFrom((byte[]) object);
         } else {
@@ -299,9 +300,6 @@ public final class xMsgUtil {
                 out.writeObject(object);
                 out.flush();
                 return bs.toByteString();
-            } catch (IOException e) {
-                e.printStackTrace();
-                return null;
             }
         }
     }
@@ -318,21 +316,24 @@ public final class xMsgUtil {
         if (object instanceof byte[]) {
             return (byte[]) object;
         }
-        java.io.ByteArrayOutputStream bs = new java.io.ByteArrayOutputStream();
-        java.io.ObjectOutputStream out = new java.io.ObjectOutputStream(bs);
-        out.writeObject(object);
-        out.flush();
-        out.close();
-        return bs.toByteArray();
+        try (ByteArrayOutputStream bs = new ByteArrayOutputStream();
+             ObjectOutputStream out = new ObjectOutputStream(bs)) {
+            out.writeObject(object);
+            out.flush();
+            return bs.toByteArray();
+        }
     }
 
     /**
      * De-serializes a protobuf {@link ByteString} into an Object.
      *
      * @param bytes the serialization of the object
-     * @return the de-serialized Object or null in case of error
+     * @return the deserialized Object
+     * @throws ClassNotFoundException if class of a serialized object cannot be found.
+     * @throws IOException if there was an error
      */
-    public static Object deserialize(ByteString bytes) {
+    public static Object deserialize(ByteString bytes)
+            throws ClassNotFoundException, IOException {
         byte[] bb = bytes.toByteArray();
         return deserialize(bb);
     }
@@ -341,15 +342,15 @@ public final class xMsgUtil {
      * De-serializes a byte array into an Object.
      *
      * @param bytes the serialization of the object
-     * @return the de-serialized Object or null in case of error
+     * @return the deserialized Object
+     * @throws ClassNotFoundException if class of a serialized object cannot be found.
+     * @throws IOException if there was an error
      */
-    public static Object deserialize(byte[] bytes) {
+    public static Object deserialize(byte[] bytes)
+            throws IOException, ClassNotFoundException {
         try (ByteArrayInputStream bs = new ByteArrayInputStream(bytes);
              ObjectInputStream in = new ObjectInputStream(bs)) {
             return in.readObject();
-        } catch (IOException | ClassNotFoundException e) {
-            e.printStackTrace();
-            return null;
         }
     }
 
