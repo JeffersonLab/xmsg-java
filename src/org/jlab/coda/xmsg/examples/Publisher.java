@@ -31,30 +31,21 @@ import java.io.IOException;
 import java.net.SocketException;
 
 /**
- * An example of a publisher that publishes
- * data required size in kBytes for ever.
- * He does not care who is subscribing to his
- * data.
+ * An example of a publisher that publishes data for ever.
+ * It does not matter who is subscribing to the messages.
  *
  * @author gurjyan
  * @version 2.x
- * @since 11/4/14
  */
 public class Publisher extends xMsg {
-    private static final String myName = "test_publisher";
-    private static final String domain = "test_domain";
-    private static final String subject = "test_subject";
-    private static final String type = "test_type";
 
     /**
+     * Constructor, requires the name of the front-end node.
+     * The name is used to open a connection to the registrar service
+     * running in the front-end.
      * <p>
-     * Constructor, requires the name of the FrontEnd host that is used
-     * to create a connection to the registrar service running within the
-     * xMsgFE. Creates the zmq context object and thread pool for servicing
-     * received messages in a separate threads.
-     * Localhost is considered to be the host of the FE.
-     * Thread pool is relevant for subscribers only.
-     * </p>
+     * In this case, localhost is expected to be the front-end.
+     * Thus, an xMsg node must be running in the localhost.
      *
      * @throws xMsgException
      */
@@ -64,26 +55,30 @@ public class Publisher extends xMsg {
 
     public static void main(String[] args) {
         try {
+            final String name = "test_publisher";
+            final String domain = "test_domain";
+            final String subject = "test_subject";
+            final String type = "test_type";
 
             Publisher publisher = new Publisher();
 
-            // Create a socket connections to the xMsg node
-            xMsgConnection con =  publisher.connect();
+            // Create a connection to the local xMsg node
+            xMsgConnection con = publisher.connect();
 
             // Register this publisher
-            publisher.registerPublisher(myName, domain, subject,type);
-
-            // Fill payload with random numbers
-            String topic = xMsgUtil.buildTopic(domain,subject,type);
+            publisher.registerPublisher(name, domain, subject, type);
 
             // Create the message to be published
+            String topic = xMsgUtil.buildTopic(domain, subject, type);
             xMsgMessage msg = new xMsgMessage(topic);
+
+            // Fill data with a byte array the required size
             System.out.println("Byte array size = " + args[0]);
             byte[] b = new byte[Integer.parseInt(args[0])];
             msg.setData(b);
 
             // Publish data for ever...
-            while(true) {
+            while (true) {
                 publisher.publish(con, msg);
             }
 

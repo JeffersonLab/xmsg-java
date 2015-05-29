@@ -28,25 +28,20 @@ import org.jlab.coda.xmsg.data.xMsgM.xMsgMeta;
 import java.util.Arrays;
 
 /**
+ * Defines a message to be serialized and passed through 0MQ.
+ *
+ * Uses {@link xMsgData} class generated as a result of the proto-buffer
+ * description to pass Java primitive types and arrays of primitive types.
+ * xMsgData is also used to pass byte[]: the result of a user specific
+ * object serialization.
  * <p>
- *     xMsgMessage class defines a message to be serialized and sent.
- *
- *     Uses xMsgData class generated as a result of the proto-buffer
- *     description to pass Java primitive types and arrays of primitive types.
- *     xMsgData is also used to pass byte[]: the result of a user specific
- *     object serialization.
- *
- *     This class will also contain complete metadata of the message data,
- *     describing details of the data. In case this class is constructed
- *     without a metadata, the default metadata will be created and the
- *     proper data type will set based on the passed data parameter type.
- *
- *     Note that data that is an instance of byte[] will be considered
- *     to be a serialization of a specific user object only in the case
- *     when a proper
- *
- * </p>
- *
+ * This class will also contain complete metadata of the message data,
+ * describing details of the data. In case an object is constructed
+ * without a metadata, the default metadata will be created and the
+ * proper data type will set based on the passed data parameter type.
+ * <p>
+ * Note that data that is an instance of {@code byte[]} will be considered to be
+ * a serialization of a specific user object only in the case when a proper
  *
  * @author gurjyan
  * @version 2.x
@@ -54,10 +49,6 @@ import java.util.Arrays;
  */
 public class xMsgMessage {
 
-
-    /**
-     * Message address section
-     */
     private String topic = xMsgConstants.UNDEFINED.getStringValue();
     private xMsgMeta.Builder metaData = null;
     private Object data = null;
@@ -68,11 +59,8 @@ public class xMsgMessage {
     }
 
     /**
-     * <p>
-     * This constructor will auto-create a metadata
-     * object based on the type of the passed data object.
-     * <p/>
-     * </p>
+     * Constructor that will auto-create the metadata.
+     * This metadata will be based on the type of the passed data object.
      *
      * @param topic of the communication
      * @param data  of the communication
@@ -83,17 +71,25 @@ public class xMsgMessage {
         setData(data);
     }
 
-    public xMsgMessage( String topic,
-                        xMsgMeta.Builder metaData,
-                        Object data) {
+    /**
+     * Constructor.
+     *
+     * @param topic of the communication
+     * @param metadata of the communication
+     * @param data of the communication
+     */
+    public xMsgMessage(String topic,
+                       xMsgMeta.Builder metadata,
+                       Object data) {
         this.topic = topic;
-        this.metaData = metaData;
+        this.metaData = metadata;
         this.data = data;
     }
 
     public boolean getIsDataSerialized() {
-        if (metaData != null) return metaData.getIsDataSerialized();
-        else {
+        if (metaData != null) {
+            return metaData.getIsDataSerialized();
+        } else {
             metaData = xMsgMeta.newBuilder();
             return metaData.getIsDataSerialized();
         }
@@ -129,18 +125,19 @@ public class xMsgMessage {
     }
 
     /**
+     * Sets the message data.
      * <p>
      * This method will check to see if passed objects are of
      * primitive types or an array of primitive types, and will assume
      * transferring them (serializing) through xMsgData object.
      * Any other Java object will be considered to be passed as
      * un-serialized J_Object.
+     * <p>
      * Note. if you pass to this method a byte[] as a result of your
      * own serialization process it will be set as the xMsgData byte[]
      * with the type T_BYTES. In this case your actual data type will be
      * lost. This is the mechanism to pass your own serialized byte[]
      * through xMsgData (type = X_Object).
-     * </p>
      *
      * @param data object
      */
@@ -221,9 +218,9 @@ public class xMsgMessage {
     }
 
     /**
+     * Sets the message data.
      * <p>
      * This method sets the data object using specified data type.
-     * </p>
      *
      * @param data object
      * @param type of the data object
@@ -263,9 +260,11 @@ public class xMsgMessage {
         }
     }
 
+    /**
+     * Sets the message data.
+     */
     public void setData(Object data, xMsgMeta.Builder metadata) {
         this.data = data;
         this.metaData = metadata;
     }
-
 }

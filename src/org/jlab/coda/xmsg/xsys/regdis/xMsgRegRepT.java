@@ -28,58 +28,49 @@ import org.jlab.coda.xmsg.excp.xMsgRegistrationException;
 
 import java.net.SocketException;
 import java.util.Set;
-import java.util.concurrent.ConcurrentHashMap;
-
+import java.util.concurrent.ConcurrentMap;
 
 /**
+ * A thread that periodically updates xMsg front-end registration database with
+ * passed publishers and subscribers database contents. These passed databases
+ * (i.e. references) are xMsgNode resident databases, defined within the
+ * xMsgRegistrar class: {@link xMsgRegistrationService}
  * <p>
- *      This is a thread that periodically updates xMsg front-end
- *      registration database with passed publishers and subscribers
- *      database contents. These passed databases (i.e. references)
- *      are xMsgNode resident databases, defined within the xMsgRegistrar class:
- *      {@link xMsgRegistrationService}
- *
- *      This class will be instantiated by the xMsgRegistrar constructor
- *      executed by the xMsgNode:
- *      {@link org.jlab.coda.xmsg.xsys.xMsgRegistrar}
- *
- *      This class inherits from {@link xMsgRegDiscDriver}
- *      where xMsg database communication methods are defined.
- *
- *      todo: constructor parameter that defines update periodicity
- * </p>
+ * This class will be instantiated by the xMsgRegistrar constructor executed by
+ * the xMsgNode: {@link org.jlab.coda.xmsg.xsys.xMsgRegistrar} This class
+ * inherits from {@link xMsgRegDiscDriver} where xMsg database communication
+ * methods are defined.
+ * <p>
+ * TODO: constructor parameter that defines update periodicity.
  *
  * @author gurjyan
- *         Created on 10/6/14
- * @version %I%
  * @since 1.0
  */
 public class xMsgRegRepT extends xMsgRegDiscDriver implements Runnable {
 
     // xMsgNode database references
-    private ConcurrentHashMap<String, Set<xMsgRegistration>> publishers_db;
-    private ConcurrentHashMap<String, Set<xMsgRegistration>> subscribers_db;
+    private ConcurrentMap<String, Set<xMsgRegistration>> publishers;
+    private ConcurrentMap<String, Set<xMsgRegistration>> subscribers;
 
     /**
-     * <p>
      * Constructor accepts the front-end host name (IP form)
      * as well as two references to publishers and subscribers
      * databases.
-     * </p>
+     *
      * @param feHost front-end host name
-     * @param publishers_db reference to the xMsgNode
-     *                      publishers database
-     * @param subscribers_db reference to the xMsgNode
-     *                       subscribers database
+     * @param publishers reference to the xMsgNode publishers database
+     * @param subscribers reference to the xMsgNode subscribers database
+     * @throws SocketException
      * @throws xMsgException
+     * @throws IOException
      */
     public xMsgRegRepT(String feHost,
-                       ConcurrentHashMap<String, Set<xMsgRegistration>> publishers_db,
-                       ConcurrentHashMap<String, Set<xMsgRegistration>> subscribers_db
-    ) throws xMsgException, SocketException {
+                       ConcurrentMap<String, Set<xMsgRegistration>> publishers,
+                       ConcurrentMap<String, Set<xMsgRegistration>> subscribers
+    ) throws SocketException, xMsgException {
         super(feHost);
-        this.publishers_db = publishers_db;
-        this.subscribers_db = subscribers_db;
+        this.publishers = publishers;
+        this.subscribers = subscribers;
     }
 
     @Override
@@ -88,10 +79,10 @@ public class xMsgRegRepT extends xMsgRegDiscDriver implements Runnable {
         while (!Thread.currentThread().isInterrupted()) {
 
             // update FE publishers database
-            for(String key:publishers_db.keySet()){
+            for (String key : publishers.keySet()) {
                 try {
-                    for(xMsgRegistration r:publishers_db.get(key)) {
-                        register_fe(key, r, true);
+                    for (xMsgRegistration r : publishers.get(key)) {
+                        registerFrontEnd(key, r, true);
                         xMsgUtil.sleep(500);
                     }
                 } catch (xMsgRegistrationException e) {
@@ -100,10 +91,10 @@ public class xMsgRegRepT extends xMsgRegDiscDriver implements Runnable {
             }
 
             // update FE subscribers database
-            for(String key:subscribers_db.keySet()){
+            for (String key : subscribers.keySet()) {
                 try {
-                    for(xMsgRegistration r:subscribers_db.get(key)) {
-                        register_fe(key, r, false);
+                    for (xMsgRegistration r : subscribers.get(key)) {
+                        registerFrontEnd(key, r, false);
                         xMsgUtil.sleep(500);
                     }
                 } catch (xMsgRegistrationException e) {
@@ -113,5 +104,4 @@ public class xMsgRegRepT extends xMsgRegDiscDriver implements Runnable {
             xMsgUtil.sleep(5000); // update period 5sec,
         }
     }
-
 }

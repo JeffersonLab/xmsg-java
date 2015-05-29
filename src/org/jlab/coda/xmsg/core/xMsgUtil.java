@@ -22,6 +22,7 @@
 package org.jlab.coda.xmsg.core;
 
 import com.google.protobuf.ByteString;
+
 import org.jlab.coda.xmsg.excp.xMsgException;
 
 import java.io.ByteArrayInputStream;
@@ -33,49 +34,49 @@ import java.net.NetworkInterface;
 import java.net.SocketException;
 import java.net.UnknownHostException;
 import java.text.DateFormat;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.Enumeration;
+import java.util.List;
+import java.util.StringTokenizer;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 /**
- * <p>
- *     xMsg utility class
- * </p>
+ * xMsg utility methods.
  *
  * @author gurjyan
- *         Created on 10/10/14
- * @version %I%
  * @since 1.0
  */
 
-public class xMsgUtil {
+public final class xMsgUtil {
 
-    public static List<String> LOCAL_HOST_IPS = new ArrayList<>();
+    private static List<String> localHostIps = new ArrayList<>();
+
+    private xMsgUtil() { }
+
 
     /**
+     * Returns formatted string of the current date and time.
+     * Options 1 through 10 are accepted, producing following formatting:
      * <p>
-     *     Returns formatted string of the current date and time:
-     * </p>
+     * <ol>
+     * <li>Tue Nov 04 20:14:11 EST 2003</li>
+     * <li>11/4/03 8:14 PM</li>
+     * <li>8:14:11 PM</li>
+     * <li>Nov 4, 2003 8:14:11 PM</li>
+     * <li>8:14 PM</li>
+     * <li>8:14:11 PM</li>
+     * <li>8:14:11 PM EST</li>
+     * <li>11/4/03 8:14 PM</li>
+     * <li>Nov 4, 2003 8:14 PM</li>
+     * <li>November 4, 2003 8:14:11 PM EST</li>
+     * </ol>
      *
-     * @param type int that defines the option of the formatting.
-     *             Options 1 through 10 are accepted, producing following formatting:
-     *             <p>
-     *             <ul>
-     *              <li>Tue Nov 04 20:14:11 EST 2003</li>
-     *              <li>11/4/03 8:14 PM</li>
-     *              <li>8:14:11 PM</li>
-     *              <li>Nov 4, 2003 8:14:11 PM</li>
-     *              <li>8:14 PM</li>
-     *              <li>8:14:11 PM</li>
-     *              <li>8:14:11 PM EST</li>
-     *              <li>11/4/03 8:14 PM</li>
-     *              <li>Nov 4, 2003 8:14 PM</li>
-     *              <li>November 4, 2003 8:14:11 PM EST</li>
-     *             </ul>
-     *             </p>
+     * @param type the option of the formatting.
      * @return formatted string of the current data
      */
-    public static String currentTime(int type){
+    public static String currentTime(int type) {
 
         // Make a new Date object.
         // It will be initialized to the current time.
@@ -105,46 +106,38 @@ public class xMsgUtil {
             case 10:
                 return DateFormat.getDateTimeInstance(
                         DateFormat.LONG, DateFormat.LONG).format(now);
+            default:
+                throw new IllegalArgumentException("unsupported date formatting option");
         }
-        return "unsupported date formatting option";
     }
 
     /**
-     * <p>
-     *     Thread sleep wrapper
-     * </p>
-     * @param t in milli seconds
+     * Thread sleep wrapper.
+     *
+     * @param millis the length of time to sleep in milliseconds
      */
-    public static void sleep(int t){
+    public static void sleep(int millis) {
         try {
-            Thread.sleep(t);
+            Thread.sleep(millis);
         } catch (InterruptedException e) {
             System.out.println(e.getMessage());
         }
-
     }
 
+
     /**
-     * <p>
-     *     Sleeps for ever
-     * </p>
-     * @param t in milli seconds
+     * Keeps the current thread sleeping forever.
      */
-    public static void sleep_fe(int t){
-        while(true) {
-            sleep(t);
+    public static void keepAlive() {
+        while (true) {
+            sleep(100);
         }
     }
 
-    public static void keepAlive(){
-        sleep_fe(7);
-    }
 
     /**
-     * <p>
-     *     Builds xMsg topic of the form:
-     *     domain:subject:type
-     * </p>
+     * Builds xMsg topic of the form: {@code domain:subject:type}.
+     *
      * @param domain domain of the message
      * @param subject subject of the message
      * @param type type of the message
@@ -155,15 +148,17 @@ public class xMsgUtil {
                                     String subject,
                                     String type) throws xMsgException {
         StringBuilder topic = new StringBuilder();
-        if(domain==null || domain.equals("*")) throw new xMsgException("domain is not defined");
+        if (domain == null || domain.equals("*")) {
+            throw new xMsgException("domain is not defined");
+        }
         topic.append(domain);
-        if(subject!=null && !subject.equals("*")) {
+        if (subject != null && !subject.equals("*")) {
             topic.append(":").append(subject);
-            if(type!=null && !type.equals("*")) {
-                StringTokenizer st = new StringTokenizer(type,":");
-                while(st.hasMoreTokens()){
+            if (type != null && !type.equals("*")) {
+                StringTokenizer st = new StringTokenizer(type, ":");
+                while (st.hasMoreTokens()) {
                     String tst = st.nextToken();
-                    if(!tst.contains("*")) {
+                    if (!tst.contains("*")) {
                         topic.append(":").append(tst);
                     } else {
                         break;
@@ -175,133 +170,123 @@ public class xMsgUtil {
     }
 
     /**
+     * Finds the domain of the xMsg topic.
      * <p>
-     *  Finds the domain of the xMsg topic.
-     *  Note that xMsg topic is constructed as:
-     *  domain:subject:type
+     * Note that xMsg topic is constructed as: {@code domain:subject:type}.
      *
-     * </p>
      * @param topic xMsg topic
      * @return domain of the topic
-     * @throws xMsgException in case topic does
-     * not have a proper xMsg topic construct
+     * @throws xMsgException in case topic does not have a proper xMsg topic construct
      */
     public static String getTopicDomain(String topic) throws xMsgException {
         return topic.substring(0, topic.indexOf(":"));
     }
 
     /**
+     * Finds the subject of the xMsg topic.
      * <p>
-     *  Finds the subject of the xMsg topic.
-     *  Note that xMsg topic is constructed as:
-     *  domain:subject:type
+     * Note that xMsg topic is constructed as: {@code domain:subject:type}.
      *
-     * </p>
      * @param topic xMsg topic
-     *
-     * @return subject of the topic. In case
-     * subject is missing in the topic, it
-     * returns xMsgConstants.UNDEFINED.
-     *
-     * @throws xMsgException in case topic does
-     * not have a proper xMsg topic construct
+     * @return subject of the topic. In case subject is missing in the topic, it
+     *         returns {@code xMsgConstants.UNDEFINED}.
+     * @throws xMsgException in case topic does not have a proper xMsg topic construct
      */
     public static String getTopicSubject(String topic) throws xMsgException {
-        StringTokenizer st = new StringTokenizer(topic,":");
-        if(st.hasMoreTokens()) st.nextToken();
-        else throw new xMsgException("malformed xMsg topic.");
-        if(st.hasMoreTokens()) return st.nextToken();
-        else return xMsgConstants.UNDEFINED.getStringValue();
+        StringTokenizer st = new StringTokenizer(topic, ":");
+        if (st.hasMoreTokens()) {
+            st.nextToken();
+        } else {
+            throw new xMsgException("malformed xMsg topic.");
+        }
+        if (st.hasMoreTokens()) {
+            return st.nextToken();
+        } else {
+            return xMsgConstants.UNDEFINED.getStringValue();
+        }
     }
 
     /**
+     * Finds the type of the xMsg topic.
      * <p>
-     *  Finds the type of the xMsg topic.
-     *  Note that xMsg topic is constructed as:
-     *  domain:subject:type
+     * Note that xMsg topic is constructed as: {@code domain:subject:type}.
      *
-     * </p>
      * @param topic xMsg topic
-     *
-     * @return type of the topic. In case
-     * subject is missing in the topic, it
-     * returns xMsgConstants.UNDEFINED.
-     * Note that type can not be defined if
-     * subject is not defined, i.e. xMsg
-     * does not support topic such as:
-     * domain:*:type
-     *
-     * @throws xMsgException in case topic does
-     * not have a proper xMsg topic construct
+     * @return type of the topic. In case subject is missing in the topic, it
+     *         returns xMsgConstants.UNDEFINED.
+     *         Note that type can not be defined if subject is not defined,
+     *         i.e. xMsg does not support topic such as: {@code domain:*:type}.
+     * @throws xMsgException in case topic does not have a proper xMsg topic construct
      */
     public static String getTopicType(String topic) throws xMsgException {
-        StringTokenizer st = new StringTokenizer(topic,":");
-        if(st.hasMoreTokens()) st.nextToken();
-        else throw new xMsgException("malformed xMsg topic.");
-        if(st.hasMoreTokens()) {
+        StringTokenizer st = new StringTokenizer(topic, ":");
+        if (st.hasMoreTokens()) {
             st.nextToken();
-            if (st.hasMoreTokens()) return st.nextToken();
-            else return xMsgConstants.UNDEFINED.getStringValue();
-        } else return xMsgConstants.UNDEFINED.getStringValue();
+        } else {
+            throw new xMsgException("malformed xMsg topic.");
+        }
+        if (st.hasMoreTokens()) {
+            st.nextToken();
+            if (st.hasMoreTokens()) {
+                return st.nextToken();
+            } else {
+                return xMsgConstants.UNDEFINED.getStringValue();
+            }
+        } else {
+            return xMsgConstants.UNDEFINED.getStringValue();
+        }
     }
 
     /**
+     * Returns the list of IP addresses of the local node.
+     * Useful when the host can have multiple network cards, i.e. IP addresses.
      * <p>
-     *     Returns list of IP addresses of a node, that can have
-     *     multiple network cards, i.e. IP addresses. This method
-     *     skip loop-back (127.xxx), ink-local (169.254.xxx),
-     *     multicast (224.xxx through 238.xxx) and
-     *     broadcast (255.255.255.255) addresses.
-     * </p>
-     *
-     * @return List of IP addresses
-     * @throws SocketException
-     */
-    public static List<String> getLocalHostIps() throws SocketException {
-        return LOCAL_HOST_IPS;
-    }
-
-    /**
-     * <p>
-     * Returns list of IP addresses of a node, that can have
-     * multiple network cards, i.e. IP addresses. This method
-     * skip loop-back (127.xxx), ink-local (169.254.xxx),
+     * This method skip loop-back (127.xxx), ink-local (169.254.xxx),
      * multicast (224.xxx through 238.xxx) and
      * broadcast (255.255.255.255) addresses.
-     * </p>
      *
-     * @throws SocketException
+     * @return list of IP addresses
+     * @throws SocketException if an I/O error occurs.
+     */
+    public static List<String> getLocalHostIps() throws SocketException {
+        return localHostIps;
+    }
+
+    /**
+     * Updates the list of IP addresses of the local node.
+     * <p>
+     * This method skip loop-back (127.xxx), ink-local (169.254.xxx),
+     * multicast (224.xxx through 238.xxx) and
+     * broadcast (255.255.255.255) addresses.
+     *
+     * @throws SocketException if an I/O error occurs.
      */
     public static void updateLocalHostIps() throws SocketException {
-
         List<String> out = new ArrayList<>();
-        Enumeration e = NetworkInterface.getNetworkInterfaces();
+        Enumeration<NetworkInterface> e = NetworkInterface.getNetworkInterfaces();
         while (e.hasMoreElements()) {
-            NetworkInterface n = (NetworkInterface) e.nextElement();
-            Enumeration ee = n.getInetAddresses();
+            NetworkInterface n = e.nextElement();
+            Enumeration<InetAddress> ee = n.getInetAddresses();
             while (ee.hasMoreElements()) {
-                InetAddress i = (InetAddress) ee.nextElement();
+                InetAddress i = ee.nextElement();
                 String address = i.getHostAddress();
-                if (address.startsWith("127") || address.contains(":")) {
-                } else {
+                if (!(address.startsWith("127") || address.contains(":"))) {
                     out.add(address);
                 }
             }
         }
-
-        LOCAL_HOST_IPS = out;
+        localHostIps = out;
     }
 
     /**
-     * <p>
-     * Returns the IP address of the specified host
-     * </p>
+     * Returns the IP address of the specified host.
      *
      * @param hostName The name of the host (accepts "localhost")
      * @return dotted notation of the IP address
+     * @throws SocketException
      * @throws xMsgException
      */
-    public static String host_to_ip(String hostName) throws xMsgException, SocketException {
+    public static String toHostAddress(String hostName) throws SocketException, xMsgException {
         if (isIP(hostName)) {
             return hostName;
         }
@@ -326,27 +311,26 @@ public class xMsgUtil {
     }
 
     /**
-     * <p>
-     * Utility method that checks to see
-     * if passed string is of if decimal form.
-     * </p>
+     * Checks if the host name is an IPv4 address.
      *
-     * @param text Host name of the computing node.
+     * @param hostname Host name of the computing node.
      * @return true if host name has an IP form.
      */
-    public static boolean isIP(String text) {
-        Pattern p = Pattern.compile("^(?:(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\\.){3}(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)$");
-        Matcher m = p.matcher(text);
+    public static boolean isIP(String hostname) {
+        Pattern p = Pattern.compile("^(?:(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\\.){3}"
+                                   + "(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)$");
+        Matcher m = p.matcher(hostname);
         return m.find();
     }
 
     /**
-     * Converts object into a byte array
+     * Serializes an Object into a protobuf {@link ByteString}.
      *
-     * @param object to be converted. Probably it must be serializable.
-     * @return ByteString or null in case of error
+     * @param object a serializable object
+     * @return the serialization of the object as a ByteString
+     *         or null in case of error
      */
-    public static ByteString O2BS(Object object) {
+    public static ByteString serializeToByteString(Object object) {
         if (object instanceof byte[]) {
             return ByteString.copyFrom((byte[]) object);
         } else {
@@ -363,14 +347,17 @@ public class xMsgUtil {
     }
 
     /**
-     * Converts object into a byte array
+     * Serializes an Object into a byte array.
      *
-     * @param object to be converted. Probably it must be serializable.
-     * @return ByteString or null in case of error
+     * @param object a serializable object
+     * @return the serialization of the object as a byte array.
+     * @throws IOException if there was an error
      */
-    public static byte[] O2B(Object object)
+    public static byte[] serializeToBytes(Object object)
             throws IOException {
-        if (object instanceof byte[]) return (byte[]) object;
+        if (object instanceof byte[]) {
+            return (byte[]) object;
+        }
         java.io.ByteArrayOutputStream bs = new java.io.ByteArrayOutputStream();
         java.io.ObjectOutputStream out = new java.io.ObjectOutputStream(bs);
         out.writeObject(object);
@@ -380,23 +367,23 @@ public class xMsgUtil {
     }
 
     /**
-     * Converts byte array into an Object, that can be cast into pre-known class object.
+     * Deserializes a protobuf {@link ByteString} into an Object.
      *
-     * @param bytes the byte array
-     * @return Object or null in case of error
+     * @param bytes the serialization of the object
+     * @return the deserialized Object or null in case of error
      */
-    public static Object B2O(ByteString bytes) {
+    public static Object deserialize(ByteString bytes) {
         byte[] bb = bytes.toByteArray();
-        return B2O(bb);
+        return deserialize(bb);
     }
 
     /**
-     * Converts byte array into an Object, that can be cast into pre-known class object.
+     * Deserializes a byte array into an Object.
      *
-     * @param bytes the byte array
-     * @return Object or null in case of error
+     * @param bytes the serialization of the object
+     * @return the deserialized Object or null in case of error
      */
-    public static Object B2O(byte[] bytes) {
+    public static Object deserialize(byte[] bytes) {
         try (ByteArrayInputStream bs = new ByteArrayInputStream(bytes);
              ObjectInputStream in = new ObjectInputStream(bs)) {
             return in.readObject();
@@ -405,6 +392,4 @@ public class xMsgUtil {
             return null;
         }
     }
-
-
 }

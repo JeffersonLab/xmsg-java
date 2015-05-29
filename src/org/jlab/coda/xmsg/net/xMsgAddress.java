@@ -26,17 +26,14 @@ import org.jlab.coda.xmsg.excp.xMsgException;
 
 import java.net.SocketException;
 
-import static org.jlab.coda.xmsg.core.xMsgUtil.host_to_ip;
+import static org.jlab.coda.xmsg.core.xMsgUtil.toHostAddress;
 
 /**
- *<p>
- *    xMsg network address container class.
- *    Defines a key constructed as host:port (xMsg
- *    convention) for storing xMsgConnection objects.
- *</p>
+ * xMsg network address.
+ * Defines a key constructed as {@code host:port} (xMsg convention) for storing
+ * xMsgConnection objects.
+ *
  * @author gurjyan
- *         Created on 10/6/14
- * @version %I%
  * @since 1.0
  */
 public class xMsgAddress {
@@ -45,75 +42,61 @@ public class xMsgAddress {
     private int port = xMsgConstants.DEFAULT_PORT.getIntValue();
     private String key = xMsgConstants.UNDEFINED.getStringValue();
 
-    public xMsgAddress(String host, boolean n) {
-        this.host = host;
+    /**
+     * Creates an address using the provided host and the default port.
+     *
+     * @param host the host name
+     * @throws SocketException if an I/O error occurs.
+     * @throws xMsgException if the host IP address could not be obtained.
+     */
+    public xMsgAddress(String host) throws SocketException, xMsgException {
+        this.host = toHostAddress(host);
         key = this.host + ":" + this.port;
-
-    }
-    /**
-     * <p>
-     *     Constructor that converts host name into a
-     *     dotted notation of the IP address.
-     *     This constructor uses xMsg default port
-     * </p>
-     * @param host name
-     * @throws xMsgException
-     */
-    public xMsgAddress(String host) throws xMsgException, SocketException {
-        this.host = host_to_ip(host);
-        key = this.host+":"+this.port;
     }
 
     /**
-     * <p>
-     *     Constructor that creates an instance of the
-     *     cMsgAddress using user provided host and port
-     * </p>
-     * @param host name
-     * @param port port number
-     * @throws xMsgException
+     * Creates an address using provided host and port.
+     *
+     * @param host the host name
+     * @param port the port number
+     * @throws SocketException if an I/O error occurs.
+     * @throws xMsgException if the host IP address could not be obtained.
      */
-    public xMsgAddress(String host, int port) throws xMsgException, SocketException {
-        this.host = host_to_ip(host);
+    public xMsgAddress(String host, int port) throws SocketException, xMsgException {
+        this.host = toHostAddress(host);
         this.port = port;
-        key = this.host+":"+this.port;
+        key = this.host + ":" + this.port;
     }
 
     /**
-     * Returns the host name
-     * @return hostname˜
-
+     * Returns the host name.
      */
     public String getHost() {
         return host;
     }
 
-
     /**
-     * Returns the port number
-     * @return port number
+     * Returns the port number.
      */
     public int getPort() {
         return port;
     }
 
     /**
-     * <p>
-     *     Allows to change the port number.
-     *     This method should be used with caution, making sure
-     *     that the xMsgConnection associated with this address
-     *     is actually created using this new port.
-     * </p>
-     * @param port port number
+     * Allows changing the port number.
+     * This method should be used with caution, making sure that the
+     * xMsgConnection associated with this address is actually created using
+     * this new port.
+     *
+     * @param port the new port number
      */
     public void setPort(int port) {
         this.port = port;
-        key = this.host+":"+this.port;
+        key = this.host + ":" + this.port;
     }
 
     /**
-     * Returns xMsg address key, constructed asd host:ort
-     * @return address key
+     * Returns xMsg address key, constructed as {@code host:port}.
      */
     public String getKey() {
         return key;

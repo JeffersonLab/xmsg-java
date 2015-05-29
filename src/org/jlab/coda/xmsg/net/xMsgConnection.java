@@ -24,15 +24,11 @@ package org.jlab.coda.xmsg.net;
 import org.zeromq.ZMQ.Socket;
 
 /**
- * <p>
- *     xMsg connection class. Contains xMSgAddress object and
- *     two zmq socket objects for publishing and subscribing
- *     xMsg messages respectfully.
- * </p>
+ * The standard connection to xMsg nodes.
+ * Contains xMSgAddress object and two 0MQ sockets for publishing and
+ * subscribing xMsg messages respectfully.
  *
  * @author gurjyan
- *         Created on 10/6/14
- * @version %I%
  * @since 1.0
  */
 public class xMsgConnection {

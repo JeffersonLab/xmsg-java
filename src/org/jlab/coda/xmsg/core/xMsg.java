@@ -56,101 +56,89 @@ import java.util.concurrent.TimeoutException;
 import static org.jlab.coda.xmsg.xsys.regdis.xMsgRegDiscDriver.__zmqSocket;
 
 /**
- * <p>
- *     xMsg base class that provides methods for
- *     organizing pub/sub communications. This class
- *     provides a local database of xMsgCommunication
- *     for publishing and/or subscribing messages without
- *     requesting registration information from the local
- *     registrar services.
- *     This class also provides a thread pool for servicing
- *     received messages (as a result of a subscription) in
- *     separate threads.
- * </p>
+ * xMsg base class that provides methods for organizing pub/sub communications.
+ *
+ * This class provides a local database of xMsgCommunication for publishing
+ * and/or subscribing messages without requesting registration information from
+ * the local registrar services.
+ *
+ * This class also provides a thread pool for servicing received messages (as a
+ * result of a subscription) in separate threads.
  *
  * @author gurjyan
- *         Created on 10/6/14
- * @version %I%
  * @since 1.0
  */
-
 public class xMsg {
 
-    // zmq context object
-    private ZContext _context;
+    /** 0MQ context object. */
+    private final ZContext context;
 
-    // Private db of stored connections
-    private HashMap<String, xMsgConnection> _connections = new HashMap<>();
+    /** Private database of stored connections. */
+    private final HashMap<String, xMsgConnection> connections = new HashMap<>();
 
-    // Fixed size thread pool
-    private ExecutorService threadPool = null;
-    // default thread pool size
-    private int pool_size = 2;
+    /** Fixed size thread pool. */
+    private final ExecutorService threadPool;
+    /** Default thread pool size. */
+    private int poolSize = 2;
 
+    /** Access to the xMsg registrars. */
     private xMsgRegDiscDriver driver;
 
 
     /**
-     * <p>
-     *     Constructor, requires the name of the FrontEnd host that is used
-     *     to create a connection to the registrar service running within the
-     *     xMsgFE. Creates the zmq context object and thread pool for servicing
-     *     received messages in a separate threads.
-     * </p>
-     * @param feHost host name of the FE
+     * Constructor. Requires the name of the front-end host that is used to
+     * create a connection to the registrar service running within the xMsgFE.
+     * Creates the 0MQ context object and thread pool for servicing received
+     * messages in a separate threads.
+     *
+     * @param feHost host name of the front-end
      * @throws xMsgException
+     * @throws SocketException
      */
     public xMsg(String feHost) throws xMsgException, SocketException {
-        /**
-         * <p>
-         *     Calls xMsgRegDiscDriver class constructor that creates sockets to
-         *     2 registrar request/reply servers running in the local
-         *     xMsgNode and xMsgFE.
-         * </p>
+        /*
+         * Calls xMsgRegDiscDriver class constructor that creates sockets to two registrar
+         * request/reply servers running in the local xMsgNode and xMsgFE.
          */
         driver = new xMsgRegDiscDriver(feHost);
-        _context = driver.getContext();
+        context = driver.getContext();
 
-        threadPool = newFixedThreadPool(this.pool_size);
+        threadPool = newFixedThreadPool(this.poolSize);
     }
 
     /**
-     * <p>
-     *     Constructor, requires the name of the FrontEnd host that is used
-     *     to create a connection to the registrar service running within the
-     *     xMsgFE. Creates the zmq context object and thread pool for servicing
-     *     received messages in a separate threads.
-     * </p>
+     * Constructor. Requires the name of the front-end host that is used to
+     * create a connection to the registrar service running within the xMsgFE.
+     * Creates the zmq context object and thread pool for servicing received
+     * messages in a separate threads.
+     *
      * @param feHost host name of the FE
-     * @param pool_size thread pool size for servicing subscription callbacks
+     * @param poolSize thread pool size for servicing subscription callbacks
+     * @throws SocketException
      * @throws xMsgException
      */
-    public xMsg(String feHost, int pool_size) throws xMsgException, SocketException {
-        /**
-         * <p>
-         *     Calls xMsgRegDiscDriver class constructor that creates sockets to
-         *     2 registrar request/reply servers running in the local
-         *     xMsgNode and xMsgFE.
-         * </p>
+    public xMsg(String feHost, int poolSize) throws xMsgException, SocketException {
+        /*
+         * Calls xMsgRegDiscDriver class constructor that creates sockets to two registrar
+         * request/reply servers running in the local xMsgNode and xMsgFE.
          */
         driver = new xMsgRegDiscDriver(feHost);
-        _context = driver.getContext();
+        context = driver.getContext();
 
         // create fixed size thread pool
-        this.pool_size = pool_size;
-        threadPool = newFixedThreadPool(this.pool_size);
+        this.poolSize = poolSize;
+        threadPool = newFixedThreadPool(this.poolSize);
     }
 
     /**
-     * <p>
-     *     Connects to the xMsgNode by creating two sockets for publishing and
-     *     subscribing/receiving messages. It returns and the same time stores
-     *     in the local connection database created
-     *     {@link org.jlab.coda.xmsg.net.xMsgConnection} object.
-     *     This constructor makes connection to the local xMsg node, i.e.
-     *     xMsgNode should be running on the localhost.
-     * </p>
-     * @return {@link org.jlab.coda.xmsg.net.xMsgConnection} object
+     * Returns the connection to the local xMsg proxy.
+     * If the connection is not created yet, it will be created and stored into
+     * the cache of connections, and then returned.
+     * If there is a connection in the cache, that object will be returned then.
+     * The local proxy should be running.
+     *
+     * @return the {@link xMsgConnection} object to the local proxy
+     * @throws SocketException
      * @throws xMsgException
      */
     public xMsgConnection connect() throws xMsgException, SocketException {
@@ -158,14 +146,15 @@ public class xMsg {
     }
 
     /**
-     * <p>
-     *     Connects to the xMsgNode by creating two sockets for publishing and
-     *     subscribing/receiving messages. It returns and the same time stores
-     *     in the local connection database created
-     *     {@link org.jlab.coda.xmsg.net.xMsgConnection} object.
-     * </p>
-     * @param host  xMsg node host name
-     * @return {@link org.jlab.coda.xmsg.net.xMsgConnection} object
+     * Returns the connection to the xMsg proxy in the specified host.
+     * If the connection is not created yet, it will be created and stored into
+     * the cache of connections, and then returned.
+     * If there is a connection in the cache, that object will be returned then.
+     * The proxy should be running in the host.
+     *
+     * @param host the name of the host where the xMsg proxy is running
+     * @return the {@link xMsgConnection} object to the proxy
+     * @throws SocketException
      * @throws xMsgException
      */
     public xMsgConnection connect(String host) throws xMsgException, SocketException {
@@ -173,71 +162,69 @@ public class xMsg {
     }
 
     /**
-     * <p>
-     *     Connects to the xMsgNode by creating two sockets for publishing and
-     *     subscribing/receiving messages. It returns and the same time stores
-     *     in the local connection database created
-     *     {@link org.jlab.coda.xmsg.net.xMsgConnection} object.
-     * </p>
-     * @param host  xMsg node host name
+     * Returns the connection to the xMsg proxy in the specified host.
+     * Use the given port to open the sockets.
+     * If the connection is not created yet, it will be created and stored into
+     * the cache of connections, and then returned.
+     * If there is a connection in the cache, that object will be returned then.
+     * The proxy should be running in the host.
+     *
+     * @param host the name of the host where the xMsg proxy is running
      * @param port  xMsg node port number
-     * @return {@link org.jlab.coda.xmsg.net.xMsgConnection} object
-     * @throws xMsgException\
+     * @return the {@link xMsgConnection} object to the proxy
+     * @throws SocketException
+     * @throws xMsgException
      */
     public xMsgConnection connect(String host, int port) throws xMsgException, SocketException {
         return connect(new xMsgAddress(host, port));
     }
 
     /**
-     * <p>
-     *     Connects to the xMsgNode by creating two sockets for publishing and
-     *     subscribing/receiving messages. It returns and the same time stores
-     *     in the local connection database created
-     *     {@link org.jlab.coda.xmsg.net.xMsgConnection} object.
-     * </p>
-     * @param address {@link xMsgAddress} object
-     * @return {@link xMsgConnection} object
+     * Returns the connection to the xMsg proxy in the specified host.
+     * If the connection is not created yet, it will be created and stored into
+     * the cache of connections, and then returned.
+     * If there is a connection in the cache, that object will be returned then.
+     * The proxy should be running in the host.
+     *
+     * @param address the xMsg address of the host where the xMsg proxy is running
+     * @return the {@link xMsgConnection} object to the proxy
      * @throws xMsgException
      */
     public xMsgConnection connect(xMsgAddress address) throws xMsgException {
 
-        /**
-         * First check to see if we have already
-         * established connection to this address
+        /*
+         * First check to see if we have already established connection
+         * to this address
          */
-        if(_connections.containsKey(address.getKey())) return _connections.get(address.getKey());
-        else {
-            /**
-             *  Otherwise create sockets to the
-             *  requested address, and store the created
-             *  connection object for the future use.
-             *  Return the reference to the connection object
-             *
+        if (connections.containsKey(address.getKey())) {
+            return connections.get(address.getKey());
+        } else {
+            /*
+             * Otherwise create sockets to the requested address, and store the
+             * created connection object for the future use. Return the
+             * reference to the connection object
              */
             xMsgConnection feCon = new xMsgConnection();
             feCon.setAddress(address);
-            feCon.setPubSock(__zmqSocket(_context, ZMQ.PUB, address.getHost(),
+            feCon.setPubSock(__zmqSocket(context, ZMQ.PUB, address.getHost(),
                     address.getPort(), xMsgConstants.CONNECT.getIntValue()));
 
-            feCon.setSubSock(__zmqSocket(_context, ZMQ.SUB, address.getHost(),
+            feCon.setSubSock(__zmqSocket(context, ZMQ.SUB, address.getHost(),
                     address.getPort() + 1, xMsgConstants.CONNECT.getIntValue()));
 
-            _connections.put(address.getKey(),feCon);
+            connections.put(address.getKey(), feCon);
             return feCon;
         }
     }
 
     /**
-     * <p>
-     *     Connects to the xMsgNode by creating two sockets for publishing and
-     *     subscribing/receiving messages.
-     *     This is method will be used in case one need to have multiple
-     *     threads using the same zmq socket. Note: do not try to
-     *     use the same socket from multiple threads. Each thread should
-     *     create it's own zmq socket and a context.
-     * </p>
-     * @param address {@link xMsgAddress} object
-     * @return {@link xMsgConnection} object
+     * Returns a new connection to the xMsg proxy in the specified host.
+     * A new connection is always created. This connection is not stored in the
+     * cache of connections (which may already contain a connection to the given
+     * host). The proxy should be running in the host.
+     *
+     * @param address the xMsg address of the host where the xMsg proxy is running
+     * @return the {@link xMsgConnection} object to the proxy
      * @throws xMsgException
      */
     public xMsgConnection getNewConnection(xMsgAddress address) throws xMsgException {
@@ -255,19 +242,18 @@ public class xMsg {
     }
 
     /**
-     * <p>
-     *     If you are periodically publishing data, use this method to
-     *     register yourself as a publisher with the local registrar.
-     *     This is necessary for future subscribers to discover and
-     *     listen to your messages.
-     * </p>
-     * @param name the name of the requester/sender. Required according to
-     *             the xMsg zmq message structure definition. (topic, sender, data)
-     * @param host host of the xMsg node where the caller is running
-     * @param port port of the xMsg node where the caller is running
-     * @param domain domain of the xMsg subscription
-     * @param subject subject of the subscription
-     * @param type type of the subscription
+     * Registers a publisher in the local registrar.
+     * The publisher should be periodically publishing data.
+     * Futures subscribers can use this registration to discover and listen to
+     * the published messages.
+     * The local registration database is periodically updated to the front-end database.
+     *
+     * @param name the name of the publisher
+     * @param host host of the xMsg proxy where the publisher is running
+     * @param port port of the xMsg proxy where the publisher is running
+     * @param domain domain of the published messages
+     * @param subject subject of the published messages
+     * @param type type of the published messages
      * @throws xMsgRegistrationException
      */
     public void registerPublisher(String name,
@@ -285,22 +271,22 @@ public class xMsg {
         regb.setSubject(subject);
         regb.setType(type);
         regb.setOwnerType(xMsgRegistration.OwnerType.PUBLISHER);
-        xMsgRegistration r_data = regb.build();
-        driver.register_local(name, r_data, true);
+        xMsgRegistration regData = regb.build();
+        driver.registerLocal(name, regData, true);
     }
 
     /**
-     * <p>
-     *     If you are periodically publishing data, use this method to
-     *     register yourself as a publisher with the local registrar.
-     *     This is necessary for future subscribers to discover and
-     *     listen to your messages.
-     * </p>
-     * @param name the name of the requester/sender. Required according to
-     *             the xMsg zmq message structure definition. (topic, sender, data)
-     * @param domain domain of the xMsg subscription
-     * @param subject subject of the subscription
-     * @param type type of the subscription
+     * Registers a local publisher in the local registrar.
+     * The publisher should be periodically publishing data.
+     * Futures subscribers can use this registration to discover and listen to
+     * the published messages.
+     * The local registration database is periodically updated to the front-end database.
+     * The publisher is expected to be running in the local node.
+     *
+     * @param name the name of the publisher
+     * @param domain domain of the published messages
+     * @param subject subject of the published messages
+     * @param type type of the published messages
      * @throws xMsgRegistrationException
      */
     public void registerPublisher(String name,
@@ -313,22 +299,20 @@ public class xMsg {
     }
 
     /**
-     * <p>
-     *     If you are a subscriber and want to listen messages on a specific
-     *     topic from a future publishers, you should register yourself as
-     *     a subscriber with the local registrar.
-     *     Future publishers might express an interest to publish data to a
-     *     a required topic of interest or might publish data only if there
-     *     are active listeners/subscribers to their published topic.
-     * </p>
-     * @param name the name of the requester/sender. Required according to
-     *             the xMsg zmq message structure definition. (topic, sender, data)
-     * @param host host of the xMsg node where the caller is running
-     * @param port port of the xMsg node where the caller is running
-     * @param domain domain of the xMsg subscription
+     * Registers a subscriber in the local registrar.
+     * The subscriber should be listening for messages of the wanted topic.
+     * Future publishers might express an interest to publish data to a a
+     * required topic of interest or might publish data only if there are active
+     * listeners/subscribers to their published topic.
+     * The local registration database is periodically updated to the front-end database.
+     *
+     * @param name the name of the subscriber.
+     * @param host host of the xMsg proxy where the subscriber is running
+     * @param port port of the xMsg proxy where the subscriber is running
+     * @param domain domain of the subscription
      * @param subject subject of the subscription
      * @param type type of the subscription
-     * @param description description
+     * @param description a description of the subscription
      * @throws xMsgRegistrationException
      */
     public void registerSubscriber(String name,
@@ -348,25 +332,25 @@ public class xMsg {
         regb.setType(type);
         regb.setOwnerType(xMsgRegistration.OwnerType.SUBSCRIBER);
         regb.setDescription(description);
-        xMsgRegistration r_data = regb.build();
-        driver.register_local(name, r_data, false);
+        xMsgRegistration regData = regb.build();
+        driver.registerLocal(name, regData, false);
     }
 
     /**
-     * <p>
-     *     If you are a subscriber and want to listen messages on a specific
-     *     topic from a future publishers, you should register yourself as
-     *     a subscriber with the local registrar.
-     *     Future publishers might express an interest to publish data to a
-     *     a required topic of interest or might publish data only if there
-     *     are active listeners/subscribers to their published topic.
-     * </p>
-     * @param name the name of the requester/sender. Required according to
-     *             the xMsg zmq message structure definition. (topic, sender, data)
-     * @param domain domain of the xMsg subscription
+     * Registers a local subscriber in the local registrar.
+     * The subscriber should be listening for messages of the wanted topic.
+     * Future publishers might express an interest to publish data to a a
+     * required topic of interest or might publish data only if there are active
+     * listeners/subscribers to their published topic.
+     * The local registration database is periodically updated to the front-end database.
+     * The subscriber is expected to be running in the local node.
+     *
+     * @param name the name of the subscriber.
+     * @param domain domain of the subscription
      * @param subject subject of the subscription
      * @param type type of the subscription
-     * @param description description
+     * @param description a description of the subscription
+     * @throws xMsgRegistrationException
      * @throws xMsgRegistrationException
      */
     public void registerSubscriber(String name,
@@ -382,18 +366,40 @@ public class xMsg {
     }
 
     /**
-     * <p>
-     *   Removes publisher registration both from the local and then from the
-     *   global registration databases
-     * </p>
-     * @param name the name of the requester/sender. Required according to
-     *             the xMsg zmq message structure definition. (topic, sender, data)
-     * @param domain domain of the xMsg subscription
+     * Removes a publisher from both the local and front-end registration databases.
+     *
+     * @param name the name of the publisher
+     * @param domain domain of the published messages
+     * @param subject subject of the published messages
+     * @param type type of the published messages
+     * @throws xMsgRegistrationException
+     */
+    public void removePublisherRegistration(String name,
+                                            String domain,
+                                            String subject,
+                                            String type)
+            throws xMsgRegistrationException {
+        xMsgRegistration.Builder regb = xMsgRegistration.newBuilder();
+        regb.setName(name);
+        regb.setDomain(domain);
+        regb.setSubject(subject);
+        regb.setType(type);
+        regb.setOwnerType(xMsgRegistration.OwnerType.PUBLISHER);
+        xMsgRegistration regData = regb.build();
+        driver.removeRegistrationLocal(name, regData, true);
+        driver.removeRegistrationFrontEnd(name, regData, true);
+    }
+
+    /**
+     * Removes a subscriber from both the local and front-end registration databases.
+     *
+     * @param name the name of the subscriber
+     * @param domain domain of the subscription
      * @param subject subject of the subscription
      * @param type type of the subscription
      * @throws xMsgRegistrationException
      */
-    public void removePublisherRegistration (String name,
+    public void removeSubscriberRegistration(String name,
                                              String domain,
                                              String subject,
                                              String type)
@@ -403,54 +409,26 @@ public class xMsg {
         regb.setDomain(domain);
         regb.setSubject(subject);
         regb.setType(type);
-        regb.setOwnerType(xMsgRegistration.OwnerType.PUBLISHER);
-        xMsgRegistration r_data = regb.build();
-        driver.removeRegistration_local(name, r_data, true);
-        driver.removeRegistration_fe(name, r_data, true);
-    }
-
-    /**
-     * <p>
-     *   Removes subscribers registration both from the local and then from the
-     *   global registration databases
-     * </p>
-     * @param name the name of the requester/sender. Required according to
-     *             the xMsg zmq message structure definition. (topic, sender, data)
-     * @param domain domain of the xMsg subscription
-     * @param subject subject of the subscription
-     * @param type type of the subscription
-     * @throws xMsgRegistrationException
-     */
-    public void removeSubscriberRegistration (String name,
-                                              String domain,
-                                              String subject,
-                                              String type)
-            throws xMsgRegistrationException {
-        xMsgRegistration.Builder regb = xMsgRegistration.newBuilder();
-        regb.setName(name);
-        regb.setDomain(domain);
-        regb.setSubject(subject);
-        regb.setType(type);
         regb.setOwnerType(xMsgRegistration.OwnerType.SUBSCRIBER);
-        xMsgRegistration r_data = regb.build();
-        driver.removeRegistration_local(name, r_data, false);
-        driver.removeRegistration_fe(name, r_data, false);
+        xMsgRegistration regData = regb.build();
+        driver.removeRegistrationLocal(name, regData, false);
+        driver.removeRegistrationFrontEnd(name, regData, false);
     }
 
     /**
+     * Finds all publishers of the given topic.
+     * The publishers are searched in the front-end registrar, and they could
+     * be deployed anywhere in the xMsg cloud of nodes.
      * <p>
-     *     Finds all global (deployed anywhere in the xMsg cloud, i.e. nodes)
-     *     publishers, publishing  to a specified topic
-     *     Note: xMsg defines a topic as domain:subject:type
-     * </p>
-     * @param name the name of the requester/sender. Required according to
-     *             the xMsg zmq message structure definition. (topic, sender, data)
-     * @param host host of the xMsg node where the caller is running
-     * @param port port of the xMsg node where the caller is running
-     * @param domain domain of the xMsg subscription
-     * @param subject subject of the subscription
-     * @param type type of the subscription
-     * @return list of {@link org.jlab.coda.xmsg.data.xMsgR.xMsgRegistration} objects
+     * Note: xMsg defines a topic as {@code domain:subject:type}.
+     *
+     * @param name the name of the sender
+     * @param host host of the xMsg node where the sender is running
+     * @param port port of the xMsg node where the sender is running
+     * @param domain domain of the published messages
+     * @param subject subject of the published messages
+     * @param type type of the published messages
+     * @return list of {@link xMsgRegistration} objects, one per found publisher
      * @throws xMsgDiscoverException
      */
     public List<xMsgRegistration> findPublishers(String name,
@@ -461,9 +439,15 @@ public class xMsg {
                                                  String type)
             throws xMsgDiscoverException {
 
-        if(domain.equals("*")) throw new xMsgDiscoverException("malformed xMsg topic");
-        if(subject.equals("*")) subject = xMsgConstants.UNDEFINED.getStringValue();
-        if(type.equals("*")) type = xMsgConstants.UNDEFINED.getStringValue();
+        if (domain.equals("*")) {
+            throw new xMsgDiscoverException("malformed xMsg topic");
+        }
+        if (subject.equals("*")) {
+            subject = xMsgConstants.UNDEFINED.getStringValue();
+        }
+        if (type.equals("*")) {
+            type = xMsgConstants.UNDEFINED.getStringValue();
+        }
 
         xMsgRegistration.Builder regb = xMsgRegistration.newBuilder();
         regb.setName(name);
@@ -473,22 +457,22 @@ public class xMsg {
         regb.setSubject(subject);
         regb.setType(type);
         regb.setOwnerType(xMsgRegistration.OwnerType.PUBLISHER);
-        xMsgRegistration r_data = regb.build();
-        return driver.findGlobal(name, r_data, true);
+        xMsgRegistration regData = regb.build();
+        return driver.findGlobal(name, regData, true);
     }
 
     /**
+     * Finds all publishers of the given topic.
+     * The publishers are searched in the front-end registrar, and they could
+     * be deployed anywhere in the xMsg cloud of nodes.
      * <p>
-     *     Finds all global (deployed anywhere in the xMsg cloud, i.e. nodes)
-     *     publishers, publishing  to a specified topic
-     *     Note: xMsg defines a topic as domain:subject:type
-     * </p>
-     * @param name the name of the requester/sender. Required according to
-     *             the xMsg zmq message structure definition. (topic, sender, data)
-     * @param domain domain of the xMsg subscription
-     * @param subject subject of the subscription
-     * @param type type of the subscription
-     * @return list of {@link org.jlab.coda.xmsg.data.xMsgR.xMsgRegistration} objects
+     * Note: xMsg defines a topic as {@code domain:subject:type}.
+     *
+     * @param name the name of the sender
+     * @param domain domain of the published messages
+     * @param subject subject of the published messages
+     * @param type type of the published messages
+     * @return list of {@link xMsgRegistration} objects, one per found publisher
      * @throws xMsgDiscoverException
      */
     public List<xMsgRegistration> findPublishers(String name,
@@ -501,19 +485,19 @@ public class xMsg {
     }
 
     /**
+     * Finds all subscribers of the given topic.
+     * The publishers are searched in the front-end registrar, and they could
+     * be deployed anywhere in the xMsg cloud of nodes.
      * <p>
-     *     Finds all global (deployed anywhere in the xMsg cloud, i.e. nodes)
-     *     subscribers, subscribing  to a specified topic
-     *     Note: xMsg defines a topic as domain:subject:type
-     * </p>
-     * @param name the name of the requester/sender. Required according to
-     *             the xMsg zmq message structure definition. (topic, sender, data)
-     * @param host host of the xMsg node where the caller is running
-     * @param port port of the xMsg node where the caller is running
-     * @param domain domain of the xMsg subscription
+     * Note: xMsg defines a topic as {@code domain:subject:type}.
+     *
+     * @param name the name of the sender
+     * @param host host of the xMsg node where the sender is running
+     * @param port port of the xMsg node where the sender is running
+     * @param domain domain of the subscription
      * @param subject subject of the subscription
      * @param type type of the subscription
-     * @return list of {@link org.jlab.coda.xmsg.data.xMsgR.xMsgRegistration} objects
+     * @return list of {@link xMsgRegistration} objects, one per found subscribers
      * @throws xMsgDiscoverException
      */
     public List<xMsgRegistration> findSubscribers(String name,
@@ -524,9 +508,15 @@ public class xMsg {
                                                   String type)
             throws xMsgDiscoverException {
 
-        if(domain.equals("*")) throw new xMsgDiscoverException("malformed xMsg topic");
-        if(subject.equals("*")) subject = xMsgConstants.UNDEFINED.getStringValue();
-        if(type.equals("*")) type = xMsgConstants.UNDEFINED.getStringValue();
+        if (domain.equals("*")) {
+            throw new xMsgDiscoverException("malformed xMsg topic");
+        }
+        if (subject.equals("*")) {
+            subject = xMsgConstants.UNDEFINED.getStringValue();
+        }
+        if (type.equals("*")) {
+            type = xMsgConstants.UNDEFINED.getStringValue();
+        }
 
         xMsgRegistration.Builder regb = xMsgRegistration.newBuilder();
         regb.setName(name);
@@ -536,21 +526,22 @@ public class xMsg {
         regb.setSubject(subject);
         regb.setType(type);
         regb.setOwnerType(xMsgRegistration.OwnerType.SUBSCRIBER);
-        xMsgRegistration r_data = regb.build();
-        return driver.findGlobal(name, r_data, false);
+        xMsgRegistration regData = regb.build();
+        return driver.findGlobal(name, regData, false);
     }
 
     /**
+     * Finds all subscribers of a given topic.
+     * The publishers are searched in the front-end registrar, and they could
+     * be deployed anywhere in the xMsg cloud of nodes.
      * <p>
-     *     Finds all local subscribers, subscribing  to a specified topic
-     *     Note: xMsg defines a topic as domain:subject:type
-     * </p>
-     * @param name the name of the requester/sender. Required according to
-     *             the xMsg zmq message structure definition. (topic, sender, data)
-     * @param domain domain of the xMsg subscription
+     * Note: xMsg defines a topic as {@code domain:subject:type}.
+     *
+     * @param name the name of the sender
+     * @param domain domain of the subscription
      * @param subject subject of the subscription
      * @param type type of the subscription
-     * @return list of {@link org.jlab.coda.xmsg.data.xMsgR.xMsgRegistration} objects
+     * @return list of {@link xMsgRegistration} objects, one per found subscribers
      * @throws xMsgDiscoverException
      */
     public List<xMsgRegistration> findSubscribers(String name,
@@ -563,19 +554,16 @@ public class xMsg {
     }
 
     /**
+     * Checks the front-end registrar for a publisher of the given topic.
      * <p>
-     *     Checks the global registration (running on the xMsg FE)
-     *     to see if there a publisher publishing to a specified
-     *     topic.
-     * </p>
+     * Note: xMsg defines a topic as {@code domain:subject:type}.
      *
-     * @param name the name of the requester/sender. Required according to
-     *             the xMsg zmq message structure definition. (topic, sender, data)
-     * @param host host of the xMsg node where the caller is running
-     * @param port port of the xMsg node where the caller is running
-     * @param domain domain of the xMsg subscription
-     * @param subject subject of the subscription
-     * @param type type of the subscription
+     * @param name the name of the sender
+     * @param host host of the xMsg node where the sender is running
+     * @param port port of the xMsg node where the sender is running
+     * @param domain domain of the published messages
+     * @param subject subject of the published messages
+     * @param type type of the published messages
      * @return true if at least one publisher is found
      * @throws xMsgDiscoverException
      */
@@ -589,17 +577,14 @@ public class xMsg {
     }
 
     /**
+     * Checks the front-end registrar for a publisher of the given topic.
      * <p>
-     *     Checks the global registration (running on the xMsg FE)
-     *     to see if there a publisher publishing to a specified
-     *     topic.
-     * </p>
+     * Note: xMsg defines a topic as {@code domain:subject:type}.
      *
-     * @param name the name of the requester/sender. Required according to
-     *             the xMsg zmq message structure definition. (topic, sender, data)
-     * @param domain domain of the xMsg subscription
-     * @param subject subject of the subscription
-     * @param type type of the subscription
+     * @param name the name of the sender
+     * @param domain domain of the published messages
+     * @param subject subject of the published messages
+     * @param type type of the published messages
      * @return true if at least one publisher is found
      * @throws xMsgDiscoverException
      */
@@ -611,17 +596,14 @@ public class xMsg {
     }
 
     /**
+     * Checks the front-end registrar for a subscriber of the given topic.
      * <p>
-     *     Checks the global registration (running on the xMsg FE)
-     *     to see if there a subscriber subscribing to a specified
-     *     topic.
-     * </p>
+     * Note: xMsg defines a topic as {@code domain:subject:type}.
      *
-     * @param name the name of the requester/sender. Required according to
-     *             the xMsg zmq message structure definition. (topic, sender, data)
-     * @param host host of the xMsg node where the caller is running
-     * @param port port of the xMsg node where the caller is running
-     * @param domain domain of the xMsg subscription
+     * @param name the name of the sender
+     * @param host host of the xMsg node where the sender is running
+     * @param port port of the xMsg node where the sender is running
+     * @param domain domain of the subscription
      * @param subject subject of the subscription
      * @param type type of the subscription
      * @return true if at least one subscriber is found
@@ -637,15 +619,12 @@ public class xMsg {
     }
 
     /**
+     * Checks the front-end registrar for a subscriber of the given topic.
      * <p>
-     *     Checks the global registration (running on the xMsg FE)
-     *     to see if there a subscriber subscribing to a specified
-     *     topic.
-     * </p>
+     * Note: xMsg defines a topic as {@code domain:subject:type}.
      *
-     * @param name the name of the requester/sender. Required according to
-     *             the xMsg zmq message structure definition. (topic, sender, data)
-     * @param domain domain of the xMsg subscription
+     * @param name the name of the sender
+     * @param domain domain of the subscription
      * @param subject subject of the subscription
      * @param type type of the subscription
      * @return true if at least one subscriber is found
@@ -659,19 +638,16 @@ public class xMsg {
     }
 
     /**
+     * Checks the local registrar for a publisher of the given topic.
      * <p>
-     *     Checks the local registration (running on the xMsg FE)
-     *     to see if there a publisher publishing to a specified
-     *     topic.
-     * </p>
+     * Note: xMsg defines a topic as {@code domain:subject:type}.
      *
-     * @param name the name of the requester/sender. Required according to
-     *             the xMsg zmq message structure definition. (topic, sender, data)
-     * @param host host of the xMsg node where the caller is running
-     * @param port port of the xMsg node where the caller is running
-     * @param domain domain of the xMsg subscription
-     * @param subject subject of the subscription
-     * @param type type of the subscription
+     * @param name the name of the sender
+     * @param host host of the xMsg node where the sender is running
+     * @param port port of the xMsg node where the sender is running
+     * @param domain domain of the published messages
+     * @param subject subject of the published messages
+     * @param type type of the published messages
      * @return true if at least one publisher is found
      * @throws xMsgDiscoverException
      */
@@ -685,17 +661,14 @@ public class xMsg {
     }
 
     /**
+     * Checks the local registrar for a publisher of the given topic.
      * <p>
-     *     Checks the local registration (running on the xMsg FE)
-     *     to see if there a publisher publishing to a specified
-     *     topic.
-     * </p>
+     * Note: xMsg defines a topic as {@code domain:subject:type}.
      *
-     * @param name the name of the requester/sender. Required according to
-     *             the xMsg zmq message structure definition. (topic, sender, data)
-     * @param domain domain of the xMsg subscription
-     * @param subject subject of the subscription
-     * @param type type of the subscription
+     * @param name the name of the sender
+     * @param domain domain of the published messages
+     * @param subject subject of the published messages
+     * @param type type of the published messages
      * @return true if at least one publisher is found
      * @throws xMsgDiscoverException
      */
@@ -707,17 +680,14 @@ public class xMsg {
     }
 
     /**
+     * Checks the local registrar for a subscriber of the given topic.
      * <p>
-     *     Checks the local registration (running on the xMsg FE)
-     *     to see if there a subscriber subscribing to a specified
-     *     topic.
-     * </p>
+     * Note: xMsg defines a topic as {@code domain:subject:type}.
      *
-     * @param name the name of the requester/sender. Required according to
-     *             the xMsg zmq message structure definition. (topic, sender, data)
-     * @param host host of the xMsg node where the caller is running
-     * @param port port of the xMsg node where the caller is running
-     * @param domain domain of the xMsg subscription
+     * @param name the name of the sender
+     * @param host host of the xMsg node where the sender is running
+     * @param port port of the xMsg node where the sender is running
+     * @param domain domain of the subscription
      * @param subject subject of the subscription
      * @param type type of the subscription
      * @return true if at least one subscriber is found
@@ -733,15 +703,12 @@ public class xMsg {
     }
 
     /**
+     * Checks the local registrar for a subscriber of the given topic.
      * <p>
-     *     Checks the local registration (running on the xMsg FE)
-     *     to see if there a subscriber subscribing to a specified
-     *     topic.
-     * </p>
+     * Note: xMsg defines a topic as {@code domain:subject:type}.
      *
-     * @param name the name of the requester/sender. Required according to
-     *             the xMsg zmq message structure definition. (topic, sender, data)
-     * @param domain domain of the xMsg subscription
+     * @param name the name of the sender
+     * @param domain domain of the subscription
      * @param subject subject of the subscription
      * @param type type of the subscription
      * @return true if at least one subscriber is found
@@ -755,15 +722,15 @@ public class xMsg {
     }
 
     /**
-     * <p>
-     *     Publishes data to a topic defined in a specified xMsgMessage
-     * </p>
-     * @param connection xMsgConnection object
-     * @param x_msg {@link xMsgMessage} object
+     * Publishes the given message.
+     *
+     * @param connection the connection to be used to send the message
+     * @param msg the message to be sent
+     * @throws IOException if the message could not be sent
      * @throws xMsgException
      */
     public void publish(xMsgConnection connection,
-                        xMsgMessage x_msg)
+                        xMsgMessage msg)
             throws xMsgException, IOException {
 
         // check connection
@@ -774,22 +741,22 @@ public class xMsg {
         }
 
         // check message
-        if (x_msg == null) {
+        if (msg == null) {
             System.out.println("Error: null message");
             throw new xMsgException("Error: null message");
         }
 
         // byte array for holding the serialized metadata and data object
-        byte[] metadata_s;
-        byte[] data_s;
+        byte[] serialMetadata;
+        byte[] serialData;
 
         // send topic, sender, followed by the metadata and data
-        ZMsg z_msg = new ZMsg();
+        ZMsg outputMsg = new ZMsg();
 
         // adding topic frame = 1
-        z_msg.addString(x_msg.getTopic());
+        outputMsg.addString(msg.getTopic());
 
-        xMsgMeta.Builder metadata = x_msg.getMetaData();
+        xMsgMeta.Builder metadata = msg.getMetaData();
         if (metadata.getDataType().equals(xMsgMeta.DataType.UNDEFINED)) {
             System.out.println("Error: undefined data type");
             throw new xMsgException("Error: undefined data type");
@@ -799,34 +766,34 @@ public class xMsg {
         if (metadata.getIsDataSerialized()) {
 
             // adding message location frame = 2
-            z_msg.add("envelope");
+            outputMsg.add("envelope");
 
             // adding metadata frame = 3
             xMsgMeta md = metadata.build();
-            metadata_s = md.toByteArray();
-            z_msg.add(metadata_s);
+            serialMetadata = md.toByteArray();
+            outputMsg.add(serialMetadata);
 
             // We serialize here only X_Object and J_object type data.
             // The rest we assume under user responsibility
             if (metadata.getDataType().equals(xMsgMeta.DataType.X_Object)) {
                 // Get the data from the xMsgMessage
-                xMsgData.Builder data = (xMsgData.Builder) x_msg.getData();
+                xMsgData.Builder data = (xMsgData.Builder) msg.getData();
                 // xMsgData serialization
                 xMsgData dd = data.build();
-                data_s = dd.toByteArray();
+                serialData = dd.toByteArray();
 
             } else if (metadata.getDataType().equals(xMsgMeta.DataType.J_Object)) {
-                Object data = x_msg.getData();
+                Object data = msg.getData();
                 // Java object serialization
-                data_s = xMsgUtil.O2B(data);
+                serialData = xMsgUtil.serializeToBytes(data);
 
             } else {
                 // NO serialization
-                data_s = (byte[]) x_msg.getData();
+                serialData = (byte[]) msg.getData();
             }
 
             // adding data frame = 4
-            z_msg.add(data_s);
+            outputMsg.add(serialData);
 
         } else {
             // Publishing within the same process (for e.g. DPE). In this case
@@ -837,23 +804,34 @@ public class xMsg {
             // Here we define a unique key for this message in the shared memory, using
             // senders unique name and the communication ID set by the user.
             String key = metadata.getSender() + "_" + metadata.getCommunicationId();
-            xMsgRegistrar._shared_memory.put(key, x_msg);
+            xMsgRegistrar.sharedMemory.put(key, msg);
 
             // add message location frame = 2
-            z_msg.add(key);
+            outputMsg.add(key);
         }
 
-        if (!z_msg.send(con)) {
+        if (!outputMsg.send(con)) {
             System.out.println("Error: publishing the message");
             throw new xMsgException("Error: publishing the message");
         }
-        z_msg.destroy();
+        outputMsg.destroy();
 
     }
 
-    public xMsgMessage sync_publish(xMsgConnection connection,
-                                    xMsgMessage x_msg,
-                                    int timeOut)
+    /**
+     * Publishes the given message and waits for a response.
+     *
+     * @param connection the connection to be used to send the message
+     * @param msg the message to be sent
+     * @param timeout the time to wait for a response, in milliseconds
+     * @return the response message
+     * @throws IOException if the message could not be sent
+     * @throws TimeoutException if a response is not received
+     * @throws xMsgException
+     */
+    public xMsgMessage syncPublish(xMsgConnection connection,
+                                    xMsgMessage msg,
+                                    int timeout)
             throws xMsgException,
             TimeoutException,
             IOException {
@@ -862,27 +840,26 @@ public class xMsg {
         String returnAddress = "return:" + (int) (Math.random() * 100.0);
 
         // set the return address as replyTo in the xMsgMessage
-        x_msg.getMetaData().setReplyTo(returnAddress);
+        msg.getMetaData().setReplyTo(returnAddress);
 
         // subscribe to the returnAddress
         SyncSendCallBack cb = new SyncSendCallBack();
         SubscriptionHandler sh = subscribe(connection, returnAddress, cb);
         cb.setSubscriptionHandler(sh);
 
-        publish(connection, x_msg);
+        publish(connection, msg);
 
         // wait for the response
         int t = 0;
-        while (cb.r_msg == null &&
-                t < timeOut*1000){
+        while (cb.recvMsg == null && t < timeout * 1000) {
             t++;
             xMsgUtil.sleep(1);
         }
-        if(t >= timeOut*1000) {
+        if (t >= timeout * 1000) {
             throw new TimeoutException("Error: no response for time_out = " + t);
         }
-        x_msg.getMetaData().setReplyTo(xMsgConstants.UNDEFINED.getStringValue());
-        return cb.r_msg;
+        msg.getMetaData().setReplyTo(xMsgConstants.UNDEFINED.getStringValue());
+        return cb.recvMsg;
     }
 
     /**
@@ -918,86 +895,86 @@ public class xMsg {
         SubscriptionHandler sHandle = new SubscriptionHandler(connection, topic) {
             @Override
             public void handle() throws xMsgException, IOException {
-                final xMsgMessage cb_msg;
+                final xMsgMessage callbackMsg;
 
-                ZMsg z_msg = ZMsg.recvMsg(con);
-                ZFrame r_topic = z_msg.pop();       // get the topic frame = 1
-                ZFrame r_msgLocation = z_msg.pop(); // get the message location frame = 2
+                ZMsg inputMsg = ZMsg.recvMsg(con);
+                ZFrame topicFrame = inputMsg.pop();       // get the topic frame = 1
+                ZFrame msgLocationFrame = inputMsg.pop(); // get the message location frame = 2
 
                 // de-serialize received message components
-                String ds_topic = new String(r_topic.getData(), ZMQ.CHARSET);
-                String ds_msgLocation = new String(r_msgLocation.getData(), ZMQ.CHARSET);
+                String topic = new String(topicFrame.getData(), ZMQ.CHARSET);
+                String msgLocation = new String(msgLocationFrame.getData(), ZMQ.CHARSET);
 
                 // we do not need frames
-                r_topic.destroy();
-                r_msgLocation.destroy();
+                topicFrame.destroy();
+                msgLocationFrame.destroy();
 
                 // Define/create received xMsgMessage
                 // by check the location of the message
-                if (ds_msgLocation.equals("envelope")) {
+                if (msgLocation.equals("envelope")) {
 
                     // Get the rest of the message components,
                     // i.e. metadata and data are in the xMsg envelope
                     // Read the rest of the zmq frames
-                    ZFrame r_metadata = z_msg.pop(); // get metadata frame = 3
-                    ZFrame r_data = z_msg.pop();     // get the data frame = 4
+                    ZFrame metadataFrame = inputMsg.pop(); // get metadata frame = 3
+                    ZFrame dataFrame = inputMsg.pop();     // get the data frame = 4
 
                     // metadata and data de-serialization
                     try {
-                        xMsgMeta s_metadata = xMsgMeta.parseFrom(r_metadata.getData());
-                        xMsgMeta.Builder ds_metadata = s_metadata.toBuilder();
+                        xMsgMeta metadataObj = xMsgMeta.parseFrom(metadataFrame.getData());
+                        xMsgMeta.Builder metadata = metadataObj.toBuilder();
 
                         // Find the type of the data passed, and de
                         // serialize only X_Object and J_Object type data.
                         // Note de-serialization of the other type data is assumed
                         // to be a user responsibility
-                        if (ds_metadata.getDataType().equals(xMsgMeta.DataType.X_Object)) {
+                        if (metadata.getDataType().equals(xMsgMeta.DataType.X_Object)) {
 
                             // xMsgData de-serialization
-                            xMsgData s_data = xMsgData.parseFrom(r_data.getData());
-                            xMsgData.Builder ds_data = s_data.toBuilder();
+                            xMsgData dataObj = xMsgData.parseFrom(dataFrame.getData());
+                            xMsgData.Builder data = dataObj.toBuilder();
 
                             // Create a message to be passed to the user callback method
-                            cb_msg = new xMsgMessage(ds_topic, ds_metadata, ds_data);
+                            callbackMsg = new xMsgMessage(topic, metadata, data);
                             // Calling user callback method with the received xMsgMessage
-                            _callUserCallBack(connection, cb, cb_msg);
+                            callUserCallBack(connection, cb, callbackMsg);
 
-                        } else if (ds_metadata.getDataType().equals(xMsgMeta.DataType.J_Object)) {
+                        } else if (metadata.getDataType().equals(xMsgMeta.DataType.J_Object)) {
 
                             // Java object de-serialization
-                            Object ds_data = xMsgUtil.B2O(r_data.getData());
+                            Object data = xMsgUtil.deserialize(dataFrame.getData());
 
                             // Create a message to be passed to the user callback method
-                            cb_msg = new xMsgMessage(ds_topic, ds_metadata, ds_data);
+                            callbackMsg = new xMsgMessage(topic, metadata, data);
                             // Calling user callback method with the received xMsgMessage
-                            _callUserCallBack(connection, cb, cb_msg);
+                            callUserCallBack(connection, cb, callbackMsg);
 
                         } else {
                             // NO de-serialization
-                            Object ds_data = r_data.getData();
+                            Object data = dataFrame.getData();
 
                             // Create a message to be passed to the user callback method
-                            cb_msg = new xMsgMessage(ds_topic, ds_metadata, ds_data);
+                            callbackMsg = new xMsgMessage(topic, metadata, data);
                             // Calling user callback method with the received xMsgMessage
-                            _callUserCallBack(connection, cb, cb_msg);
+                            callUserCallBack(connection, cb, callbackMsg);
                         }
 
                         // we do not need the rest of frames as well as the z_msg
-                        r_metadata.destroy();
-                        r_data.destroy();
-                        z_msg.destroy();
+                        metadataFrame.destroy();
+                        dataFrame.destroy();
+                        inputMsg.destroy();
 
                     } catch (InvalidProtocolBufferException e) {
-                        r_metadata.destroy();
-                        r_data.destroy();
-                        z_msg.destroy();
+                        metadataFrame.destroy();
+                        dataFrame.destroy();
+                        inputMsg.destroy();
                         throw new xMsgException(e.getMessage());
                     }
                 } else {
-                    cb_msg = xMsgRegistrar._shared_memory.get(ds_msgLocation);
+                    callbackMsg = xMsgRegistrar.sharedMemory.get(msgLocation);
 
                     // Calling user callback method with the received xMsgMessage
-                    _callUserCallBack(connection, cb, cb_msg);
+                    callUserCallBack(connection, cb, callbackMsg);
                 }
             }
         };
@@ -1015,27 +992,28 @@ public class xMsg {
 
     }
 
-    private void _callUserCallBack(final xMsgConnection connection,
-                                   final xMsgCallBack cb,
-                                   final xMsgMessage cb_msg)
+    private void callUserCallBack(final xMsgConnection connection,
+                                  final xMsgCallBack callback,
+                                  final xMsgMessage callbackMsg)
             throws xMsgException, IOException {
 
         // Check if it is sync request
         // sync request
-        if (!cb_msg.getMetaData().getReplyTo().equals(xMsgConstants.UNDEFINED.getStringValue())) {
-            xMsgMessage rm = cb.callback(cb_msg);
+        String requester = callbackMsg.getMetaData().getReplyTo();
+        if (!requester.equals(xMsgConstants.UNDEFINED.getStringValue())) {
+            xMsgMessage rm = callback.callback(callbackMsg);
             if (rm != null) {
-                rm.setTopic(cb_msg.getMetaData().getReplyTo());
+                rm.setTopic(callbackMsg.getMetaData().getReplyTo());
                 publish(connection, rm);
             }
         } else {
             // async request
             threadPool.submit(new Runnable() {
-                                  public void run() {
-                                      cb.callback(cb_msg);
-                                  }
-                              }
-            );
+                @Override
+                public void run() {
+                    callback.callback(callbackMsg);
+                }
+            });
         }
     }
 
@@ -1055,49 +1033,46 @@ public class xMsg {
 
 
     /**
-     * <p>
-     *     Returns internal thread pool size
-     * </p>
-     * @return size of the thread pool
+     * Returns the size of the internal thread pool.
      */
-    public int getPool_size() {
-        return pool_size;
+    public int getPoolSize() {
+        return poolSize;
     }
 
     /**
-     * <p>
-     *     Private inner class used to organize
-     *     sync send/publish communications
-     * </p>
+     * Private inner class used to organize sync send/publish communications.
      */
     private class SyncSendCallBack implements xMsgCallBack {
 
-        public xMsgMessage r_msg = null;
-        public Boolean isReceived  =false;
+        public xMsgMessage recvMsg = null;
+        public Boolean isReceived = false;
 
-        private SubscriptionHandler sh = null;
+        private SubscriptionHandler handler = null;
 
-        public void setSubscriptionHandler(SubscriptionHandler sh){
-            this.sh = sh;
+        public void setSubscriptionHandler(SubscriptionHandler handler) {
+            this.handler = handler;
         }
 
         @Override
         public xMsgMessage callback(xMsgMessage msg) {
             isReceived = true;
-            r_msg = msg;
+            recvMsg = msg;
             try {
-                if(sh!=null) {
-                    unsubscribe(sh);
+                if (handler != null) {
+                    unsubscribe(handler);
                 }
             } catch (xMsgException e) {
                 e.printStackTrace();
             }
 
-            return r_msg;
+            return recvMsg;
         }
     }
 
 
+    /**
+     * Creates a new {@link xMsg.FixedExecutor}.
+     */
     public static ExecutorService newFixedThreadPool(int nThreads) {
         return new FixedExecutor(nThreads, nThreads,
                                       0L, TimeUnit.MILLISECONDS,
@@ -1105,6 +1080,9 @@ public class xMsg {
     }
 
 
+    /**
+     * A thread pool executor that prints the stacktrace of uncaught exceptions.
+     */
     private static class FixedExecutor extends ThreadPoolExecutor {
 
         public FixedExecutor(int corePoolSize, int maximumPoolSize, long keepAliveTime,

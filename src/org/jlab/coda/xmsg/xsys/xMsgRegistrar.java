@@ -21,7 +21,6 @@
 
 package org.jlab.coda.xmsg.xsys;
 
-import org.jlab.coda.xmsg.core.xMsgConstants;
 import org.jlab.coda.xmsg.core.xMsgMessage;
 import org.jlab.coda.xmsg.core.xMsgUtil;
 import org.jlab.coda.xmsg.excp.xMsgException;
@@ -31,35 +30,32 @@ import org.zeromq.ZContext;
 
 import java.net.SocketException;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.ConcurrentMap;
 
 /**
- * <p>
  * xMsgRegistrar.
  * Note that no arg constructed object can play master registrar role.
- * </p>
  *
  * @author gurjyan
- *         Created on 10/6/14
- * @version %I%
  * @since 1.0
  */
 public class xMsgRegistrar extends xMsgRegDiscDriver {
 
+    // CHECKSTYLE.OFF: ConstantName
     // shared memory of the node (in the language of CLARA it would be DPE)
-    public static final ConcurrentHashMap<String, xMsgMessage> _shared_memory = new ConcurrentHashMap<>();
-
+    public static final ConcurrentMap<String, xMsgMessage>
+            sharedMemory = new ConcurrentHashMap<>();
 
     /**
-     * <p>
      * Starts a local registrar service.
      * Note: this version assumes that xMsgNode and xMsgFE registrar services
      * use default registrar port:
-     * {@link xMsgConstants#REGISTRAR_PORT}
-     * </p>
+     * {@link org.jlab.coda.xmsg.core.xMsgConstants#REGISTRAR_PORT}
      *
+     * @throws SocketException
      * @throws xMsgException
      */
-    public xMsgRegistrar() throws xMsgException, SocketException {
+    public xMsgRegistrar() throws SocketException, xMsgException {
 
         super("localhost");
 
@@ -68,32 +64,33 @@ public class xMsgRegistrar extends xMsgRegDiscDriver {
         xMsgUtil.updateLocalHostIps();
 
         // Zmq context
-        final ZContext _context = new ZContext();
+        final ZContext context = new ZContext();
 
         // start registrar service
-        new xMsgRegistrationService(_context).run();
+        new xMsgRegistrationService(context).start();
     }
 
 
     /**
-     * <p>
      * Starts a local registrar service.
-     * Constructor of the {@link org.jlab.coda.xmsg.xsys.regdis.xMsgRegistrationService} class
-     * will start a thread that will periodically report local registration
-     * database to xMsgRegistrar service that is defined to be a master Registrar service (FE).
-     * This ways registration data is distributed/duplicated between xMsgNode
-     * and xMsgFE registrar services.
+     * Constructor of the {@link xMsgRegistrationService} class will start a
+     * thread that will periodically report local registration database to
+     * xMsgRegistrar service that is defined to be a master Registrar service
+     * (FE).
+     * This way registration data is distributed/duplicated between xMsgNode and
+     * xMsgFE registrar services.
      * That is the reason we need to pass xMsg front-end host name.
+     * <p>
      * Note: this version assumes that xMsgNode and xMsgFE registrar services
      * use default registrar port:
      * {@link org.jlab.coda.xmsg.core.xMsgConstants#REGISTRAR_PORT}
-     * </p>
      *
      * @param feHost xMsg front-end host. Host is passed through command line -h option,
      *               or through the environmental variable: XMSG_FE_HOST
+     * @throws SocketException
      * @throws xMsgException
      */
-    public xMsgRegistrar(final String feHost) throws xMsgException, SocketException {
+    public xMsgRegistrar(final String feHost) throws SocketException, xMsgException {
 
         super(feHost);
 
@@ -102,14 +99,14 @@ public class xMsgRegistrar extends xMsgRegDiscDriver {
         xMsgUtil.updateLocalHostIps();
 
         // Zmq context
-        final ZContext _context = new ZContext();
+        final ZContext context = new ZContext();
 
         // Start local registrar service.
         // In this case this specific constructor starts a thread
         // that periodically updates front-end registrar database with
         // the data from the local databases
 
-        new xMsgRegistrationService(feHost, _context).run();
+        new xMsgRegistrationService(feHost, context).start();
     }
 
 
@@ -140,5 +137,3 @@ public class xMsgRegistrar extends xMsgRegDiscDriver {
         }
     }
 }
-
-

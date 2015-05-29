@@ -30,23 +30,20 @@ import java.io.IOException;
 import java.util.concurrent.TimeoutException;
 
 /**
- * <p>
- *     xMsg subscription handler
- * </p>
+ * xMsg subscription handler.
  *
  * @author gurjyan
  * @version 2.x
  * @since 3/6/15
  */
-
-
 public abstract class SubscriptionHandler implements Runnable {
 
     private boolean isRunning = true;
     private Socket con;
     private String topic;
+
     public SubscriptionHandler(xMsgConnection connection,
-                               String topic){
+                               String topic) {
         con = connection.getSubSock();
         this.topic = topic;
     }
@@ -55,7 +52,7 @@ public abstract class SubscriptionHandler implements Runnable {
 
     @Override
     public void run() {
-        while(isRunning){
+        while (isRunning) {
             try {
                 handle();
             } catch (xMsgException | TimeoutException | IOException e) {
@@ -65,8 +62,7 @@ public abstract class SubscriptionHandler implements Runnable {
         con.unsubscribe(topic.getBytes(ZMQ.CHARSET));
     }
 
-    public void unsubscribe(){
+    public void unsubscribe() {
         isRunning = false;
     }
-
 }

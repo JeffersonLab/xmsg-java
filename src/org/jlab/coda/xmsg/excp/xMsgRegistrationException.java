@@ -22,12 +22,9 @@
 package org.jlab.coda.xmsg.excp;
 
 /**
- *<p>
- *     xMsgRegistrationException class
- *</p>
+ * xMsgRegistrationException class.
+ *
  * @author gurjyan
- *         Created on 10/6/14
- * @version %I%
  * @since 1.0
  */
 public class xMsgRegistrationException extends xMsgException {

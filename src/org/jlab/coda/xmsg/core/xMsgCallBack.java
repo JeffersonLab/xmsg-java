@@ -22,17 +22,12 @@
 package org.jlab.coda.xmsg.core;
 
 /**
- * <p>
- *     xMsg callback interface
- * </p>
+ * xMsg callback interface.
  *
  * @author gurjyan
- *         Created on 10/6/14
- * @version %I%
  * @since 1.0
  */
 public interface xMsgCallBack {
 
-    public xMsgMessage callback(xMsgMessage msg);
-
+    xMsgMessage callback(xMsgMessage msg);
 }

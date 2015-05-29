@@ -22,16 +22,13 @@
 package org.jlab.coda.xmsg.core;
 
 /**
- * <p>
- *     xMsg constants
- * </p>
+ * xMsg constants.
  *
  * @author gurjyan
- *         Created on 10/6/14
- * @version %I%
  * @since 1.0
  */
 public enum xMsgConstants {
+
     UNDEFINED(0, "undefined"),
     SUCCESS(1, "success"),
     ANY(2, "*"),
@@ -40,27 +37,27 @@ public enum xMsgConstants {
 
     REGISTER_PUBLISHER(4, "registerPublisher"),
     REGISTER_SUBSCRIBER(5, "registerSubscriber"),
-    REGISTER_REQUEST_TIMEOUT(3000,"registerRequestTimeout"),
+    REGISTER_REQUEST_TIMEOUT(3000, "registerRequestTimeout"),
 
     REMOVE_PUBLISHER(6, "removePublisherRegistration"),
     REMOVE_SUBSCRIBER(7, "removeSubscriberRegistration"),
     REMOVE_ALL_REGISTRATION(8, "removeAllRegistration"),
-    REMOVE_REQUEST_TIMEOUT(3000,"removeRequestTimeout"),
+    REMOVE_REQUEST_TIMEOUT(3000, "removeRequestTimeout"),
 
-    FIND_REQUEST_TIMEOUT(3000,"findRequestTimeout"),
-    FIND_PUBLISHER(9,"findPublisher"),
-    FIND_SUBSCRIBER(10,"findSubscribers"),
+    FIND_REQUEST_TIMEOUT(3000, "findRequestTimeout"),
+    FIND_PUBLISHER(9, "findPublisher"),
+    FIND_SUBSCRIBER(10, "findSubscribers"),
 
-    INFO(11,"INFO"),
-    WARNING(12,"WARNING"),
-    ERROR(13,"ERROR"),
-    DONE(14,"done"),
-    DATA(15,"data"),
+    INFO(11, "INFO"),
+    WARNING(12, "WARNING"),
+    ERROR(13, "ERROR"),
+    DONE(14, "done"),
+    DATA(15, "data"),
 
-    NO_RESULT(16,"none"),
+    NO_RESULT(16, "none"),
 
-    BIND(17,"bind"),
-    CONNECT(18,"connect"),
+    BIND(17, "bind"),
+    CONNECT(18, "connect"),
 
     DEFAULT_PORT(7771, "defaultPort"),
     REGISTRAR_PORT(8888, "registrarPort");
@@ -68,7 +65,7 @@ public enum xMsgConstants {
     private int intValue;
     private String stringValue;
 
-    private xMsgConstants(int intValue, String stringValue){
+    private xMsgConstants(int intValue, String stringValue) {
         this.intValue = intValue;
         this.stringValue = stringValue;
     }
@@ -76,6 +73,7 @@ public enum xMsgConstants {
     public int getIntValue() {
         return intValue;
     }
+
     public String getStringValue() {
         return stringValue;
     }
