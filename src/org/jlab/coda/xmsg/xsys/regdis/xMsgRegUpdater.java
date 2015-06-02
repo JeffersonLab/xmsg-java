@@ -27,14 +27,12 @@ import org.jlab.coda.xmsg.excp.xMsgException;
 import org.jlab.coda.xmsg.excp.xMsgRegistrationException;
 
 import java.net.SocketException;
-import java.util.Set;
-import java.util.concurrent.ConcurrentMap;
 
 /**
  * A thread that periodically updates xMsg front-end registration database with
  * passed publishers and subscribers database contents. These passed databases
  * (i.e. references) are xMsgNode resident databases, defined within the
- * xMsgRegistrar class: {@link xMsgRegistrationService}
+ * xMsgRegistrar class: {@link xMsgRegService}
  * <p>
  * This class will be instantiated by the xMsgRegistrar constructor executed by
  * the xMsgNode: {@link org.jlab.coda.xmsg.xsys.xMsgRegistrar} This class
@@ -46,11 +44,11 @@ import java.util.concurrent.ConcurrentMap;
  * @author gurjyan
  * @since 1.0
  */
-public class xMsgRegRepT extends xMsgRegDiscDriver implements Runnable {
+public class xMsgRegUpdater extends xMsgRegDiscDriver implements Runnable {
 
     // xMsgNode database references
-    private ConcurrentMap<String, Set<xMsgRegistration>> publishers;
-    private ConcurrentMap<String, Set<xMsgRegistration>> subscribers;
+    private xMsgRegDatabase publishers;
+    private xMsgRegDatabase subscribers;
 
     /**
      * Constructor accepts the front-end host name (IP form)
@@ -64,9 +62,9 @@ public class xMsgRegRepT extends xMsgRegDiscDriver implements Runnable {
      * @throws xMsgException
      * @throws IOException
      */
-    public xMsgRegRepT(String feHost,
-                       ConcurrentMap<String, Set<xMsgRegistration>> publishers,
-                       ConcurrentMap<String, Set<xMsgRegistration>> subscribers
+    public xMsgRegUpdater(String feHost,
+                       xMsgRegDatabase publishers,
+                       xMsgRegDatabase subscribers
     ) throws SocketException, xMsgException {
         super(feHost);
         this.publishers = publishers;
@@ -79,7 +77,7 @@ public class xMsgRegRepT extends xMsgRegDiscDriver implements Runnable {
         while (!Thread.currentThread().isInterrupted()) {
 
             // update FE publishers database
-            for (String key : publishers.keySet()) {
+            for (String key : publishers.topics()) {
                 try {
                     for (xMsgRegistration r : publishers.get(key)) {
                         registerFrontEnd(key, r, true);
@@ -91,7 +89,7 @@ public class xMsgRegRepT extends xMsgRegDiscDriver implements Runnable {
             }
 
             // update FE subscribers database
-            for (String key : subscribers.keySet()) {
+            for (String key : subscribers.topics()) {
                 try {
                     for (xMsgRegistration r : subscribers.get(key)) {
                         registerFrontEnd(key, r, false);

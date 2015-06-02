@@ -25,7 +25,7 @@ import org.jlab.coda.xmsg.core.xMsgMessage;
 import org.jlab.coda.xmsg.core.xMsgUtil;
 import org.jlab.coda.xmsg.excp.xMsgException;
 import org.jlab.coda.xmsg.xsys.regdis.xMsgRegDiscDriver;
-import org.jlab.coda.xmsg.xsys.regdis.xMsgRegistrationService;
+import org.jlab.coda.xmsg.xsys.regdis.xMsgRegService;
 import org.zeromq.ZContext;
 
 import java.net.SocketException;
@@ -67,13 +67,13 @@ public class xMsgRegistrar extends xMsgRegDiscDriver {
         final ZContext context = new ZContext();
 
         // start registrar service
-        new xMsgRegistrationService(context).start();
+        new xMsgRegService(context).start();
     }
 
 
     /**
      * Starts a local registrar service.
-     * Constructor of the {@link xMsgRegistrationService} class will start a
+     * Constructor of the {@link xMsgRegService} class will start a
      * thread that will periodically report local registration database to
      * xMsgRegistrar service that is defined to be a master Registrar service
      * (FE).
@@ -106,34 +106,29 @@ public class xMsgRegistrar extends xMsgRegDiscDriver {
         // that periodically updates front-end registrar database with
         // the data from the local databases
 
-        new xMsgRegistrationService(feHost, context).start();
+        new xMsgRegService(feHost, context).start();
     }
 
 
     public static void main(String[] args) {
-
-        if (args.length == 2) {
-            if (args[0].equals("-fe_host")) {
-                try {
+        try {
+            if (args.length == 2) {
+                if (args[0].equals("-fe_host")) {
                     new xMsgRegistrar(args[1]);
-                } catch (xMsgException e) {
-                    System.out.println(e.getMessage());
-                    System.out.println("exiting...");
-                } catch (SocketException e) {
-                    e.printStackTrace();
+                } else {
+                    System.err.println("Wrong option. Accepts -fe_host option only.");
+                    System.exit(1);
                 }
-            } else {
-                System.out.println("wrong option. Accepts -fe_host option only.");
-            }
-        } else if (args.length == 0) {
-            try {
+            } else if (args.length == 0) {
                 new xMsgRegistrar();
-            } catch (xMsgException e) {
-                System.out.println(e.getMessage());
-                System.out.println("exiting...");
-            } catch (SocketException e) {
-                e.printStackTrace();
+            } else {
+                System.err.println("Wrong arguments. Accepts -fe_host option only.");
+                System.exit(1);
             }
+        } catch (xMsgException | SocketException e) {
+            System.out.println(e.getMessage());
+            System.out.println("exiting...");
+            System.exit(1);
         }
     }
 }
