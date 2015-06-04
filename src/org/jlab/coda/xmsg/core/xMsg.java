@@ -26,12 +26,11 @@ import com.google.protobuf.InvalidProtocolBufferException;
 import org.jlab.coda.xmsg.data.xMsgD.xMsgData;
 import org.jlab.coda.xmsg.data.xMsgM.xMsgMeta;
 import org.jlab.coda.xmsg.data.xMsgR.xMsgRegistration;
-import org.jlab.coda.xmsg.excp.xMsgDiscoverException;
 import org.jlab.coda.xmsg.excp.xMsgException;
 import org.jlab.coda.xmsg.excp.xMsgRegistrationException;
 import org.jlab.coda.xmsg.net.xMsgAddress;
 import org.jlab.coda.xmsg.net.xMsgConnection;
-import org.jlab.coda.xmsg.xsys.regdis.xMsgRegDiscDriver;
+import org.jlab.coda.xmsg.xsys.regdis.xMsgRegDriver;
 import org.jlab.coda.xmsg.xsys.xMsgRegistrar;
 import org.zeromq.ZContext;
 import org.zeromq.ZFrame;
@@ -42,7 +41,7 @@ import org.zeromq.ZMsg;
 import java.io.IOException;
 import java.net.SocketException;
 import java.util.HashMap;
-import java.util.List;
+import java.util.Set;
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.CancellationException;
 import java.util.concurrent.ExecutionException;
@@ -53,7 +52,7 @@ import java.util.concurrent.ThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
 
-import static org.jlab.coda.xmsg.xsys.regdis.xMsgRegDiscDriver.__zmqSocket;
+import static org.jlab.coda.xmsg.xsys.regdis.xMsgRegDriver.__zmqSocket;
 
 /**
  * xMsg base class that provides methods for organizing pub/sub communications.
@@ -82,7 +81,7 @@ public class xMsg {
     private int poolSize = 2;
 
     /** Access to the xMsg registrars. */
-    private xMsgRegDiscDriver driver;
+    private xMsgRegDriver driver;
 
 
     /**
@@ -100,7 +99,7 @@ public class xMsg {
          * Calls xMsgRegDiscDriver class constructor that creates sockets to two registrar
          * request/reply servers running in the local xMsgNode and xMsgFE.
          */
-        driver = new xMsgRegDiscDriver(feHost);
+        driver = new xMsgRegDriver(feHost);
         context = driver.getContext();
 
         threadPool = newFixedThreadPool(this.poolSize);
@@ -122,7 +121,7 @@ public class xMsg {
          * Calls xMsgRegDiscDriver class constructor that creates sockets to two registrar
          * request/reply servers running in the local xMsgNode and xMsgFE.
          */
-        driver = new xMsgRegDiscDriver(feHost);
+        driver = new xMsgRegDriver(feHost);
         context = driver.getContext();
 
         // create fixed size thread pool
@@ -431,16 +430,16 @@ public class xMsg {
      * @return list of {@link xMsgRegistration} objects, one per found publisher
      * @throws xMsgDiscoverException
      */
-    public List<xMsgRegistration> findPublishers(String name,
-                                                 String host,
-                                                 int port,
-                                                 String domain,
-                                                 String subject,
-                                                 String type)
-            throws xMsgDiscoverException {
+    public Set<xMsgRegistration> findPublishers(String name,
+                                                String host,
+                                                int port,
+                                                String domain,
+                                                String subject,
+                                                String type)
+            throws xMsgRegistrationException {
 
         if (domain.equals("*")) {
-            throw new xMsgDiscoverException("malformed xMsg topic");
+            throw new xMsgRegistrationException("malformed xMsg topic");
         }
         if (subject.equals("*")) {
             subject = xMsgConstants.UNDEFINED.getStringValue();
@@ -475,11 +474,11 @@ public class xMsg {
      * @return list of {@link xMsgRegistration} objects, one per found publisher
      * @throws xMsgDiscoverException
      */
-    public List<xMsgRegistration> findPublishers(String name,
-                                                 String domain,
-                                                 String subject,
-                                                 String type)
-            throws xMsgDiscoverException {
+    public Set<xMsgRegistration> findPublishers(String name,
+                                                String domain,
+                                                String subject,
+                                                String type)
+            throws xMsgRegistrationException {
         return findPublishers(name, "localhost", xMsgConstants.REGISTRAR_PORT.getIntValue(),
                 domain, subject, type);
     }
@@ -500,16 +499,16 @@ public class xMsg {
      * @return list of {@link xMsgRegistration} objects, one per found subscribers
      * @throws xMsgDiscoverException
      */
-    public List<xMsgRegistration> findSubscribers(String name,
-                                                  String host,
-                                                  int port,
-                                                  String domain,
-                                                  String subject,
-                                                  String type)
-            throws xMsgDiscoverException {
+    public Set<xMsgRegistration> findSubscribers(String name,
+                                                 String host,
+                                                 int port,
+                                                 String domain,
+                                                 String subject,
+                                                 String type)
+            throws xMsgRegistrationException {
 
         if (domain.equals("*")) {
-            throw new xMsgDiscoverException("malformed xMsg topic");
+            throw new xMsgRegistrationException("malformed xMsg topic");
         }
         if (subject.equals("*")) {
             subject = xMsgConstants.UNDEFINED.getStringValue();
@@ -542,13 +541,13 @@ public class xMsg {
      * @param subject subject of the subscription
      * @param type type of the subscription
      * @return list of {@link xMsgRegistration} objects, one per found subscribers
-     * @throws xMsgDiscoverException
+     * @throws xMsgRegistrationException
      */
-    public List<xMsgRegistration> findSubscribers(String name,
-                                                  String domain,
-                                                  String subject,
-                                                  String type)
-            throws xMsgDiscoverException {
+    public Set<xMsgRegistration> findSubscribers(String name,
+                                                 String domain,
+                                                 String subject,
+                                                 String type)
+            throws xMsgRegistrationException {
         return findSubscribers(name, "localhost", xMsgConstants.REGISTRAR_PORT.getIntValue(),
                 domain, subject, type);
     }
@@ -565,14 +564,14 @@ public class xMsg {
      * @param subject subject of the published messages
      * @param type type of the published messages
      * @return true if at least one publisher is found
-     * @throws xMsgDiscoverException
+     * @throws xMsgRegistrationException
      */
     public boolean isTherePublisher(String name,
                                     String host,
                                     int port,
                                     String domain,
                                     String subject,
-                                    String type) throws xMsgDiscoverException {
+                                    String type) throws xMsgRegistrationException {
         return findPublishers(name, host, port, domain, subject, type).size() > 0;
     }
 
@@ -586,12 +585,12 @@ public class xMsg {
      * @param subject subject of the published messages
      * @param type type of the published messages
      * @return true if at least one publisher is found
-     * @throws xMsgDiscoverException
+     * @throws xMsgRegistrationException
      */
     public boolean isTherePublisher(String name,
                                     String domain,
                                     String subject,
-                                    String type) throws xMsgDiscoverException {
+                                    String type) throws xMsgRegistrationException {
         return findPublishers(name, domain, subject, type).size() > 0;
     }
 
@@ -607,14 +606,14 @@ public class xMsg {
      * @param subject subject of the subscription
      * @param type type of the subscription
      * @return true if at least one subscriber is found
-     * @throws xMsgDiscoverException
+     * @throws xMsgRegistrationException
      */
     public boolean isThereSubscriber(String name,
                                      String host,
                                      int port,
                                      String domain,
                                      String subject,
-                                     String type) throws xMsgDiscoverException {
+                                     String type) throws xMsgRegistrationException {
         return findSubscribers(name, host, port, domain, subject, type).size() > 0;
     }
 
@@ -628,12 +627,12 @@ public class xMsg {
      * @param subject subject of the subscription
      * @param type type of the subscription
      * @return true if at least one subscriber is found
-     * @throws xMsgDiscoverException
+     * @throws xMsgRegistrationException
      */
     public boolean isThereSubscriber(String name,
                                      String domain,
                                      String subject,
-                                     String type) throws xMsgDiscoverException {
+                                     String type) throws xMsgRegistrationException {
         return findSubscribers(name, domain, subject, type).size() > 0;
     }
 
@@ -649,14 +648,14 @@ public class xMsg {
      * @param subject subject of the published messages
      * @param type type of the published messages
      * @return true if at least one publisher is found
-     * @throws xMsgDiscoverException
+     * @throws xMsgRegistrationException
      */
     public boolean isThereLocalPublisher(String name,
                                          String host,
                                          int port,
                                          String domain,
                                          String subject,
-                                         String type) throws xMsgDiscoverException {
+                                         String type) throws xMsgRegistrationException {
         return findPublishers(name, host, port, domain, subject, type).size() > 0;
     }
 
@@ -670,12 +669,12 @@ public class xMsg {
      * @param subject subject of the published messages
      * @param type type of the published messages
      * @return true if at least one publisher is found
-     * @throws xMsgDiscoverException
+     * @throws xMsgRegistrationException
      */
     public boolean isThereLocalPublisher(String name,
                                          String domain,
                                          String subject,
-                                         String type) throws xMsgDiscoverException {
+                                         String type) throws xMsgRegistrationException {
         return findPublishers(name, domain, subject, type).size() > 0;
     }
 
@@ -691,14 +690,14 @@ public class xMsg {
      * @param subject subject of the subscription
      * @param type type of the subscription
      * @return true if at least one subscriber is found
-     * @throws xMsgDiscoverException
+     * @throws xMsgRegistrationException
      */
     public boolean isThereLocalSubscriber(String name,
                                           String host,
                                           int port,
                                           String domain,
                                           String subject,
-                                          String type) throws xMsgDiscoverException {
+                                          String type) throws xMsgRegistrationException {
         return findSubscribers(name, host, port, domain, subject, type).size() > 0;
     }
 
@@ -712,12 +711,12 @@ public class xMsg {
      * @param subject subject of the subscription
      * @param type type of the subscription
      * @return true if at least one subscriber is found
-     * @throws xMsgDiscoverException
+     * @throws xMsgRegistrationException
      */
     public boolean isThereLocalSubscriber(String name,
                                           String domain,
                                           String subject,
-                                          String type) throws xMsgDiscoverException {
+                                          String type) throws xMsgRegistrationException {
         return findSubscribers(name, domain, subject, type).size() > 0;
     }
 

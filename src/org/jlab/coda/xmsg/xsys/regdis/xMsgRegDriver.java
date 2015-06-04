@@ -21,23 +21,18 @@
 
 package org.jlab.coda.xmsg.xsys.regdis;
 
-import com.google.protobuf.InvalidProtocolBufferException;
-
 import org.jlab.coda.xmsg.core.xMsgConstants;
 import org.jlab.coda.xmsg.core.xMsgUtil;
 import org.jlab.coda.xmsg.data.xMsgR.xMsgRegistration;
-import org.jlab.coda.xmsg.excp.xMsgDiscoverException;
 import org.jlab.coda.xmsg.excp.xMsgException;
 import org.jlab.coda.xmsg.excp.xMsgRegistrationException;
 import org.zeromq.ZContext;
-import org.zeromq.ZFrame;
 import org.zeromq.ZMQ;
 import org.zeromq.ZMQ.Socket;
 import org.zeromq.ZMsg;
 
 import java.net.SocketException;
-import java.util.ArrayList;
-import java.util.List;
+import java.util.Set;
 
 /**
  * Methods for registration and discovery of xMsg actors, i.e. publishers and
@@ -54,7 +49,7 @@ import java.util.List;
  * @since 1.0
  */
 // CHECKSTYLE.OFF: MethodName
-public class xMsgRegDiscDriver {
+public class xMsgRegDriver {
 
     /** Front-end registrar server (req/rep) connection socket. */
     private final Socket _feConnection;
@@ -65,7 +60,6 @@ public class xMsgRegDiscDriver {
     /** zmq context. */
     private final ZContext _context;
 
-
     /**
      * Class constructor.
      * Creates sockets to both front-end and local registration and discovery
@@ -75,10 +69,15 @@ public class xMsgRegDiscDriver {
      * @throws SocketException if an I/O error occurs.
      * @throws xMsgException if the host IP address could not be obtained.
      */
-    public xMsgRegDiscDriver(String feHost) throws SocketException, xMsgException {
+    public xMsgRegDriver(String feHost) throws SocketException, xMsgException {
+        this(new ZContext(), feHost);
+    }
 
-        _context = new ZContext();
-
+    /**
+     * Constructor for testing. Can receive a mock context.
+     */
+    xMsgRegDriver(ZContext context, String feHost) throws SocketException, xMsgException {
+        _context = context;
         _feConnection = __zmqSocket(_context, ZMQ.REQ,
                 xMsgUtil.toHostAddress(feHost),
                 xMsgConstants.REGISTRAR_PORT.getIntValue(),
@@ -143,6 +142,48 @@ public class xMsgRegDiscDriver {
     }
 
     /**
+     * Sends a request to the given registrar server and waits the response.
+     */
+    protected xMsgRegResponse request(Socket socket, xMsgRegRequest request, int timeout)
+            throws xMsgRegistrationException {
+        ZMsg requestMsg = request.msg();
+        try {
+            if (!requestMsg.send(socket)) {
+                throw new xMsgRegistrationException("error sending the message");
+            }
+        } finally {
+            requestMsg.destroy();
+        }
+
+        ZMQ.PollItem[] items = {new ZMQ.PollItem(socket, ZMQ.Poller.POLLIN)};
+        int rc = ZMQ.poll(items, timeout);
+        if (rc != -1 && items[0].isReadable()) {
+            ZMsg responseMsg = ZMsg.recvMsg(socket);
+            try {
+                xMsgRegResponse response = new xMsgRegResponse(responseMsg);
+                String status = response.status();
+                if (!status.equals(xMsgConstants.SUCCESS.getStringValue())) {
+                    throw new xMsgRegistrationException(status);
+                }
+                return response;
+            } finally {
+                responseMsg.destroy();
+            }
+        } else {
+            throw new xMsgRegistrationException("xMsg actor registration timeout");
+        }
+    }
+
+    /**
+     * Checks if the registration data is initialized.
+     */
+    private void _validateData(xMsgRegistration data) throws xMsgRegistrationException {
+        if (!data.isInitialized()) {
+            throw new xMsgRegistrationException("The registration data is not complete");
+        }
+    }
+
+    /**
      * Sends a registration request to the given registrar server.
      * Request is wired using xMsg message construct, that have 3 part: topic,
      * sender, and data.
@@ -161,76 +202,16 @@ public class xMsgRegDiscDriver {
                            boolean isPublisher)
             throws xMsgRegistrationException {
 
-        // Byte array for the registration data serialization
-        byte[] dt;
+        _validateData(data);
 
-        // Data serialization
-        if (data.isInitialized()) {
-            dt = data.toByteArray(); // serialize data object
-        } else  {
-            throw new xMsgRegistrationException("The registration data is not complete");
-        }
+        String topic = isPublisher ? xMsgConstants.REGISTER_PUBLISHER.getStringValue() :
+                                     xMsgConstants.REGISTER_SUBSCRIBER.getStringValue();
+        int timeout = xMsgConstants.REGISTER_REQUEST_TIMEOUT.getIntValue();
 
-        // Send topic, sender, followed by the data
-        ZMsg msg = new ZMsg();
+        xMsgRegRequest request = new xMsgRegRequest(topic, name, data);
+        request(socket, request, timeout);
 
-        // Topic of the message is a string = "registerPublisher" or "registerSubscriber"
-        if (isPublisher) {
-            msg.addString(xMsgConstants.REGISTER_PUBLISHER.getStringValue());
-        } else {
-            msg.addString(xMsgConstants.REGISTER_SUBSCRIBER.getStringValue());
-        }
-
-        // Sender
-        msg.addString(name);
-
-        // Serialized data
-        msg.add(dt);
-
-        if (!msg.send(socket)) {
-            throw new xMsgRegistrationException("error sending the message");
-        }
-
-        msg.destroy();
-
-        //  Poll socket for a reply, with timeout, make sure server is up and running
-        ZMQ.PollItem[] items = {new ZMQ.PollItem(socket, ZMQ.Poller.POLLIN)};
-
-        int rc = ZMQ.poll(items, xMsgConstants.REGISTER_REQUEST_TIMEOUT.getIntValue());
-
-
-        if (rc != -1 && items[0].isReadable()) {
-            //Server responded. It is alive
-
-            // Block until we receive the answer to our registration request
-            ZMsg repMsg = ZMsg.recvMsg(socket);
-
-            // get serialized content of the message that is back
-            ZFrame repTopicFrame = repMsg.pop();
-            ZFrame repSenderFrame = repMsg.pop();
-            ZFrame repDataFrame = repMsg.pop();
-            if (repDataFrame == null) {
-                throw new xMsgRegistrationException("null xMsg data is received");
-            }
-
-            // De-serialize received message components
-            String repData = new String(repDataFrame.getData(), ZMQ.CHARSET);
-
-            // cleanup
-            repTopicFrame.destroy();
-            repSenderFrame.destroy();
-            repDataFrame.destroy();
-            repMsg.destroy();
-
-            // data sent back from the registration server should be a string = "success"
-            if (!repData.equals(xMsgConstants.SUCCESS.getStringValue())) {
-                throw new xMsgRegistrationException("failed");
-            }
-            System.out.println(xMsgUtil.currentTime(2) + " " + name + " successfully registered.");
-
-        } else {
-            throw new xMsgRegistrationException("xMsg actor registration timeout");
-        }
+        System.out.println(xMsgUtil.currentTime(2) + " " + name + " successfully registered.");
     }
 
     /**
@@ -253,78 +234,14 @@ public class xMsgRegDiscDriver {
                                      boolean isPublisher)
             throws xMsgRegistrationException {
 
-        // Byte array for the registration data serialization
-        byte[] dt;
+        _validateData(data);
 
-        // Data serialization
-        if (data.isInitialized()) {
-            dt = data.toByteArray(); // serialize data object
-            if (dt == null) {
-                throw new xMsgRegistrationException("null serialization: data");
-            }
-        } else {
-            throw new xMsgRegistrationException("The registration data is not complete");
-        }
+        String topic = isPublisher ? xMsgConstants.REMOVE_PUBLISHER.getStringValue() :
+                                     xMsgConstants.REMOVE_SUBSCRIBER.getStringValue();
+        int timeout = xMsgConstants.REMOVE_REQUEST_TIMEOUT.getIntValue();
 
-        // Send topic, sender, followed by the data
-        ZMsg msg = new ZMsg();
-
-        // Topic of the message is a string
-        // "removePublisherRegistration" or "removeSubscriberRegistration"
-        if (isPublisher) {
-            msg.addString(xMsgConstants.REMOVE_PUBLISHER.getStringValue());
-        } else {
-            msg.addString(xMsgConstants.REMOVE_SUBSCRIBER.getStringValue());
-        }
-
-        // Sender
-        msg.addString(name);
-
-        // Serialized data
-        msg.add(dt);
-
-        if (!msg.send(socket)) {
-            throw new xMsgRegistrationException("error sending the message");
-        }
-
-        // destroy message
-        msg.destroy();
-
-        //  Poll socket for a reply, with timeout, make sure server is up and running
-        ZMQ.PollItem[] items = {new ZMQ.PollItem(socket, ZMQ.Poller.POLLIN)};
-
-        int rc = ZMQ.poll(items, xMsgConstants.REMOVE_REQUEST_TIMEOUT.getIntValue());
-
-        if (rc != -1 && items[0].isReadable()) {
-            //Server responded. It is alive
-
-            // Block until we receive the answer to our registration request
-            ZMsg repMsg = ZMsg.recvMsg(socket);
-
-            // get serialized content of the message that is back
-            ZFrame repTopicFrame = repMsg.pop();
-            ZFrame repSenderFrame = repMsg.pop();
-            ZFrame repDataFrame = repMsg.pop();
-            if (repDataFrame == null) {
-                throw new xMsgRegistrationException("null xMsg data is received");
-            }
-
-            // De-serialize received message components
-            String repData = new String(repSenderFrame.getData(), ZMQ.CHARSET);
-
-            // cleanup
-            repTopicFrame.destroy();
-            repSenderFrame.destroy();
-            repDataFrame.destroy();
-            repMsg.destroy();
-
-            // data sent back from the registration server should a string = "success"
-            if (!repData.equals(xMsgConstants.SUCCESS.getStringValue())) {
-                throw new xMsgRegistrationException("failed");
-            }
-        } else {
-            throw new xMsgRegistrationException("xMsg actor remove registration timeout");
-        }
+        xMsgRegRequest request = new xMsgRegRequest(topic, name, data);
+        request(socket, request, timeout);
     }
 
     /**
@@ -343,60 +260,11 @@ public class xMsgRegDiscDriver {
                                         String name)
             throws xMsgRegistrationException {
 
-        // Send topic, sender, followed by the data
-        ZMsg msg = new ZMsg();
+        String topic = xMsgConstants.REMOVE_ALL_REGISTRATION.getStringValue();
+        int timeout = xMsgConstants.REMOVE_REQUEST_TIMEOUT.getIntValue();
 
-        // Topic of the message is a string =  "removeAllRegistration"
-        msg.addString(xMsgConstants.REMOVE_ALL_REGISTRATION.getStringValue());
-
-        // Sender
-        msg.addString(name);
-
-        // host of the xMsg node
-        msg.addString(host);
-
-        if (!msg.send(_feConnection)) {
-            throw new xMsgRegistrationException("error sending the message");
-        }
-
-        // destroy message
-        msg.destroy();
-
-        //  Poll socket for a reply, with timeout, make sure server is up and running
-        ZMQ.PollItem[] items = {new ZMQ.PollItem(_feConnection, ZMQ.Poller.POLLIN)};
-
-        int rc = ZMQ.poll(items, xMsgConstants.REMOVE_REQUEST_TIMEOUT.getIntValue());
-
-        if (rc != -1 && items[0].isReadable()) {
-            //Server responded. It is alive
-
-            // Block until we receive the answer to our registration request
-            ZMsg repMsg = ZMsg.recvMsg(_feConnection);
-
-            // get serialized content of the message that is back
-            ZFrame repTopicFrame = repMsg.pop();
-            ZFrame repSenderFrame = repMsg.pop();
-            ZFrame repDataFrame = repMsg.pop();
-            if (repDataFrame == null) {
-                throw new xMsgRegistrationException("null xMsg data is received");
-            }
-
-            // De-serialize received message components
-            String repData = new String(repSenderFrame.getData(), ZMQ.CHARSET);
-
-            // cleanup
-            repTopicFrame.destroy();
-            repSenderFrame.destroy();
-            repDataFrame.destroy();
-            repMsg.destroy();
-
-            // data sent back from the registration server should a string = "success"
-            if (!repData.equals(xMsgConstants.SUCCESS.getStringValue())) {
-                throw new xMsgRegistrationException("failed");
-            }
-        } else {
-            throw new xMsgRegistrationException("xMsg actor remove registration timeout");
-        }
+        xMsgRegRequest request = new xMsgRegRequest(topic, name, host);
+        request(_feConnection, request, timeout);
     }
 
     /**
@@ -412,80 +280,23 @@ public class xMsgRegDiscDriver {
      *                     otherwise this is a request to find subscribers
      * @return list of publishers or subscribers to the required topic
      * @throws xMsgDiscoverException
+     * @throws xMsgRegistrationException
      */
-    private List<xMsgRegistration> _find(Socket socket,
-                                         String name,
-                                         xMsgRegistration data,
-                                         boolean isPublisher)
-            throws xMsgDiscoverException {
+    private Set<xMsgRegistration> _find(Socket socket,
+                                        String name,
+                                        xMsgRegistration data,
+                                        boolean isPublisher)
+            throws xMsgRegistrationException {
 
-        // Byte array for the registration data serialization
-        byte[] dt;
+        _validateData(data);
 
-        // Data serialization
-        if (data.isInitialized()) {
-            dt = data.toByteArray(); // serialize data object
-        } else {
-            throw new xMsgDiscoverException("The registration data is not complete");
-        }
+        String topic = isPublisher ? xMsgConstants.FIND_PUBLISHER.getStringValue() :
+                                     xMsgConstants.FIND_SUBSCRIBER.getStringValue();
+        int timeout = xMsgConstants.FIND_REQUEST_TIMEOUT.getIntValue();
 
-        // Send topic, sender, followed by the data
-        ZMsg msg = new ZMsg();
-
-        // Topic of the message is a string = "findPublisher" or "findSubscriber"
-        if (isPublisher) {
-            msg.addString(xMsgConstants.FIND_PUBLISHER.getStringValue());
-        } else {
-            msg.addString(xMsgConstants.FIND_SUBSCRIBER.getStringValue());
-        }
-
-        // Sender
-        msg.addString(name);
-
-        // serialized data
-        msg.add(dt);
-
-        // Sending the request
-        if (!msg.send(socket)) {
-            throw new xMsgDiscoverException("error sending the data");
-        }
-
-        msg.destroy();
-
-        //  Poll socket for a reply, with timeout, make sure server is up and running
-        ZMQ.PollItem[] items = {new ZMQ.PollItem(socket, ZMQ.Poller.POLLIN)};
-
-        int rc = ZMQ.poll(items, xMsgConstants.FIND_REQUEST_TIMEOUT.getIntValue());
-
-        if (rc != -1 && items[0].isReadable()) {
-
-            // Block until we receive the message
-            ZMsg repMsg = ZMsg.recvMsg(socket);
-            ZFrame repTopicFrame = repMsg.pop();
-            ZFrame repSenderFrame = repMsg.pop();
-
-            List<xMsgRegistration> res = new ArrayList<>();
-            while (!repMsg.isEmpty()) {
-                ZFrame repDataFrame = repMsg.pop();
-                if (repDataFrame == null) {
-                    throw new xMsgDiscoverException("null xMsg data is received");
-                }
-                try {
-                    res.add(xMsgRegistration.parseFrom(repDataFrame.getData()));
-                } catch (InvalidProtocolBufferException e) {
-                    throw new xMsgDiscoverException(e.getMessage());
-                }
-                repDataFrame.destroy();
-            }
-
-            // cleanup
-            repTopicFrame.destroy();
-            repSenderFrame.destroy();
-            repMsg.destroy();
-            return res;
-        } else {
-            throw new xMsgDiscoverException("xMsg actor discovery timeout");
-        }
+        xMsgRegRequest request = new xMsgRegRequest(topic, name, data);
+        xMsgRegResponse response = request(socket, request, timeout);
+        return response.data();
     }
 
     /**
@@ -563,12 +374,13 @@ public class xMsgRegDiscDriver {
      * @param isPublisher if true then this is a request to find publishers,
      *                     otherwise this is a request to find subscribers
      * @return list of publishers or subscribers to the required topic
+     * @throws xMsgRegistrationException
      * @throws xMsgDiscoverException
      */
-    public List<xMsgRegistration> findLocal(String name,
-                                            xMsgRegistration data,
-                                            boolean isPublisher)
-            throws xMsgDiscoverException {
+    public Set<xMsgRegistration> findLocal(String name,
+                                           xMsgRegistration data,
+                                           boolean isPublisher)
+           throws xMsgRegistrationException {
         return _find(_lnConnection, name, data, isPublisher);
     }
 
@@ -585,10 +397,10 @@ public class xMsgRegDiscDriver {
      * @return list of publishers or subscribers to the required topic
      * @throws xMsgDiscoverException
      */
-    public List<xMsgRegistration> findGlobal(String name,
-                                             xMsgRegistration data,
-                                             boolean isPublisher)
-            throws xMsgDiscoverException {
+    public Set<xMsgRegistration> findGlobal(String name,
+                                            xMsgRegistration data,
+                                            boolean isPublisher)
+            throws xMsgRegistrationException {
         return _find(_feConnection, name, data, isPublisher);
     }
 }

@@ -24,7 +24,7 @@ package org.jlab.coda.xmsg.xsys;
 import org.jlab.coda.xmsg.core.xMsgMessage;
 import org.jlab.coda.xmsg.core.xMsgUtil;
 import org.jlab.coda.xmsg.excp.xMsgException;
-import org.jlab.coda.xmsg.xsys.regdis.xMsgRegDiscDriver;
+import org.jlab.coda.xmsg.xsys.regdis.xMsgRegDriver;
 import org.jlab.coda.xmsg.xsys.regdis.xMsgRegService;
 import org.zeromq.ZContext;
 
@@ -39,7 +39,7 @@ import java.util.concurrent.ConcurrentMap;
  * @author gurjyan
  * @since 1.0
  */
-public class xMsgRegistrar extends xMsgRegDiscDriver {
+public class xMsgRegistrar extends xMsgRegDriver {
 
     // CHECKSTYLE.OFF: ConstantName
     // shared memory of the node (in the language of CLARA it would be DPE)

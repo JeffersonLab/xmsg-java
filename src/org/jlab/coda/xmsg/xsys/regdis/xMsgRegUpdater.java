@@ -36,7 +36,7 @@ import java.net.SocketException;
  * <p>
  * This class will be instantiated by the xMsgRegistrar constructor executed by
  * the xMsgNode: {@link org.jlab.coda.xmsg.xsys.xMsgRegistrar} This class
- * inherits from {@link xMsgRegDiscDriver} where xMsg database communication
+ * inherits from {@link xMsgRegDriver} where xMsg database communication
  * methods are defined.
  * <p>
  * TODO: constructor parameter that defines update periodicity.
@@ -44,7 +44,7 @@ import java.net.SocketException;
  * @author gurjyan
  * @since 1.0
  */
-public class xMsgRegUpdater extends xMsgRegDiscDriver implements Runnable {
+public class xMsgRegUpdater extends xMsgRegDriver implements Runnable {
 
     // xMsgNode database references
     private xMsgRegDatabase publishers;
