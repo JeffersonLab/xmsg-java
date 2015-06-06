@@ -112,18 +112,25 @@ public class xMsgRegistrar extends xMsgRegDriver {
 
     public static void main(String[] args) {
         try {
+            String localHost = xMsgUtil.toHostAddress("localhost");
+            String frontEndHost = localHost;
             if (args.length == 2) {
                 if (args[0].equals("-fe_host")) {
-                    new xMsgRegistrar(args[1]);
+                    frontEndHost = xMsgUtil.toHostAddress(args[1]);
                 } else {
                     System.err.println("Wrong option. Accepts -fe_host option only.");
                     System.exit(1);
                 }
-            } else if (args.length == 0) {
-                new xMsgRegistrar();
-            } else {
+            } else if (args.length != 0) {
                 System.err.println("Wrong arguments. Accepts -fe_host option only.");
                 System.exit(1);
+            }
+
+            final xMsgRegistrar registrar;
+            if (frontEndHost.equals(localHost)) {
+                new xMsgRegistrar();
+            } else {
+                new xMsgRegistrar(frontEndHost);
             }
         } catch (xMsgException | SocketException e) {
             System.out.println(e.getMessage());
