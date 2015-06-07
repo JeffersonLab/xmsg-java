@@ -154,11 +154,14 @@ public class xMsgRegService extends Thread {
                     request.destroy();
                 }
             } catch (ZMQException e) {
+                if (e.getErrorCode() == ZMQ.Error.ETERM.getCode()) {
+                    break;
+                }
                 log(e);
             }
         }
-
-        regSocket.close();
+        context.destroy();
+        log("Info: shutting down xMsg local registration and discovery server");
     }
 
 

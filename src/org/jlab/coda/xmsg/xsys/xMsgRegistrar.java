@@ -45,6 +45,8 @@ public class xMsgRegistrar extends xMsgRegDriver {
     // shared memory of the node (in the language of CLARA it would be DPE)
     public static final ConcurrentMap<String, xMsgMessage>
             sharedMemory = new ConcurrentHashMap<>();
+    private xMsgRegService regService;
+    private ZContext context;
 
     /**
      * Starts a local registrar service.
@@ -59,15 +61,11 @@ public class xMsgRegistrar extends xMsgRegDriver {
 
         super("localhost");
 
-        // Get local IP addresses in case of multiple network cards.
-        // This list is available through xMsgUtil.LOCAL_HOST_IPS
-        xMsgUtil.updateLocalHostIps();
-
-        // Zmq context
-        final ZContext context = new ZContext();
+        context = getContext();
+        ZContext shadowContext = ZContext.shadow(context);
 
         // start registrar service
-        new xMsgRegService(context).start();
+        regService = new xMsgRegService(shadowContext);
     }
 
 
@@ -94,19 +92,31 @@ public class xMsgRegistrar extends xMsgRegDriver {
 
         super(feHost);
 
-        // Get local IP addresses in case of multiple network cards.
-        // This list is available through xMsgUtil.LOCAL_HOST_IPS
-        xMsgUtil.updateLocalHostIps();
-
         // Zmq context
-        final ZContext context = new ZContext();
+        context = getContext();
+        ZContext shadowContext = ZContext.shadow(context);
 
-        // Start local registrar service.
+        // Local registrar service.
         // In this case this specific constructor starts a thread
         // that periodically updates front-end registrar database with
         // the data from the local databases
+        regService = new xMsgRegService(feHost, shadowContext);
+    }
 
-        new xMsgRegService(feHost, context).start();
+
+    public void start() {
+        regService.start();
+    }
+
+
+    public void shutdown() {
+        try {
+            context.destroy();
+            regService.interrupt();
+            regService.join();
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
     }
 
 
@@ -126,12 +136,23 @@ public class xMsgRegistrar extends xMsgRegDriver {
                 System.exit(1);
             }
 
+
             final xMsgRegistrar registrar;
             if (frontEndHost.equals(localHost)) {
-                new xMsgRegistrar();
+                registrar = new xMsgRegistrar();
             } else {
-                new xMsgRegistrar(frontEndHost);
+                registrar = new xMsgRegistrar(frontEndHost);
             }
+
+            Runtime.getRuntime().addShutdownHook(new Thread() {
+                @Override
+                public void run() {
+                    registrar.shutdown();
+                }
+            });
+
+            registrar.start();
+
         } catch (xMsgException | SocketException e) {
             System.out.println(e.getMessage());
             System.out.println("exiting...");
