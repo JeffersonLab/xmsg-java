@@ -78,7 +78,7 @@ public class xMsg {
     /** Fixed size thread pool. */
     private final ExecutorService threadPool;
     /** Default thread pool size. */
-    private int poolSize = 2;
+    private final int poolSize;
 
     /** Access to the xMsg registrars. */
     private xMsgRegDriver driver;
@@ -95,14 +95,7 @@ public class xMsg {
      * @throws SocketException
      */
     public xMsg(String feHost) throws xMsgException, SocketException {
-        /*
-         * Calls xMsgRegDiscDriver class constructor that creates sockets to two registrar
-         * request/reply servers running in the local xMsgNode and xMsgFE.
-         */
-        driver = new xMsgRegDriver(feHost);
-        context = driver.getContext();
-
-        threadPool = newFixedThreadPool(this.poolSize);
+        this(new xMsgRegDriver(feHost), 2);
     }
 
     /**
@@ -121,12 +114,18 @@ public class xMsg {
          * Calls xMsgRegDiscDriver class constructor that creates sockets to two registrar
          * request/reply servers running in the local xMsgNode and xMsgFE.
          */
-        driver = new xMsgRegDriver(feHost);
-        context = driver.getContext();
+        this(new xMsgRegDriver(feHost), poolSize);
+    }
+
+
+    xMsg(xMsgRegDriver driver, int poolSize) throws SocketException, xMsgException {
+        this.localHostIp = xMsgUtil.toHostAddress("localhost");
+        this.context = driver.getContext();
+        this.driver = driver;
 
         // create fixed size thread pool
         this.poolSize = poolSize;
-        threadPool = newFixedThreadPool(this.poolSize);
+        this.threadPool = newFixedThreadPool(this.poolSize);
     }
 
     /**
