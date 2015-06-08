@@ -99,18 +99,21 @@ task deploy(type: Copy, overwrite: true, dependsOn: install) {
 
 
 task(startFE, dependsOn: 'classes', type: JavaExec) {
-    main = 'org.jlab.coda.xmsg.xsys.xMsgFE'
+    main = 'org.jlab.coda.xmsg.xsys.xMsgRegistrar'
     classpath = sourceSets.main.runtimeClasspath
 }
 
 task(startNode, dependsOn: 'classes', type: JavaExec) {
-    main = 'org.jlab.coda.xmsg.xsys.xMsgNode'
+    main = 'org.jlab.coda.xmsg.xsys.xMsgProxy'
     classpath = sourceSets.main.runtimeClasspath
 }
 
 
 task(runPub, dependsOn: 'classes', type: JavaExec) {
     main = 'org.jlab.coda.xmsg.examples.Publisher'
+    if (project.hasProperty("pubArgs")) {
+        args Eval.me(pubArgs)
+    }
     classpath = sourceSets.main.runtimeClasspath
 }
 
