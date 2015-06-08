@@ -22,12 +22,13 @@ public class SyncPublisher extends xMsg {
             final String domain = "test_domain";
             final String subject = "test_subject";
             final String type = "test_type";
+            final String description = "test_description";
 
             SyncPublisher publisher = new SyncPublisher();
 
             xMsgConnection con =  publisher.connect();
 
-            publisher.registerPublisher(myName, domain, subject, type);
+            publisher.registerPublisher(myName, domain, subject, type, description);
             String topic = xMsgUtil.buildTopic(domain, subject, type);
 
             xMsgMessage msg = new xMsgMessage(topic);

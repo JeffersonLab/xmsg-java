@@ -66,6 +66,7 @@ public class Publisher extends xMsg {
             final String domain = "test_domain";
             final String subject = "test_subject";
             final String type = "test_type";
+            final String description = "test_description";
 
             Publisher publisher = new Publisher();
 
@@ -73,7 +74,7 @@ public class Publisher extends xMsg {
             xMsgConnection con = publisher.connect();
 
             // Register this publisher
-            publisher.registerPublisher(name, domain, subject, type);
+            publisher.registerPublisher(name, domain, subject, type, description);
 
             // Create the message to be published
             String topic = xMsgUtil.buildTopic(domain, subject, type);
