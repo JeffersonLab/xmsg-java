@@ -445,66 +445,48 @@ public class xMsg {
      * <p>
      * Note: xMsg defines a topic as {@code domain:subject:type}.
      *
-     * @param name the name of the sender
-     * @param host host of the xMsg node where the sender is running
-     * @param port port of the xMsg node where the sender is running
+     * @param sender the name of the sender / requester
      * @param domain domain of the published messages
      * @param subject subject of the published messages
      * @param type type of the published messages
-     * @return list of {@link xMsgRegistration} objects, one per found publisher
+     * @return set of {@link xMsgRegistration} objects, one per found publisher
      * @throws xMsgDiscoverException
      */
-    public Set<xMsgRegistration> findPublishers(String name,
-                                                String host,
-                                                int port,
+    public Set<xMsgRegistration> findPublishers(String sender,
                                                 String domain,
                                                 String subject,
                                                 String type)
             throws xMsgRegistrationException {
 
-        if (domain.equals("*")) {
-            throw new xMsgRegistrationException("malformed xMsg topic");
-        }
-        if (subject.equals("*")) {
-            subject = xMsgConstants.UNDEFINED.getStringValue();
-        }
-        if (type.equals("*")) {
-            type = xMsgConstants.UNDEFINED.getStringValue();
-        }
-
-        xMsgRegistration.Builder regb = xMsgRegistration.newBuilder();
-        regb.setName(name);
-        regb.setHost(host);
-        regb.setPort(port);
-        regb.setDomain(domain);
-        regb.setSubject(subject);
-        regb.setType(type);
+        xMsgRegistration.Builder regb = findRegistrationBuilder(sender, domain, subject, type);
         regb.setOwnerType(xMsgRegistration.OwnerType.PUBLISHER);
         xMsgRegistration regData = regb.build();
-        return driver.findGlobal(name, regData, true);
+        return driver.findGlobal(sender, regData, true);
     }
 
     /**
-     * Finds all publishers of the given topic.
-     * The publishers are searched in the front-end registrar, and they could
-     * be deployed anywhere in the xMsg cloud of nodes.
+     * Finds all local publishers of the given topic.
+     * The publishers are searched in the local registrar, thus they are
+     * deployed in the local node.
      * <p>
      * Note: xMsg defines a topic as {@code domain:subject:type}.
      *
-     * @param name the name of the sender
+     * @param sender the name of the sender / requester
      * @param domain domain of the published messages
      * @param subject subject of the published messages
      * @param type type of the published messages
-     * @return list of {@link xMsgRegistration} objects, one per found publisher
+     * @return set of {@link xMsgRegistration} objects, one per found publisher
      * @throws xMsgDiscoverException
      */
-    public Set<xMsgRegistration> findPublishers(String name,
-                                                String domain,
-                                                String subject,
-                                                String type)
+    public Set<xMsgRegistration> findLocalPublishers(String sender,
+                                                     String domain,
+                                                     String subject,
+                                                     String type)
             throws xMsgRegistrationException {
-        return findPublishers(name, "localhost", xMsgConstants.REGISTRAR_PORT.getIntValue(),
-                domain, subject, type);
+        xMsgRegistration.Builder regb = findRegistrationBuilder(sender, domain, subject, type);
+        regb.setOwnerType(xMsgRegistration.OwnerType.PUBLISHER);
+        xMsgRegistration regData = regb.build();
+        return driver.findLocal(sender, regData, true);
     }
 
     /**
@@ -514,66 +496,48 @@ public class xMsg {
      * <p>
      * Note: xMsg defines a topic as {@code domain:subject:type}.
      *
-     * @param name the name of the sender
-     * @param host host of the xMsg node where the sender is running
-     * @param port port of the xMsg node where the sender is running
+     * @param sender the name of the sender / requester
      * @param domain domain of the subscription
      * @param subject subject of the subscription
      * @param type type of the subscription
-     * @return list of {@link xMsgRegistration} objects, one per found subscribers
+     * @return set of {@link xMsgRegistration} objects, one per found subscribers
      * @throws xMsgDiscoverException
      */
-    public Set<xMsgRegistration> findSubscribers(String name,
-                                                 String host,
-                                                 int port,
+    public Set<xMsgRegistration> findSubscribers(String sender,
                                                  String domain,
                                                  String subject,
                                                  String type)
             throws xMsgRegistrationException {
-
-        if (domain.equals("*")) {
-            throw new xMsgRegistrationException("malformed xMsg topic");
-        }
-        if (subject.equals("*")) {
-            subject = xMsgConstants.UNDEFINED.getStringValue();
-        }
-        if (type.equals("*")) {
-            type = xMsgConstants.UNDEFINED.getStringValue();
-        }
-
-        xMsgRegistration.Builder regb = xMsgRegistration.newBuilder();
-        regb.setName(name);
-        regb.setHost(host);
-        regb.setPort(port);
-        regb.setDomain(domain);
-        regb.setSubject(subject);
-        regb.setType(type);
+        xMsgRegistration.Builder regb = findRegistrationBuilder(sender, domain, subject, type);
         regb.setOwnerType(xMsgRegistration.OwnerType.SUBSCRIBER);
         xMsgRegistration regData = regb.build();
-        return driver.findGlobal(name, regData, false);
+        return driver.findGlobal(sender, regData, false);
     }
 
     /**
-     * Finds all subscribers of a given topic.
-     * The publishers are searched in the front-end registrar, and they could
-     * be deployed anywhere in the xMsg cloud of nodes.
+     * Finds all local subscribers of the given topic.
+     * The publishers are searched in the local registrar, thus they are
+     * deployed in the local node.
      * <p>
      * Note: xMsg defines a topic as {@code domain:subject:type}.
      *
-     * @param name the name of the sender
+     * @param sender the name of the sender / requester
      * @param domain domain of the subscription
      * @param subject subject of the subscription
      * @param type type of the subscription
-     * @return list of {@link xMsgRegistration} objects, one per found subscribers
-     * @throws xMsgRegistrationException
+     * @return set of {@link xMsgRegistration} objects, one per found subscribers
+     * @throws xMsgDiscoverException
      */
-    public Set<xMsgRegistration> findSubscribers(String name,
-                                                 String domain,
-                                                 String subject,
-                                                 String type)
+    public Set<xMsgRegistration> findLocalSubscribers(String sender,
+                                                      String domain,
+                                                      String subject,
+                                                      String type)
             throws xMsgRegistrationException {
-        return findSubscribers(name, "localhost", xMsgConstants.REGISTRAR_PORT.getIntValue(),
-                domain, subject, type);
+
+        xMsgRegistration.Builder regb = findRegistrationBuilder(sender, domain, subject, type);
+        regb.setOwnerType(xMsgRegistration.OwnerType.SUBSCRIBER);
+        xMsgRegistration regData = regb.build();
+        return driver.findLocal(sender, regData, false);
     }
 
     private Builder registrationBuilder(String name,
@@ -590,173 +554,22 @@ public class xMsg {
         return regb;
     }
 
-    /**
-     * Checks the front-end registrar for a publisher of the given topic.
-     * <p>
-     * Note: xMsg defines a topic as {@code domain:subject:type}.
-     *
-     * @param name the name of the sender
-     * @param host host of the xMsg node where the sender is running
-     * @param port port of the xMsg node where the sender is running
-     * @param domain domain of the published messages
-     * @param subject subject of the published messages
-     * @param type type of the published messages
-     * @return true if at least one publisher is found
-     * @throws xMsgRegistrationException
-     */
-    public boolean isTherePublisher(String name,
-                                    String host,
-                                    int port,
-                                    String domain,
-                                    String subject,
-                                    String type) throws xMsgRegistrationException {
-        return findPublishers(name, host, port, domain, subject, type).size() > 0;
+    private Builder findRegistrationBuilder(String name,
+                                            String domain,
+                                            String subject,
+                                            String type) throws xMsgRegistrationException {
+        if (domain.equals("*")) {
+            throw new xMsgRegistrationException("malformed xMsg topic");
+        }
+        if (subject.equals("*")) {
+            subject = xMsgConstants.UNDEFINED.getStringValue();
+        }
+        if (type.equals("*")) {
+            type = xMsgConstants.UNDEFINED.getStringValue();
+        }
+        return registrationBuilder(name, domain, subject, type);
     }
 
-    /**
-     * Checks the front-end registrar for a publisher of the given topic.
-     * <p>
-     * Note: xMsg defines a topic as {@code domain:subject:type}.
-     *
-     * @param name the name of the sender
-     * @param domain domain of the published messages
-     * @param subject subject of the published messages
-     * @param type type of the published messages
-     * @return true if at least one publisher is found
-     * @throws xMsgRegistrationException
-     */
-    public boolean isTherePublisher(String name,
-                                    String domain,
-                                    String subject,
-                                    String type) throws xMsgRegistrationException {
-        return findPublishers(name, domain, subject, type).size() > 0;
-    }
-
-    /**
-     * Checks the front-end registrar for a subscriber of the given topic.
-     * <p>
-     * Note: xMsg defines a topic as {@code domain:subject:type}.
-     *
-     * @param name the name of the sender
-     * @param host host of the xMsg node where the sender is running
-     * @param port port of the xMsg node where the sender is running
-     * @param domain domain of the subscription
-     * @param subject subject of the subscription
-     * @param type type of the subscription
-     * @return true if at least one subscriber is found
-     * @throws xMsgRegistrationException
-     */
-    public boolean isThereSubscriber(String name,
-                                     String host,
-                                     int port,
-                                     String domain,
-                                     String subject,
-                                     String type) throws xMsgRegistrationException {
-        return findSubscribers(name, host, port, domain, subject, type).size() > 0;
-    }
-
-    /**
-     * Checks the front-end registrar for a subscriber of the given topic.
-     * <p>
-     * Note: xMsg defines a topic as {@code domain:subject:type}.
-     *
-     * @param name the name of the sender
-     * @param domain domain of the subscription
-     * @param subject subject of the subscription
-     * @param type type of the subscription
-     * @return true if at least one subscriber is found
-     * @throws xMsgRegistrationException
-     */
-    public boolean isThereSubscriber(String name,
-                                     String domain,
-                                     String subject,
-                                     String type) throws xMsgRegistrationException {
-        return findSubscribers(name, domain, subject, type).size() > 0;
-    }
-
-    /**
-     * Checks the local registrar for a publisher of the given topic.
-     * <p>
-     * Note: xMsg defines a topic as {@code domain:subject:type}.
-     *
-     * @param name the name of the sender
-     * @param host host of the xMsg node where the sender is running
-     * @param port port of the xMsg node where the sender is running
-     * @param domain domain of the published messages
-     * @param subject subject of the published messages
-     * @param type type of the published messages
-     * @return true if at least one publisher is found
-     * @throws xMsgRegistrationException
-     */
-    public boolean isThereLocalPublisher(String name,
-                                         String host,
-                                         int port,
-                                         String domain,
-                                         String subject,
-                                         String type) throws xMsgRegistrationException {
-        return findPublishers(name, host, port, domain, subject, type).size() > 0;
-    }
-
-    /**
-     * Checks the local registrar for a publisher of the given topic.
-     * <p>
-     * Note: xMsg defines a topic as {@code domain:subject:type}.
-     *
-     * @param name the name of the sender
-     * @param domain domain of the published messages
-     * @param subject subject of the published messages
-     * @param type type of the published messages
-     * @return true if at least one publisher is found
-     * @throws xMsgRegistrationException
-     */
-    public boolean isThereLocalPublisher(String name,
-                                         String domain,
-                                         String subject,
-                                         String type) throws xMsgRegistrationException {
-        return findPublishers(name, domain, subject, type).size() > 0;
-    }
-
-    /**
-     * Checks the local registrar for a subscriber of the given topic.
-     * <p>
-     * Note: xMsg defines a topic as {@code domain:subject:type}.
-     *
-     * @param name the name of the sender
-     * @param host host of the xMsg node where the sender is running
-     * @param port port of the xMsg node where the sender is running
-     * @param domain domain of the subscription
-     * @param subject subject of the subscription
-     * @param type type of the subscription
-     * @return true if at least one subscriber is found
-     * @throws xMsgRegistrationException
-     */
-    public boolean isThereLocalSubscriber(String name,
-                                          String host,
-                                          int port,
-                                          String domain,
-                                          String subject,
-                                          String type) throws xMsgRegistrationException {
-        return findSubscribers(name, host, port, domain, subject, type).size() > 0;
-    }
-
-    /**
-     * Checks the local registrar for a subscriber of the given topic.
-     * <p>
-     * Note: xMsg defines a topic as {@code domain:subject:type}.
-     *
-     * @param name the name of the sender
-     * @param domain domain of the subscription
-     * @param subject subject of the subscription
-     * @param type type of the subscription
-     * @return true if at least one subscriber is found
-     * @throws xMsgRegistrationException
-     */
-    public boolean isThereLocalSubscriber(String name,
-                                          String domain,
-                                          String subject,
-                                          String type) throws xMsgRegistrationException {
-        return findSubscribers(name, domain, subject, type).size() > 0;
-    }
 
     /**
      * Publishes the given message.

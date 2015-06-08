@@ -124,6 +124,114 @@ public class xMsgTest {
     }
 
 
+    @Test
+    public void findPublishersDomainOnly() throws Exception {
+        core.findPublishers("sender", "writer", "*", "*");
+
+        RegValidator validator = new RegValidator("sender", "writer:undefined:undefined", true);
+        validator.assertFind();
+    }
+
+
+    @Test
+    public void findLocalPublishersDomainOnly() throws Exception {
+        core.findLocalPublishers("sender", "writer", "*", "*");
+
+        RegValidator validator = new RegValidator("sender", "writer:undefined:undefined", true);
+        validator.assertLocalFind();
+    }
+
+
+    @Test
+    public void findPublishersDomainAndSubject() throws Exception {
+        core.findPublishers("sender", "writer", "scifi", "*");
+
+        RegValidator validator = new RegValidator("sender", "writer:scifi:undefined", true);
+        validator.assertFind();
+    }
+
+
+    @Test
+    public void findLocalPublishersDomainAndSubject() throws Exception {
+        core.findLocalPublishers("sender", "writer", "scifi", "*");
+
+        RegValidator validator = new RegValidator("sender", "writer:scifi:undefined", true);
+        validator.assertLocalFind();
+    }
+
+
+    @Test
+    public void findPublishersFullTopic() throws Exception {
+        core.findPublishers("sender", "writer", "scifi", "book");
+
+        RegValidator validator = new RegValidator("sender", "writer:scifi:book", true);
+        validator.assertFind();
+    }
+
+
+    @Test
+    public void findLocalPublishersFullTopic() throws Exception {
+        core.findLocalPublishers("sender", "writer", "scifi", "book");
+
+        RegValidator validator = new RegValidator("sender", "writer:scifi:book", true);
+        validator.assertLocalFind();
+    }
+
+
+    @Test
+    public void findSubscribersDomainOnly() throws Exception {
+        core.findSubscribers("sender", "writer", "*", "*");
+
+        RegValidator validator = new RegValidator("sender", "writer:undefined:undefined", false);
+        validator.assertFind();
+    }
+
+
+    @Test
+    public void findLocalSubscribersDomainOnly() throws Exception {
+        core.findLocalSubscribers("sender", "writer", "*", "*");
+
+        RegValidator validator = new RegValidator("sender", "writer:undefined:undefined", false);
+        validator.assertLocalFind();
+    }
+
+
+    @Test
+    public void findSubscribersDomainAndSubject() throws Exception {
+        core.findSubscribers("sender", "writer", "scifi", "*");
+
+        RegValidator validator = new RegValidator("sender", "writer:scifi:undefined", false);
+        validator.assertFind();
+    }
+
+
+    @Test
+    public void findLocalSubscribersDomainAndSubject() throws Exception {
+        core.findLocalSubscribers("sender", "writer", "scifi", "*");
+
+        RegValidator validator = new RegValidator("sender", "writer:scifi:undefined", false);
+        validator.assertLocalFind();
+    }
+
+
+    @Test
+    public void findSubscribersFullTopic() throws Exception {
+        core.findSubscribers("sender", "writer", "scifi", "book");
+
+        RegValidator validator = new RegValidator("sender", "writer:scifi:book", false);
+        validator.assertFind();
+    }
+
+
+    @Test
+    public void findLocalSubscribersFullTopic() throws Exception {
+        core.findLocalSubscribers("sender", "writer", "scifi", "book");
+
+        RegValidator validator = new RegValidator("sender", "writer:scifi:book", false);
+        validator.assertLocalFind();
+    }
+
+
     private class RegValidator {
 
         private String name;
@@ -164,6 +272,16 @@ public class xMsgTest {
 
         public void assertLocalRemove() throws Exception {
             verify(driver).removeRegistrationLocal(eq(name), dataArg.capture(), eq(isPublisher));
+            verifyData();
+        }
+
+        public void assertFind() throws Exception {
+            verify(driver).findGlobal(eq(name), dataArg.capture(), eq(isPublisher));
+            verifyData();
+        }
+
+        public void assertLocalFind() throws Exception {
+            verify(driver).findLocal(eq(name), dataArg.capture(), eq(isPublisher));
             verifyData();
         }
 
