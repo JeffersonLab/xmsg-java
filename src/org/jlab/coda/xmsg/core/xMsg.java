@@ -43,14 +43,7 @@ import java.io.IOException;
 import java.net.SocketException;
 import java.util.HashMap;
 import java.util.Set;
-import java.util.concurrent.BlockingQueue;
-import java.util.concurrent.CancellationException;
-import java.util.concurrent.ExecutionException;
 import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Future;
-import java.util.concurrent.LinkedBlockingQueue;
-import java.util.concurrent.ThreadPoolExecutor;
-import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
 
 import static org.jlab.coda.xmsg.xsys.regdis.xMsgRegDriver.__zmqSocket;
@@ -128,7 +121,7 @@ public class xMsg {
 
         // create fixed size thread pool
         this.poolSize = poolSize;
-        this.threadPool = newFixedThreadPool(this.poolSize);
+        this.threadPool = xMsgUtil.newFixedThreadPool(this.poolSize);
     }
 
     /**
@@ -916,50 +909,6 @@ public class xMsg {
             }
 
             return recvMsg;
-        }
-    }
-
-
-    /**
-     * Creates a new {@link xMsg.FixedExecutor}.
-     */
-    public static ExecutorService newFixedThreadPool(int nThreads) {
-        return new FixedExecutor(nThreads, nThreads,
-                                      0L, TimeUnit.MILLISECONDS,
-                                      new LinkedBlockingQueue<Runnable>());
-    }
-
-
-    /**
-     * A thread pool executor that prints the stacktrace of uncaught exceptions.
-     */
-    private static class FixedExecutor extends ThreadPoolExecutor {
-
-        public FixedExecutor(int corePoolSize, int maximumPoolSize, long keepAliveTime,
-                                TimeUnit unit, BlockingQueue<Runnable> workQueue) {
-            super(corePoolSize, maximumPoolSize, keepAliveTime, unit, workQueue);
-        }
-
-        @Override
-        protected void afterExecute(Runnable r, Throwable t) {
-            super.afterExecute(r, t);
-            if (t == null && r instanceof Future<?>) {
-                try {
-                    Future<?> future = (Future<?>) r;
-                    if (future.isDone()) {
-                        future.get();
-                    }
-                } catch (CancellationException ce) {
-                    t = ce;
-                } catch (ExecutionException ee) {
-                    t = ee.getCause();
-                } catch (InterruptedException ie) {
-                    Thread.currentThread().interrupt(); // ignore/reset
-                }
-            }
-            if (t != null) {
-                t.printStackTrace();
-            }
         }
     }
 }
