@@ -378,7 +378,6 @@ public class xMsg {
         xMsgRegistration.Builder regb = registrationBuilder(name, topic);
         regb.setOwnerType(xMsgRegistration.OwnerType.SUBSCRIBER);
         xMsgRegistration regData = regb.build();
-        driver.removeRegistrationLocal(name, regData, false);
         driver.removeRegistrationFrontEnd(name, regData, false);
     }
 
@@ -396,7 +395,6 @@ public class xMsg {
         regb.setOwnerType(xMsgRegistration.OwnerType.SUBSCRIBER);
         xMsgRegistration regData = regb.build();
         driver.removeRegistrationLocal(name, regData, false);
-        driver.removeRegistrationFrontEnd(name, regData, false);
     }
 
     /**
