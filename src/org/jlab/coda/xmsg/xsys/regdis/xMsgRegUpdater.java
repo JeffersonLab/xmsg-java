@@ -49,6 +49,7 @@ public class xMsgRegUpdater extends xMsgRegDriver implements Runnable {
     // xMsgNode database references
     private xMsgRegDatabase publishers;
     private xMsgRegDatabase subscribers;
+    private String name;
 
     /**
      * Constructor accepts the front-end host name (IP form)
@@ -69,6 +70,7 @@ public class xMsgRegUpdater extends xMsgRegDriver implements Runnable {
         super(feHost);
         this.publishers = publishers;
         this.subscribers = subscribers;
+        this.name = xMsgUtil.toHostAddress("localhost") + "_registration_updater";
     }
 
     @Override
@@ -80,7 +82,7 @@ public class xMsgRegUpdater extends xMsgRegDriver implements Runnable {
             for (String key : publishers.topics()) {
                 try {
                     for (xMsgRegistration r : publishers.get(key)) {
-                        registerFrontEnd(key, r, true);
+                        registerFrontEnd(name, r, true);
                         xMsgUtil.sleep(500);
                     }
                 } catch (xMsgRegistrationException e) {
@@ -92,7 +94,7 @@ public class xMsgRegUpdater extends xMsgRegDriver implements Runnable {
             for (String key : subscribers.topics()) {
                 try {
                     for (xMsgRegistration r : subscribers.get(key)) {
-                        registerFrontEnd(key, r, false);
+                        registerFrontEnd(name, r, false);
                         xMsgUtil.sleep(500);
                     }
                 } catch (xMsgRegistrationException e) {
