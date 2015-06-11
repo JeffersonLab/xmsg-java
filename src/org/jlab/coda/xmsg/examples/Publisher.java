@@ -23,7 +23,7 @@ package org.jlab.coda.xmsg.examples;
 
 import org.jlab.coda.xmsg.core.xMsg;
 import org.jlab.coda.xmsg.core.xMsgMessage;
-import org.jlab.coda.xmsg.core.xMsgUtil;
+import org.jlab.coda.xmsg.core.xMsgTopic;
 import org.jlab.coda.xmsg.excp.xMsgException;
 import org.jlab.coda.xmsg.net.xMsgConnection;
 
@@ -73,12 +73,14 @@ public class Publisher extends xMsg {
             // Create a connection to the local xMsg node
             xMsgConnection con = publisher.connect();
 
+            // Create the topic
+            xMsgTopic topic = xMsgTopic.build(domain, subject, type);
+
             // Register this publisher
-            publisher.registerPublisher(name, domain, subject, type, description);
+            publisher.registerPublisher(name, topic, description);
 
             // Create the message to be published
-            String topic = xMsgUtil.buildTopic(domain, subject, type);
-            xMsgMessage msg = new xMsgMessage(topic);
+            xMsgMessage msg = new xMsgMessage(topic.toString());
 
             // Fill data with a byte array the required size
             System.out.println("Byte array size = " + dataSize);

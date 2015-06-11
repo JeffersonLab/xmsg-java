@@ -48,9 +48,11 @@ public class xMsgTest {
 
     @Test
     public void registerPublisher() throws Exception {
-        core.registerPublisher("asimov", "writer", "scifi", "book", "test pub");
+        xMsgTopic topic = xMsgTopic.wrap("writer:scifi:book");
 
-        RegValidator validator = new RegValidator("asimov", "writer:scifi:book", true);
+        core.registerPublisher("asimov", topic, "test pub");
+
+        RegValidator validator = new RegValidator("asimov", topic, true);
         validator.desc = "test pub";
         validator.assertRegistration();
     }
@@ -58,9 +60,11 @@ public class xMsgTest {
 
     @Test
     public void registerLocalPublisher() throws Exception {
-        core.registerLocalPublisher("asimov", "writer", "scifi", "book", "test pub");
+        xMsgTopic topic = xMsgTopic.wrap("writer:scifi:book");
 
-        RegValidator validator = new RegValidator("asimov", "writer:scifi:book", true);
+        core.registerLocalPublisher("asimov", topic, "test pub");
+
+        RegValidator validator = new RegValidator("asimov", topic, true);
         validator.desc = "test pub";
         validator.assertLocalRegistration();
     }
@@ -68,10 +72,11 @@ public class xMsgTest {
 
     @Test
     public void registerSubscriber() throws Exception {
+        xMsgTopic topic = xMsgTopic.wrap("writer:scifi:book");
 
-        core.registerSubscriber("asimov", "writer", "scifi", "book", "test sub");
+        core.registerSubscriber("asimov", topic, "test sub");
 
-        RegValidator validator = new RegValidator("asimov", "writer:scifi:book", false);
+        RegValidator validator = new RegValidator("asimov", topic, false);
         validator.desc = "test sub";
         validator.assertRegistration();
     }
@@ -79,10 +84,11 @@ public class xMsgTest {
 
     @Test
     public void registerLocalSubscriber() throws Exception {
+        xMsgTopic topic = xMsgTopic.wrap("writer:scifi:book");
 
-        core.registerLocalSubscriber("asimov", "writer", "scifi", "book", "test sub");
+        core.registerLocalSubscriber("asimov", topic, "test sub");
 
-        RegValidator validator = new RegValidator("asimov", "writer:scifi:book", false);
+        RegValidator validator = new RegValidator("asimov", topic, false);
         validator.desc = "test sub";
         validator.assertLocalRegistration();
     }
@@ -90,144 +96,86 @@ public class xMsgTest {
 
     @Test
     public void removePublisher() throws Exception {
-        core.removePublisher("asimov", "writer", "scifi", "book");
+        xMsgTopic topic = xMsgTopic.wrap("writer:scifi:book");
 
-        RegValidator validator = new RegValidator("asimov", "writer:scifi:book", true);
+        core.removePublisher("asimov", topic);
+
+        RegValidator validator = new RegValidator("asimov", topic, true);
         validator.assertRemove();
     }
 
 
     @Test
     public void removeLocalPublisher() throws Exception {
-        core.removeLocalPublisher("asimov", "writer", "scifi", "book");
+        xMsgTopic topic = xMsgTopic.wrap("writer:scifi:book");
 
-        RegValidator validator = new RegValidator("asimov", "writer:scifi:book", true);
+        core.removeLocalPublisher("asimov", topic);
+
+        RegValidator validator = new RegValidator("asimov", topic, true);
         validator.assertLocalRemove();
     }
 
 
     @Test
     public void removeSubscriber() throws Exception {
-        core.removeSubscriber("asimov", "writer", "scifi", "book");
+        xMsgTopic topic = xMsgTopic.wrap("writer:scifi:book");
 
-        RegValidator validator = new RegValidator("asimov", "writer:scifi:book", false);
+        core.removeSubscriber("asimov", topic);
+
+        RegValidator validator = new RegValidator("asimov", topic, false);
         validator.assertRemove();
     }
 
 
     @Test
     public void removeLocalSubscriber() throws Exception {
-        core.removeLocalSubscriber("asimov", "writer", "scifi", "book");
+        xMsgTopic topic = xMsgTopic.wrap("writer:scifi:book");
 
-        RegValidator validator = new RegValidator("asimov", "writer:scifi:book", false);
+        core.removeLocalSubscriber("asimov", topic);
+
+        RegValidator validator = new RegValidator("asimov", topic, false);
         validator.assertLocalRemove();
     }
 
 
     @Test
-    public void findPublishersDomainOnly() throws Exception {
-        core.findPublishers("sender", "writer", "*", "*");
+    public void findPublishers() throws Exception {
+        xMsgTopic topic = xMsgTopic.wrap("writer:scifi:book");
 
-        RegValidator validator = new RegValidator("sender", "writer:undefined:undefined", true);
+        core.findPublishers("sender", topic);
+
+        RegValidator validator = new RegValidator("sender", topic, true);
         validator.assertFind();
     }
 
 
     @Test
-    public void findLocalPublishersDomainOnly() throws Exception {
-        core.findLocalPublishers("sender", "writer", "*", "*");
+    public void findLocalPublishers() throws Exception {
+        xMsgTopic topic = xMsgTopic.wrap("writer:scifi:book");
 
-        RegValidator validator = new RegValidator("sender", "writer:undefined:undefined", true);
+        core.findLocalPublishers("sender", topic);
+
+        RegValidator validator = new RegValidator("sender", topic, true);
         validator.assertLocalFind();
     }
 
 
     @Test
-    public void findPublishersDomainAndSubject() throws Exception {
-        core.findPublishers("sender", "writer", "scifi", "*");
+    public void findSubscribers() throws Exception {
+        xMsgTopic topic = xMsgTopic.wrap("writer:scifi");
+        core.findSubscribers("sender", topic);
 
-        RegValidator validator = new RegValidator("sender", "writer:scifi:undefined", true);
+        RegValidator validator = new RegValidator("sender", topic, false);
         validator.assertFind();
     }
 
 
     @Test
-    public void findLocalPublishersDomainAndSubject() throws Exception {
-        core.findLocalPublishers("sender", "writer", "scifi", "*");
+    public void findLocalSubscribers() throws Exception {
+        xMsgTopic topic = xMsgTopic.wrap("writer:scifi:book");
+        core.findLocalSubscribers("sender", topic);
 
-        RegValidator validator = new RegValidator("sender", "writer:scifi:undefined", true);
-        validator.assertLocalFind();
-    }
-
-
-    @Test
-    public void findPublishersFullTopic() throws Exception {
-        core.findPublishers("sender", "writer", "scifi", "book");
-
-        RegValidator validator = new RegValidator("sender", "writer:scifi:book", true);
-        validator.assertFind();
-    }
-
-
-    @Test
-    public void findLocalPublishersFullTopic() throws Exception {
-        core.findLocalPublishers("sender", "writer", "scifi", "book");
-
-        RegValidator validator = new RegValidator("sender", "writer:scifi:book", true);
-        validator.assertLocalFind();
-    }
-
-
-    @Test
-    public void findSubscribersDomainOnly() throws Exception {
-        core.findSubscribers("sender", "writer", "*", "*");
-
-        RegValidator validator = new RegValidator("sender", "writer:undefined:undefined", false);
-        validator.assertFind();
-    }
-
-
-    @Test
-    public void findLocalSubscribersDomainOnly() throws Exception {
-        core.findLocalSubscribers("sender", "writer", "*", "*");
-
-        RegValidator validator = new RegValidator("sender", "writer:undefined:undefined", false);
-        validator.assertLocalFind();
-    }
-
-
-    @Test
-    public void findSubscribersDomainAndSubject() throws Exception {
-        core.findSubscribers("sender", "writer", "scifi", "*");
-
-        RegValidator validator = new RegValidator("sender", "writer:scifi:undefined", false);
-        validator.assertFind();
-    }
-
-
-    @Test
-    public void findLocalSubscribersDomainAndSubject() throws Exception {
-        core.findLocalSubscribers("sender", "writer", "scifi", "*");
-
-        RegValidator validator = new RegValidator("sender", "writer:scifi:undefined", false);
-        validator.assertLocalFind();
-    }
-
-
-    @Test
-    public void findSubscribersFullTopic() throws Exception {
-        core.findSubscribers("sender", "writer", "scifi", "book");
-
-        RegValidator validator = new RegValidator("sender", "writer:scifi:book", false);
-        validator.assertFind();
-    }
-
-
-    @Test
-    public void findLocalSubscribersFullTopic() throws Exception {
-        core.findLocalSubscribers("sender", "writer", "scifi", "book");
-
-        RegValidator validator = new RegValidator("sender", "writer:scifi:book", false);
+        RegValidator validator = new RegValidator("sender", topic, false);
         validator.assertLocalFind();
     }
 
@@ -237,13 +185,13 @@ public class xMsgTest {
         private String name;
         private String host;
         private int port;
-        private String topic;
+        private xMsgTopic topic;
         private String desc;
         private boolean isPublisher;
 
         private ArgumentCaptor<xMsgRegistration> dataArg;
 
-        public RegValidator(String name, String topic, boolean isPublisher)
+        public RegValidator(String name, xMsgTopic topic, boolean isPublisher)
                 throws Exception {
             this.name = name;
             this.host = xMsgUtil.toHostAddress("localhost");
@@ -299,9 +247,9 @@ public class xMsgTest {
             data.setName(name);
             data.setHost(host);
             data.setPort(port);
-            data.setDomain(xMsgUtil.getTopicDomain(topic));
-            data.setSubject(xMsgUtil.getTopicSubject(topic));
-            data.setType(xMsgUtil.getTopicType(topic));
+            data.setDomain(topic.domain());
+            data.setSubject(topic.subject());
+            data.setType(topic.type());
             data.setOwnerType(dataType);
             if (!desc.isEmpty()) {
                 data.setDescription(desc);

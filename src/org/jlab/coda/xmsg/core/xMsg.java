@@ -244,19 +244,15 @@ public class xMsg {
      * The publisher is expected to be running in the local node.
      *
      * @param name the name of the publisher
-     * @param domain domain of the published messages
-     * @param subject subject of the published messages
-     * @param type type of the published messages
+     * @param topic the topic of the published messages
      * @param description a description of the publisher
      * @throws xMsgRegistrationException
      */
     public void registerPublisher(String name,
-                                  String domain,
-                                  String subject,
-                                  String type,
+                                  xMsgTopic topic,
                                   String description)
             throws xMsgRegistrationException {
-        xMsgRegistration.Builder regb = registrationBuilder(name, domain, subject, type);
+        xMsgRegistration.Builder regb = registrationBuilder(name, topic);
         regb.setOwnerType(xMsgRegistration.OwnerType.PUBLISHER);
         regb.setDescription(description);
         xMsgRegistration regData = regb.build();
@@ -272,19 +268,15 @@ public class xMsg {
      * The publisher is expected to be running in the local node.
      *
      * @param name the name of the publisher
-     * @param domain domain of the published messages
-     * @param subject subject of the published messages
-     * @param type type of the published messages
+     * @param topic the topic of the published messages
      * @param description a description of the publisher
      * @throws xMsgRegistrationException
      */
     public void registerLocalPublisher(String name,
-                                       String domain,
-                                       String subject,
-                                       String type,
+                                       xMsgTopic topic,
                                        String description)
             throws xMsgRegistrationException {
-        xMsgRegistration.Builder regb = registrationBuilder(name, domain, subject, type);
+        xMsgRegistration.Builder regb = registrationBuilder(name, topic);
         regb.setOwnerType(xMsgRegistration.OwnerType.PUBLISHER);
         regb.setDescription(description);
         xMsgRegistration regData = regb.build();
@@ -301,19 +293,15 @@ public class xMsg {
      * The subscriber is expected to be running in the local node.
      *
      * @param name the name of the subscriber.
-     * @param domain domain of the subscription
-     * @param subject subject of the subscription
-     * @param type type of the subscription
+     * @param topic the topic of the subscription
      * @param description a description of the subscription
      * @throws xMsgRegistrationException
      */
     public void registerSubscriber(String name,
-                                   String domain,
-                                   String subject,
-                                   String type,
+                                   xMsgTopic topic,
                                    String description)
             throws xMsgRegistrationException {
-        xMsgRegistration.Builder regb = registrationBuilder(name, domain, subject, type);
+        xMsgRegistration.Builder regb = registrationBuilder(name, topic);
         regb.setOwnerType(xMsgRegistration.OwnerType.SUBSCRIBER);
         regb.setDescription(description);
         xMsgRegistration regData = regb.build();
@@ -330,19 +318,15 @@ public class xMsg {
      * The subscriber is expected to be running in the local node.
      *
      * @param name the name of the subscriber.
-     * @param domain domain of the subscription
-     * @param subject subject of the subscription
-     * @param type type of the subscription
+     * @param topic the topic of the subscription
      * @param description a description of the subscription
      * @throws xMsgRegistrationException
      */
     public void registerLocalSubscriber(String name,
-                                        String domain,
-                                        String subject,
-                                        String type,
+                                        xMsgTopic topic,
                                         String description)
             throws xMsgRegistrationException {
-        xMsgRegistration.Builder regb = registrationBuilder(name, domain, subject, type);
+        xMsgRegistration.Builder regb = registrationBuilder(name, topic);
         regb.setOwnerType(xMsgRegistration.OwnerType.SUBSCRIBER);
         regb.setDescription(description);
         xMsgRegistration regData = regb.build();
@@ -353,17 +337,13 @@ public class xMsg {
      * Removes a local publisher from the global front-end registration.
      *
      * @param name the name of the publisher
-     * @param domain domain of the published messages
-     * @param subject subject of the published messages
-     * @param type type of the published messages
+     * @param topic the topic of the published messages
      * @throws xMsgRegistrationException
      */
     public void removePublisher(String name,
-                                String domain,
-                                String subject,
-                                String type)
+                                xMsgTopic topic)
             throws xMsgRegistrationException {
-        xMsgRegistration.Builder regb = registrationBuilder(name, domain, subject, type);
+        xMsgRegistration.Builder regb = registrationBuilder(name, topic);
         regb.setOwnerType(xMsgRegistration.OwnerType.PUBLISHER);
         xMsgRegistration regData = regb.build();
         driver.removeRegistrationFrontEnd(name, regData, true);
@@ -373,17 +353,13 @@ public class xMsg {
      * Removes a local publisher from the local registration.
      *
      * @param name the name of the publisher
-     * @param domain domain of the published messages
-     * @param subject subject of the published messages
-     * @param type type of the published messages
+     * @param topic the topic of the published messages
      * @throws xMsgRegistrationException
      */
     public void removeLocalPublisher(String name,
-                                     String domain,
-                                     String subject,
-                                     String type)
+                                     xMsgTopic topic)
             throws xMsgRegistrationException {
-        xMsgRegistration.Builder regb = registrationBuilder(name, domain, subject, type);
+        xMsgRegistration.Builder regb = registrationBuilder(name, topic);
         regb.setOwnerType(xMsgRegistration.OwnerType.PUBLISHER);
         xMsgRegistration regData = regb.build();
         driver.removeRegistrationLocal(name, regData, true);
@@ -393,17 +369,13 @@ public class xMsg {
      * Removes a local subscriber from the global front-end registration.
      *
      * @param name the name of the subscriber
-     * @param domain domain of the subscription
-     * @param subject subject of the subscription
-     * @param type type of the subscription
+     * @param topic the topic of the subscription
      * @throws xMsgRegistrationException
      */
     public void removeSubscriber(String name,
-                                 String domain,
-                                 String subject,
-                                 String type)
+                                 xMsgTopic topic)
             throws xMsgRegistrationException {
-        xMsgRegistration.Builder regb = registrationBuilder(name, domain, subject, type);
+        xMsgRegistration.Builder regb = registrationBuilder(name, topic);
         regb.setOwnerType(xMsgRegistration.OwnerType.SUBSCRIBER);
         xMsgRegistration regData = regb.build();
         driver.removeRegistrationLocal(name, regData, false);
@@ -414,17 +386,13 @@ public class xMsg {
      * Removes a local subscriber from the local registration.
      *
      * @param name the name of the subscriber
-     * @param domain domain of the subscription
-     * @param subject subject of the subscription
-     * @param type type of the subscription
+     * @param topic the topic of the subscription
      * @throws xMsgRegistrationException
      */
     public void removeLocalSubscriber(String name,
-                                      String domain,
-                                      String subject,
-                                      String type)
+                                      xMsgTopic topic)
             throws xMsgRegistrationException {
-        xMsgRegistration.Builder regb = registrationBuilder(name, domain, subject, type);
+        xMsgRegistration.Builder regb = registrationBuilder(name, topic);
         regb.setOwnerType(xMsgRegistration.OwnerType.SUBSCRIBER);
         xMsgRegistration regData = regb.build();
         driver.removeRegistrationLocal(name, regData, false);
@@ -439,19 +407,15 @@ public class xMsg {
      * Note: xMsg defines a topic as {@code domain:subject:type}.
      *
      * @param sender the name of the sender / requester
-     * @param domain domain of the published messages
-     * @param subject subject of the published messages
-     * @param type type of the published messages
+     * @param topic the topic of the published messages
      * @return set of {@link xMsgRegistration} objects, one per found publisher
      * @throws xMsgDiscoverException
      */
     public Set<xMsgRegistration> findPublishers(String sender,
-                                                String domain,
-                                                String subject,
-                                                String type)
+                                                xMsgTopic topic)
             throws xMsgRegistrationException {
 
-        xMsgRegistration.Builder regb = findRegistrationBuilder(sender, domain, subject, type);
+        xMsgRegistration.Builder regb = registrationBuilder(sender, topic);
         regb.setOwnerType(xMsgRegistration.OwnerType.PUBLISHER);
         xMsgRegistration regData = regb.build();
         return driver.findGlobal(sender, regData, true);
@@ -465,18 +429,14 @@ public class xMsg {
      * Note: xMsg defines a topic as {@code domain:subject:type}.
      *
      * @param sender the name of the sender / requester
-     * @param domain domain of the published messages
-     * @param subject subject of the published messages
-     * @param type type of the published messages
+     * @param topic the topic of the published messages
      * @return set of {@link xMsgRegistration} objects, one per found publisher
      * @throws xMsgDiscoverException
      */
     public Set<xMsgRegistration> findLocalPublishers(String sender,
-                                                     String domain,
-                                                     String subject,
-                                                     String type)
+                                                     xMsgTopic topic)
             throws xMsgRegistrationException {
-        xMsgRegistration.Builder regb = findRegistrationBuilder(sender, domain, subject, type);
+        xMsgRegistration.Builder regb = registrationBuilder(sender, topic);
         regb.setOwnerType(xMsgRegistration.OwnerType.PUBLISHER);
         xMsgRegistration regData = regb.build();
         return driver.findLocal(sender, regData, true);
@@ -490,18 +450,14 @@ public class xMsg {
      * Note: xMsg defines a topic as {@code domain:subject:type}.
      *
      * @param sender the name of the sender / requester
-     * @param domain domain of the subscription
-     * @param subject subject of the subscription
-     * @param type type of the subscription
+     * @param topic the topic of the subscription
      * @return set of {@link xMsgRegistration} objects, one per found subscribers
      * @throws xMsgDiscoverException
      */
     public Set<xMsgRegistration> findSubscribers(String sender,
-                                                 String domain,
-                                                 String subject,
-                                                 String type)
+                                                 xMsgTopic topic)
             throws xMsgRegistrationException {
-        xMsgRegistration.Builder regb = findRegistrationBuilder(sender, domain, subject, type);
+        xMsgRegistration.Builder regb = registrationBuilder(sender, topic);
         regb.setOwnerType(xMsgRegistration.OwnerType.SUBSCRIBER);
         xMsgRegistration regData = regb.build();
         return driver.findGlobal(sender, regData, false);
@@ -515,52 +471,30 @@ public class xMsg {
      * Note: xMsg defines a topic as {@code domain:subject:type}.
      *
      * @param sender the name of the sender / requester
-     * @param domain domain of the subscription
-     * @param subject subject of the subscription
-     * @param type type of the subscription
+     * @param topic the topic of the subscription
      * @return set of {@link xMsgRegistration} objects, one per found subscribers
      * @throws xMsgDiscoverException
      */
     public Set<xMsgRegistration> findLocalSubscribers(String sender,
-                                                      String domain,
-                                                      String subject,
-                                                      String type)
+                                                      xMsgTopic topic)
             throws xMsgRegistrationException {
 
-        xMsgRegistration.Builder regb = findRegistrationBuilder(sender, domain, subject, type);
+        xMsgRegistration.Builder regb = registrationBuilder(sender, topic);
         regb.setOwnerType(xMsgRegistration.OwnerType.SUBSCRIBER);
         xMsgRegistration regData = regb.build();
         return driver.findLocal(sender, regData, false);
     }
 
     private Builder registrationBuilder(String name,
-                                        String domain,
-                                        String subject,
-                                        String type) {
+                                        xMsgTopic topic) {
         xMsgRegistration.Builder regb = xMsgRegistration.newBuilder();
         regb.setName(name);
         regb.setHost(localHostIp);
         regb.setPort(xMsgConstants.DEFAULT_PORT.getIntValue());
-        regb.setDomain(domain);
-        regb.setSubject(subject);
-        regb.setType(type);
+        regb.setDomain(topic.domain());
+        regb.setSubject(topic.subject());
+        regb.setType(topic.type());
         return regb;
-    }
-
-    private Builder findRegistrationBuilder(String name,
-                                            String domain,
-                                            String subject,
-                                            String type) throws xMsgRegistrationException {
-        if (domain.equals("*")) {
-            throw new xMsgRegistrationException("malformed xMsg topic");
-        }
-        if (subject.equals("*")) {
-            subject = xMsgConstants.UNDEFINED.getStringValue();
-        }
-        if (type.equals("*")) {
-            type = xMsgConstants.UNDEFINED.getStringValue();
-        }
-        return registrationBuilder(name, domain, subject, type);
     }
 
 

@@ -2,6 +2,7 @@ package org.jlab.coda.xmsg.examples;
 
 import org.jlab.coda.xmsg.core.xMsg;
 import org.jlab.coda.xmsg.core.xMsgMessage;
+import org.jlab.coda.xmsg.core.xMsgTopic;
 import org.jlab.coda.xmsg.core.xMsgUtil;
 import org.jlab.coda.xmsg.excp.xMsgException;
 import org.jlab.coda.xmsg.net.xMsgConnection;
@@ -27,11 +28,11 @@ public class SyncPublisher extends xMsg {
             SyncPublisher publisher = new SyncPublisher();
 
             xMsgConnection con =  publisher.connect();
+            xMsgTopic topic = xMsgTopic.build(domain, subject, type);
 
-            publisher.registerPublisher(myName, domain, subject, type, description);
-            String topic = xMsgUtil.buildTopic(domain, subject, type);
+            publisher.registerPublisher(myName, topic, description);
 
-            xMsgMessage msg = new xMsgMessage(topic);
+            xMsgMessage msg = new xMsgMessage(topic.toString());
             msg.setData(111);
             int counter = 1;
             while (true) {

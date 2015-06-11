@@ -25,6 +25,7 @@ import org.jlab.coda.xmsg.core.xMsg;
 import org.jlab.coda.xmsg.core.xMsgCallBack;
 import org.jlab.coda.xmsg.core.xMsgConstants;
 import org.jlab.coda.xmsg.core.xMsgMessage;
+import org.jlab.coda.xmsg.core.xMsgTopic;
 import org.jlab.coda.xmsg.core.xMsgUtil;
 import org.jlab.coda.xmsg.data.xMsgD.xMsgData;
 import org.jlab.coda.xmsg.excp.xMsgException;
@@ -63,12 +64,14 @@ public class Subscriber extends xMsg {
             // Create the connection to the local xMsg node
             con = subscriber.connect();
 
+            // Create the topic
+            xMsgTopic topic = xMsgTopic.build(domain, subject, type);
+
             // Register this subscriber
-            subscriber.registerSubscriber(myName, domain, subject, type, description);
+            subscriber.registerSubscriber(myName, topic, description);
 
             // Subscribe by passing a callback to the subscription
-            String topic = xMsgUtil.buildTopic(domain, subject, type);
-            subscriber.subscribe(con, topic, subscriber.callback);
+            subscriber.subscribe(con, topic.toString(), subscriber.callback);
 
             xMsgUtil.keepAlive();
         } catch (xMsgException | SocketException e) {
