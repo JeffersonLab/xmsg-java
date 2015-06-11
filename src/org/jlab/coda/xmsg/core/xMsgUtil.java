@@ -38,8 +38,6 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.Enumeration;
 import java.util.List;
-import java.util.Objects;
-import java.util.StringTokenizer;
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.CancellationException;
 import java.util.concurrent.ExecutionException;
@@ -133,7 +131,6 @@ public final class xMsgUtil {
         }
     }
 
-
     /**
      * Keeps the current thread sleeping forever.
      */
@@ -141,106 +138,6 @@ public final class xMsgUtil {
         while (true) {
             sleep(100);
         }
-    }
-
-
-    /**
-     * Builds xMsg topic of the form: {@code domain:subject:type}.
-     * <p>
-     * The domain cannot be undefined. If the topic should accept any subject or
-     * domain, pass {@code null} or {@code "*"}.
-     *
-     * @param domain domain of the topic
-     * @param subject subject of the topic
-     * @param type type of the topic
-     * @return the constructed xMsg topic
-     */
-    public static String buildTopic(String domain,
-                                    String subject,
-                                    String type) {
-        if (domain == null || domain.equals("*")) {
-            throw new IllegalArgumentException("domain is not defined");
-        }
-        StringBuilder topic = new StringBuilder();
-        topic.append(domain);
-        if (subject != null && !subject.equals("*")) {
-            topic.append(":").append(subject);
-            if (type != null && !type.equals("*")) {
-                StringTokenizer st = new StringTokenizer(type, ":");
-                while (st.hasMoreTokens()) {
-                    String tst = st.nextToken();
-                    if (!tst.contains("*")) {
-                        topic.append(":").append(tst);
-                    } else {
-                        break;
-                    }
-                }
-            }
-        }
-        return topic.toString();
-    }
-
-    /**
-     * Finds the domain of the xMsg topic.
-     * <p>
-     * Note that xMsg topic is constructed as: {@code domain:subject:type}.
-     *
-     * @param topic xMsg topic
-     * @return domain of the topic
-     */
-    public static String getTopicDomain(String topic) {
-        Objects.requireNonNull(topic, "null topic");
-        int firstSep = topic.indexOf(":");
-        if (firstSep < 0) {
-            return topic;
-        }
-        return topic.substring(0, firstSep);
-    }
-
-    /**
-     * Finds the subject of the xMsg topic.
-     * <p>
-     * Note that xMsg topic is constructed as: {@code domain:subject:type}.
-     *
-     * @param topic xMsg topic
-     * @return subject of the topic. In case subject is missing in the topic, it
-     *         returns {@code xMsgConstants.UNDEFINED}.
-     */
-    public static String getTopicSubject(String topic) {
-        Objects.requireNonNull(topic, "null topic");
-        int firstSep = topic.indexOf(":");
-        if (firstSep < 0) {
-            return xMsgConstants.UNDEFINED.getStringValue();
-        }
-        int secondSep = topic.indexOf(":", firstSep + 1);
-        if (secondSep < 0) {
-            return topic.substring(firstSep + 1);
-        }
-        return topic.substring(firstSep + 1, secondSep);
-    }
-
-    /**
-     * Finds the type of the xMsg topic.
-     * <p>
-     * Note that xMsg topic is constructed as: {@code domain:subject:type}.
-     *
-     * @param topic xMsg topic
-     * @return type of the topic. In case subject is missing in the topic, it
-     *         returns xMsgConstants.UNDEFINED.
-     *         Note that type can not be defined if subject is not defined,
-     *         i.e. xMsg does not support topic such as: {@code domain:*:type}.
-     */
-    public static String getTopicType(String topic) {
-        Objects.requireNonNull(topic, "null topic");
-        int firstSep = topic.indexOf(":");
-        if (firstSep < 0) {
-            return xMsgConstants.UNDEFINED.getStringValue();
-        }
-        int secondSep = topic.indexOf(":", firstSep + 1);
-        if (secondSep < 0) {
-            return xMsgConstants.UNDEFINED.getStringValue();
-        }
-        return topic.substring(secondSep + 1);
     }
 
     /**

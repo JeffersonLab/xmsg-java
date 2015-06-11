@@ -37,72 +37,9 @@ import static org.hamcrest.Matchers.is;
 
 
 public class xMsgUtilTest {
-    private static final String UDF = xMsgConstants.UNDEFINED.getStringValue();
 
     @Rule
     public ExpectedException expectedEx = ExpectedException.none();
-
-    @Test
-    public void buildTopicWithDomainOnly() throws Exception {
-        assertThat(xMsgUtil.buildTopic("rock", null, null), is("rock"));
-        assertThat(xMsgUtil.buildTopic("rock", "*", null), is("rock"));
-        assertThat(xMsgUtil.buildTopic("rock", "*", "*"), is("rock"));
-    }
-
-    @Test
-    public void buildTopicWithSubject() throws Exception {
-        assertThat(xMsgUtil.buildTopic("rock", "metal", null), is("rock:metal"));
-        assertThat(xMsgUtil.buildTopic("rock", "metal", "*"), is("rock:metal"));
-    }
-
-    @Test
-    public void buildTopicWithTopic() throws Exception {
-        assertThat(xMsgUtil.buildTopic("rock", "metal", "metallica"), is("rock:metal:metallica"));
-    }
-
-    @Test
-    public void buildTopicWithExtendedTopic() throws Exception {
-        assertThat(xMsgUtil.buildTopic("rock", "metal", "metallica:lars:james"),
-                   is("rock:metal:metallica:lars:james"));
-        assertThat(xMsgUtil.buildTopic("rock", "metal", "metallica:lars:*"),
-                   is("rock:metal:metallica:lars"));
-    }
-
-    @Test
-    public void buildTopicWithNullDomainFails() throws Exception {
-        expectedEx.expect(IllegalArgumentException.class);
-        xMsgUtil.buildTopic(null, "metal", "metallica");
-    }
-
-    @Test
-    public void buildTopicWithAnyDomainFails() throws Exception {
-        expectedEx.expect(IllegalArgumentException.class);
-        xMsgUtil.buildTopic("*", null, null);
-    }
-
-    @Test
-    public void getTopicDomainReturnsTheDomain() throws Exception {
-        assertThat(xMsgUtil.getTopicDomain("rock"), is("rock"));
-        assertThat(xMsgUtil.getTopicDomain("rock:metal"), is("rock"));
-        assertThat(xMsgUtil.getTopicDomain("rock:metal:metallica"), is("rock"));
-        assertThat(xMsgUtil.getTopicDomain("rock:metal:metallica:lars"), is("rock"));
-    }
-
-    @Test
-    public void getTopicSubjectReturnsTheSubject() throws Exception {
-        assertThat(xMsgUtil.getTopicSubject("rock"), is(UDF));
-        assertThat(xMsgUtil.getTopicSubject("rock:metal"), is("metal"));
-        assertThat(xMsgUtil.getTopicSubject("rock:metal:metallica"), is("metal"));
-        assertThat(xMsgUtil.getTopicSubject("rock:metal:metallica:lars"), is("metal"));
-    }
-
-    @Test
-    public void getTopicTypeReturnsTheType() throws Exception {
-        assertThat(xMsgUtil.getTopicType("rock"), is(UDF));
-        assertThat(xMsgUtil.getTopicType("rock:metal"), is(UDF));
-        assertThat(xMsgUtil.getTopicType("rock:metal:metallica"), is("metallica"));
-        assertThat(xMsgUtil.getTopicType("rock:metal:metallica:lars"), is("metallica:lars"));
-    }
 
     @Test
     public void checkValidIPs() throws Exception {
