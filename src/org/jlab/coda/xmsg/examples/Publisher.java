@@ -80,7 +80,7 @@ public class Publisher extends xMsg {
             publisher.registerPublisher(name, topic, description);
 
             // Create the message to be published
-            xMsgMessage msg = new xMsgMessage(topic.toString());
+            xMsgMessage msg = new xMsgMessage(topic);
 
             // Fill data with a byte array the required size
             System.out.println("Byte array size = " + dataSize);

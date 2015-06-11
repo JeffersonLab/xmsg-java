@@ -43,9 +43,9 @@ public abstract class SubscriptionHandler implements Runnable {
     private String topic;
 
     public SubscriptionHandler(xMsgConnection connection,
-                               String topic) {
+                               xMsgTopic topic) {
         con = connection.getSubSock();
-        this.topic = topic;
+        this.topic = topic.toString();
     }
 
     public abstract void handle() throws xMsgException, TimeoutException, IOException;

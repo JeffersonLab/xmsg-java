@@ -32,7 +32,7 @@ public class SyncPublisher extends xMsg {
 
             publisher.registerPublisher(myName, topic, description);
 
-            xMsgMessage msg = new xMsgMessage(topic.toString());
+            xMsgMessage msg = new xMsgMessage(topic);
             msg.setData(111);
             int counter = 1;
             while (true) {

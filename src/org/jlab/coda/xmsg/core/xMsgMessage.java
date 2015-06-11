@@ -22,6 +22,7 @@
 package org.jlab.coda.xmsg.core;
 
 import com.google.protobuf.ByteString;
+
 import org.jlab.coda.xmsg.data.xMsgD.xMsgData;
 import org.jlab.coda.xmsg.data.xMsgM.xMsgMeta;
 
@@ -49,11 +50,11 @@ import java.util.Arrays;
  */
 public class xMsgMessage {
 
-    private String topic = xMsgConstants.UNDEFINED.getStringValue();
+    private xMsgTopic topic;
     private xMsgMeta.Builder metaData = null;
     private Object data = null;
 
-    public xMsgMessage(String topic) {
+    public xMsgMessage(xMsgTopic topic) {
         this.topic = topic;
         setData(xMsgConstants.UNDEFINED.getStringValue());
     }
@@ -65,7 +66,7 @@ public class xMsgMessage {
      * @param topic of the communication
      * @param data  of the communication
      */
-    public xMsgMessage(String topic,
+    public xMsgMessage(xMsgTopic topic,
                        Object data) {
         this.topic = topic;
         setData(data);
@@ -78,7 +79,7 @@ public class xMsgMessage {
      * @param metadata of the communication
      * @param data of the communication
      */
-    public xMsgMessage(String topic,
+    public xMsgMessage(xMsgTopic topic,
                        xMsgMeta.Builder metadata,
                        Object data) {
         this.topic = topic;
@@ -104,11 +105,11 @@ public class xMsgMessage {
         }
     }
 
-    public String getTopic() {
+    public xMsgTopic getTopic() {
         return topic;
     }
 
-    public void setTopic(String topic) {
+    public void setTopic(xMsgTopic topic) {
         this.topic = topic;
     }
 

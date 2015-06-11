@@ -71,7 +71,7 @@ public class Subscriber extends xMsg {
             subscriber.registerSubscriber(myName, topic, description);
 
             // Subscribe by passing a callback to the subscription
-            subscriber.subscribe(con, topic.toString(), subscriber.callback);
+            subscriber.subscribe(con, topic, subscriber.callback);
 
             xMsgUtil.keepAlive();
         } catch (xMsgException | SocketException e) {

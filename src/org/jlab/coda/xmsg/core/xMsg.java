@@ -531,7 +531,7 @@ public class xMsg {
         ZMsg outputMsg = new ZMsg();
 
         // adding topic frame = 1
-        outputMsg.addString(msg.getTopic());
+        outputMsg.addString(msg.getTopic().toString());
 
         xMsgMeta.Builder metadata = msg.getMetaData();
         if (metadata.getDataType().equals(xMsgMeta.DataType.UNDEFINED)) {
@@ -621,7 +621,7 @@ public class xMsg {
 
         // subscribe to the returnAddress
         SyncSendCallBack cb = new SyncSendCallBack();
-        SubscriptionHandler sh = subscribe(connection, returnAddress, cb);
+        SubscriptionHandler sh = subscribe(connection, xMsgTopic.wrap(returnAddress), cb);
         cb.setSubscriptionHandler(sh);
 
         publish(connection, msg);
@@ -655,7 +655,7 @@ public class xMsg {
      * @throws xMsgException
      */
     public SubscriptionHandler subscribe(final xMsgConnection connection,
-                                         String topic,
+                                         final xMsgTopic topic,
                                          final xMsgCallBack cb)
             throws xMsgException {
 
@@ -667,7 +667,7 @@ public class xMsg {
         }
 
         // zmq subscribe
-        con.subscribe(topic.getBytes(ZMQ.CHARSET));
+        con.subscribe(topic.toString().getBytes(ZMQ.CHARSET));
 
         SubscriptionHandler sHandle = new SubscriptionHandler(connection, topic) {
             @Override
@@ -679,7 +679,7 @@ public class xMsg {
                 ZFrame msgLocationFrame = inputMsg.pop(); // get the message location frame = 2
 
                 // de-serialize received message components
-                String topic = new String(topicFrame.getData(), ZMQ.CHARSET);
+                xMsgTopic topic = xMsgTopic.wrap(topicFrame.getData());
                 String msgLocation = new String(msgLocationFrame.getData(), ZMQ.CHARSET);
 
                 // we do not need frames
@@ -780,7 +780,7 @@ public class xMsg {
         if (!requester.equals(xMsgConstants.UNDEFINED.getStringValue())) {
             xMsgMessage rm = callback.callback(callbackMsg);
             if (rm != null) {
-                rm.setTopic(callbackMsg.getMetaData().getReplyTo());
+                rm.setTopic(xMsgTopic.wrap(requester));
                 publish(connection, rm);
             }
         } else {
