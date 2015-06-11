@@ -21,6 +21,7 @@
 
 package org.jlab.coda.xmsg.xsys.regdis;
 
+import org.jlab.coda.xmsg.core.xMsgTopic;
 import org.jlab.coda.xmsg.core.xMsgUtil;
 import org.jlab.coda.xmsg.data.xMsgR.xMsgRegistration;
 import org.jlab.coda.xmsg.excp.xMsgException;
@@ -79,7 +80,7 @@ public class xMsgRegUpdater extends xMsgRegDriver implements Runnable {
         while (!Thread.currentThread().isInterrupted()) {
 
             // update FE publishers database
-            for (String key : publishers.topics()) {
+            for (xMsgTopic key : publishers.topics()) {
                 try {
                     for (xMsgRegistration r : publishers.get(key)) {
                         registerFrontEnd(name, r, true);
@@ -91,7 +92,7 @@ public class xMsgRegUpdater extends xMsgRegDriver implements Runnable {
             }
 
             // update FE subscribers database
-            for (String key : subscribers.topics()) {
+            for (xMsgTopic key : subscribers.topics()) {
                 try {
                     for (xMsgRegistration r : subscribers.get(key)) {
                         registerFrontEnd(name, r, false);

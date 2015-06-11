@@ -24,7 +24,7 @@ package org.jlab.coda.xmsg.xsys.regdis;
 import java.util.Random;
 
 import org.jlab.coda.xmsg.core.xMsgConstants;
-import org.jlab.coda.xmsg.core.xMsgUtil;
+import org.jlab.coda.xmsg.core.xMsgTopic;
 import org.jlab.coda.xmsg.data.xMsgR.xMsgRegistration;
 import org.jlab.coda.xmsg.data.xMsgR.xMsgRegistration.Builder;
 
@@ -82,12 +82,13 @@ public final class RegistrationDataFactory {
                 ? xMsgRegistration.OwnerType.PUBLISHER
                 : xMsgRegistration.OwnerType.SUBSCRIBER;
         Builder data = xMsgRegistration.newBuilder();
+        xMsgTopic xtopic = xMsgTopic.wrap(topic);
         data.setName(name);
         data.setHost(host);
         data.setPort(xMsgConstants.DEFAULT_PORT.getIntValue());
-        data.setDomain(xMsgUtil.getTopicDomain(topic));
-        data.setSubject(xMsgUtil.getTopicSubject(topic));
-        data.setType(xMsgUtil.getTopicType(topic));
+        data.setDomain(xtopic.domain());
+        data.setSubject(xtopic.subject());
+        data.setType(xtopic.type());
         data.setOwnerType(dataType);
         data.setDescription(name + " test data");
         return data;

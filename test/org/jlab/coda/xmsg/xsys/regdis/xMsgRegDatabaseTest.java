@@ -24,6 +24,7 @@ package org.jlab.coda.xmsg.xsys.regdis;
 import java.util.HashSet;
 import java.util.Set;
 
+import org.jlab.coda.xmsg.core.xMsgTopic;
 import org.jlab.coda.xmsg.data.xMsgR.xMsgRegistration;
 import org.junit.Before;
 import org.junit.Test;
@@ -311,10 +312,10 @@ public class xMsgRegDatabaseTest {
     }
 
 
-    private static Set<String> newTopicSet(String... topics) {
-        Set<String> set = new HashSet<String>();
+    private static Set<xMsgTopic> newTopicSet(String... topics) {
+        Set<xMsgTopic> set = new HashSet<xMsgTopic>();
         for (String s : topics) {
-            set.add(s);
+            set.add(xMsgTopic.wrap(s));
         }
         return set;
     }

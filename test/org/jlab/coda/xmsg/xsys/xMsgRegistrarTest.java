@@ -27,7 +27,7 @@ import java.util.Iterator;
 import java.util.Random;
 import java.util.Set;
 
-import org.jlab.coda.xmsg.core.xMsgUtil;
+import org.jlab.coda.xmsg.core.xMsgTopic;
 import org.jlab.coda.xmsg.data.xMsgR.xMsgRegistration;
 import org.jlab.coda.xmsg.data.xMsgR.xMsgRegistration.Builder;
 import org.jlab.coda.xmsg.excp.xMsgException;
@@ -177,12 +177,13 @@ public final class xMsgRegistrarTest implements AutoCloseable {
 
     private Set<xMsgRegistration> find(String topic, boolean isPublisher) {
         Set<xMsgRegistration> set = new HashSet<>();
+        xMsgTopic searchTopic = xMsgTopic.wrap(topic);
         for (xMsgRegistration reg : registration) {
             if (isPublisher != checkPublisher(reg)) {
                 continue;
             }
-            String regTopic = xMsgUtil.buildTopic(reg.getDomain(), reg.getSubject(), reg.getType());
-            if (regTopic.startsWith(topic)) {
+            xMsgTopic regTopic = xMsgTopic.build(reg.getDomain(), reg.getSubject(), reg.getType());
+            if (searchTopic.isParent(regTopic)) {
                 set.add(reg);
             }
         }

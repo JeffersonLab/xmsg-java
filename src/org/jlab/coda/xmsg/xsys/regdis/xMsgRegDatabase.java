@@ -29,7 +29,7 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
 
 import org.jlab.coda.xmsg.core.xMsgConstants;
-import org.jlab.coda.xmsg.core.xMsgUtil;
+import org.jlab.coda.xmsg.core.xMsgTopic;
 import org.jlab.coda.xmsg.data.xMsgR.xMsgRegistration;
 
 /**
@@ -40,7 +40,7 @@ import org.jlab.coda.xmsg.data.xMsgR.xMsgRegistration;
  */
 public class xMsgRegDatabase {
 
-    private final ConcurrentMap<String, Set<xMsgRegistration>> db =  new ConcurrentHashMap<>();
+    private final ConcurrentMap<xMsgTopic, Set<xMsgRegistration>> db =  new ConcurrentHashMap<>();
 
     /**
      * Adds a new xMsg actor to the registration.
@@ -50,7 +50,7 @@ public class xMsgRegDatabase {
      * @param regData the description of the actor
      */
     public void register(xMsgRegistration regData) {
-        String key = generateKey(regData);
+        xMsgTopic key = generateKey(regData);
         if (db.containsKey(key)) {
             db.get(key).add(regData);
         } else {
@@ -69,7 +69,7 @@ public class xMsgRegDatabase {
      * @param regData the description of the actor
      */
     public void remove(xMsgRegistration regData) {
-        String key = generateKey(regData);
+        xMsgTopic key = generateKey(regData);
         if (db.containsKey(key)) {
             Set<xMsgRegistration> set = db.get(key);
             for (Iterator<xMsgRegistration> i = set.iterator(); i.hasNext();) {
@@ -94,9 +94,9 @@ public class xMsgRegDatabase {
      * @param host the host of the actors that should be removed
      */
     public void remove(String host) {
-        Iterator<Entry<String, Set<xMsgRegistration>>> dbIt = db.entrySet().iterator();
+        Iterator<Entry<xMsgTopic, Set<xMsgRegistration>>> dbIt = db.entrySet().iterator();
         while (dbIt.hasNext()) {
-            Entry<String, Set<xMsgRegistration>> dbEntry = dbIt.next();
+            Entry<xMsgTopic, Set<xMsgRegistration>> dbEntry = dbIt.next();
             Iterator<xMsgRegistration> regIt = dbEntry.getValue().iterator();
             while (regIt.hasNext()) {
                 xMsgRegistration reg = regIt.next();
@@ -111,23 +111,8 @@ public class xMsgRegDatabase {
     }
 
 
-    private String generateKey(xMsgRegistration regData) {
-        StringBuilder kb = new StringBuilder();
-        kb.append(regData.getDomain());
-
-        String subject = regData.getSubject();
-        if (!subject.equals(xMsgConstants.UNDEFINED.getStringValue())
-                && !subject.equals(xMsgConstants.ANY.getStringValue())) {
-            kb.append(":").append(subject);
-        }
-
-        String type = regData.getType();
-        if (!type.equals(xMsgConstants.UNDEFINED.getStringValue())
-                && !type.equals(xMsgConstants.ANY.getStringValue())) {
-            kb.append(":").append(type);
-        }
-
-        return kb.toString();
+    private xMsgTopic generateKey(xMsgRegistration regData) {
+        return xMsgTopic.build(regData.getDomain(), regData.getSubject(), regData.getType());
     }
 
 
@@ -156,15 +141,10 @@ public class xMsgRegDatabase {
      */
     public Set<xMsgRegistration> find(String domain, String subject, String type) {
         Set<xMsgRegistration> result = new HashSet<>();
-        for (String k : db.keySet()) {
-            if ((xMsgUtil.getTopicDomain(k).equals(domain)) &&
-                    (xMsgUtil.getTopicSubject(k).equals(subject) ||
-                            subject.equals("*") ||
-                            subject.equals(xMsgConstants.UNDEFINED.getStringValue())) &&
-                    (xMsgUtil.getTopicType(k).equals(type) ||
-                            type.equals("*") ||
-                            type.equals(xMsgConstants.UNDEFINED.getStringValue()))) {
-                result.addAll(db.get(k));
+        xMsgTopic searchedTopic = xMsgTopic.build(domain, subject, type);
+        for (xMsgTopic topic : db.keySet()) {
+            if (searchedTopic.isParent(topic)) {
+                result.addAll(db.get(topic));
             }
         }
         return result;
@@ -176,7 +156,7 @@ public class xMsgRegDatabase {
      *
      * @see #get
      */
-    Set<String> topics() {
+    Set<xMsgTopic> topics() {
         return db.keySet();
     }
 
@@ -187,6 +167,16 @@ public class xMsgRegDatabase {
      * @see #topics
      */
     Set<xMsgRegistration> get(String topic) {
+        return db.get(xMsgTopic.wrap(topic));
+    }
+
+
+    /**
+     * Returns all actors registered with the specific known topic.
+     *
+     * @see #topics
+     */
+    Set<xMsgRegistration> get(xMsgTopic topic) {
         return db.get(topic);
     }
 }
