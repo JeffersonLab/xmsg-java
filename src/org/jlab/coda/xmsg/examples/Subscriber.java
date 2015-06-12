@@ -47,7 +47,7 @@ public class Subscriber extends xMsg {
     private MyCallBack callback;
 
     public Subscriber() throws xMsgException, SocketException {
-        super("localhost");
+        super("test_subscriber", "localhost");
         callback = new MyCallBack();
     }
 

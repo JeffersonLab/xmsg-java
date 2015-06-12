@@ -38,11 +38,12 @@ public class xMsgTest {
 
     private xMsgRegDriver driver;
     private xMsg core;
+    private String name = "asimov";
 
     @Before
     public void setup() throws Exception {
         driver = mock(xMsgRegDriver.class);
-        core = new xMsg(driver, 2);
+        core = new xMsg(name, driver, 2);
     }
 
 

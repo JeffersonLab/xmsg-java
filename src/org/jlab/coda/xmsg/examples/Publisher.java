@@ -50,7 +50,7 @@ public class Publisher extends xMsg {
      * @throws xMsgException
      */
     public Publisher() throws xMsgException, SocketException {
-        super("localhost");
+        super("test_publisher", "localhost");
     }
 
     public static void main(String[] args) {

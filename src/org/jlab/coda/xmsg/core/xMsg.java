@@ -63,6 +63,9 @@ import static org.jlab.coda.xmsg.xsys.regdis.xMsgRegDriver.__zmqSocket;
  */
 public class xMsg {
 
+    /** The unique identificator of this actor. */
+    protected final String myName;
+
     /** 0MQ context object. */
     private final ZContext context;
 
@@ -92,8 +95,8 @@ public class xMsg {
      * @throws xMsgException
      * @throws SocketException
      */
-    public xMsg(String feHost) throws xMsgException, SocketException {
-        this(new xMsgRegDriver(feHost), 2);
+    public xMsg(String name, String feHost) throws xMsgException, SocketException {
+        this(name, new xMsgRegDriver(feHost), 2);
     }
 
     /**
@@ -107,16 +110,19 @@ public class xMsg {
      * @throws SocketException
      * @throws xMsgException
      */
-    public xMsg(String feHost, int poolSize) throws xMsgException, SocketException {
+    public xMsg(String name, String feHost, int poolSize)
+            throws xMsgException, SocketException {
         /*
          * Calls xMsgRegDiscDriver class constructor that creates sockets to two registrar
          * request/reply servers running in the local xMsgNode and xMsgFE.
          */
-        this(new xMsgRegDriver(feHost), poolSize);
+        this(name, new xMsgRegDriver(feHost), poolSize);
     }
 
 
-    xMsg(xMsgRegDriver driver, int poolSize) throws SocketException, xMsgException {
+    xMsg(String name, xMsgRegDriver driver, int poolSize)
+            throws SocketException, xMsgException {
+        this.myName = name;
         this.localHostIp = xMsgUtil.toHostAddress("localhost");
         this.context = driver.getContext();
         this.driver = driver;

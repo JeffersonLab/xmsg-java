@@ -14,7 +14,7 @@ import java.util.concurrent.TimeoutException;
 public class SyncPublisher extends xMsg {
 
     public SyncPublisher() throws xMsgException, SocketException {
-        super("localhost");
+        super("test_sync_publisher", "localhost");
     }
 
     public static void main(String[] args) {
