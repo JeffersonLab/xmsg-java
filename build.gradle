@@ -65,6 +65,21 @@ artifacts {
 
 
 
+test {
+    useJUnit {
+        excludeCategories 'org.jlab.coda.xmsg.testing.IntegrationTest'
+    }
+}
+
+
+task integrationTest(type: Test) {
+    useJUnit {
+        includeCategories 'org.jlab.coda.xmsg.testing.IntegrationTest'
+    }
+}
+
+
+
 def deploySpec = copySpec {
     into ('lib') {
         from configurations.runtime
