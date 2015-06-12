@@ -78,7 +78,8 @@ public class xMsg {
     /** Access to the xMsg registrars. */
     private final xMsgRegDriver driver;
 
-    private final String localHostIp;
+    /** The localhost IP. */
+    protected final String localHostIp;
 
 
     /**
