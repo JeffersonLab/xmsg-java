@@ -62,7 +62,6 @@ public class Publisher extends xMsg {
 
             int dataSize = Integer.parseInt(args[0]);
 
-            final String name = "test_publisher";
             final String domain = "test_domain";
             final String subject = "test_subject";
             final String type = "test_type";
@@ -77,7 +76,7 @@ public class Publisher extends xMsg {
             xMsgTopic topic = xMsgTopic.build(domain, subject, type);
 
             // Register this publisher
-            publisher.registerPublisher(name, topic, description);
+            publisher.registerPublisher(topic, description);
 
             // Create the message to be published
             xMsgMessage msg = new xMsgMessage(topic);

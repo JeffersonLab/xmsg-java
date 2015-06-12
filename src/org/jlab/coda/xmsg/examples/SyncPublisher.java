@@ -19,7 +19,6 @@ public class SyncPublisher extends xMsg {
 
     public static void main(String[] args) {
         try {
-            final String myName = "test_publisher";
             final String domain = "test_domain";
             final String subject = "test_subject";
             final String type = "test_type";
@@ -30,7 +29,7 @@ public class SyncPublisher extends xMsg {
             xMsgConnection con =  publisher.connect();
             xMsgTopic topic = xMsgTopic.build(domain, subject, type);
 
-            publisher.registerPublisher(myName, topic, description);
+            publisher.registerPublisher(topic, description);
 
             xMsgMessage msg = new xMsgMessage(topic);
             msg.setData(111);
