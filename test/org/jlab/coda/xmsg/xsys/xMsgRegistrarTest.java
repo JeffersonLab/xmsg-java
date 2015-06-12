@@ -21,67 +21,64 @@
 
 package org.jlab.coda.xmsg.xsys;
 
-import java.net.SocketException;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.Random;
 import java.util.Set;
 
 import org.jlab.coda.xmsg.core.xMsgTopic;
+import org.jlab.coda.xmsg.core.xMsgUtil;
 import org.jlab.coda.xmsg.data.xMsgR.xMsgRegistration;
 import org.jlab.coda.xmsg.data.xMsgR.xMsgRegistration.Builder;
-import org.jlab.coda.xmsg.excp.xMsgException;
 import org.jlab.coda.xmsg.excp.xMsgRegistrationException;
+import org.jlab.coda.xmsg.testing.IntegrationTest;
 import org.jlab.coda.xmsg.xsys.regdis.RegistrationDataFactory;
+import org.junit.experimental.categories.Category;
+import org.junit.Test;
 
+import static org.junit.Assert.fail;
 
-public final class xMsgRegistrarTest implements AutoCloseable {
-
-    public static void main(String[] args) {
-        try (xMsgRegistrarTest test = new xMsgRegistrarTest()) {
-            long start = System.currentTimeMillis();
-
-            test.addRandom(10000);
-            test.check();
-
-            test.removeRandom(2500);
-            test.check();
-
-            test.addRandom(1000);
-            test.check();
-
-            test.removeRandomHost();
-            test.check();
-
-            test.addRandom(1000);
-            test.check();
-
-            test.removeAll();
-            test.check();
-
-            long end = System.currentTimeMillis();
-            System.out.println("Total time: " + (end - start) / 1000.0);
-        } catch (Exception e) {
-            e.printStackTrace();
-            System.exit(1);
-        }
-    }
-
+@Category(IntegrationTest.class)
+public class xMsgRegistrarTest {
 
     private xMsgRegistrar registrar;
     private Set<xMsgRegistration> registration = new HashSet<>();
     private String name = "registrat_test";
 
+    @Test
+    public void testRegistrationDataBase() throws Exception {
+        try {
+            registrar = new xMsgRegistrar();
+            registrar.start();
+            xMsgUtil.sleep(200);
 
-    private xMsgRegistrarTest() throws SocketException, xMsgException {
-        registrar = new xMsgRegistrar();
-        registrar.start();
-    }
+            long start = System.currentTimeMillis();
 
+            addRandom(10000);
+            check();
 
-    @Override
-    public void close() throws Exception {
-        registrar.shutdown();
+            removeRandom(2500);
+            check();
+
+            addRandom(1000);
+            check();
+
+            removeRandomHost();
+            check();
+
+            addRandom(1000);
+            check();
+
+            removeAll();
+            check();
+
+            long end = System.currentTimeMillis();
+            System.out.println("Total time: " + (end - start) / 1000.0);
+        } finally {
+            if (registrar != null) {
+                registrar.shutdown();
+            }
+        }
     }
 
 
@@ -164,7 +161,7 @@ public final class xMsgRegistrarTest implements AutoCloseable {
                 System.out.println("Topic: " + topic);
                 System.out.println("Result: " + result.size());
                 System.out.println("Expected: " + expected.size());
-                throw new RuntimeException("Sets doesn't match!!!");
+                fail("Sets doesn't match!!!");
             }
         }
     }
