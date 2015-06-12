@@ -62,8 +62,8 @@ public enum xMsgConstants {
     DEFAULT_PORT(7771, "defaultPort"),
     REGISTRAR_PORT(8888, "registrarPort");
 
-    private int intValue;
-    private String stringValue;
+    private final int intValue;
+    private final String stringValue;
 
     private xMsgConstants(int intValue, String stringValue) {
         this.intValue = intValue;

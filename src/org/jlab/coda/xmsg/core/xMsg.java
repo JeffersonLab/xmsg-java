@@ -75,9 +75,9 @@ public class xMsg {
     private final int poolSize;
 
     /** Access to the xMsg registrars. */
-    private xMsgRegDriver driver;
+    private final xMsgRegDriver driver;
 
-    private String localHostIp;
+    private final String localHostIp;
 
 
     /**
