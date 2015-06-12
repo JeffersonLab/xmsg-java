@@ -1,6 +1,7 @@
 apply plugin: 'java'
 apply plugin: 'maven'
 
+apply plugin: 'checkstyle'
 apply plugin: "findbugs"
 
 apply plugin: 'eclipse'
@@ -125,6 +126,11 @@ task(runSub, dependsOn: 'classes', type: JavaExec) {
 
 
 
+checkstyle {
+    toolVersion = "6.4"
+    configFile = new File(rootDir, "config/quality/checkstyle.xml")
+}
+
 findbugs {
     toolVersion = "3.0.1"
     ignoreFailures = true
@@ -132,6 +138,14 @@ findbugs {
     reportLevel = "medium"
     excludeFilter = new File(rootDir, "config/quality/findbugs-exclude.xml")
 }
+
+task checkstyleHtml << {
+    ant.xslt(in: checkstyleMain.reports.xml.destination,
+             style: new File(rootDir, 'config/quality/checkstyle-noframes-sorted.xsl'),
+             out: new File(checkstyleMain.reports.xml.destination.parent, 'main.html'))
+}
+
+checkstyleMain.finalizedBy checkstyleHtml
 
 tasks.withType(FindBugs) {
     reports {
