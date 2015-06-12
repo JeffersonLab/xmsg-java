@@ -45,6 +45,7 @@ public class xMsgRegistrar extends xMsgRegDriver {
     // shared memory of the node (in the language of CLARA it would be DPE)
     public static final ConcurrentMap<String, xMsgMessage>
             sharedMemory = new ConcurrentHashMap<>();
+
     private final xMsgRegService regService;
     private final ZContext context;
 

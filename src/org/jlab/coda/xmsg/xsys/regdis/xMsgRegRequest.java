@@ -40,7 +40,6 @@ class xMsgRegRequest {
     private final String sender;
     private final byte[] data;
 
-
     /**
      * Constructs a data request.
      *

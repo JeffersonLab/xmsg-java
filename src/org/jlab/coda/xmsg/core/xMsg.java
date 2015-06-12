@@ -71,6 +71,7 @@ public class xMsg {
 
     /** Fixed size thread pool. */
     private final ExecutorService threadPool;
+
     /** Default thread pool size. */
     private final int poolSize;
 
@@ -401,8 +402,6 @@ public class xMsg {
      * Finds all publishers of the given topic.
      * The publishers are searched in the front-end registrar, and they could
      * be deployed anywhere in the xMsg cloud of nodes.
-     * <p>
-     * Note: xMsg defines a topic as {@code domain:subject:type}.
      *
      * @param sender the name of the sender / requester
      * @param topic the topic of the published messages
@@ -423,8 +422,6 @@ public class xMsg {
      * Finds all local publishers of the given topic.
      * The publishers are searched in the local registrar, thus they are
      * deployed in the local node.
-     * <p>
-     * Note: xMsg defines a topic as {@code domain:subject:type}.
      *
      * @param sender the name of the sender / requester
      * @param topic the topic of the published messages
@@ -444,8 +441,6 @@ public class xMsg {
      * Finds all subscribers of the given topic.
      * The publishers are searched in the front-end registrar, and they could
      * be deployed anywhere in the xMsg cloud of nodes.
-     * <p>
-     * Note: xMsg defines a topic as {@code domain:subject:type}.
      *
      * @param sender the name of the sender / requester
      * @param topic the topic of the subscription
@@ -465,8 +460,6 @@ public class xMsg {
      * Finds all local subscribers of the given topic.
      * The publishers are searched in the local registrar, thus they are
      * deployed in the local node.
-     * <p>
-     * Note: xMsg defines a topic as {@code domain:subject:type}.
      *
      * @param sender the name of the sender / requester
      * @param topic the topic of the subscription

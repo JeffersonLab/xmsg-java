@@ -47,7 +47,6 @@ import java.net.SocketException;
  */
 public class xMsgRegUpdater extends xMsgRegDriver implements Runnable {
 
-    // xMsgNode database references
     private final xMsgRegDatabase publishers;
     private final xMsgRegDatabase subscribers;
     private final String name;
@@ -65,8 +64,8 @@ public class xMsgRegUpdater extends xMsgRegDriver implements Runnable {
      * @throws IOException
      */
     public xMsgRegUpdater(String feHost,
-                       xMsgRegDatabase publishers,
-                       xMsgRegDatabase subscribers
+                          xMsgRegDatabase publishers,
+                          xMsgRegDatabase subscribers
     ) throws SocketException, xMsgException {
         super(feHost);
         this.publishers = publishers;
