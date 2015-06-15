@@ -25,6 +25,7 @@ import org.jlab.coda.xmsg.excp.xMsgException;
 import org.jlab.coda.xmsg.net.xMsgConnection;
 import org.zeromq.ZMQ;
 import org.zeromq.ZMQ.Socket;
+import org.zeromq.ZMsg;
 
 import java.io.IOException;
 import java.util.concurrent.TimeoutException;
@@ -36,33 +37,65 @@ import java.util.concurrent.TimeoutException;
  * @version 2.x
  * @since 3/6/15
  */
-public abstract class SubscriptionHandler implements Runnable {
+public abstract class xMsgSubscription {
 
-    private boolean isRunning = true;
-    private Socket con;
-    private String topic;
+    private final Socket socket;
+    private final String topic;
+    private final Thread thread;
 
-    public SubscriptionHandler(xMsgConnection connection,
-                               xMsgTopic topic) {
-        con = connection.getSubSock();
+    private volatile boolean isRunning = true;
+
+
+    xMsgSubscription(String name, xMsgConnection connection, xMsgTopic topic) {
+        this.socket = connection.getSubSock();
+        if (this.socket == null) {
+            throw new IllegalArgumentException("Error: null subscription socket");
+        }
+        this.socket.subscribe(topic.toString().getBytes(ZMQ.CHARSET));
+
         this.topic = topic.toString();
+        this.thread = xMsgUtil.newThread(name, new Handler());
     }
 
-    public abstract void handle() throws xMsgException, TimeoutException, IOException;
 
-    @Override
-    public void run() {
-        while (isRunning) {
-            try {
-                handle();
-            } catch (xMsgException | TimeoutException | IOException e) {
-                e.printStackTrace();
+    abstract void handle(ZMsg msg) throws xMsgException, TimeoutException, IOException;
+
+
+    private class Handler implements Runnable {
+
+        @Override
+        public void run() {
+            while (isRunning) {
+                ZMsg msg = ZMsg.recvMsg(socket);
+                try {
+                    handle(msg);
+                } catch (xMsgException | TimeoutException | IOException e) {
+                    e.printStackTrace();
+                } finally {
+                    msg.destroy();
+                }
             }
         }
-        con.unsubscribe(topic.getBytes(ZMQ.CHARSET));
     }
 
-    public void unsubscribe() {
+
+    void start() {
+        thread.start();
+    }
+
+
+    void stop() {
         isRunning = false;
+        try {
+            thread.join();
+        } catch (InterruptedException e) {
+            Thread.currentThread().interrupt();
+        }
+        socket.unsubscribe(topic.getBytes(ZMQ.CHARSET));
+    }
+
+
+    public boolean isAlive() {
+        return isRunning;
     }
 }

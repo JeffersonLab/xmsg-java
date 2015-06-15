@@ -592,7 +592,7 @@ public class xMsg {
 
         // subscribe to the returnAddress
         SyncSendCallBack cb = new SyncSendCallBack();
-        SubscriptionHandler sh = subscribe(connection, xMsgTopic.wrap(returnAddress), cb);
+        xMsgSubscription sh = subscribe(connection, xMsgTopic.wrap(returnAddress), cb);
         cb.setSubscriptionHandler(sh);
 
         publish(connection, msg);
@@ -625,27 +625,18 @@ public class xMsg {
      * @return SubscriptionHandler object reference
      * @throws xMsgException
      */
-    public SubscriptionHandler subscribe(final xMsgConnection connection,
-                                         final xMsgTopic topic,
-                                         final xMsgCallBack cb)
+    public xMsgSubscription subscribe(final xMsgConnection connection,
+                                      final xMsgTopic topic,
+                                      final xMsgCallBack cb)
             throws xMsgException {
 
-        // check connection
-        final Socket con = connection.getSubSock();
-        if (con == null) {
-            System.out.println("Error: null connection object");
-            throw new xMsgException("Error: null connection object");
-        }
+        String name = "sub-" + myName + "-" + connection.getAddress().getKey() + "-" + topic;
 
-        // zmq subscribe
-        con.subscribe(topic.toString().getBytes(ZMQ.CHARSET));
-
-        SubscriptionHandler sHandle = new SubscriptionHandler(connection, topic) {
+        xMsgSubscription sHandle = new xMsgSubscription(name, connection, topic) {
             @Override
-            public void handle() throws xMsgException, IOException {
+            public void handle(ZMsg inputMsg) throws xMsgException, IOException {
                 final xMsgMessage callbackMsg;
 
-                ZMsg inputMsg = ZMsg.recvMsg(con);
                 ZFrame topicFrame = inputMsg.pop();       // get the topic frame = 1
                 ZFrame msgLocationFrame = inputMsg.pop(); // get the message location frame = 2
 
@@ -710,12 +701,10 @@ public class xMsg {
                         // we do not need the rest of frames as well as the z_msg
                         metadataFrame.destroy();
                         dataFrame.destroy();
-                        inputMsg.destroy();
 
                     } catch (InvalidProtocolBufferException e) {
                         metadataFrame.destroy();
                         dataFrame.destroy();
-                        inputMsg.destroy();
                         throw new xMsgException(e.getMessage());
                     }
                 } else {
@@ -727,15 +716,7 @@ public class xMsg {
             }
         };
 
-        // wait for messages published to a required topic
-        Thread t = new Thread(sHandle);
-        t.setUncaughtExceptionHandler(new Thread.UncaughtExceptionHandler() {
-            @Override
-            public void uncaughtException(Thread t, Throwable e) {
-                e.printStackTrace();
-            }
-        });
-        t.start();
+        sHandle.start();
         return sHandle;
 
     }
@@ -773,9 +754,9 @@ public class xMsg {
      * @param handle SubscribeHandler object reference
      * @throws xMsgException
      */
-    public void unsubscribe(SubscriptionHandler handle)
+    public void unsubscribe(xMsgSubscription handle)
             throws xMsgException {
-        handle.unsubscribe();
+        handle.stop();
     }
 
 
@@ -795,9 +776,9 @@ public class xMsg {
         public xMsgMessage recvMsg = null;
         public Boolean isReceived = false;
 
-        private SubscriptionHandler handler = null;
+        private xMsgSubscription handler = null;
 
-        public void setSubscriptionHandler(SubscriptionHandler handler) {
+        public void setSubscriptionHandler(xMsgSubscription handler) {
             this.handler = handler;
         }
 
