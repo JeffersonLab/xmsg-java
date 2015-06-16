@@ -46,7 +46,7 @@ public class xMsgRegistrar extends xMsgRegDriver {
     public static final ConcurrentMap<String, xMsgMessage>
             sharedMemory = new ConcurrentHashMap<>();
 
-    private final xMsgRegService regService;
+    private final Thread regServiceThread;
     private final ZContext context;
 
     /**
@@ -66,7 +66,8 @@ public class xMsgRegistrar extends xMsgRegDriver {
         ZContext shadowContext = ZContext.shadow(context);
 
         // start registrar service
-        regService = new xMsgRegService(shadowContext);
+        xMsgRegService regService = new xMsgRegService(shadowContext);
+        regServiceThread = new Thread(regService);
     }
 
 
@@ -101,20 +102,21 @@ public class xMsgRegistrar extends xMsgRegDriver {
         // In this case this specific constructor starts a thread
         // that periodically updates front-end registrar database with
         // the data from the local databases
-        regService = new xMsgRegService(feHost, shadowContext);
+        xMsgRegService regService = new xMsgRegService(feHost, shadowContext);
+        regServiceThread = new Thread(regService);
     }
 
 
     public void start() {
-        regService.start();
+        regServiceThread.start();
     }
 
 
     public void shutdown() {
         try {
             context.destroy();
-            regService.interrupt();
-            regService.join();
+            regServiceThread.interrupt();
+            regServiceThread.join();
         } catch (InterruptedException e) {
             e.printStackTrace();
         }

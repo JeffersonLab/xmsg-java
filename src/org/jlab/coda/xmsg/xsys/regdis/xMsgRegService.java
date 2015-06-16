@@ -58,7 +58,7 @@ import java.util.Set;
  * @since 1.0
  */
 
-public class xMsgRegService extends Thread {
+public class xMsgRegService implements Runnable {
 
     // zmq context.
     // Note. this class does not own the context.
@@ -133,8 +133,6 @@ public class xMsgRegService extends Thread {
 
     @Override
     public void run() {
-        super.run();
-
         log("Info: xMsg local registration and discovery server is started");
 
         ZMQ.Socket regSocket = context.createSocket(ZMQ.REP);
