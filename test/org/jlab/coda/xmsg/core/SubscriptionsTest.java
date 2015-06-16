@@ -23,6 +23,7 @@ package org.jlab.coda.xmsg.core;
 
 import java.io.IOException;
 import java.net.SocketException;
+import java.util.concurrent.TimeoutException;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.atomic.AtomicLong;
 
@@ -142,5 +143,77 @@ public class SubscriptionsTest {
 
         assertThat(check.counter.get(), is(Check.N));
         assertThat(check.sum.get(), is(Check.SUM_N));
+    }
+
+
+    @Test
+    public void syncPublicationReceivesAllResponses() throws Exception {
+        class Check {
+            int counter = 0;
+            long sum = 0;
+
+            static final int N = 100;
+            static final long SUM_N = 4950L;
+        }
+
+        final ZContext context = new ZContext();
+        final Check check = new Check();
+
+        Thread proxyThread = xMsgUtil.newThread("proxy-thread", new Runnable() {
+            @Override
+            public void run() {
+                try {
+                    xMsgProxy proxy = new xMsgProxy();
+                    proxy.startProxy(context);
+                } catch (xMsgException e) {
+                    e.printStackTrace();
+                }
+            }
+        });
+        proxyThread.start();
+        xMsgUtil.sleep(100);
+
+        Thread pubThread = xMsgUtil.newThread("syncpub-thread", new Runnable() {
+            @Override
+            public void run() {
+                try {
+                    xMsg subActor = new xMsg("test_publisher", "localhost");
+                    xMsgConnection subCon = subActor.connect();
+                    xMsgUtil.sleep(100);
+                    xMsgTopic subTopic = xMsgTopic.wrap("test_topic");
+                    xMsgSubscription sub = subActor.subscribe(subCon, subTopic, new xMsgCallBack() {
+                        @Override
+                        public xMsgMessage callback(xMsgMessage msg) {
+                            return msg;
+                        }
+                    });
+                    xMsgUtil.sleep(100);
+                    xMsg pubActor = new xMsg("test_publisher", "localhost");
+                    xMsgConnection pubCon = pubActor.connect();
+                    xMsgUtil.sleep(100);
+                    xMsgTopic pubTopic = xMsgTopic.wrap("test_topic");
+                    for (int i = 0; i < Check.N; i++) {
+                        xMsgMessage msg = new xMsgMessage(pubTopic, i);
+                        xMsgMessage resMsg = pubActor.syncPublish(pubCon, msg, 1);
+                        Builder data = (Builder) resMsg.getData();
+                        check.sum += data.getFLSINT32();
+                        check.counter++;
+                    }
+                    subActor.unsubscribe(sub);
+                } catch (IOException | xMsgException | TimeoutException e) {
+                    e.printStackTrace();
+                }
+            }
+        });
+        pubThread.start();
+
+        pubThread.join();
+
+        context.destroy();
+        proxyThread.interrupt();
+        proxyThread.join();
+
+        assertThat(check.counter, is(Check.N));
+        assertThat(check.sum, is(Check.SUM_N));
     }
 }
