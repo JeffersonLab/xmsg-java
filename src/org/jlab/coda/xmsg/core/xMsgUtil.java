@@ -38,6 +38,7 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.Enumeration;
 import java.util.List;
+import java.util.Objects;
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.CancellationException;
 import java.util.concurrent.ExecutionException;
@@ -297,6 +298,28 @@ public final class xMsgUtil {
             e.printStackTrace();
             return null;
         }
+    }
+
+
+    /**
+     * Creates a new Thread that reports uncaught exceptions.
+     *
+     * @param name the name for the thread
+     * @param target the object whose run method is invoked when this thread is started
+     * @return a Thread object that will run the target
+     */
+    public static Thread newThread(String name, Runnable target) {
+        Objects.requireNonNull(name, "name is null");
+        Objects.requireNonNull(target, "target is null");
+        Thread t = new Thread(target);
+        t.setName(name);
+        t.setUncaughtExceptionHandler(new Thread.UncaughtExceptionHandler() {
+            @Override
+            public void uncaughtException(Thread t, Throwable e) {
+                e.printStackTrace();
+            }
+        });
+        return t;
     }
 
 
