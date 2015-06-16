@@ -67,7 +67,7 @@ public class xMsgRegistrar extends xMsgRegDriver {
 
         // start registrar service
         xMsgRegService regService = new xMsgRegService(shadowContext);
-        regServiceThread = new Thread(regService);
+        regServiceThread = xMsgUtil.newThread("registration-service", regService);
     }
 
 
@@ -103,7 +103,7 @@ public class xMsgRegistrar extends xMsgRegDriver {
         // that periodically updates front-end registrar database with
         // the data from the local databases
         xMsgRegService regService = new xMsgRegService(feHost, shadowContext);
-        regServiceThread = new Thread(regService);
+        regServiceThread = xMsgUtil.newThread("registration-service", regService);
     }
 
 
