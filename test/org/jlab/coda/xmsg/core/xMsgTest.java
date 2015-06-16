@@ -55,7 +55,7 @@ public class xMsgTest {
 
         RegValidator validator = new RegValidator(topic, true);
         validator.desc = "test pub";
-        validator.assertRegistration();
+        validator.assertDriverCall("register");
     }
 
 
@@ -67,7 +67,7 @@ public class xMsgTest {
 
         RegValidator validator = new RegValidator(topic, true);
         validator.desc = "test pub";
-        validator.assertLocalRegistration();
+        validator.assertDriverCall("registerLocal");
     }
 
 
@@ -79,7 +79,7 @@ public class xMsgTest {
 
         RegValidator validator = new RegValidator(topic, false);
         validator.desc = "test sub";
-        validator.assertRegistration();
+        validator.assertDriverCall("register");
     }
 
 
@@ -91,7 +91,7 @@ public class xMsgTest {
 
         RegValidator validator = new RegValidator(topic, false);
         validator.desc = "test sub";
-        validator.assertLocalRegistration();
+        validator.assertDriverCall("registerLocal");
     }
 
 
@@ -102,7 +102,7 @@ public class xMsgTest {
         core.removePublisher(topic);
 
         RegValidator validator = new RegValidator(topic, true);
-        validator.assertRemove();
+        validator.assertDriverCall("remove");
     }
 
 
@@ -113,7 +113,7 @@ public class xMsgTest {
         core.removeLocalPublisher(topic);
 
         RegValidator validator = new RegValidator(topic, true);
-        validator.assertLocalRemove();
+        validator.assertDriverCall("removeLocal");
     }
 
 
@@ -124,7 +124,7 @@ public class xMsgTest {
         core.removeSubscriber(topic);
 
         RegValidator validator = new RegValidator(topic, false);
-        validator.assertRemove();
+        validator.assertDriverCall("remove");
     }
 
 
@@ -135,7 +135,7 @@ public class xMsgTest {
         core.removeLocalSubscriber(topic);
 
         RegValidator validator = new RegValidator(topic, false);
-        validator.assertLocalRemove();
+        validator.assertDriverCall("removeLocal");
     }
 
 
@@ -146,7 +146,7 @@ public class xMsgTest {
         core.findPublishers(topic);
 
         RegValidator validator = new RegValidator(topic, true);
-        validator.assertFind();
+        validator.assertDriverCall("find");
     }
 
 
@@ -157,7 +157,7 @@ public class xMsgTest {
         core.findLocalPublishers(topic);
 
         RegValidator validator = new RegValidator(topic, true);
-        validator.assertLocalFind();
+        validator.assertDriverCall("findLocal");
     }
 
 
@@ -167,7 +167,7 @@ public class xMsgTest {
         core.findSubscribers(topic);
 
         RegValidator validator = new RegValidator(topic, false);
-        validator.assertFind();
+        validator.assertDriverCall("find");
     }
 
 
@@ -177,7 +177,7 @@ public class xMsgTest {
         core.findLocalSubscribers(topic);
 
         RegValidator validator = new RegValidator(topic, false);
-        validator.assertLocalFind();
+        validator.assertDriverCall("findLocal");
     }
 
 
@@ -202,34 +202,35 @@ public class xMsgTest {
             this.dataArg = ArgumentCaptor.forClass(xMsgRegistration.class);
         }
 
-        public void assertRegistration() throws Exception {
-            verify(driver).registerFrontEnd(eq(name), dataArg.capture(), eq(isPublisher));
+        private void assertDriverCall(String method) throws Exception {
+            verifyCalled(method);
             verifyData();
         }
 
-        public void assertLocalRegistration() throws Exception {
-            verify(driver).registerLocal(eq(name), dataArg.capture(), eq(isPublisher));
-            verifyData();
-        }
-
-        public void assertRemove() throws Exception {
-            verify(driver).removeRegistrationFrontEnd(eq(name), dataArg.capture(), eq(isPublisher));
-            verifyData();
-        }
-
-        public void assertLocalRemove() throws Exception {
-            verify(driver).removeRegistrationLocal(eq(name), dataArg.capture(), eq(isPublisher));
-            verifyData();
-        }
-
-        public void assertFind() throws Exception {
-            verify(driver).findGlobal(eq(name), dataArg.capture(), eq(isPublisher));
-            verifyData();
-        }
-
-        public void assertLocalFind() throws Exception {
-            verify(driver).findLocal(eq(name), dataArg.capture(), eq(isPublisher));
-            verifyData();
+        private void verifyCalled(String method) throws Exception {
+            xMsgRegDriver v = verify(driver);
+            switch (method) {
+                case "register":
+                    v.registerFrontEnd(eq(name), dataArg.capture(), eq(isPublisher));
+                    break;
+                case "registerLocal":
+                    v.registerLocal(eq(name), dataArg.capture(), eq(isPublisher));
+                    break;
+                case "remove":
+                    v.removeRegistrationFrontEnd(eq(name), dataArg.capture(), eq(isPublisher));
+                    break;
+                case "removeLocal":
+                    v.removeRegistrationLocal(eq(name), dataArg.capture(), eq(isPublisher));
+                    break;
+                case "find":
+                    v.findGlobal(eq(name), dataArg.capture(), eq(isPublisher));
+                    break;
+                case "findLocal":
+                    v.findLocal(eq(name), dataArg.capture(), eq(isPublisher));
+                    break;
+                default:
+                    throw new IllegalArgumentException("Illegal method " + method);
+            }
         }
 
         private void verifyData() throws Exception {
