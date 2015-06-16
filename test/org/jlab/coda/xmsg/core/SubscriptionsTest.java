@@ -37,6 +37,7 @@ import org.junit.experimental.categories.Category;
 import org.zeromq.ZContext;
 
 import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertTrue;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.is;
 
@@ -215,5 +216,75 @@ public class SubscriptionsTest {
 
         assertThat(check.counter, is(Check.N));
         assertThat(check.sum, is(Check.SUM_N));
+    }
+
+
+    @Test
+    public void syncPublicationThrowsOnTimeout() throws Exception {
+        class Check {
+            boolean received = false;
+            boolean timeout = false;
+        }
+
+        final ZContext context = new ZContext();
+        final Check check = new Check();
+
+        Thread proxyThread = xMsgUtil.newThread("proxy-thread", new Runnable() {
+            @Override
+            public void run() {
+                try {
+                    xMsgProxy proxy = new xMsgProxy();
+                    proxy.startProxy(context);
+                } catch (xMsgException e) {
+                    e.printStackTrace();
+                }
+            }
+        });
+        proxyThread.start();
+        xMsgUtil.sleep(100);
+
+        Thread pubThread = xMsgUtil.newThread("syncpub-thread", new Runnable() {
+            @Override
+            public void run() {
+                try {
+                    xMsg subActor = new xMsg("test_publisher", "localhost");
+                    xMsgConnection subCon = subActor.connect();
+                    xMsgUtil.sleep(100);
+                    xMsgTopic subTopic = xMsgTopic.wrap("test_topic");
+                    xMsgSubscription sub = subActor.subscribe(subCon, subTopic, new xMsgCallBack() {
+                        @Override
+                        public xMsgMessage callback(xMsgMessage msg) {
+                            check.received = true;
+                            xMsgUtil.sleep(1500);
+                            return msg;
+                        }
+                    });
+                    xMsgUtil.sleep(100);
+                    xMsg pubActor = new xMsg("test_publisher", "localhost");
+                    xMsgConnection pubCon = pubActor.connect();
+                    xMsgUtil.sleep(100);
+                    xMsgTopic pubTopic = xMsgTopic.wrap("test_topic");
+                    xMsgMessage msg = new xMsgMessage(pubTopic, 1);
+                    try {
+                        pubActor.syncPublish(pubCon, msg, 1);
+                    } catch (TimeoutException e) {
+                        check.timeout = true;
+                    }
+                    subActor.unsubscribe(sub);
+                } catch (IOException | xMsgException e) {
+                    e.printStackTrace();
+                }
+            }
+        });
+        pubThread.start();
+
+        pubThread.join();
+
+        context.destroy();
+        proxyThread.interrupt();
+        proxyThread.join();
+
+        assertTrue("not received", check.received);
+        assertTrue("no timeout", check.timeout);
     }
 }
