@@ -121,13 +121,8 @@ public class xMsgRegService implements Runnable {
          * Start a thread with periodic process (hard-coded 5 sec. interval) that
          * updates xMsgFE database with the data stored in the local databases.
          */
-        Thread t = new Thread(new xMsgRegUpdater(feHost, publishers, subscribers));
-        t.setUncaughtExceptionHandler(new Thread.UncaughtExceptionHandler() {
-            @Override
-            public void uncaughtException(Thread t, Throwable e) {
-                e.printStackTrace();
-            }
-        });
+        xMsgRegUpdater updater = new xMsgRegUpdater(feHost, publishers, subscribers);
+        Thread t = xMsgUtil.newThread("registration-updater", updater);
         t.start();
     }
 
