@@ -25,6 +25,7 @@ import org.jlab.coda.xmsg.excp.xMsgException;
 import org.jlab.coda.xmsg.net.xMsgConnection;
 import org.zeromq.ZMQ;
 import org.zeromq.ZMQ.Socket;
+import org.zeromq.ZMQException;
 import org.zeromq.ZMsg;
 
 import java.io.IOException;
@@ -65,14 +66,23 @@ public abstract class xMsgSubscription {
 
         @Override
         public void run() {
+            ZMQ.Poller items = new ZMQ.Poller(1);
+            items.register(socket, ZMQ.Poller.POLLIN);
             while (isRunning) {
-                ZMsg msg = ZMsg.recvMsg(socket);
                 try {
-                    handle(msg);
-                } catch (xMsgException | TimeoutException | IOException e) {
+                    items.poll(100);
+                    if (items.pollin(0)) {
+                        ZMsg msg = ZMsg.recvMsg(socket);
+                        try {
+                            handle(msg);
+                        } catch (xMsgException | TimeoutException | IOException e) {
+                            e.printStackTrace();
+                        } finally {
+                            msg.destroy();
+                        }
+                    }
+                } catch (ZMQException e) {
                     e.printStackTrace();
-                } finally {
-                    msg.destroy();
                 }
             }
         }
