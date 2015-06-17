@@ -141,6 +141,24 @@ task(runSub, dependsOn: 'classes', type: JavaExec) {
 
 
 
+task(localThr, dependsOn: 'classes', type: JavaExec) {
+    main = 'perf.LocalThroughput'
+    if (project.hasProperty("locThrArgs")) {
+        args Eval.me(locThrArgs)
+    }
+    classpath = sourceSets.test.runtimeClasspath
+}
+
+task(remoteThr, dependsOn: 'classes', type: JavaExec) {
+    main = 'perf.RemoteThroughput'
+    if (project.hasProperty("remThrArgs")) {
+        args Eval.me(remThrArgs)
+    }
+    classpath = sourceSets.test.runtimeClasspath
+}
+
+
+
 checkstyle {
     toolVersion = "6.4"
     configFile = new File(rootDir, "config/quality/checkstyle.xml")
