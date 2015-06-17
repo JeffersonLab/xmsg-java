@@ -774,7 +774,6 @@ public class xMsg {
     private class SyncSendCallBack implements xMsgCallBack {
 
         public xMsgMessage recvMsg = null;
-        public Boolean isReceived = false;
 
         private xMsgSubscription handler = null;
 
@@ -784,7 +783,6 @@ public class xMsg {
 
         @Override
         public xMsgMessage callback(xMsgMessage msg) {
-            isReceived = true;
             recvMsg = msg;
             try {
                 if (handler != null) {
