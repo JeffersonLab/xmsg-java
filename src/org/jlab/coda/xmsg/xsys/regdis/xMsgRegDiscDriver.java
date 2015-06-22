@@ -557,6 +557,8 @@ public class xMsgRegDiscDriver {
         Socket sb = context.createSocket(socket_type);
         if(sb == null)throw new xMsgException("null zmq socket-base");
 
+        sb.setHWM(0);
+
         if (boc == xMsgConstants.BIND.getIntValue()) {
 
             // Bind socket to the host and port
