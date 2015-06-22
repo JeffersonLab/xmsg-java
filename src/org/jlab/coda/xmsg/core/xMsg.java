@@ -1108,6 +1108,7 @@ public class xMsg {
         if (con==null) throw new xMsgSubscribingException("null connection object");
 
         con.subscribe(topic.getBytes(ZMQ.CHARSET));
+        xMsgUtil.sleep(100);
 
         SubscriptionHandler sHandle = new SubscriptionHandler(connection, topic) {
             @Override
@@ -1258,6 +1259,7 @@ public class xMsg {
         if (con==null) throw new xMsgSubscribingException("null connection object");
 
         con.subscribe(topic.getBytes(ZMQ.CHARSET));
+        xMsgUtil.sleep(100);
 
         SubscriptionHandler sHandle = new SubscriptionHandler(connection, topic) {
             @Override
