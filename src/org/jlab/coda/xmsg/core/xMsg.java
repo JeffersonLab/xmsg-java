@@ -705,7 +705,7 @@ public class xMsg {
                     } catch (InvalidProtocolBufferException e) {
                         metadataFrame.destroy();
                         dataFrame.destroy();
-                        throw new xMsgException(e.getMessage());
+                        throw new xMsgException("Could not parse protobuf", e);
                     }
                 } else {
                     callbackMsg = xMsgRegistrar.sharedMemory.get(msgLocation);
