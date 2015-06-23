@@ -122,6 +122,27 @@ public class xMsg {
     }
 
     /**
+     * Destructor. Call this to gracefully terminate context and close any
+     * managed sockets.
+     */
+    public void destroy() {
+        _context.destroy();
+        threadPool.shutdown();
+    }
+
+    /**
+     * Destructor. Call this to gracefully terminate context and close any
+     * managed sockets.
+     *
+     * @param linger the linger period for socket shutdown
+     * @see <a href="http://api.zeromq.org/3-2:zmq-setsockopt">ZMQ_LINGER</a>
+     */
+    public void destroy(int linger) {
+        _context.setLinger(linger);
+        destroy();
+    }
+
+    /**
      * <p>
      *     Connects to the xMsgNode by creating two sockets for publishing and
      *     subscribing/receiving messages. It returns and the same time stores
