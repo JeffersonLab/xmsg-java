@@ -53,6 +53,7 @@ public abstract class xMsgSubscription {
             throw new IllegalArgumentException("Error: null subscription socket");
         }
         this.socket.subscribe(topic.toString().getBytes(ZMQ.CHARSET));
+        xMsgUtil.sleep(100);
 
         this.topic = topic.toString();
         this.thread = xMsgUtil.newThread(name, new Handler());
