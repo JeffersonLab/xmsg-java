@@ -133,6 +133,27 @@ public class xMsg {
     }
 
     /**
+     * Destructor. Call this to gracefully terminate context and close any
+     * managed sockets.
+     */
+    public void destroy() {
+        context.destroy();
+        threadPool.shutdown();
+    }
+
+    /**
+     * Destructor. Call this to gracefully terminate context and close any
+     * managed sockets.
+     *
+     * @param linger the linger period for socket shutdown
+     * @see <a href="http://api.zeromq.org/3-2:zmq-setsockopt">ZMQ_LINGER</a>
+     */
+    public void destroy(int linger) {
+        context.setLinger(linger);
+        destroy();
+    }
+
+    /**
      * Returns the connection to the local xMsg proxy.
      * If the connection is not created yet, it will be created and stored into
      * the cache of connections, and then returned.
