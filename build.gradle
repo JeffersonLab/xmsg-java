@@ -90,3 +90,22 @@ task(runSub, dependsOn: 'classes', type: JavaExec) {
     main = 'org.jlab.coda.xmsg.examples.Subscriber'
     classpath = sourceSets.main.runtimeClasspath
 }
+
+
+
+
+task(localThr, dependsOn: 'classes', type: JavaExec) {
+    main = 'perf.LocalThroughput'
+    if (project.hasProperty("locThrArgs")) {
+        args Eval.me(locThrArgs)
+    }
+    classpath = sourceSets.test.runtimeClasspath
+}
+
+task(remoteThr, dependsOn: 'classes', type: JavaExec) {
+    main = 'perf.RemoteThroughput'
+    if (project.hasProperty("remThrArgs")) {
+        args Eval.me(remThrArgs)
+    }
+    classpath = sourceSets.test.runtimeClasspath
+}
