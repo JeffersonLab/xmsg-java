@@ -230,9 +230,6 @@ public class xMsg {
      * @throws xMsgException
      */
     public xMsgConnection getNewConnection(xMsgAddress address) throws xMsgException {
-
-        ZContext context = new ZContext();
-
         xMsgConnection feCon = new xMsgConnection();
         feCon.setAddress(address);
         feCon.setPubSock(__zmqSocket(context, ZMQ.PUB, address.getHost(),
