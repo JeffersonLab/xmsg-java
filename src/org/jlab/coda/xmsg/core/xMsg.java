@@ -221,15 +221,12 @@ public class xMsg {
      * @throws xMsgException
      */
     public xMsgConnection getNewConnection(xMsgAddress address) throws xMsgException {
-
-        ZContext context = new ZContext();
-
         xMsgConnection feCon = new xMsgConnection();
         feCon.setAddress(address);
-        feCon.setPubSock(__zmqSocket(context, ZMQ.PUB, address.getHost(),
+        feCon.setPubSock(__zmqSocket(_context, ZMQ.PUB, address.getHost(),
                 address.getPort(), xMsgConstants.CONNECT.getIntValue()));
 
-        feCon.setSubSock(__zmqSocket(context, ZMQ.SUB, address.getHost(),
+        feCon.setSubSock(__zmqSocket(_context, ZMQ.SUB, address.getHost(),
                 address.getPort() + 1, xMsgConstants.CONNECT.getIntValue()));
         return feCon;
     }
