@@ -42,6 +42,7 @@ import org.zeromq.ZMsg;
 import java.io.IOException;
 import java.net.SocketException;
 import java.util.HashMap;
+import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.TimeoutException;
@@ -70,7 +71,7 @@ public class xMsg {
     private final ZContext context;
 
     /** Private database of stored connections. */
-    private final HashMap<String, xMsgConnection> connections = new HashMap<>();
+    private final Map<xMsgAddress, xMsgConnection> connections = new HashMap<>();
 
     /** Fixed size thread pool. */
     private final ExecutorService threadPool;
@@ -219,8 +220,8 @@ public class xMsg {
          * First check to see if we have already established connection
          * to this address
          */
-        if (connections.containsKey(address.getKey())) {
-            return connections.get(address.getKey());
+        if (connections.containsKey(address)) {
+            return connections.get(address);
         } else {
             /*
              * Otherwise create sockets to the requested address, and store the
@@ -235,7 +236,7 @@ public class xMsg {
             feCon.setSubSock(__zmqSocket(context, ZMQ.SUB, address.getHost(),
                     address.getPort() + 1, xMsgConstants.CONNECT.getIntValue()));
 
-            connections.put(address.getKey(), feCon);
+            connections.put(address, feCon);
             return feCon;
         }
     }
@@ -648,7 +649,7 @@ public class xMsg {
                                       final xMsgCallBack cb)
             throws xMsgException {
 
-        String name = "sub-" + myName + "-" + connection.getAddress().getKey() + "-" + topic;
+        String name = "sub-" + myName + "-" + connection.getAddress() + "-" + topic;
 
         xMsgSubscription sHandle = new xMsgSubscription(name, connection, topic) {
             @Override
