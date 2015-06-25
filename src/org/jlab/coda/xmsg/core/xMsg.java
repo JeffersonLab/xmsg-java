@@ -47,8 +47,6 @@ import java.util.Set;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.TimeoutException;
 
-import static org.jlab.coda.xmsg.xsys.regdis.xMsgRegDriver.__zmqSocket;
-
 /**
  * xMsg base class that provides methods for organizing pub/sub communications.
  *
@@ -187,24 +185,6 @@ public class xMsg {
 
     /**
      * Returns the connection to the xMsg proxy in the specified host.
-     * Use the given port to open the sockets.
-     * If the connection is not created yet, it will be created and stored into
-     * the cache of connections, and then returned.
-     * If there is a connection in the cache, that object will be returned then.
-     * The proxy should be running in the host.
-     *
-     * @param host the name of the host where the xMsg proxy is running
-     * @param port  xMsg node port number
-     * @return the {@link xMsgConnection} object to the proxy
-     * @throws SocketException
-     * @throws xMsgException
-     */
-    public xMsgConnection connect(String host, int port) throws xMsgException, SocketException {
-        return connect(new xMsgAddress(host, port));
-    }
-
-    /**
-     * Returns the connection to the xMsg proxy in the specified host.
      * If the connection is not created yet, it will be created and stored into
      * the cache of connections, and then returned.
      * If there is a connection in the cache, that object will be returned then.
@@ -228,17 +208,21 @@ public class xMsg {
              * created connection object for the future use. Return the
              * reference to the connection object
              */
-            xMsgConnection feCon = new xMsgConnection();
-            feCon.setAddress(address);
-            feCon.setPubSock(__zmqSocket(context, ZMQ.PUB, address.getHost(),
-                    address.getPort(), xMsgConstants.CONNECT.getIntValue()));
-
-            feCon.setSubSock(__zmqSocket(context, ZMQ.SUB, address.getHost(),
-                    address.getPort() + 1, xMsgConstants.CONNECT.getIntValue()));
-
-            connections.put(address, feCon);
-            return feCon;
+            xMsgConnection connection = createConnection(address);
+            connections.put(address, connection);
+            return connection;
         }
+    }
+
+    /**
+     * Closes the sockets and removes the connection from the cache.
+     *
+     * @param connection the connection to be destroyed
+     */
+    public void destroyConnection(xMsgConnection connection) {
+        context.destroySocket(connection.getPubSock());
+        context.destroySocket(connection.getSubSock());
+        connections.remove(connection.getAddress());
     }
 
     /**
@@ -252,14 +236,31 @@ public class xMsg {
      * @throws xMsgException
      */
     public xMsgConnection getNewConnection(xMsgAddress address) throws xMsgException {
-        xMsgConnection feCon = new xMsgConnection();
-        feCon.setAddress(address);
-        feCon.setPubSock(__zmqSocket(context, ZMQ.PUB, address.getHost(),
-                address.getPort(), xMsgConstants.CONNECT.getIntValue()));
+        return createConnection(address);
+    }
 
-        feCon.setSubSock(__zmqSocket(context, ZMQ.SUB, address.getHost(),
-                address.getPort() + 1, xMsgConstants.CONNECT.getIntValue()));
-        return feCon;
+    /**
+     * Creates a new connection to the specified proxy.
+     * @param address the address of the proxy to be connected
+     * @return the created connection
+     */
+    private xMsgConnection createConnection(xMsgAddress address) {
+        Socket pubSock = context.createSocket(ZMQ.PUB);
+        Socket subSock = context.createSocket(ZMQ.SUB);
+        pubSock.setHWM(0);
+        subSock.setHWM(0);
+
+        int pubPort = address.getPort();
+        int subPort = pubPort + 1;
+        pubSock.connect("tcp://" + address.getHost() + ":" + pubPort);
+        subSock.connect("tcp://" + address.getHost() + ":" + subPort);
+
+        xMsgConnection connection = new xMsgConnection();
+        connection.setAddress(address);
+        connection.setPubSock(pubSock);
+        connection.setSubSock(subSock);
+
+        return connection;
     }
 
     /**

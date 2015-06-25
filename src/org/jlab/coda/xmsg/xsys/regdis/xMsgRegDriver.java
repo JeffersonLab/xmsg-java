@@ -78,16 +78,13 @@ public class xMsgRegDriver {
      */
     xMsgRegDriver(ZContext context, String feHost) throws SocketException, xMsgException {
         _context = context;
-        _feConnection = __zmqSocket(_context, ZMQ.REQ,
-                xMsgUtil.toHostAddress(feHost),
-                xMsgConstants.REGISTRAR_PORT.getIntValue(),
-                xMsgConstants.CONNECT.getIntValue());
 
-        if (!feHost.equals("localhost")) {
-            _lnConnection = __zmqSocket(_context, ZMQ.REQ,
-                    xMsgUtil.toHostAddress("localhost"),
-                    xMsgConstants.REGISTRAR_PORT.getIntValue(),
-                    xMsgConstants.CONNECT.getIntValue());
+        feHost = xMsgUtil.toHostAddress(feHost);
+        String localHost = xMsgUtil.toHostAddress("localhost");
+
+        _feConnection = connect(feHost);
+        if (!feHost.equals(localHost)) {
+            _lnConnection = connect(localHost);
         } else {
             _lnConnection = _feConnection;
         }
@@ -95,44 +92,11 @@ public class xMsgRegDriver {
 
     /**
      * Creates and returns 0MQ socket.
-     *
-     * @param context the common 0MQ context
-     * @param socketType the type of the socket (integer defined by 0MQ)
-     * @param host host name
-     * @param port port number
-     * @param boc if set 0 socket will be bind, otherwise it will connect.
-     *                Note that for xMsg proxies we always connect (boc = 1)
-     *                (proxies are XPUB/XSUB sockets).
-     * @return zmq socket object
-     * @throws org.jlab.coda.xmsg.excp.xMsgException
      */
-    public static Socket __zmqSocket(ZContext context,
-                                     int socketType,
-                                     String host,
-                                     int port,
-                                     int boc)
-            throws xMsgException {
-
-        // Create a zmq socket
-        Socket sb = context.createSocket(socketType);
-        if (sb == null) {
-            throw new xMsgException("null zmq socket-base");
-        }
-
+    private Socket connect(String host) {
+        Socket sb = _context.createSocket(ZMQ.REQ);
         sb.setHWM(0);
-
-        if (boc == xMsgConstants.BIND.getIntValue()) {
-            // Bind socket to the host and port
-            int bindPort = sb.bind("tcp://" + host + ":" + port);
-            if (bindPort <= 0) {
-                throw new xMsgException("can not bind to the port = " + bindPort);
-            }
-        } else if (boc == xMsgConstants.CONNECT.getIntValue()) {
-            // Connect to the host and port
-            sb.connect("tcp://" + host + ":" + port);
-        } else {
-            throw new xMsgException("unknown socket bind/connect option");
-        }
+        sb.connect("tcp://" + host + ":" + xMsgConstants.REGISTRAR_PORT.getIntValue());
         return sb;
     }
 
