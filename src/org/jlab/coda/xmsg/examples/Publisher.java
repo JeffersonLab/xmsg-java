@@ -85,7 +85,7 @@ public class Publisher extends xMsg {
             // Fill data with a byte array the required size
             System.out.println("Byte array size = " + dataSize);
             byte[] b = new byte[dataSize];
-            msg.setData(b);
+            msg.setData(b, "native");
 
             // Publish data for ever...
             while (true) {

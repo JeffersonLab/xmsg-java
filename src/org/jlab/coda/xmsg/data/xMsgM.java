@@ -3,64 +3,9 @@ package org.jlab.coda.xmsg.data;
 // source: xMsgMeta.proto
 
 public final class xMsgM {
-  private static com.google.protobuf.Descriptors.Descriptor
-    internal_static_xMsgMeta_descriptor;
-  private static
-    com.google.protobuf.GeneratedMessage.FieldAccessorTable
-      internal_static_xMsgMeta_fieldAccessorTable;
-  private static com.google.protobuf.Descriptors.FileDescriptor
-      descriptor;
-  static {
-    java.lang.String[] descriptorData = {
-      "\n\016xMsgMeta.proto\"\324\005\n\010xMsgMeta\022\017\n\007version" +
-      "\030\001 \001(\t\022\023\n\013description\030\002 \001(\t\022\016\n\006author\030\003 " +
-      "\001(\t\022 \n\006status\030\004 \001(\0162\020.xMsgMeta.Status\022\022\n" +
-      "\nseverityId\030\005 \001(\017\022\016\n\006sender\030\006 \001(\t\022\023\n\013sen" +
-      "derState\030\007 \001(\t\022\027\n\017communicationId\030\010 \001(\007\022" +
-      "\023\n\013composition\030\n \001(\t\022\025\n\rexecutionTime\030\013 " +
-      "\001(\020\022\'\n\006action\030\014 \001(\0162\027.xMsgMeta.ControlAc" +
-      "tion\022+\n\007control\030\r \001(\0162\032.xMsgMeta.SubCont" +
-      "rolAction\022$\n\010dataType\030\016 \001(\0162\022.xMsgMeta.D" +
-      "ataType\022\032\n\022datTypeDescription\030\017 \001(\t\022\036\n\020i",
-      "sDataSerialized\030\020 \001(\010:\004true\022\032\n\007replyTo\030\021" +
-      " \001(\t:\tundefined\022#\n\tbyteOrder\030\022 \001(\0162\020.xMs" +
-      "gMeta.Endian\"c\n\010DataType\022\r\n\tUNDEFINED\020\001\022" +
-      "\014\n\010X_Object\020\002\022\014\n\010J_Object\020\003\022\014\n\010C_Object\020" +
-      "\004\022\014\n\010P_Object\020\005\022\020\n\014NCDFS_Object\020\006\"*\n\006Sta" +
-      "tus\022\010\n\004INFO\020\001\022\013\n\007WARNING\020\002\022\t\n\005ERROR\020\003\"\035\n" +
-      "\006Endian\022\n\n\006Little\020\001\022\007\n\003Big\020\002\"+\n\rControlA" +
-      "ction\022\013\n\007EXECUTE\020\000\022\r\n\tCONFIGURE\020\001\"\034\n\020Sub" +
-      "ControlAction\022\010\n\004SKIP\020\000B\tB\005xMsgMH\001"
-    };
-    com.google.protobuf.Descriptors.FileDescriptor.InternalDescriptorAssigner assigner =
-      new com.google.protobuf.Descriptors.FileDescriptor.InternalDescriptorAssigner() {
-        public com.google.protobuf.ExtensionRegistry assignDescriptors(
-            com.google.protobuf.Descriptors.FileDescriptor root) {
-          descriptor = root;
-          internal_static_xMsgMeta_descriptor =
-            getDescriptor().getMessageTypes().get(0);
-          internal_static_xMsgMeta_fieldAccessorTable = new
-            com.google.protobuf.GeneratedMessage.FieldAccessorTable(
-              internal_static_xMsgMeta_descriptor,
-              new java.lang.String[] { "Version", "Description", "Author", "Status", "SeverityId", "Sender", "SenderState", "CommunicationId", "Composition", "ExecutionTime", "Action", "Control", "DataType", "DatTypeDescription", "IsDataSerialized", "ReplyTo", "ByteOrder", });
-          return null;
-        }
-      };
-    com.google.protobuf.Descriptors.FileDescriptor
-      .internalBuildGeneratedFileFrom(descriptorData,
-        new com.google.protobuf.Descriptors.FileDescriptor[] {
-        }, assigner);
-  }
-
   private xMsgM() {}
-
   public static void registerAllExtensions(
       com.google.protobuf.ExtensionRegistry registry) {
-  }
-
-  public static com.google.protobuf.Descriptors.FileDescriptor
-      getDescriptor() {
-    return descriptor;
   }
   public interface xMsgMetaOrBuilder
       extends com.google.protobuf.MessageOrBuilder {
@@ -354,9 +299,9 @@ public final class xMsgM {
      */
     xMsgM.xMsgMeta.SubControlAction getControl();
 
-    // optional .xMsgMeta.DataType dataType = 14;
+    // optional string dataType = 14 [default = "native"];
     /**
-     * <code>optional .xMsgMeta.DataType dataType = 14;</code>
+     * <code>optional string dataType = 14 [default = "native"];</code>
      *
      * <pre>
      * ... Data section ...
@@ -365,14 +310,24 @@ public final class xMsgM {
      */
     boolean hasDataType();
     /**
-     * <code>optional .xMsgMeta.DataType dataType = 14;</code>
+     * <code>optional string dataType = 14 [default = "native"];</code>
      *
      * <pre>
      * ... Data section ...
      * Type of the data
      * </pre>
      */
-    xMsgM.xMsgMeta.DataType getDataType();
+    java.lang.String getDataType();
+    /**
+     * <code>optional string dataType = 14 [default = "native"];</code>
+     *
+     * <pre>
+     * ... Data section ...
+     * Type of the data
+     * </pre>
+     */
+    com.google.protobuf.ByteString
+        getDataTypeBytes();
 
     // optional string datTypeDescription = 15;
     /**
@@ -472,7 +427,6 @@ public final class xMsgM {
      */
     xMsgM.xMsgMeta.Endian getByteOrder();
   }
-
   /**
    * Protobuf type {@code xMsgMeta}
    *
@@ -483,79 +437,28 @@ public final class xMsgM {
   public static final class xMsgMeta extends
       com.google.protobuf.GeneratedMessage
       implements xMsgMetaOrBuilder {
-    // optional string version = 1;
-    public static final int VERSION_FIELD_NUMBER = 1;
-    // optional string description = 2;
-    public static final int DESCRIPTION_FIELD_NUMBER = 2;
-    // optional string author = 3;
-    public static final int AUTHOR_FIELD_NUMBER = 3;
-    // optional .xMsgMeta.Status status = 4;
-    public static final int STATUS_FIELD_NUMBER = 4;
-    // optional sfixed32 severityId = 5;
-    public static final int SEVERITYID_FIELD_NUMBER = 5;
-    // optional string sender = 6;
-    public static final int SENDER_FIELD_NUMBER = 6;
-    // optional string senderState = 7;
-    public static final int SENDERSTATE_FIELD_NUMBER = 7;
-    // optional fixed32 communicationId = 8;
-    public static final int COMMUNICATIONID_FIELD_NUMBER = 8;
-    // optional string composition = 10;
-    public static final int COMPOSITION_FIELD_NUMBER = 10;
-    // optional sfixed64 executionTime = 11;
-    public static final int EXECUTIONTIME_FIELD_NUMBER = 11;
-    // optional .xMsgMeta.ControlAction action = 12;
-    public static final int ACTION_FIELD_NUMBER = 12;
-    // optional .xMsgMeta.SubControlAction control = 13;
-    public static final int CONTROL_FIELD_NUMBER = 13;
-    // optional .xMsgMeta.DataType dataType = 14;
-    public static final int DATATYPE_FIELD_NUMBER = 14;
-    // optional string datTypeDescription = 15;
-    public static final int DATTYPEDESCRIPTION_FIELD_NUMBER = 15;
-    // optional bool isDataSerialized = 16 [default = true];
-    public static final int ISDATASERIALIZED_FIELD_NUMBER = 16;
-    // optional string replyTo = 17 [default = "undefined"];
-    public static final int REPLYTO_FIELD_NUMBER = 17;
-    // optional .xMsgMeta.Endian byteOrder = 18;
-    public static final int BYTEORDER_FIELD_NUMBER = 18;
-    private static final xMsgMeta defaultInstance;
-    private static final long serialVersionUID = 0L;
-    public static com.google.protobuf.Parser<xMsgMeta> PARSER =
-        new com.google.protobuf.AbstractParser<xMsgMeta>() {
-      public xMsgMeta parsePartialFrom(
-          com.google.protobuf.CodedInputStream input,
-          com.google.protobuf.ExtensionRegistryLite extensionRegistry)
-          throws com.google.protobuf.InvalidProtocolBufferException {
-        return new xMsgMeta(input, extensionRegistry);
-      }
-    };
-    private final com.google.protobuf.UnknownFieldSet unknownFields;
-    private int bitField0_;
-    private java.lang.Object version_;
-    private java.lang.Object description_;
-    private java.lang.Object author_;
-    private xMsgM.xMsgMeta.Status status_;
-    private int severityId_;
-    private java.lang.Object sender_;
-    private java.lang.Object senderState_;
-    private int communicationId_;
-    private java.lang.Object composition_;
-    private long executionTime_;
-    private xMsgM.xMsgMeta.ControlAction action_;
-    private xMsgM.xMsgMeta.SubControlAction control_;
-    private xMsgM.xMsgMeta.DataType dataType_;
-    private java.lang.Object datTypeDescription_;
-    private boolean isDataSerialized_;
-    private java.lang.Object replyTo_;
-    private xMsgM.xMsgMeta.Endian byteOrder_;
-    private byte memoizedIsInitialized = -1;
-    private int memoizedSerializedSize = -1;
-
     // Use xMsgMeta.newBuilder() to construct.
     private xMsgMeta(com.google.protobuf.GeneratedMessage.Builder<?> builder) {
       super(builder);
       this.unknownFields = builder.getUnknownFields();
     }
     private xMsgMeta(boolean noInit) { this.unknownFields = com.google.protobuf.UnknownFieldSet.getDefaultInstance(); }
+
+    private static final xMsgMeta defaultInstance;
+    public static xMsgMeta getDefaultInstance() {
+      return defaultInstance;
+    }
+
+    public xMsgMeta getDefaultInstanceForType() {
+      return defaultInstance;
+    }
+
+    private final com.google.protobuf.UnknownFieldSet unknownFields;
+    @java.lang.Override
+    public final com.google.protobuf.UnknownFieldSet
+        getUnknownFields() {
+      return this.unknownFields;
+    }
     private xMsgMeta(
         com.google.protobuf.CodedInputStream input,
         com.google.protobuf.ExtensionRegistryLite extensionRegistry)
@@ -657,15 +560,9 @@ public final class xMsgM {
               }
               break;
             }
-            case 112: {
-              int rawValue = input.readEnum();
-              xMsgM.xMsgMeta.DataType value = xMsgM.xMsgMeta.DataType.valueOf(rawValue);
-              if (value == null) {
-                unknownFields.mergeVarintField(14, rawValue);
-              } else {
-                bitField0_ |= 0x00001000;
-                dataType_ = value;
-              }
+            case 114: {
+              bitField0_ |= 0x00001000;
+              dataType_ = input.readBytes();
               break;
             }
             case 122: {
@@ -706,92 +603,9 @@ public final class xMsgM {
         makeExtensionsImmutable();
       }
     }
-
-    public static xMsgMeta getDefaultInstance() {
-      return defaultInstance;
-    }
-
     public static final com.google.protobuf.Descriptors.Descriptor
         getDescriptor() {
       return xMsgM.internal_static_xMsgMeta_descriptor;
-    }
-
-    public static xMsgM.xMsgMeta parseFrom(
-        com.google.protobuf.ByteString data)
-        throws com.google.protobuf.InvalidProtocolBufferException {
-      return PARSER.parseFrom(data);
-    }
-
-    public static xMsgM.xMsgMeta parseFrom(
-        com.google.protobuf.ByteString data,
-        com.google.protobuf.ExtensionRegistryLite extensionRegistry)
-        throws com.google.protobuf.InvalidProtocolBufferException {
-      return PARSER.parseFrom(data, extensionRegistry);
-    }
-
-    public static xMsgM.xMsgMeta parseFrom(byte[] data)
-        throws com.google.protobuf.InvalidProtocolBufferException {
-      return PARSER.parseFrom(data);
-    }
-
-    public static xMsgM.xMsgMeta parseFrom(
-        byte[] data,
-        com.google.protobuf.ExtensionRegistryLite extensionRegistry)
-        throws com.google.protobuf.InvalidProtocolBufferException {
-      return PARSER.parseFrom(data, extensionRegistry);
-    }
-
-    public static xMsgM.xMsgMeta parseFrom(java.io.InputStream input)
-        throws java.io.IOException {
-      return PARSER.parseFrom(input);
-    }
-
-    public static xMsgM.xMsgMeta parseFrom(
-        java.io.InputStream input,
-        com.google.protobuf.ExtensionRegistryLite extensionRegistry)
-        throws java.io.IOException {
-      return PARSER.parseFrom(input, extensionRegistry);
-    }
-
-    public static xMsgM.xMsgMeta parseDelimitedFrom(java.io.InputStream input)
-        throws java.io.IOException {
-      return PARSER.parseDelimitedFrom(input);
-    }
-
-    public static xMsgM.xMsgMeta parseDelimitedFrom(
-        java.io.InputStream input,
-        com.google.protobuf.ExtensionRegistryLite extensionRegistry)
-        throws java.io.IOException {
-      return PARSER.parseDelimitedFrom(input, extensionRegistry);
-    }
-
-    public static xMsgM.xMsgMeta parseFrom(
-        com.google.protobuf.CodedInputStream input)
-        throws java.io.IOException {
-      return PARSER.parseFrom(input);
-    }
-
-    public static xMsgM.xMsgMeta parseFrom(
-        com.google.protobuf.CodedInputStream input,
-        com.google.protobuf.ExtensionRegistryLite extensionRegistry)
-        throws java.io.IOException {
-      return PARSER.parseFrom(input, extensionRegistry);
-    }
-
-    public static Builder newBuilder() { return Builder.create(); }
-
-    public static Builder newBuilder(xMsgM.xMsgMeta prototype) {
-      return newBuilder().mergeFrom(prototype);
-    }
-
-    public xMsgMeta getDefaultInstanceForType() {
-      return defaultInstance;
-    }
-
-    @java.lang.Override
-    public final com.google.protobuf.UnknownFieldSet
-        getUnknownFields() {
-      return this.unknownFields;
     }
 
     protected com.google.protobuf.GeneratedMessage.FieldAccessorTable
@@ -801,11 +615,369 @@ public final class xMsgM {
               xMsgM.xMsgMeta.class, xMsgM.xMsgMeta.Builder.class);
     }
 
+    public static com.google.protobuf.Parser<xMsgMeta> PARSER =
+        new com.google.protobuf.AbstractParser<xMsgMeta>() {
+      public xMsgMeta parsePartialFrom(
+          com.google.protobuf.CodedInputStream input,
+          com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+          throws com.google.protobuf.InvalidProtocolBufferException {
+        return new xMsgMeta(input, extensionRegistry);
+      }
+    };
+
     @java.lang.Override
     public com.google.protobuf.Parser<xMsgMeta> getParserForType() {
       return PARSER;
     }
 
+    /**
+     * Protobuf enum {@code xMsgMeta.Status}
+     *
+     * <pre>
+     * Data processing status
+     * </pre>
+     */
+    public enum Status
+        implements com.google.protobuf.ProtocolMessageEnum {
+      /**
+       * <code>INFO = 1;</code>
+       */
+      INFO(0, 1),
+      /**
+       * <code>WARNING = 2;</code>
+       */
+      WARNING(1, 2),
+      /**
+       * <code>ERROR = 3;</code>
+       */
+      ERROR(2, 3),
+      ;
+
+      /**
+       * <code>INFO = 1;</code>
+       */
+      public static final int INFO_VALUE = 1;
+      /**
+       * <code>WARNING = 2;</code>
+       */
+      public static final int WARNING_VALUE = 2;
+      /**
+       * <code>ERROR = 3;</code>
+       */
+      public static final int ERROR_VALUE = 3;
+
+
+      public final int getNumber() { return value; }
+
+      public static Status valueOf(int value) {
+        switch (value) {
+          case 1: return INFO;
+          case 2: return WARNING;
+          case 3: return ERROR;
+          default: return null;
+        }
+      }
+
+      public static com.google.protobuf.Internal.EnumLiteMap<Status>
+          internalGetValueMap() {
+        return internalValueMap;
+      }
+      private static com.google.protobuf.Internal.EnumLiteMap<Status>
+          internalValueMap =
+            new com.google.protobuf.Internal.EnumLiteMap<Status>() {
+              public Status findValueByNumber(int number) {
+                return Status.valueOf(number);
+              }
+            };
+
+      public final com.google.protobuf.Descriptors.EnumValueDescriptor
+          getValueDescriptor() {
+        return getDescriptor().getValues().get(index);
+      }
+      public final com.google.protobuf.Descriptors.EnumDescriptor
+          getDescriptorForType() {
+        return getDescriptor();
+      }
+      public static final com.google.protobuf.Descriptors.EnumDescriptor
+          getDescriptor() {
+        return xMsgM.xMsgMeta.getDescriptor().getEnumTypes().get(0);
+      }
+
+      private static final Status[] VALUES = values();
+
+      public static Status valueOf(
+          com.google.protobuf.Descriptors.EnumValueDescriptor desc) {
+        if (desc.getType() != getDescriptor()) {
+          throw new java.lang.IllegalArgumentException(
+            "EnumValueDescriptor is not for this type.");
+        }
+        return VALUES[desc.getIndex()];
+      }
+
+      private final int index;
+      private final int value;
+
+      private Status(int index, int value) {
+        this.index = index;
+        this.value = value;
+      }
+
+      // @@protoc_insertion_point(enum_scope:xMsgMeta.Status)
+    }
+
+    /**
+     * Protobuf enum {@code xMsgMeta.Endian}
+     *
+     * <pre>
+     * Endianness
+     * </pre>
+     */
+    public enum Endian
+        implements com.google.protobuf.ProtocolMessageEnum {
+      /**
+       * <code>Little = 1;</code>
+       */
+      Little(0, 1),
+      /**
+       * <code>Big = 2;</code>
+       */
+      Big(1, 2),
+      ;
+
+      /**
+       * <code>Little = 1;</code>
+       */
+      public static final int Little_VALUE = 1;
+      /**
+       * <code>Big = 2;</code>
+       */
+      public static final int Big_VALUE = 2;
+
+
+      public final int getNumber() { return value; }
+
+      public static Endian valueOf(int value) {
+        switch (value) {
+          case 1: return Little;
+          case 2: return Big;
+          default: return null;
+        }
+      }
+
+      public static com.google.protobuf.Internal.EnumLiteMap<Endian>
+          internalGetValueMap() {
+        return internalValueMap;
+      }
+      private static com.google.protobuf.Internal.EnumLiteMap<Endian>
+          internalValueMap =
+            new com.google.protobuf.Internal.EnumLiteMap<Endian>() {
+              public Endian findValueByNumber(int number) {
+                return Endian.valueOf(number);
+              }
+            };
+
+      public final com.google.protobuf.Descriptors.EnumValueDescriptor
+          getValueDescriptor() {
+        return getDescriptor().getValues().get(index);
+      }
+      public final com.google.protobuf.Descriptors.EnumDescriptor
+          getDescriptorForType() {
+        return getDescriptor();
+      }
+      public static final com.google.protobuf.Descriptors.EnumDescriptor
+          getDescriptor() {
+        return xMsgM.xMsgMeta.getDescriptor().getEnumTypes().get(1);
+      }
+
+      private static final Endian[] VALUES = values();
+
+      public static Endian valueOf(
+          com.google.protobuf.Descriptors.EnumValueDescriptor desc) {
+        if (desc.getType() != getDescriptor()) {
+          throw new java.lang.IllegalArgumentException(
+            "EnumValueDescriptor is not for this type.");
+        }
+        return VALUES[desc.getIndex()];
+      }
+
+      private final int index;
+      private final int value;
+
+      private Endian(int index, int value) {
+        this.index = index;
+        this.value = value;
+      }
+
+      // @@protoc_insertion_point(enum_scope:xMsgMeta.Endian)
+    }
+
+    /**
+     * Protobuf enum {@code xMsgMeta.ControlAction}
+     *
+     * <pre>
+     * Control actions, used to define service control directive
+     * </pre>
+     */
+    public enum ControlAction
+        implements com.google.protobuf.ProtocolMessageEnum {
+      /**
+       * <code>EXECUTE = 0;</code>
+       */
+      EXECUTE(0, 0),
+      /**
+       * <code>CONFIGURE = 1;</code>
+       */
+      CONFIGURE(1, 1),
+      ;
+
+      /**
+       * <code>EXECUTE = 0;</code>
+       */
+      public static final int EXECUTE_VALUE = 0;
+      /**
+       * <code>CONFIGURE = 1;</code>
+       */
+      public static final int CONFIGURE_VALUE = 1;
+
+
+      public final int getNumber() { return value; }
+
+      public static ControlAction valueOf(int value) {
+        switch (value) {
+          case 0: return EXECUTE;
+          case 1: return CONFIGURE;
+          default: return null;
+        }
+      }
+
+      public static com.google.protobuf.Internal.EnumLiteMap<ControlAction>
+          internalGetValueMap() {
+        return internalValueMap;
+      }
+      private static com.google.protobuf.Internal.EnumLiteMap<ControlAction>
+          internalValueMap =
+            new com.google.protobuf.Internal.EnumLiteMap<ControlAction>() {
+              public ControlAction findValueByNumber(int number) {
+                return ControlAction.valueOf(number);
+              }
+            };
+
+      public final com.google.protobuf.Descriptors.EnumValueDescriptor
+          getValueDescriptor() {
+        return getDescriptor().getValues().get(index);
+      }
+      public final com.google.protobuf.Descriptors.EnumDescriptor
+          getDescriptorForType() {
+        return getDescriptor();
+      }
+      public static final com.google.protobuf.Descriptors.EnumDescriptor
+          getDescriptor() {
+        return xMsgM.xMsgMeta.getDescriptor().getEnumTypes().get(2);
+      }
+
+      private static final ControlAction[] VALUES = values();
+
+      public static ControlAction valueOf(
+          com.google.protobuf.Descriptors.EnumValueDescriptor desc) {
+        if (desc.getType() != getDescriptor()) {
+          throw new java.lang.IllegalArgumentException(
+            "EnumValueDescriptor is not for this type.");
+        }
+        return VALUES[desc.getIndex()];
+      }
+
+      private final int index;
+      private final int value;
+
+      private ControlAction(int index, int value) {
+        this.index = index;
+        this.value = value;
+      }
+
+      // @@protoc_insertion_point(enum_scope:xMsgMeta.ControlAction)
+    }
+
+    /**
+     * Protobuf enum {@code xMsgMeta.SubControlAction}
+     *
+     * <pre>
+     * Sub control action, used to micromanage service engine activity
+     * </pre>
+     */
+    public enum SubControlAction
+        implements com.google.protobuf.ProtocolMessageEnum {
+      /**
+       * <code>SKIP = 0;</code>
+       */
+      SKIP(0, 0),
+      ;
+
+      /**
+       * <code>SKIP = 0;</code>
+       */
+      public static final int SKIP_VALUE = 0;
+
+
+      public final int getNumber() { return value; }
+
+      public static SubControlAction valueOf(int value) {
+        switch (value) {
+          case 0: return SKIP;
+          default: return null;
+        }
+      }
+
+      public static com.google.protobuf.Internal.EnumLiteMap<SubControlAction>
+          internalGetValueMap() {
+        return internalValueMap;
+      }
+      private static com.google.protobuf.Internal.EnumLiteMap<SubControlAction>
+          internalValueMap =
+            new com.google.protobuf.Internal.EnumLiteMap<SubControlAction>() {
+              public SubControlAction findValueByNumber(int number) {
+                return SubControlAction.valueOf(number);
+              }
+            };
+
+      public final com.google.protobuf.Descriptors.EnumValueDescriptor
+          getValueDescriptor() {
+        return getDescriptor().getValues().get(index);
+      }
+      public final com.google.protobuf.Descriptors.EnumDescriptor
+          getDescriptorForType() {
+        return getDescriptor();
+      }
+      public static final com.google.protobuf.Descriptors.EnumDescriptor
+          getDescriptor() {
+        return xMsgM.xMsgMeta.getDescriptor().getEnumTypes().get(3);
+      }
+
+      private static final SubControlAction[] VALUES = values();
+
+      public static SubControlAction valueOf(
+          com.google.protobuf.Descriptors.EnumValueDescriptor desc) {
+        if (desc.getType() != getDescriptor()) {
+          throw new java.lang.IllegalArgumentException(
+            "EnumValueDescriptor is not for this type.");
+        }
+        return VALUES[desc.getIndex()];
+      }
+
+      private final int index;
+      private final int value;
+
+      private SubControlAction(int index, int value) {
+        this.index = index;
+        this.value = value;
+      }
+
+      // @@protoc_insertion_point(enum_scope:xMsgMeta.SubControlAction)
+    }
+
+    private int bitField0_;
+    // optional string version = 1;
+    public static final int VERSION_FIELD_NUMBER = 1;
+    private java.lang.Object version_;
     /**
      * <code>optional string version = 1;</code>
      *
@@ -817,7 +989,6 @@ public final class xMsgM {
     public boolean hasVersion() {
       return ((bitField0_ & 0x00000001) == 0x00000001);
     }
-
     /**
      * <code>optional string version = 1;</code>
      *
@@ -831,7 +1002,7 @@ public final class xMsgM {
       if (ref instanceof java.lang.String) {
         return (java.lang.String) ref;
       } else {
-        com.google.protobuf.ByteString bs =
+        com.google.protobuf.ByteString bs = 
             (com.google.protobuf.ByteString) ref;
         java.lang.String s = bs.toStringUtf8();
         if (bs.isValidUtf8()) {
@@ -840,7 +1011,6 @@ public final class xMsgM {
         return s;
       }
     }
-
     /**
      * <code>optional string version = 1;</code>
      *
@@ -853,7 +1023,7 @@ public final class xMsgM {
         getVersionBytes() {
       java.lang.Object ref = version_;
       if (ref instanceof java.lang.String) {
-        com.google.protobuf.ByteString b =
+        com.google.protobuf.ByteString b = 
             com.google.protobuf.ByteString.copyFromUtf8(
                 (java.lang.String) ref);
         version_ = b;
@@ -863,6 +1033,9 @@ public final class xMsgM {
       }
     }
 
+    // optional string description = 2;
+    public static final int DESCRIPTION_FIELD_NUMBER = 2;
+    private java.lang.Object description_;
     /**
      * <code>optional string description = 2;</code>
      *
@@ -873,7 +1046,6 @@ public final class xMsgM {
     public boolean hasDescription() {
       return ((bitField0_ & 0x00000002) == 0x00000002);
     }
-
     /**
      * <code>optional string description = 2;</code>
      *
@@ -886,7 +1058,7 @@ public final class xMsgM {
       if (ref instanceof java.lang.String) {
         return (java.lang.String) ref;
       } else {
-        com.google.protobuf.ByteString bs =
+        com.google.protobuf.ByteString bs = 
             (com.google.protobuf.ByteString) ref;
         java.lang.String s = bs.toStringUtf8();
         if (bs.isValidUtf8()) {
@@ -895,7 +1067,6 @@ public final class xMsgM {
         return s;
       }
     }
-
     /**
      * <code>optional string description = 2;</code>
      *
@@ -907,7 +1078,7 @@ public final class xMsgM {
         getDescriptionBytes() {
       java.lang.Object ref = description_;
       if (ref instanceof java.lang.String) {
-        com.google.protobuf.ByteString b =
+        com.google.protobuf.ByteString b = 
             com.google.protobuf.ByteString.copyFromUtf8(
                 (java.lang.String) ref);
         description_ = b;
@@ -917,6 +1088,9 @@ public final class xMsgM {
       }
     }
 
+    // optional string author = 3;
+    public static final int AUTHOR_FIELD_NUMBER = 3;
+    private java.lang.Object author_;
     /**
      * <code>optional string author = 3;</code>
      *
@@ -927,7 +1101,6 @@ public final class xMsgM {
     public boolean hasAuthor() {
       return ((bitField0_ & 0x00000004) == 0x00000004);
     }
-
     /**
      * <code>optional string author = 3;</code>
      *
@@ -940,7 +1113,7 @@ public final class xMsgM {
       if (ref instanceof java.lang.String) {
         return (java.lang.String) ref;
       } else {
-        com.google.protobuf.ByteString bs =
+        com.google.protobuf.ByteString bs = 
             (com.google.protobuf.ByteString) ref;
         java.lang.String s = bs.toStringUtf8();
         if (bs.isValidUtf8()) {
@@ -949,7 +1122,6 @@ public final class xMsgM {
         return s;
       }
     }
-
     /**
      * <code>optional string author = 3;</code>
      *
@@ -961,7 +1133,7 @@ public final class xMsgM {
         getAuthorBytes() {
       java.lang.Object ref = author_;
       if (ref instanceof java.lang.String) {
-        com.google.protobuf.ByteString b =
+        com.google.protobuf.ByteString b = 
             com.google.protobuf.ByteString.copyFromUtf8(
                 (java.lang.String) ref);
         author_ = b;
@@ -971,6 +1143,9 @@ public final class xMsgM {
       }
     }
 
+    // optional .xMsgMeta.Status status = 4;
+    public static final int STATUS_FIELD_NUMBER = 4;
+    private xMsgM.xMsgMeta.Status status_;
     /**
      * <code>optional .xMsgMeta.Status status = 4;</code>
      *
@@ -981,7 +1156,6 @@ public final class xMsgM {
     public boolean hasStatus() {
       return ((bitField0_ & 0x00000008) == 0x00000008);
     }
-
     /**
      * <code>optional .xMsgMeta.Status status = 4;</code>
      *
@@ -993,6 +1167,9 @@ public final class xMsgM {
       return status_;
     }
 
+    // optional sfixed32 severityId = 5;
+    public static final int SEVERITYID_FIELD_NUMBER = 5;
+    private int severityId_;
     /**
      * <code>optional sfixed32 severityId = 5;</code>
      *
@@ -1003,7 +1180,6 @@ public final class xMsgM {
     public boolean hasSeverityId() {
       return ((bitField0_ & 0x00000010) == 0x00000010);
     }
-
     /**
      * <code>optional sfixed32 severityId = 5;</code>
      *
@@ -1015,6 +1191,9 @@ public final class xMsgM {
       return severityId_;
     }
 
+    // optional string sender = 6;
+    public static final int SENDER_FIELD_NUMBER = 6;
+    private java.lang.Object sender_;
     /**
      * <code>optional string sender = 6;</code>
      *
@@ -1026,7 +1205,6 @@ public final class xMsgM {
     public boolean hasSender() {
       return ((bitField0_ & 0x00000020) == 0x00000020);
     }
-
     /**
      * <code>optional string sender = 6;</code>
      *
@@ -1040,7 +1218,7 @@ public final class xMsgM {
       if (ref instanceof java.lang.String) {
         return (java.lang.String) ref;
       } else {
-        com.google.protobuf.ByteString bs =
+        com.google.protobuf.ByteString bs = 
             (com.google.protobuf.ByteString) ref;
         java.lang.String s = bs.toStringUtf8();
         if (bs.isValidUtf8()) {
@@ -1049,7 +1227,6 @@ public final class xMsgM {
         return s;
       }
     }
-
     /**
      * <code>optional string sender = 6;</code>
      *
@@ -1062,7 +1239,7 @@ public final class xMsgM {
         getSenderBytes() {
       java.lang.Object ref = sender_;
       if (ref instanceof java.lang.String) {
-        com.google.protobuf.ByteString b =
+        com.google.protobuf.ByteString b = 
             com.google.protobuf.ByteString.copyFromUtf8(
                 (java.lang.String) ref);
         sender_ = b;
@@ -1072,6 +1249,9 @@ public final class xMsgM {
       }
     }
 
+    // optional string senderState = 7;
+    public static final int SENDERSTATE_FIELD_NUMBER = 7;
+    private java.lang.Object senderState_;
     /**
      * <code>optional string senderState = 7;</code>
      *
@@ -1083,7 +1263,6 @@ public final class xMsgM {
     public boolean hasSenderState() {
       return ((bitField0_ & 0x00000040) == 0x00000040);
     }
-
     /**
      * <code>optional string senderState = 7;</code>
      *
@@ -1097,7 +1276,7 @@ public final class xMsgM {
       if (ref instanceof java.lang.String) {
         return (java.lang.String) ref;
       } else {
-        com.google.protobuf.ByteString bs =
+        com.google.protobuf.ByteString bs = 
             (com.google.protobuf.ByteString) ref;
         java.lang.String s = bs.toStringUtf8();
         if (bs.isValidUtf8()) {
@@ -1106,7 +1285,6 @@ public final class xMsgM {
         return s;
       }
     }
-
     /**
      * <code>optional string senderState = 7;</code>
      *
@@ -1119,7 +1297,7 @@ public final class xMsgM {
         getSenderStateBytes() {
       java.lang.Object ref = senderState_;
       if (ref instanceof java.lang.String) {
-        com.google.protobuf.ByteString b =
+        com.google.protobuf.ByteString b = 
             com.google.protobuf.ByteString.copyFromUtf8(
                 (java.lang.String) ref);
         senderState_ = b;
@@ -1129,6 +1307,9 @@ public final class xMsgM {
       }
     }
 
+    // optional fixed32 communicationId = 8;
+    public static final int COMMUNICATIONID_FIELD_NUMBER = 8;
+    private int communicationId_;
     /**
      * <code>optional fixed32 communicationId = 8;</code>
      *
@@ -1139,7 +1320,6 @@ public final class xMsgM {
     public boolean hasCommunicationId() {
       return ((bitField0_ & 0x00000080) == 0x00000080);
     }
-
     /**
      * <code>optional fixed32 communicationId = 8;</code>
      *
@@ -1151,6 +1331,9 @@ public final class xMsgM {
       return communicationId_;
     }
 
+    // optional string composition = 10;
+    public static final int COMPOSITION_FIELD_NUMBER = 10;
+    private java.lang.Object composition_;
     /**
      * <code>optional string composition = 10;</code>
      *
@@ -1163,7 +1346,6 @@ public final class xMsgM {
     public boolean hasComposition() {
       return ((bitField0_ & 0x00000100) == 0x00000100);
     }
-
     /**
      * <code>optional string composition = 10;</code>
      *
@@ -1178,7 +1360,7 @@ public final class xMsgM {
       if (ref instanceof java.lang.String) {
         return (java.lang.String) ref;
       } else {
-        com.google.protobuf.ByteString bs =
+        com.google.protobuf.ByteString bs = 
             (com.google.protobuf.ByteString) ref;
         java.lang.String s = bs.toStringUtf8();
         if (bs.isValidUtf8()) {
@@ -1187,7 +1369,6 @@ public final class xMsgM {
         return s;
       }
     }
-
     /**
      * <code>optional string composition = 10;</code>
      *
@@ -1201,7 +1382,7 @@ public final class xMsgM {
         getCompositionBytes() {
       java.lang.Object ref = composition_;
       if (ref instanceof java.lang.String) {
-        com.google.protobuf.ByteString b =
+        com.google.protobuf.ByteString b = 
             com.google.protobuf.ByteString.copyFromUtf8(
                 (java.lang.String) ref);
         composition_ = b;
@@ -1211,6 +1392,9 @@ public final class xMsgM {
       }
     }
 
+    // optional sfixed64 executionTime = 11;
+    public static final int EXECUTIONTIME_FIELD_NUMBER = 11;
+    private long executionTime_;
     /**
      * <code>optional sfixed64 executionTime = 11;</code>
      *
@@ -1222,7 +1406,6 @@ public final class xMsgM {
     public boolean hasExecutionTime() {
       return ((bitField0_ & 0x00000200) == 0x00000200);
     }
-
     /**
      * <code>optional sfixed64 executionTime = 11;</code>
      *
@@ -1235,6 +1418,9 @@ public final class xMsgM {
       return executionTime_;
     }
 
+    // optional .xMsgMeta.ControlAction action = 12;
+    public static final int ACTION_FIELD_NUMBER = 12;
+    private xMsgM.xMsgMeta.ControlAction action_;
     /**
      * <code>optional .xMsgMeta.ControlAction action = 12;</code>
      *
@@ -1246,7 +1432,6 @@ public final class xMsgM {
     public boolean hasAction() {
       return ((bitField0_ & 0x00000400) == 0x00000400);
     }
-
     /**
      * <code>optional .xMsgMeta.ControlAction action = 12;</code>
      *
@@ -1259,6 +1444,9 @@ public final class xMsgM {
       return action_;
     }
 
+    // optional .xMsgMeta.SubControlAction control = 13;
+    public static final int CONTROL_FIELD_NUMBER = 13;
+    private xMsgM.xMsgMeta.SubControlAction control_;
     /**
      * <code>optional .xMsgMeta.SubControlAction control = 13;</code>
      *
@@ -1269,7 +1457,6 @@ public final class xMsgM {
     public boolean hasControl() {
       return ((bitField0_ & 0x00000800) == 0x00000800);
     }
-
     /**
      * <code>optional .xMsgMeta.SubControlAction control = 13;</code>
      *
@@ -1281,8 +1468,11 @@ public final class xMsgM {
       return control_;
     }
 
+    // optional string dataType = 14 [default = "native"];
+    public static final int DATATYPE_FIELD_NUMBER = 14;
+    private java.lang.Object dataType_;
     /**
-     * <code>optional .xMsgMeta.DataType dataType = 14;</code>
+     * <code>optional string dataType = 14 [default = "native"];</code>
      *
      * <pre>
      * ... Data section ...
@@ -1292,19 +1482,53 @@ public final class xMsgM {
     public boolean hasDataType() {
       return ((bitField0_ & 0x00001000) == 0x00001000);
     }
-
     /**
-     * <code>optional .xMsgMeta.DataType dataType = 14;</code>
+     * <code>optional string dataType = 14 [default = "native"];</code>
      *
      * <pre>
      * ... Data section ...
      * Type of the data
      * </pre>
      */
-    public xMsgM.xMsgMeta.DataType getDataType() {
-      return dataType_;
+    public java.lang.String getDataType() {
+      java.lang.Object ref = dataType_;
+      if (ref instanceof java.lang.String) {
+        return (java.lang.String) ref;
+      } else {
+        com.google.protobuf.ByteString bs = 
+            (com.google.protobuf.ByteString) ref;
+        java.lang.String s = bs.toStringUtf8();
+        if (bs.isValidUtf8()) {
+          dataType_ = s;
+        }
+        return s;
+      }
+    }
+    /**
+     * <code>optional string dataType = 14 [default = "native"];</code>
+     *
+     * <pre>
+     * ... Data section ...
+     * Type of the data
+     * </pre>
+     */
+    public com.google.protobuf.ByteString
+        getDataTypeBytes() {
+      java.lang.Object ref = dataType_;
+      if (ref instanceof java.lang.String) {
+        com.google.protobuf.ByteString b = 
+            com.google.protobuf.ByteString.copyFromUtf8(
+                (java.lang.String) ref);
+        dataType_ = b;
+        return b;
+      } else {
+        return (com.google.protobuf.ByteString) ref;
+      }
     }
 
+    // optional string datTypeDescription = 15;
+    public static final int DATTYPEDESCRIPTION_FIELD_NUMBER = 15;
+    private java.lang.Object datTypeDescription_;
     /**
      * <code>optional string datTypeDescription = 15;</code>
      *
@@ -1317,7 +1541,6 @@ public final class xMsgM {
     public boolean hasDatTypeDescription() {
       return ((bitField0_ & 0x00002000) == 0x00002000);
     }
-
     /**
      * <code>optional string datTypeDescription = 15;</code>
      *
@@ -1332,7 +1555,7 @@ public final class xMsgM {
       if (ref instanceof java.lang.String) {
         return (java.lang.String) ref;
       } else {
-        com.google.protobuf.ByteString bs =
+        com.google.protobuf.ByteString bs = 
             (com.google.protobuf.ByteString) ref;
         java.lang.String s = bs.toStringUtf8();
         if (bs.isValidUtf8()) {
@@ -1341,7 +1564,6 @@ public final class xMsgM {
         return s;
       }
     }
-
     /**
      * <code>optional string datTypeDescription = 15;</code>
      *
@@ -1355,7 +1577,7 @@ public final class xMsgM {
         getDatTypeDescriptionBytes() {
       java.lang.Object ref = datTypeDescription_;
       if (ref instanceof java.lang.String) {
-        com.google.protobuf.ByteString b =
+        com.google.protobuf.ByteString b = 
             com.google.protobuf.ByteString.copyFromUtf8(
                 (java.lang.String) ref);
         datTypeDescription_ = b;
@@ -1365,6 +1587,9 @@ public final class xMsgM {
       }
     }
 
+    // optional bool isDataSerialized = 16 [default = true];
+    public static final int ISDATASERIALIZED_FIELD_NUMBER = 16;
+    private boolean isDataSerialized_;
     /**
      * <code>optional bool isDataSerialized = 16 [default = true];</code>
      *
@@ -1375,7 +1600,6 @@ public final class xMsgM {
     public boolean hasIsDataSerialized() {
       return ((bitField0_ & 0x00004000) == 0x00004000);
     }
-
     /**
      * <code>optional bool isDataSerialized = 16 [default = true];</code>
      *
@@ -1387,6 +1611,9 @@ public final class xMsgM {
       return isDataSerialized_;
     }
 
+    // optional string replyTo = 17 [default = "undefined"];
+    public static final int REPLYTO_FIELD_NUMBER = 17;
+    private java.lang.Object replyTo_;
     /**
      * <code>optional string replyTo = 17 [default = "undefined"];</code>
      *
@@ -1397,7 +1624,6 @@ public final class xMsgM {
     public boolean hasReplyTo() {
       return ((bitField0_ & 0x00008000) == 0x00008000);
     }
-
     /**
      * <code>optional string replyTo = 17 [default = "undefined"];</code>
      *
@@ -1410,7 +1636,7 @@ public final class xMsgM {
       if (ref instanceof java.lang.String) {
         return (java.lang.String) ref;
       } else {
-        com.google.protobuf.ByteString bs =
+        com.google.protobuf.ByteString bs = 
             (com.google.protobuf.ByteString) ref;
         java.lang.String s = bs.toStringUtf8();
         if (bs.isValidUtf8()) {
@@ -1419,7 +1645,6 @@ public final class xMsgM {
         return s;
       }
     }
-
     /**
      * <code>optional string replyTo = 17 [default = "undefined"];</code>
      *
@@ -1431,7 +1656,7 @@ public final class xMsgM {
         getReplyToBytes() {
       java.lang.Object ref = replyTo_;
       if (ref instanceof java.lang.String) {
-        com.google.protobuf.ByteString b =
+        com.google.protobuf.ByteString b = 
             com.google.protobuf.ByteString.copyFromUtf8(
                 (java.lang.String) ref);
         replyTo_ = b;
@@ -1441,6 +1666,9 @@ public final class xMsgM {
       }
     }
 
+    // optional .xMsgMeta.Endian byteOrder = 18;
+    public static final int BYTEORDER_FIELD_NUMBER = 18;
+    private xMsgM.xMsgMeta.Endian byteOrder_;
     /**
      * <code>optional .xMsgMeta.Endian byteOrder = 18;</code>
      *
@@ -1452,7 +1680,6 @@ public final class xMsgM {
     public boolean hasByteOrder() {
       return ((bitField0_ & 0x00010000) == 0x00010000);
     }
-
     /**
      * <code>optional .xMsgMeta.Endian byteOrder = 18;</code>
      *
@@ -1478,13 +1705,13 @@ public final class xMsgM {
       executionTime_ = 0L;
       action_ = xMsgM.xMsgMeta.ControlAction.EXECUTE;
       control_ = xMsgM.xMsgMeta.SubControlAction.SKIP;
-      dataType_ = xMsgM.xMsgMeta.DataType.UNDEFINED;
+      dataType_ = "native";
       datTypeDescription_ = "";
       isDataSerialized_ = true;
       replyTo_ = "undefined";
       byteOrder_ = xMsgM.xMsgMeta.Endian.Little;
     }
-
+    private byte memoizedIsInitialized = -1;
     public final boolean isInitialized() {
       byte isInitialized = memoizedIsInitialized;
       if (isInitialized != -1) return isInitialized == 1;
@@ -1533,7 +1760,7 @@ public final class xMsgM {
         output.writeEnum(13, control_.getNumber());
       }
       if (((bitField0_ & 0x00001000) == 0x00001000)) {
-        output.writeEnum(14, dataType_.getNumber());
+        output.writeBytes(14, getDataTypeBytes());
       }
       if (((bitField0_ & 0x00002000) == 0x00002000)) {
         output.writeBytes(15, getDatTypeDescriptionBytes());
@@ -1550,6 +1777,7 @@ public final class xMsgM {
       getUnknownFields().writeTo(output);
     }
 
+    private int memoizedSerializedSize = -1;
     public int getSerializedSize() {
       int size = memoizedSerializedSize;
       if (size != -1) return size;
@@ -1605,7 +1833,7 @@ public final class xMsgM {
       }
       if (((bitField0_ & 0x00001000) == 0x00001000)) {
         size += com.google.protobuf.CodedOutputStream
-          .computeEnumSize(14, dataType_.getNumber());
+          .computeBytesSize(14, getDataTypeBytes());
       }
       if (((bitField0_ & 0x00002000) == 0x00002000)) {
         size += com.google.protobuf.CodedOutputStream
@@ -1628,14 +1856,71 @@ public final class xMsgM {
       return size;
     }
 
+    private static final long serialVersionUID = 0L;
     @java.lang.Override
     protected java.lang.Object writeReplace()
         throws java.io.ObjectStreamException {
       return super.writeReplace();
     }
 
-    public Builder newBuilderForType() { return newBuilder(); }
+    public static xMsgM.xMsgMeta parseFrom(
+        com.google.protobuf.ByteString data)
+        throws com.google.protobuf.InvalidProtocolBufferException {
+      return PARSER.parseFrom(data);
+    }
+    public static xMsgM.xMsgMeta parseFrom(
+        com.google.protobuf.ByteString data,
+        com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+        throws com.google.protobuf.InvalidProtocolBufferException {
+      return PARSER.parseFrom(data, extensionRegistry);
+    }
+    public static xMsgM.xMsgMeta parseFrom(byte[] data)
+        throws com.google.protobuf.InvalidProtocolBufferException {
+      return PARSER.parseFrom(data);
+    }
+    public static xMsgM.xMsgMeta parseFrom(
+        byte[] data,
+        com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+        throws com.google.protobuf.InvalidProtocolBufferException {
+      return PARSER.parseFrom(data, extensionRegistry);
+    }
+    public static xMsgM.xMsgMeta parseFrom(java.io.InputStream input)
+        throws java.io.IOException {
+      return PARSER.parseFrom(input);
+    }
+    public static xMsgM.xMsgMeta parseFrom(
+        java.io.InputStream input,
+        com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+        throws java.io.IOException {
+      return PARSER.parseFrom(input, extensionRegistry);
+    }
+    public static xMsgM.xMsgMeta parseDelimitedFrom(java.io.InputStream input)
+        throws java.io.IOException {
+      return PARSER.parseDelimitedFrom(input);
+    }
+    public static xMsgM.xMsgMeta parseDelimitedFrom(
+        java.io.InputStream input,
+        com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+        throws java.io.IOException {
+      return PARSER.parseDelimitedFrom(input, extensionRegistry);
+    }
+    public static xMsgM.xMsgMeta parseFrom(
+        com.google.protobuf.CodedInputStream input)
+        throws java.io.IOException {
+      return PARSER.parseFrom(input);
+    }
+    public static xMsgM.xMsgMeta parseFrom(
+        com.google.protobuf.CodedInputStream input,
+        com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+        throws java.io.IOException {
+      return PARSER.parseFrom(input, extensionRegistry);
+    }
 
+    public static Builder newBuilder() { return Builder.create(); }
+    public Builder newBuilderForType() { return newBuilder(); }
+    public static Builder newBuilder(xMsgM.xMsgMeta prototype) {
+      return newBuilder().mergeFrom(prototype);
+    }
     public Builder toBuilder() { return newBuilder(this); }
 
     @java.lang.Override
@@ -1644,506 +1929,6 @@ public final class xMsgM {
       Builder builder = new Builder(parent);
       return builder;
     }
-
-    /**
-     * Protobuf enum {@code xMsgMeta.DataType}
-     *
-     * <pre>
-     * ... Enumerations ...
-     * Data type
-     * </pre>
-     */
-    public enum DataType
-        implements com.google.protobuf.ProtocolMessageEnum {
-      /**
-       * <code>UNDEFINED = 1;</code>
-       */
-      UNDEFINED(0, 1),
-      /**
-       * <code>X_Object = 2;</code>
-       *
-       * <pre>
-       * xMsgData object
-       * </pre>
-       */
-      X_Object(1, 2),
-      /**
-       * <code>J_Object = 3;</code>
-       *
-       * <pre>
-       * Java object
-       * </pre>
-       */
-      J_Object(2, 3),
-      /**
-       * <code>C_Object = 4;</code>
-       *
-       * <pre>
-       * C++ object
-       * </pre>
-       */
-      C_Object(3, 4),
-      /**
-       * <code>P_Object = 5;</code>
-       *
-       * <pre>
-       * Python Object
-       * </pre>
-       */
-      P_Object(4, 5),
-      /**
-       * <code>NCDFS_Object = 6;</code>
-       *
-       * <pre>
-       * Streaming NetCDF Object
-       * </pre>
-       */
-      NCDFS_Object(5, 6),
-      ;
-
-      /**
-       * <code>UNDEFINED = 1;</code>
-       */
-      public static final int UNDEFINED_VALUE = 1;
-      /**
-       * <code>X_Object = 2;</code>
-       *
-       * <pre>
-       * xMsgData object
-       * </pre>
-       */
-      public static final int X_Object_VALUE = 2;
-      /**
-       * <code>J_Object = 3;</code>
-       *
-       * <pre>
-       * Java object
-       * </pre>
-       */
-      public static final int J_Object_VALUE = 3;
-      /**
-       * <code>C_Object = 4;</code>
-       *
-       * <pre>
-       * C++ object
-       * </pre>
-       */
-      public static final int C_Object_VALUE = 4;
-      /**
-       * <code>P_Object = 5;</code>
-       *
-       * <pre>
-       * Python Object
-       * </pre>
-       */
-      public static final int P_Object_VALUE = 5;
-      /**
-       * <code>NCDFS_Object = 6;</code>
-       *
-       * <pre>
-       * Streaming NetCDF Object
-       * </pre>
-       */
-      public static final int NCDFS_Object_VALUE = 6;
-      private static final DataType[] VALUES = values();
-      private static com.google.protobuf.Internal.EnumLiteMap<DataType>
-          internalValueMap =
-            new com.google.protobuf.Internal.EnumLiteMap<DataType>() {
-              public DataType findValueByNumber(int number) {
-                return DataType.valueOf(number);
-              }
-            };
-      private final int index;
-      private final int value;
-
-      private DataType(int index, int value) {
-        this.index = index;
-        this.value = value;
-      }
-
-      public static DataType valueOf(int value) {
-        switch (value) {
-          case 1: return UNDEFINED;
-          case 2: return X_Object;
-          case 3: return J_Object;
-          case 4: return C_Object;
-          case 5: return P_Object;
-          case 6: return NCDFS_Object;
-          default: return null;
-        }
-      }
-
-      public static com.google.protobuf.Internal.EnumLiteMap<DataType>
-          internalGetValueMap() {
-        return internalValueMap;
-      }
-
-      public static final com.google.protobuf.Descriptors.EnumDescriptor
-          getDescriptor() {
-        return xMsgM.xMsgMeta.getDescriptor().getEnumTypes().get(0);
-      }
-
-      public static DataType valueOf(
-          com.google.protobuf.Descriptors.EnumValueDescriptor desc) {
-        if (desc.getType() != getDescriptor()) {
-          throw new java.lang.IllegalArgumentException(
-            "EnumValueDescriptor is not for this type.");
-        }
-        return VALUES[desc.getIndex()];
-      }
-
-      public final int getNumber() { return value; }
-
-      public final com.google.protobuf.Descriptors.EnumValueDescriptor
-          getValueDescriptor() {
-        return getDescriptor().getValues().get(index);
-      }
-
-      public final com.google.protobuf.Descriptors.EnumDescriptor
-          getDescriptorForType() {
-        return getDescriptor();
-      }
-
-      // @@protoc_insertion_point(enum_scope:xMsgMeta.DataType)
-    }
-    /**
-     * Protobuf enum {@code xMsgMeta.Status}
-     *
-     * <pre>
-     * Data processing status
-     * </pre>
-     */
-    public enum Status
-        implements com.google.protobuf.ProtocolMessageEnum {
-      /**
-       * <code>INFO = 1;</code>
-       */
-      INFO(0, 1),
-      /**
-       * <code>WARNING = 2;</code>
-       */
-      WARNING(1, 2),
-      /**
-       * <code>ERROR = 3;</code>
-       */
-      ERROR(2, 3),
-      ;
-
-      /**
-       * <code>INFO = 1;</code>
-       */
-      public static final int INFO_VALUE = 1;
-      /**
-       * <code>WARNING = 2;</code>
-       */
-      public static final int WARNING_VALUE = 2;
-      /**
-       * <code>ERROR = 3;</code>
-       */
-      public static final int ERROR_VALUE = 3;
-      private static final Status[] VALUES = values();
-      private static com.google.protobuf.Internal.EnumLiteMap<Status>
-          internalValueMap =
-            new com.google.protobuf.Internal.EnumLiteMap<Status>() {
-              public Status findValueByNumber(int number) {
-                return Status.valueOf(number);
-              }
-            };
-      private final int index;
-      private final int value;
-
-      private Status(int index, int value) {
-        this.index = index;
-        this.value = value;
-      }
-
-      public static Status valueOf(int value) {
-        switch (value) {
-          case 1: return INFO;
-          case 2: return WARNING;
-          case 3: return ERROR;
-          default: return null;
-        }
-      }
-
-      public static com.google.protobuf.Internal.EnumLiteMap<Status>
-          internalGetValueMap() {
-        return internalValueMap;
-      }
-
-      public static final com.google.protobuf.Descriptors.EnumDescriptor
-          getDescriptor() {
-        return xMsgM.xMsgMeta.getDescriptor().getEnumTypes().get(1);
-      }
-
-      public static Status valueOf(
-          com.google.protobuf.Descriptors.EnumValueDescriptor desc) {
-        if (desc.getType() != getDescriptor()) {
-          throw new java.lang.IllegalArgumentException(
-            "EnumValueDescriptor is not for this type.");
-        }
-        return VALUES[desc.getIndex()];
-      }
-
-      public final int getNumber() { return value; }
-
-      public final com.google.protobuf.Descriptors.EnumValueDescriptor
-          getValueDescriptor() {
-        return getDescriptor().getValues().get(index);
-      }
-
-      public final com.google.protobuf.Descriptors.EnumDescriptor
-          getDescriptorForType() {
-        return getDescriptor();
-      }
-
-      // @@protoc_insertion_point(enum_scope:xMsgMeta.Status)
-    }
-    /**
-     * Protobuf enum {@code xMsgMeta.Endian}
-     *
-     * <pre>
-     * Endianness
-     * </pre>
-     */
-    public enum Endian
-        implements com.google.protobuf.ProtocolMessageEnum {
-      /**
-       * <code>Little = 1;</code>
-       */
-      Little(0, 1),
-      /**
-       * <code>Big = 2;</code>
-       */
-      Big(1, 2),
-      ;
-
-      /**
-       * <code>Little = 1;</code>
-       */
-      public static final int Little_VALUE = 1;
-      /**
-       * <code>Big = 2;</code>
-       */
-      public static final int Big_VALUE = 2;
-      private static final Endian[] VALUES = values();
-      private static com.google.protobuf.Internal.EnumLiteMap<Endian>
-          internalValueMap =
-            new com.google.protobuf.Internal.EnumLiteMap<Endian>() {
-              public Endian findValueByNumber(int number) {
-                return Endian.valueOf(number);
-              }
-            };
-      private final int index;
-      private final int value;
-
-      private Endian(int index, int value) {
-        this.index = index;
-        this.value = value;
-      }
-
-      public static Endian valueOf(int value) {
-        switch (value) {
-          case 1: return Little;
-          case 2: return Big;
-          default: return null;
-        }
-      }
-
-      public static com.google.protobuf.Internal.EnumLiteMap<Endian>
-          internalGetValueMap() {
-        return internalValueMap;
-      }
-
-      public static final com.google.protobuf.Descriptors.EnumDescriptor
-          getDescriptor() {
-        return xMsgM.xMsgMeta.getDescriptor().getEnumTypes().get(2);
-      }
-
-      public static Endian valueOf(
-          com.google.protobuf.Descriptors.EnumValueDescriptor desc) {
-        if (desc.getType() != getDescriptor()) {
-          throw new java.lang.IllegalArgumentException(
-            "EnumValueDescriptor is not for this type.");
-        }
-        return VALUES[desc.getIndex()];
-      }
-
-      public final int getNumber() { return value; }
-
-      public final com.google.protobuf.Descriptors.EnumValueDescriptor
-          getValueDescriptor() {
-        return getDescriptor().getValues().get(index);
-      }
-
-      public final com.google.protobuf.Descriptors.EnumDescriptor
-          getDescriptorForType() {
-        return getDescriptor();
-      }
-
-      // @@protoc_insertion_point(enum_scope:xMsgMeta.Endian)
-    }
-    /**
-     * Protobuf enum {@code xMsgMeta.ControlAction}
-     *
-     * <pre>
-     * Control actions, used to define service control directive
-     * </pre>
-     */
-    public enum ControlAction
-        implements com.google.protobuf.ProtocolMessageEnum {
-      /**
-       * <code>EXECUTE = 0;</code>
-       */
-      EXECUTE(0, 0),
-      /**
-       * <code>CONFIGURE = 1;</code>
-       */
-      CONFIGURE(1, 1),
-      ;
-
-      /**
-       * <code>EXECUTE = 0;</code>
-       */
-      public static final int EXECUTE_VALUE = 0;
-      /**
-       * <code>CONFIGURE = 1;</code>
-       */
-      public static final int CONFIGURE_VALUE = 1;
-      private static final ControlAction[] VALUES = values();
-      private static com.google.protobuf.Internal.EnumLiteMap<ControlAction>
-          internalValueMap =
-            new com.google.protobuf.Internal.EnumLiteMap<ControlAction>() {
-              public ControlAction findValueByNumber(int number) {
-                return ControlAction.valueOf(number);
-              }
-            };
-      private final int index;
-      private final int value;
-
-      private ControlAction(int index, int value) {
-        this.index = index;
-        this.value = value;
-      }
-
-      public static ControlAction valueOf(int value) {
-        switch (value) {
-          case 0: return EXECUTE;
-          case 1: return CONFIGURE;
-          default: return null;
-        }
-      }
-
-      public static com.google.protobuf.Internal.EnumLiteMap<ControlAction>
-          internalGetValueMap() {
-        return internalValueMap;
-      }
-
-      public static final com.google.protobuf.Descriptors.EnumDescriptor
-          getDescriptor() {
-        return xMsgM.xMsgMeta.getDescriptor().getEnumTypes().get(3);
-      }
-
-      public static ControlAction valueOf(
-          com.google.protobuf.Descriptors.EnumValueDescriptor desc) {
-        if (desc.getType() != getDescriptor()) {
-          throw new java.lang.IllegalArgumentException(
-            "EnumValueDescriptor is not for this type.");
-        }
-        return VALUES[desc.getIndex()];
-      }
-
-      public final int getNumber() { return value; }
-
-      public final com.google.protobuf.Descriptors.EnumValueDescriptor
-          getValueDescriptor() {
-        return getDescriptor().getValues().get(index);
-      }
-
-      public final com.google.protobuf.Descriptors.EnumDescriptor
-          getDescriptorForType() {
-        return getDescriptor();
-      }
-
-      // @@protoc_insertion_point(enum_scope:xMsgMeta.ControlAction)
-    }
-
-    /**
-     * Protobuf enum {@code xMsgMeta.SubControlAction}
-     *
-     * <pre>
-     * Sub control action, used to micromanage service engine activity
-     * </pre>
-     */
-    public enum SubControlAction
-        implements com.google.protobuf.ProtocolMessageEnum {
-      /**
-       * <code>SKIP = 0;</code>
-       */
-      SKIP(0, 0),
-      ;
-
-      /**
-       * <code>SKIP = 0;</code>
-       */
-      public static final int SKIP_VALUE = 0;
-      private static final SubControlAction[] VALUES = values();
-      private static com.google.protobuf.Internal.EnumLiteMap<SubControlAction>
-          internalValueMap =
-            new com.google.protobuf.Internal.EnumLiteMap<SubControlAction>() {
-              public SubControlAction findValueByNumber(int number) {
-                return SubControlAction.valueOf(number);
-              }
-            };
-      private final int index;
-      private final int value;
-
-      private SubControlAction(int index, int value) {
-        this.index = index;
-        this.value = value;
-      }
-
-      public static SubControlAction valueOf(int value) {
-        switch (value) {
-          case 0: return SKIP;
-          default: return null;
-        }
-      }
-
-      public static com.google.protobuf.Internal.EnumLiteMap<SubControlAction>
-          internalGetValueMap() {
-        return internalValueMap;
-      }
-
-      public static final com.google.protobuf.Descriptors.EnumDescriptor
-          getDescriptor() {
-        return xMsgM.xMsgMeta.getDescriptor().getEnumTypes().get(4);
-      }
-
-      public static SubControlAction valueOf(
-          com.google.protobuf.Descriptors.EnumValueDescriptor desc) {
-        if (desc.getType() != getDescriptor()) {
-          throw new java.lang.IllegalArgumentException(
-            "EnumValueDescriptor is not for this type.");
-        }
-        return VALUES[desc.getIndex()];
-      }
-
-      public final int getNumber() { return value; }
-
-      public final com.google.protobuf.Descriptors.EnumValueDescriptor
-          getValueDescriptor() {
-        return getDescriptor().getValues().get(index);
-      }
-
-      public final com.google.protobuf.Descriptors.EnumDescriptor
-          getDescriptorForType() {
-        return getDescriptor();
-      }
-
-      // @@protoc_insertion_point(enum_scope:xMsgMeta.SubControlAction)
-    }
-
     /**
      * Protobuf type {@code xMsgMeta}
      *
@@ -2154,58 +1939,9 @@ public final class xMsgM {
     public static final class Builder extends
         com.google.protobuf.GeneratedMessage.Builder<Builder>
        implements xMsgM.xMsgMetaOrBuilder {
-      private int bitField0_;
-      // optional string version = 1;
-      private java.lang.Object version_ = "";
-      // optional string description = 2;
-      private java.lang.Object description_ = "";
-      // optional string author = 3;
-      private java.lang.Object author_ = "";
-      // optional .xMsgMeta.Status status = 4;
-      private xMsgM.xMsgMeta.Status status_ = xMsgM.xMsgMeta.Status.INFO;
-      // optional sfixed32 severityId = 5;
-      private int severityId_ ;
-      // optional string sender = 6;
-      private java.lang.Object sender_ = "";
-      // optional string senderState = 7;
-      private java.lang.Object senderState_ = "";
-      // optional fixed32 communicationId = 8;
-      private int communicationId_ ;
-      // optional string composition = 10;
-      private java.lang.Object composition_ = "";
-      // optional sfixed64 executionTime = 11;
-      private long executionTime_ ;
-      // optional .xMsgMeta.ControlAction action = 12;
-      private xMsgM.xMsgMeta.ControlAction action_ = xMsgM.xMsgMeta.ControlAction.EXECUTE;
-      // optional .xMsgMeta.SubControlAction control = 13;
-      private xMsgM.xMsgMeta.SubControlAction control_ = xMsgM.xMsgMeta.SubControlAction.SKIP;
-      // optional .xMsgMeta.DataType dataType = 14;
-      private xMsgM.xMsgMeta.DataType dataType_ = xMsgM.xMsgMeta.DataType.UNDEFINED;
-      // optional string datTypeDescription = 15;
-      private java.lang.Object datTypeDescription_ = "";
-      // optional bool isDataSerialized = 16 [default = true];
-      private boolean isDataSerialized_ = true;
-      // optional string replyTo = 17 [default = "undefined"];
-      private java.lang.Object replyTo_ = "undefined";
-      // optional .xMsgMeta.Endian byteOrder = 18;
-      private xMsgM.xMsgMeta.Endian byteOrder_ = xMsgM.xMsgMeta.Endian.Little;
-      // Construct using xMsgM.xMsgMeta.newBuilder()
-      private Builder() {
-        maybeForceBuilderInitialization();
-      }
-      private Builder(
-          com.google.protobuf.GeneratedMessage.BuilderParent parent) {
-        super(parent);
-        maybeForceBuilderInitialization();
-      }
-
       public static final com.google.protobuf.Descriptors.Descriptor
           getDescriptor() {
         return xMsgM.internal_static_xMsgMeta_descriptor;
-      }
-
-      private static Builder create() {
-        return new Builder();
       }
 
       protected com.google.protobuf.GeneratedMessage.FieldAccessorTable
@@ -2215,9 +1951,22 @@ public final class xMsgM {
                 xMsgM.xMsgMeta.class, xMsgM.xMsgMeta.Builder.class);
       }
 
+      // Construct using xMsgM.xMsgMeta.newBuilder()
+      private Builder() {
+        maybeForceBuilderInitialization();
+      }
+
+      private Builder(
+          com.google.protobuf.GeneratedMessage.BuilderParent parent) {
+        super(parent);
+        maybeForceBuilderInitialization();
+      }
       private void maybeForceBuilderInitialization() {
         if (com.google.protobuf.GeneratedMessage.alwaysUseFieldBuilders) {
         }
+      }
+      private static Builder create() {
+        return new Builder();
       }
 
       public Builder clear() {
@@ -2246,7 +1995,7 @@ public final class xMsgM {
         bitField0_ = (bitField0_ & ~0x00000400);
         control_ = xMsgM.xMsgMeta.SubControlAction.SKIP;
         bitField0_ = (bitField0_ & ~0x00000800);
-        dataType_ = xMsgM.xMsgMeta.DataType.UNDEFINED;
+        dataType_ = "native";
         bitField0_ = (bitField0_ & ~0x00001000);
         datTypeDescription_ = "";
         bitField0_ = (bitField0_ & ~0x00002000);
@@ -2417,7 +2166,9 @@ public final class xMsgM {
           setControl(other.getControl());
         }
         if (other.hasDataType()) {
-          setDataType(other.getDataType());
+          bitField0_ |= 0x00001000;
+          dataType_ = other.dataType_;
+          onChanged();
         }
         if (other.hasDatTypeDescription()) {
           bitField0_ |= 0x00002000;
@@ -2460,7 +2211,10 @@ public final class xMsgM {
         }
         return this;
       }
+      private int bitField0_;
 
+      // optional string version = 1;
+      private java.lang.Object version_ = "";
       /**
        * <code>optional string version = 1;</code>
        *
@@ -2472,7 +2226,6 @@ public final class xMsgM {
       public boolean hasVersion() {
         return ((bitField0_ & 0x00000001) == 0x00000001);
       }
-
       /**
        * <code>optional string version = 1;</code>
        *
@@ -2492,7 +2245,27 @@ public final class xMsgM {
           return (java.lang.String) ref;
         }
       }
-
+      /**
+       * <code>optional string version = 1;</code>
+       *
+       * <pre>
+       * ... Communication section ...
+       * Version
+       * </pre>
+       */
+      public com.google.protobuf.ByteString
+          getVersionBytes() {
+        java.lang.Object ref = version_;
+        if (ref instanceof String) {
+          com.google.protobuf.ByteString b = 
+              com.google.protobuf.ByteString.copyFromUtf8(
+                  (java.lang.String) ref);
+          version_ = b;
+          return b;
+        } else {
+          return (com.google.protobuf.ByteString) ref;
+        }
+      }
       /**
        * <code>optional string version = 1;</code>
        *
@@ -2511,7 +2284,6 @@ public final class xMsgM {
         onChanged();
         return this;
       }
-
       /**
        * <code>optional string version = 1;</code>
        *
@@ -2520,20 +2292,12 @@ public final class xMsgM {
        * Version
        * </pre>
        */
-      public com.google.protobuf.ByteString
-          getVersionBytes() {
-        java.lang.Object ref = version_;
-        if (ref instanceof String) {
-          com.google.protobuf.ByteString b =
-              com.google.protobuf.ByteString.copyFromUtf8(
-                  (java.lang.String) ref);
-          version_ = b;
-          return b;
-        } else {
-          return (com.google.protobuf.ByteString) ref;
-        }
+      public Builder clearVersion() {
+        bitField0_ = (bitField0_ & ~0x00000001);
+        version_ = getDefaultInstance().getVersion();
+        onChanged();
+        return this;
       }
-
       /**
        * <code>optional string version = 1;</code>
        *
@@ -2553,21 +2317,8 @@ public final class xMsgM {
         return this;
       }
 
-      /**
-       * <code>optional string version = 1;</code>
-       *
-       * <pre>
-       * ... Communication section ...
-       * Version
-       * </pre>
-       */
-      public Builder clearVersion() {
-        bitField0_ = (bitField0_ & ~0x00000001);
-        version_ = getDefaultInstance().getVersion();
-        onChanged();
-        return this;
-      }
-
+      // optional string description = 2;
+      private java.lang.Object description_ = "";
       /**
        * <code>optional string description = 2;</code>
        *
@@ -2578,7 +2329,6 @@ public final class xMsgM {
       public boolean hasDescription() {
         return ((bitField0_ & 0x00000002) == 0x00000002);
       }
-
       /**
        * <code>optional string description = 2;</code>
        *
@@ -2597,7 +2347,26 @@ public final class xMsgM {
           return (java.lang.String) ref;
         }
       }
-
+      /**
+       * <code>optional string description = 2;</code>
+       *
+       * <pre>
+       * Description
+       * </pre>
+       */
+      public com.google.protobuf.ByteString
+          getDescriptionBytes() {
+        java.lang.Object ref = description_;
+        if (ref instanceof String) {
+          com.google.protobuf.ByteString b = 
+              com.google.protobuf.ByteString.copyFromUtf8(
+                  (java.lang.String) ref);
+          description_ = b;
+          return b;
+        } else {
+          return (com.google.protobuf.ByteString) ref;
+        }
+      }
       /**
        * <code>optional string description = 2;</code>
        *
@@ -2615,7 +2384,6 @@ public final class xMsgM {
         onChanged();
         return this;
       }
-
       /**
        * <code>optional string description = 2;</code>
        *
@@ -2623,20 +2391,12 @@ public final class xMsgM {
        * Description
        * </pre>
        */
-      public com.google.protobuf.ByteString
-          getDescriptionBytes() {
-        java.lang.Object ref = description_;
-        if (ref instanceof String) {
-          com.google.protobuf.ByteString b =
-              com.google.protobuf.ByteString.copyFromUtf8(
-                  (java.lang.String) ref);
-          description_ = b;
-          return b;
-        } else {
-          return (com.google.protobuf.ByteString) ref;
-        }
+      public Builder clearDescription() {
+        bitField0_ = (bitField0_ & ~0x00000002);
+        description_ = getDefaultInstance().getDescription();
+        onChanged();
+        return this;
       }
-
       /**
        * <code>optional string description = 2;</code>
        *
@@ -2655,20 +2415,8 @@ public final class xMsgM {
         return this;
       }
 
-      /**
-       * <code>optional string description = 2;</code>
-       *
-       * <pre>
-       * Description
-       * </pre>
-       */
-      public Builder clearDescription() {
-        bitField0_ = (bitField0_ & ~0x00000002);
-        description_ = getDefaultInstance().getDescription();
-        onChanged();
-        return this;
-      }
-
+      // optional string author = 3;
+      private java.lang.Object author_ = "";
       /**
        * <code>optional string author = 3;</code>
        *
@@ -2679,7 +2427,6 @@ public final class xMsgM {
       public boolean hasAuthor() {
         return ((bitField0_ & 0x00000004) == 0x00000004);
       }
-
       /**
        * <code>optional string author = 3;</code>
        *
@@ -2698,7 +2445,26 @@ public final class xMsgM {
           return (java.lang.String) ref;
         }
       }
-
+      /**
+       * <code>optional string author = 3;</code>
+       *
+       * <pre>
+       * Author of the communicating data
+       * </pre>
+       */
+      public com.google.protobuf.ByteString
+          getAuthorBytes() {
+        java.lang.Object ref = author_;
+        if (ref instanceof String) {
+          com.google.protobuf.ByteString b = 
+              com.google.protobuf.ByteString.copyFromUtf8(
+                  (java.lang.String) ref);
+          author_ = b;
+          return b;
+        } else {
+          return (com.google.protobuf.ByteString) ref;
+        }
+      }
       /**
        * <code>optional string author = 3;</code>
        *
@@ -2716,7 +2482,6 @@ public final class xMsgM {
         onChanged();
         return this;
       }
-
       /**
        * <code>optional string author = 3;</code>
        *
@@ -2724,20 +2489,12 @@ public final class xMsgM {
        * Author of the communicating data
        * </pre>
        */
-      public com.google.protobuf.ByteString
-          getAuthorBytes() {
-        java.lang.Object ref = author_;
-        if (ref instanceof String) {
-          com.google.protobuf.ByteString b =
-              com.google.protobuf.ByteString.copyFromUtf8(
-                  (java.lang.String) ref);
-          author_ = b;
-          return b;
-        } else {
-          return (com.google.protobuf.ByteString) ref;
-        }
+      public Builder clearAuthor() {
+        bitField0_ = (bitField0_ & ~0x00000004);
+        author_ = getDefaultInstance().getAuthor();
+        onChanged();
+        return this;
       }
-
       /**
        * <code>optional string author = 3;</code>
        *
@@ -2756,20 +2513,8 @@ public final class xMsgM {
         return this;
       }
 
-      /**
-       * <code>optional string author = 3;</code>
-       *
-       * <pre>
-       * Author of the communicating data
-       * </pre>
-       */
-      public Builder clearAuthor() {
-        bitField0_ = (bitField0_ & ~0x00000004);
-        author_ = getDefaultInstance().getAuthor();
-        onChanged();
-        return this;
-      }
-
+      // optional .xMsgMeta.Status status = 4;
+      private xMsgM.xMsgMeta.Status status_ = xMsgM.xMsgMeta.Status.INFO;
       /**
        * <code>optional .xMsgMeta.Status status = 4;</code>
        *
@@ -2780,7 +2525,6 @@ public final class xMsgM {
       public boolean hasStatus() {
         return ((bitField0_ & 0x00000008) == 0x00000008);
       }
-
       /**
        * <code>optional .xMsgMeta.Status status = 4;</code>
        *
@@ -2791,7 +2535,6 @@ public final class xMsgM {
       public xMsgM.xMsgMeta.Status getStatus() {
         return status_;
       }
-
       /**
        * <code>optional .xMsgMeta.Status status = 4;</code>
        *
@@ -2808,7 +2551,6 @@ public final class xMsgM {
         onChanged();
         return this;
       }
-
       /**
        * <code>optional .xMsgMeta.Status status = 4;</code>
        *
@@ -2823,6 +2565,8 @@ public final class xMsgM {
         return this;
       }
 
+      // optional sfixed32 severityId = 5;
+      private int severityId_ ;
       /**
        * <code>optional sfixed32 severityId = 5;</code>
        *
@@ -2833,7 +2577,6 @@ public final class xMsgM {
       public boolean hasSeverityId() {
         return ((bitField0_ & 0x00000010) == 0x00000010);
       }
-
       /**
        * <code>optional sfixed32 severityId = 5;</code>
        *
@@ -2844,7 +2587,6 @@ public final class xMsgM {
       public int getSeverityId() {
         return severityId_;
       }
-
       /**
        * <code>optional sfixed32 severityId = 5;</code>
        *
@@ -2858,7 +2600,6 @@ public final class xMsgM {
         onChanged();
         return this;
       }
-
       /**
        * <code>optional sfixed32 severityId = 5;</code>
        *
@@ -2873,6 +2614,8 @@ public final class xMsgM {
         return this;
       }
 
+      // optional string sender = 6;
+      private java.lang.Object sender_ = "";
       /**
        * <code>optional string sender = 6;</code>
        *
@@ -2884,7 +2627,6 @@ public final class xMsgM {
       public boolean hasSender() {
         return ((bitField0_ & 0x00000020) == 0x00000020);
       }
-
       /**
        * <code>optional string sender = 6;</code>
        *
@@ -2904,7 +2646,27 @@ public final class xMsgM {
           return (java.lang.String) ref;
         }
       }
-
+      /**
+       * <code>optional string sender = 6;</code>
+       *
+       * <pre>
+       * The sender of the data.
+       * Note, in most cases this is going to be the author
+       * </pre>
+       */
+      public com.google.protobuf.ByteString
+          getSenderBytes() {
+        java.lang.Object ref = sender_;
+        if (ref instanceof String) {
+          com.google.protobuf.ByteString b = 
+              com.google.protobuf.ByteString.copyFromUtf8(
+                  (java.lang.String) ref);
+          sender_ = b;
+          return b;
+        } else {
+          return (com.google.protobuf.ByteString) ref;
+        }
+      }
       /**
        * <code>optional string sender = 6;</code>
        *
@@ -2923,7 +2685,6 @@ public final class xMsgM {
         onChanged();
         return this;
       }
-
       /**
        * <code>optional string sender = 6;</code>
        *
@@ -2932,20 +2693,12 @@ public final class xMsgM {
        * Note, in most cases this is going to be the author
        * </pre>
        */
-      public com.google.protobuf.ByteString
-          getSenderBytes() {
-        java.lang.Object ref = sender_;
-        if (ref instanceof String) {
-          com.google.protobuf.ByteString b =
-              com.google.protobuf.ByteString.copyFromUtf8(
-                  (java.lang.String) ref);
-          sender_ = b;
-          return b;
-        } else {
-          return (com.google.protobuf.ByteString) ref;
-        }
+      public Builder clearSender() {
+        bitField0_ = (bitField0_ & ~0x00000020);
+        sender_ = getDefaultInstance().getSender();
+        onChanged();
+        return this;
       }
-
       /**
        * <code>optional string sender = 6;</code>
        *
@@ -2965,21 +2718,8 @@ public final class xMsgM {
         return this;
       }
 
-      /**
-       * <code>optional string sender = 6;</code>
-       *
-       * <pre>
-       * The sender of the data.
-       * Note, in most cases this is going to be the author
-       * </pre>
-       */
-      public Builder clearSender() {
-        bitField0_ = (bitField0_ & ~0x00000020);
-        sender_ = getDefaultInstance().getSender();
-        onChanged();
-        return this;
-      }
-
+      // optional string senderState = 7;
+      private java.lang.Object senderState_ = "";
       /**
        * <code>optional string senderState = 7;</code>
        *
@@ -2991,7 +2731,6 @@ public final class xMsgM {
       public boolean hasSenderState() {
         return ((bitField0_ & 0x00000040) == 0x00000040);
       }
-
       /**
        * <code>optional string senderState = 7;</code>
        *
@@ -3011,7 +2750,27 @@ public final class xMsgM {
           return (java.lang.String) ref;
         }
       }
-
+      /**
+       * <code>optional string senderState = 7;</code>
+       *
+       * <pre>
+       * The state of the message sender.
+       * Note, this is reserved to be used for state machine organization
+       * </pre>
+       */
+      public com.google.protobuf.ByteString
+          getSenderStateBytes() {
+        java.lang.Object ref = senderState_;
+        if (ref instanceof String) {
+          com.google.protobuf.ByteString b = 
+              com.google.protobuf.ByteString.copyFromUtf8(
+                  (java.lang.String) ref);
+          senderState_ = b;
+          return b;
+        } else {
+          return (com.google.protobuf.ByteString) ref;
+        }
+      }
       /**
        * <code>optional string senderState = 7;</code>
        *
@@ -3030,7 +2789,6 @@ public final class xMsgM {
         onChanged();
         return this;
       }
-
       /**
        * <code>optional string senderState = 7;</code>
        *
@@ -3039,20 +2797,12 @@ public final class xMsgM {
        * Note, this is reserved to be used for state machine organization
        * </pre>
        */
-      public com.google.protobuf.ByteString
-          getSenderStateBytes() {
-        java.lang.Object ref = senderState_;
-        if (ref instanceof String) {
-          com.google.protobuf.ByteString b =
-              com.google.protobuf.ByteString.copyFromUtf8(
-                  (java.lang.String) ref);
-          senderState_ = b;
-          return b;
-        } else {
-          return (com.google.protobuf.ByteString) ref;
-        }
+      public Builder clearSenderState() {
+        bitField0_ = (bitField0_ & ~0x00000040);
+        senderState_ = getDefaultInstance().getSenderState();
+        onChanged();
+        return this;
       }
-
       /**
        * <code>optional string senderState = 7;</code>
        *
@@ -3072,21 +2822,8 @@ public final class xMsgM {
         return this;
       }
 
-      /**
-       * <code>optional string senderState = 7;</code>
-       *
-       * <pre>
-       * The state of the message sender.
-       * Note, this is reserved to be used for state machine organization
-       * </pre>
-       */
-      public Builder clearSenderState() {
-        bitField0_ = (bitField0_ & ~0x00000040);
-        senderState_ = getDefaultInstance().getSenderState();
-        onChanged();
-        return this;
-      }
-
+      // optional fixed32 communicationId = 8;
+      private int communicationId_ ;
       /**
        * <code>optional fixed32 communicationId = 8;</code>
        *
@@ -3097,7 +2834,6 @@ public final class xMsgM {
       public boolean hasCommunicationId() {
         return ((bitField0_ & 0x00000080) == 0x00000080);
       }
-
       /**
        * <code>optional fixed32 communicationId = 8;</code>
        *
@@ -3108,7 +2844,6 @@ public final class xMsgM {
       public int getCommunicationId() {
         return communicationId_;
       }
-
       /**
        * <code>optional fixed32 communicationId = 8;</code>
        *
@@ -3122,7 +2857,6 @@ public final class xMsgM {
         onChanged();
         return this;
       }
-
       /**
        * <code>optional fixed32 communicationId = 8;</code>
        *
@@ -3137,6 +2871,8 @@ public final class xMsgM {
         return this;
       }
 
+      // optional string composition = 10;
+      private java.lang.Object composition_ = "";
       /**
        * <code>optional string composition = 10;</code>
        *
@@ -3149,7 +2885,6 @@ public final class xMsgM {
       public boolean hasComposition() {
         return ((bitField0_ & 0x00000100) == 0x00000100);
       }
-
       /**
        * <code>optional string composition = 10;</code>
        *
@@ -3170,7 +2905,28 @@ public final class xMsgM {
           return (java.lang.String) ref;
         }
       }
-
+      /**
+       * <code>optional string composition = 10;</code>
+       *
+       * <pre>
+       * Reserved and used for Clara service based application
+       * composition i.e. link schema (list of linked service names)
+       * e.g. s1+s2;s1+s3,s4,s5+&amp;s6
+       * </pre>
+       */
+      public com.google.protobuf.ByteString
+          getCompositionBytes() {
+        java.lang.Object ref = composition_;
+        if (ref instanceof String) {
+          com.google.protobuf.ByteString b = 
+              com.google.protobuf.ByteString.copyFromUtf8(
+                  (java.lang.String) ref);
+          composition_ = b;
+          return b;
+        } else {
+          return (com.google.protobuf.ByteString) ref;
+        }
+      }
       /**
        * <code>optional string composition = 10;</code>
        *
@@ -3190,7 +2946,6 @@ public final class xMsgM {
         onChanged();
         return this;
       }
-
       /**
        * <code>optional string composition = 10;</code>
        *
@@ -3200,20 +2955,12 @@ public final class xMsgM {
        * e.g. s1+s2;s1+s3,s4,s5+&amp;s6
        * </pre>
        */
-      public com.google.protobuf.ByteString
-          getCompositionBytes() {
-        java.lang.Object ref = composition_;
-        if (ref instanceof String) {
-          com.google.protobuf.ByteString b =
-              com.google.protobuf.ByteString.copyFromUtf8(
-                  (java.lang.String) ref);
-          composition_ = b;
-          return b;
-        } else {
-          return (com.google.protobuf.ByteString) ref;
-        }
+      public Builder clearComposition() {
+        bitField0_ = (bitField0_ & ~0x00000100);
+        composition_ = getDefaultInstance().getComposition();
+        onChanged();
+        return this;
       }
-
       /**
        * <code>optional string composition = 10;</code>
        *
@@ -3234,22 +2981,8 @@ public final class xMsgM {
         return this;
       }
 
-      /**
-       * <code>optional string composition = 10;</code>
-       *
-       * <pre>
-       * Reserved and used for Clara service based application
-       * composition i.e. link schema (list of linked service names)
-       * e.g. s1+s2;s1+s3,s4,s5+&amp;s6
-       * </pre>
-       */
-      public Builder clearComposition() {
-        bitField0_ = (bitField0_ & ~0x00000100);
-        composition_ = getDefaultInstance().getComposition();
-        onChanged();
-        return this;
-      }
-
+      // optional sfixed64 executionTime = 11;
+      private long executionTime_ ;
       /**
        * <code>optional sfixed64 executionTime = 11;</code>
        *
@@ -3261,7 +2994,6 @@ public final class xMsgM {
       public boolean hasExecutionTime() {
         return ((bitField0_ & 0x00000200) == 0x00000200);
       }
-
       /**
        * <code>optional sfixed64 executionTime = 11;</code>
        *
@@ -3273,7 +3005,6 @@ public final class xMsgM {
       public long getExecutionTime() {
         return executionTime_;
       }
-
       /**
        * <code>optional sfixed64 executionTime = 11;</code>
        *
@@ -3288,7 +3019,6 @@ public final class xMsgM {
         onChanged();
         return this;
       }
-
       /**
        * <code>optional sfixed64 executionTime = 11;</code>
        *
@@ -3304,6 +3034,8 @@ public final class xMsgM {
         return this;
       }
 
+      // optional .xMsgMeta.ControlAction action = 12;
+      private xMsgM.xMsgMeta.ControlAction action_ = xMsgM.xMsgMeta.ControlAction.EXECUTE;
       /**
        * <code>optional .xMsgMeta.ControlAction action = 12;</code>
        *
@@ -3315,7 +3047,6 @@ public final class xMsgM {
       public boolean hasAction() {
         return ((bitField0_ & 0x00000400) == 0x00000400);
       }
-
       /**
        * <code>optional .xMsgMeta.ControlAction action = 12;</code>
        *
@@ -3327,7 +3058,6 @@ public final class xMsgM {
       public xMsgM.xMsgMeta.ControlAction getAction() {
         return action_;
       }
-
       /**
        * <code>optional .xMsgMeta.ControlAction action = 12;</code>
        *
@@ -3345,7 +3075,6 @@ public final class xMsgM {
         onChanged();
         return this;
       }
-
       /**
        * <code>optional .xMsgMeta.ControlAction action = 12;</code>
        *
@@ -3361,6 +3090,8 @@ public final class xMsgM {
         return this;
       }
 
+      // optional .xMsgMeta.SubControlAction control = 13;
+      private xMsgM.xMsgMeta.SubControlAction control_ = xMsgM.xMsgMeta.SubControlAction.SKIP;
       /**
        * <code>optional .xMsgMeta.SubControlAction control = 13;</code>
        *
@@ -3371,7 +3102,6 @@ public final class xMsgM {
       public boolean hasControl() {
         return ((bitField0_ & 0x00000800) == 0x00000800);
       }
-
       /**
        * <code>optional .xMsgMeta.SubControlAction control = 13;</code>
        *
@@ -3382,7 +3112,6 @@ public final class xMsgM {
       public xMsgM.xMsgMeta.SubControlAction getControl() {
         return control_;
       }
-
       /**
        * <code>optional .xMsgMeta.SubControlAction control = 13;</code>
        *
@@ -3399,7 +3128,6 @@ public final class xMsgM {
         onChanged();
         return this;
       }
-
       /**
        * <code>optional .xMsgMeta.SubControlAction control = 13;</code>
        *
@@ -3414,8 +3142,10 @@ public final class xMsgM {
         return this;
       }
 
+      // optional string dataType = 14 [default = "native"];
+      private java.lang.Object dataType_ = "native";
       /**
-       * <code>optional .xMsgMeta.DataType dataType = 14;</code>
+       * <code>optional string dataType = 14 [default = "native"];</code>
        *
        * <pre>
        * ... Data section ...
@@ -3425,39 +3155,66 @@ public final class xMsgM {
       public boolean hasDataType() {
         return ((bitField0_ & 0x00001000) == 0x00001000);
       }
-
       /**
-       * <code>optional .xMsgMeta.DataType dataType = 14;</code>
+       * <code>optional string dataType = 14 [default = "native"];</code>
        *
        * <pre>
        * ... Data section ...
        * Type of the data
        * </pre>
        */
-      public xMsgM.xMsgMeta.DataType getDataType() {
-        return dataType_;
-      }
-
-      /**
-       * <code>optional .xMsgMeta.DataType dataType = 14;</code>
-       *
-       * <pre>
-       * ... Data section ...
-       * Type of the data
-       * </pre>
-       */
-      public Builder setDataType(xMsgM.xMsgMeta.DataType value) {
-        if (value == null) {
-          throw new NullPointerException();
+      public java.lang.String getDataType() {
+        java.lang.Object ref = dataType_;
+        if (!(ref instanceof java.lang.String)) {
+          java.lang.String s = ((com.google.protobuf.ByteString) ref)
+              .toStringUtf8();
+          dataType_ = s;
+          return s;
+        } else {
+          return (java.lang.String) ref;
         }
-        bitField0_ |= 0x00001000;
+      }
+      /**
+       * <code>optional string dataType = 14 [default = "native"];</code>
+       *
+       * <pre>
+       * ... Data section ...
+       * Type of the data
+       * </pre>
+       */
+      public com.google.protobuf.ByteString
+          getDataTypeBytes() {
+        java.lang.Object ref = dataType_;
+        if (ref instanceof String) {
+          com.google.protobuf.ByteString b = 
+              com.google.protobuf.ByteString.copyFromUtf8(
+                  (java.lang.String) ref);
+          dataType_ = b;
+          return b;
+        } else {
+          return (com.google.protobuf.ByteString) ref;
+        }
+      }
+      /**
+       * <code>optional string dataType = 14 [default = "native"];</code>
+       *
+       * <pre>
+       * ... Data section ...
+       * Type of the data
+       * </pre>
+       */
+      public Builder setDataType(
+          java.lang.String value) {
+        if (value == null) {
+    throw new NullPointerException();
+  }
+  bitField0_ |= 0x00001000;
         dataType_ = value;
         onChanged();
         return this;
       }
-
       /**
-       * <code>optional .xMsgMeta.DataType dataType = 14;</code>
+       * <code>optional string dataType = 14 [default = "native"];</code>
        *
        * <pre>
        * ... Data section ...
@@ -3466,11 +3223,31 @@ public final class xMsgM {
        */
       public Builder clearDataType() {
         bitField0_ = (bitField0_ & ~0x00001000);
-        dataType_ = xMsgM.xMsgMeta.DataType.UNDEFINED;
+        dataType_ = getDefaultInstance().getDataType();
+        onChanged();
+        return this;
+      }
+      /**
+       * <code>optional string dataType = 14 [default = "native"];</code>
+       *
+       * <pre>
+       * ... Data section ...
+       * Type of the data
+       * </pre>
+       */
+      public Builder setDataTypeBytes(
+          com.google.protobuf.ByteString value) {
+        if (value == null) {
+    throw new NullPointerException();
+  }
+  bitField0_ |= 0x00001000;
+        dataType_ = value;
         onChanged();
         return this;
       }
 
+      // optional string datTypeDescription = 15;
+      private java.lang.Object datTypeDescription_ = "";
       /**
        * <code>optional string datTypeDescription = 15;</code>
        *
@@ -3483,7 +3260,6 @@ public final class xMsgM {
       public boolean hasDatTypeDescription() {
         return ((bitField0_ & 0x00002000) == 0x00002000);
       }
-
       /**
        * <code>optional string datTypeDescription = 15;</code>
        *
@@ -3504,7 +3280,28 @@ public final class xMsgM {
           return (java.lang.String) ref;
         }
       }
-
+      /**
+       * <code>optional string datTypeDescription = 15;</code>
+       *
+       * <pre>
+       * description of the type, for e.g. If data
+       * type = J_Object then this can be used to
+       * further clarify what type of Java object is this.
+       * </pre>
+       */
+      public com.google.protobuf.ByteString
+          getDatTypeDescriptionBytes() {
+        java.lang.Object ref = datTypeDescription_;
+        if (ref instanceof String) {
+          com.google.protobuf.ByteString b = 
+              com.google.protobuf.ByteString.copyFromUtf8(
+                  (java.lang.String) ref);
+          datTypeDescription_ = b;
+          return b;
+        } else {
+          return (com.google.protobuf.ByteString) ref;
+        }
+      }
       /**
        * <code>optional string datTypeDescription = 15;</code>
        *
@@ -3524,7 +3321,6 @@ public final class xMsgM {
         onChanged();
         return this;
       }
-
       /**
        * <code>optional string datTypeDescription = 15;</code>
        *
@@ -3534,20 +3330,12 @@ public final class xMsgM {
        * further clarify what type of Java object is this.
        * </pre>
        */
-      public com.google.protobuf.ByteString
-          getDatTypeDescriptionBytes() {
-        java.lang.Object ref = datTypeDescription_;
-        if (ref instanceof String) {
-          com.google.protobuf.ByteString b =
-              com.google.protobuf.ByteString.copyFromUtf8(
-                  (java.lang.String) ref);
-          datTypeDescription_ = b;
-          return b;
-        } else {
-          return (com.google.protobuf.ByteString) ref;
-        }
+      public Builder clearDatTypeDescription() {
+        bitField0_ = (bitField0_ & ~0x00002000);
+        datTypeDescription_ = getDefaultInstance().getDatTypeDescription();
+        onChanged();
+        return this;
       }
-
       /**
        * <code>optional string datTypeDescription = 15;</code>
        *
@@ -3568,22 +3356,8 @@ public final class xMsgM {
         return this;
       }
 
-      /**
-       * <code>optional string datTypeDescription = 15;</code>
-       *
-       * <pre>
-       * description of the type, for e.g. If data
-       * type = J_Object then this can be used to
-       * further clarify what type of Java object is this.
-       * </pre>
-       */
-      public Builder clearDatTypeDescription() {
-        bitField0_ = (bitField0_ & ~0x00002000);
-        datTypeDescription_ = getDefaultInstance().getDatTypeDescription();
-        onChanged();
-        return this;
-      }
-
+      // optional bool isDataSerialized = 16 [default = true];
+      private boolean isDataSerialized_ = true;
       /**
        * <code>optional bool isDataSerialized = 16 [default = true];</code>
        *
@@ -3594,7 +3368,6 @@ public final class xMsgM {
       public boolean hasIsDataSerialized() {
         return ((bitField0_ & 0x00004000) == 0x00004000);
       }
-
       /**
        * <code>optional bool isDataSerialized = 16 [default = true];</code>
        *
@@ -3605,7 +3378,6 @@ public final class xMsgM {
       public boolean getIsDataSerialized() {
         return isDataSerialized_;
       }
-
       /**
        * <code>optional bool isDataSerialized = 16 [default = true];</code>
        *
@@ -3619,7 +3391,6 @@ public final class xMsgM {
         onChanged();
         return this;
       }
-
       /**
        * <code>optional bool isDataSerialized = 16 [default = true];</code>
        *
@@ -3634,6 +3405,8 @@ public final class xMsgM {
         return this;
       }
 
+      // optional string replyTo = 17 [default = "undefined"];
+      private java.lang.Object replyTo_ = "undefined";
       /**
        * <code>optional string replyTo = 17 [default = "undefined"];</code>
        *
@@ -3644,7 +3417,6 @@ public final class xMsgM {
       public boolean hasReplyTo() {
         return ((bitField0_ & 0x00008000) == 0x00008000);
       }
-
       /**
        * <code>optional string replyTo = 17 [default = "undefined"];</code>
        *
@@ -3663,7 +3435,26 @@ public final class xMsgM {
           return (java.lang.String) ref;
         }
       }
-
+      /**
+       * <code>optional string replyTo = 17 [default = "undefined"];</code>
+       *
+       * <pre>
+       * Sync request reply_to address
+       * </pre>
+       */
+      public com.google.protobuf.ByteString
+          getReplyToBytes() {
+        java.lang.Object ref = replyTo_;
+        if (ref instanceof String) {
+          com.google.protobuf.ByteString b = 
+              com.google.protobuf.ByteString.copyFromUtf8(
+                  (java.lang.String) ref);
+          replyTo_ = b;
+          return b;
+        } else {
+          return (com.google.protobuf.ByteString) ref;
+        }
+      }
       /**
        * <code>optional string replyTo = 17 [default = "undefined"];</code>
        *
@@ -3681,7 +3472,6 @@ public final class xMsgM {
         onChanged();
         return this;
       }
-
       /**
        * <code>optional string replyTo = 17 [default = "undefined"];</code>
        *
@@ -3689,20 +3479,12 @@ public final class xMsgM {
        * Sync request reply_to address
        * </pre>
        */
-      public com.google.protobuf.ByteString
-          getReplyToBytes() {
-        java.lang.Object ref = replyTo_;
-        if (ref instanceof String) {
-          com.google.protobuf.ByteString b =
-              com.google.protobuf.ByteString.copyFromUtf8(
-                  (java.lang.String) ref);
-          replyTo_ = b;
-          return b;
-        } else {
-          return (com.google.protobuf.ByteString) ref;
-        }
+      public Builder clearReplyTo() {
+        bitField0_ = (bitField0_ & ~0x00008000);
+        replyTo_ = getDefaultInstance().getReplyTo();
+        onChanged();
+        return this;
       }
-
       /**
        * <code>optional string replyTo = 17 [default = "undefined"];</code>
        *
@@ -3721,20 +3503,8 @@ public final class xMsgM {
         return this;
       }
 
-      /**
-       * <code>optional string replyTo = 17 [default = "undefined"];</code>
-       *
-       * <pre>
-       * Sync request reply_to address
-       * </pre>
-       */
-      public Builder clearReplyTo() {
-        bitField0_ = (bitField0_ & ~0x00008000);
-        replyTo_ = getDefaultInstance().getReplyTo();
-        onChanged();
-        return this;
-      }
-
+      // optional .xMsgMeta.Endian byteOrder = 18;
+      private xMsgM.xMsgMeta.Endian byteOrder_ = xMsgM.xMsgMeta.Endian.Little;
       /**
        * <code>optional .xMsgMeta.Endian byteOrder = 18;</code>
        *
@@ -3798,6 +3568,58 @@ public final class xMsgM {
     }
 
     // @@protoc_insertion_point(class_scope:xMsgMeta)
+  }
+
+  private static com.google.protobuf.Descriptors.Descriptor
+    internal_static_xMsgMeta_descriptor;
+  private static
+    com.google.protobuf.GeneratedMessage.FieldAccessorTable
+      internal_static_xMsgMeta_fieldAccessorTable;
+
+  public static com.google.protobuf.Descriptors.FileDescriptor
+      getDescriptor() {
+    return descriptor;
+  }
+  private static com.google.protobuf.Descriptors.FileDescriptor
+      descriptor;
+  static {
+    java.lang.String[] descriptorData = {
+      "\n\016xMsgMeta.proto\"\343\004\n\010xMsgMeta\022\017\n\007version" +
+      "\030\001 \001(\t\022\023\n\013description\030\002 \001(\t\022\016\n\006author\030\003 " +
+      "\001(\t\022 \n\006status\030\004 \001(\0162\020.xMsgMeta.Status\022\022\n" +
+      "\nseverityId\030\005 \001(\017\022\016\n\006sender\030\006 \001(\t\022\023\n\013sen" +
+      "derState\030\007 \001(\t\022\027\n\017communicationId\030\010 \001(\007\022" +
+      "\023\n\013composition\030\n \001(\t\022\025\n\rexecutionTime\030\013 " +
+      "\001(\020\022\'\n\006action\030\014 \001(\0162\027.xMsgMeta.ControlAc" +
+      "tion\022+\n\007control\030\r \001(\0162\032.xMsgMeta.SubCont" +
+      "rolAction\022\030\n\010dataType\030\016 \001(\t:\006native\022\032\n\022d" +
+      "atTypeDescription\030\017 \001(\t\022\036\n\020isDataSeriali",
+      "zed\030\020 \001(\010:\004true\022\032\n\007replyTo\030\021 \001(\t:\tundefi" +
+      "ned\022#\n\tbyteOrder\030\022 \001(\0162\020.xMsgMeta.Endian" +
+      "\"*\n\006Status\022\010\n\004INFO\020\001\022\013\n\007WARNING\020\002\022\t\n\005ERR" +
+      "OR\020\003\"\035\n\006Endian\022\n\n\006Little\020\001\022\007\n\003Big\020\002\"+\n\rC" +
+      "ontrolAction\022\013\n\007EXECUTE\020\000\022\r\n\tCONFIGURE\020\001" +
+      "\"\034\n\020SubControlAction\022\010\n\004SKIP\020\000B\tB\005xMsgMH" +
+      "\001"
+    };
+    com.google.protobuf.Descriptors.FileDescriptor.InternalDescriptorAssigner assigner =
+      new com.google.protobuf.Descriptors.FileDescriptor.InternalDescriptorAssigner() {
+        public com.google.protobuf.ExtensionRegistry assignDescriptors(
+            com.google.protobuf.Descriptors.FileDescriptor root) {
+          descriptor = root;
+          internal_static_xMsgMeta_descriptor =
+            getDescriptor().getMessageTypes().get(0);
+          internal_static_xMsgMeta_fieldAccessorTable = new
+            com.google.protobuf.GeneratedMessage.FieldAccessorTable(
+              internal_static_xMsgMeta_descriptor,
+              new java.lang.String[] { "Version", "Description", "Author", "Status", "SeverityId", "Sender", "SenderState", "CommunicationId", "Composition", "ExecutionTime", "Action", "Control", "DataType", "DatTypeDescription", "IsDataSerialized", "ReplyTo", "ByteOrder", });
+          return null;
+        }
+      };
+    com.google.protobuf.Descriptors.FileDescriptor
+      .internalBuildGeneratedFileFrom(descriptorData,
+        new com.google.protobuf.Descriptors.FileDescriptor[] {
+        }, assigner);
   }
 
   // @@protoc_insertion_point(outer_class_scope)

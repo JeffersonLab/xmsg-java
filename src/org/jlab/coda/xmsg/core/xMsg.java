@@ -409,7 +409,7 @@ public class xMsg {
      * @param sender the name of the sender / requester
      * @param topic the topic of the published messages
      * @return set of {@link xMsgRegistration} objects, one per found publisher
-     * @throws xMsgDiscoverException
+     * @throws xMsgRegistrationException
      */
     public Set<xMsgRegistration> findPublishers(String sender,
                                                 xMsgTopic topic)
@@ -431,7 +431,7 @@ public class xMsg {
      * @param sender the name of the sender / requester
      * @param topic the topic of the published messages
      * @return set of {@link xMsgRegistration} objects, one per found publisher
-     * @throws xMsgDiscoverException
+     * @throws xMsgRegistrationException
      */
     public Set<xMsgRegistration> findLocalPublishers(String sender,
                                                      xMsgTopic topic)
@@ -452,7 +452,7 @@ public class xMsg {
      * @param sender the name of the sender / requester
      * @param topic the topic of the subscription
      * @return set of {@link xMsgRegistration} objects, one per found subscribers
-     * @throws xMsgDiscoverException
+     * @throws xMsgRegistrationException
      */
     public Set<xMsgRegistration> findSubscribers(String sender,
                                                  xMsgTopic topic)
@@ -473,7 +473,7 @@ public class xMsg {
      * @param sender the name of the sender / requester
      * @param topic the topic of the subscription
      * @return set of {@link xMsgRegistration} objects, one per found subscribers
-     * @throws xMsgDiscoverException
+     * @throws xMsgRegistrationException
      */
     public Set<xMsgRegistration> findLocalSubscribers(String sender,
                                                       xMsgTopic topic)
@@ -534,10 +534,6 @@ public class xMsg {
         outputMsg.addString(msg.getTopic().toString());
 
         xMsgMeta.Builder metadata = msg.getMetaData();
-        if (metadata.getDataType().equals(xMsgMeta.DataType.UNDEFINED)) {
-            System.out.println("Error: undefined data type");
-            throw new xMsgException("Error: undefined data type");
-        }
 
         // publishing over process or network boundaries
         if (metadata.getIsDataSerialized()) {
@@ -552,19 +548,14 @@ public class xMsg {
 
             // We serialize here only X_Object and J_object type data.
             // The rest we assume under user responsibility
-            if (metadata.getDataType().equals(xMsgMeta.DataType.X_Object)) {
+            if (metadata.getDataType().equals("native")) {
                 // Get the data from the xMsgMessage
                 xMsgData.Builder data = (xMsgData.Builder) msg.getData();
                 // xMsgData serialization
                 xMsgData dd = data.build();
                 serialData = dd.toByteArray();
 
-            } else if (metadata.getDataType().equals(xMsgMeta.DataType.J_Object)) {
-                Object data = msg.getData();
-                // Java object serialization
-                serialData = xMsgUtil.serializeToBytes(data);
-
-            } else {
+            }  else {
                 // NO serialization
                 serialData = (byte[]) msg.getData();
             }
@@ -705,7 +696,7 @@ public class xMsg {
                         // serialize only X_Object and J_Object type data.
                         // Note de-serialization of the other type data is assumed
                         // to be a user responsibility
-                        if (metadata.getDataType().equals(xMsgMeta.DataType.X_Object)) {
+                        if (metadata.getDataType().equals("native")) {
 
                             // xMsgData de-serialization
                             xMsgData dataObj = xMsgData.parseFrom(dataFrame.getData());
@@ -716,17 +707,7 @@ public class xMsg {
                             // Calling user callback method with the received xMsgMessage
                             callUserCallBack(connection, cb, callbackMsg);
 
-                        } else if (metadata.getDataType().equals(xMsgMeta.DataType.J_Object)) {
-
-                            // Java object de-serialization
-                            Object data = xMsgUtil.deserialize(dataFrame.getData());
-
-                            // Create a message to be passed to the user callback method
-                            callbackMsg = new xMsgMessage(topic, metadata, data);
-                            // Calling user callback method with the received xMsgMessage
-                            callUserCallBack(connection, cb, callbackMsg);
-
-                        } else {
+                        }  else {
                             // NO de-serialization
                             Object data = dataFrame.getData();
 

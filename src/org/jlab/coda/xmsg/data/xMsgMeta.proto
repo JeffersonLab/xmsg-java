@@ -71,7 +71,7 @@ message xMsgMeta {
 
     // ... Data section ...
     // Type of the data
-    optional DataType dataType = 14;
+    optional string dataType = 14 [ default = "native"];
 
     // description of the type, for e.g. If data
     // type = J_Object then this can be used to
@@ -88,16 +88,6 @@ message xMsgMeta {
     // sub-type is T_BYTES/T_BYTESA
     optional Endian byteOrder = 18;
 
-    // ... Enumerations ...
-    // Data type
-    enum DataType {
-        UNDEFINED = 1;
-        X_Object = 2; // xMsgData object
-        J_Object = 3; // Java object
-        C_Object = 4; // C++ object
-        P_Object = 5; // Python Object
-        NCDFS_Object = 6; // Streaming NetCDF Object
-    }
 
     // Data processing status
     enum Status {

@@ -56,7 +56,7 @@ public class xMsgMessage {
 
     public xMsgMessage(xMsgTopic topic) {
         this.topic = topic;
-        setData(xMsgConstants.UNDEFINED.getStringValue());
+        setData(xMsgConstants.UNDEFINED.getStringValue(),"native");
     }
 
     /**
@@ -67,9 +67,9 @@ public class xMsgMessage {
      * @param data  of the communication
      */
     public xMsgMessage(xMsgTopic topic,
-                       Object data) {
+                       Object data, String dataType) {
         this.topic = topic;
-        setData(data);
+        setData(data, dataType);
     }
 
     /**
@@ -142,14 +142,14 @@ public class xMsgMessage {
      *
      * @param data object
      */
-    public void setData(Object data) {
+    public void setData(Object data, String dataType) {
         if (metaData == null) {
             metaData = xMsgMeta.newBuilder();
         }
 
         // xMsgData object for all primitive types
         xMsgData.Builder d = xMsgData.newBuilder();
-        metaData.setDataType(xMsgMeta.DataType.X_Object);
+        metaData.setDataType("native");
         if (data instanceof String) {
             d.setSTRING((String) data);
             d.setType(xMsgData.Type.T_STRING);
@@ -210,53 +210,10 @@ public class xMsgMessage {
             metaData.setIsDataSerialized(false);
             this.data = data;
 
-            // Any Java object (un serialized)
+            // Any custom object (un serialized)
         } else {
-            metaData.setDataType(xMsgMeta.DataType.J_Object);
+            metaData.setDataType(dataType);
             metaData.setIsDataSerialized(false);
-            this.data = data;
-        }
-    }
-
-    /**
-     * Sets the message data.
-     * <p>
-     * This method sets the data object using specified data type.
-     *
-     * @param data object
-     * @param type of the data object
-     */
-    public void setData(Object data, xMsgMeta.DataType type) {
-        if (metaData == null) {
-            metaData = xMsgMeta.newBuilder();
-        }
-
-        // data type defined is xMsgData
-        if (type.equals(xMsgMeta.DataType.X_Object)) {
-            if (data instanceof xMsgData) {
-                metaData.setDataType(xMsgMeta.DataType.X_Object);
-                metaData.setIsDataSerialized(true);
-                this.data = data;
-
-                // un-serialized xMsgData object (X_Object)
-            } else if (data instanceof xMsgData.Builder) {
-                metaData.setDataType(xMsgMeta.DataType.X_Object);
-                metaData.setIsDataSerialized(false);
-                this.data = data;
-            }
-        } else {
-
-            // This is the user defined data type, such as
-            // NETCDFS_Object, P_Object, C_Object, etc.
-            metaData.setDataType(type);
-
-            // If user object has type =  byte[], then it
-            // is considered to be a serialized object.
-            if (data instanceof byte[]) {
-                metaData.setIsDataSerialized(true);
-            } else {
-                metaData.setIsDataSerialized(false);
-            }
             this.data = data;
         }
     }

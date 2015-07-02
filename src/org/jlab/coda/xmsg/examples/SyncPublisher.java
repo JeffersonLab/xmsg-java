@@ -33,7 +33,7 @@ public class SyncPublisher extends xMsg {
             publisher.registerPublisher(myName, topic, description);
 
             xMsgMessage msg = new xMsgMessage(topic);
-            msg.setData(111);
+            msg.setData(111, "native");
             int counter = 1;
             while (true) {
                 System.out.println("Publishing " + counter);
@@ -43,7 +43,7 @@ public class SyncPublisher extends xMsg {
                 long delta = (t2 - t1) / 1000000L;
                 System.out.printf("Received response = %s in %d ms%n", recData, delta);
                 counter++;
-                msg.setData(String.valueOf(counter));
+                msg.setData(String.valueOf(counter), "native");
                 xMsgUtil.sleep(2000);
             }
         } catch (xMsgException | TimeoutException | IOException e) {
