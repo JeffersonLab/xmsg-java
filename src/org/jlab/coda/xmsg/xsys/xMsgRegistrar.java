@@ -102,7 +102,7 @@ public class xMsgRegistrar extends xMsgRegDriver {
         // In this case this specific constructor starts a thread
         // that periodically updates front-end registrar database with
         // the data from the local databases
-        xMsgRegService regService = new xMsgRegService(feHost, shadowContext);
+        xMsgRegService regService = new xMsgRegService(shadowContext, feHost);
         regServiceThread = xMsgUtil.newThread("registration-service", regService);
     }
 

@@ -112,7 +112,7 @@ public class xMsgRegService implements Runnable {
      * @throws SocketException
      * @throws IOException
      */
-    public xMsgRegService(String feHost, ZContext context)
+    public xMsgRegService(ZContext context, String feHost)
             throws SocketException, xMsgException {
         this.context = context;
         localhost = xMsgUtil.toHostAddress("localhost");
