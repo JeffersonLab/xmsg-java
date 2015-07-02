@@ -45,8 +45,9 @@ import java.net.SocketException;
  * @author gurjyan
  * @since 1.0
  */
-public class xMsgRegUpdater extends xMsgRegDriver implements Runnable {
+public class xMsgRegUpdater implements Runnable {
 
+    private final xMsgRegDriver driver;
     private final xMsgRegDatabase publishers;
     private final xMsgRegDatabase subscribers;
     private final String name;
@@ -56,18 +57,18 @@ public class xMsgRegUpdater extends xMsgRegDriver implements Runnable {
      * as well as two references to publishers and subscribers
      * databases.
      *
-     * @param feHost front-end host name
+     * @param driver the registration driver
      * @param publishers reference to the xMsgNode publishers database
      * @param subscribers reference to the xMsgNode subscribers database
      * @throws SocketException
      * @throws xMsgException
      * @throws IOException
      */
-    public xMsgRegUpdater(String feHost,
+    public xMsgRegUpdater(xMsgRegDriver driver,
                           xMsgRegDatabase publishers,
                           xMsgRegDatabase subscribers
     ) throws SocketException, xMsgException {
-        super(feHost);
+        this.driver = driver;
         this.publishers = publishers;
         this.subscribers = subscribers;
         this.name = xMsgUtil.toHostAddress("localhost") + "_registration_updater";
@@ -82,7 +83,7 @@ public class xMsgRegUpdater extends xMsgRegDriver implements Runnable {
             for (xMsgTopic key : publishers.topics()) {
                 try {
                     for (xMsgRegistration r : publishers.get(key)) {
-                        registerFrontEnd(name, r, true);
+                        driver.registerFrontEnd(name, r, true);
                         xMsgUtil.sleep(500);
                     }
                 } catch (xMsgRegistrationException e) {
@@ -94,7 +95,7 @@ public class xMsgRegUpdater extends xMsgRegDriver implements Runnable {
             for (xMsgTopic key : subscribers.topics()) {
                 try {
                     for (xMsgRegistration r : subscribers.get(key)) {
-                        registerFrontEnd(name, r, false);
+                        driver.registerFrontEnd(name, r, false);
                         xMsgUtil.sleep(500);
                     }
                 } catch (xMsgRegistrationException e) {
