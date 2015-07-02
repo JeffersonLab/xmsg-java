@@ -22,7 +22,6 @@
 package org.jlab.coda.xmsg.core;
 
 import com.google.protobuf.ByteString;
-
 import org.jlab.coda.xmsg.data.xMsgD.xMsgData;
 import org.jlab.coda.xmsg.data.xMsgM.xMsgMeta;
 
@@ -216,6 +215,7 @@ public class xMsgMessage {
             metaData.setIsDataSerialized(false);
             this.data = data;
         }
+
     }
 
     /**
