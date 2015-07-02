@@ -64,10 +64,12 @@ public class xMsgProxy {
         // setting up the xMsg proxy
         // socket where clients publish their data/messages
         ZMQ.Socket in = context.createSocket(ZMQ.XSUB);
+        in.setHWM(0);
         in.bind("tcp://*:" + xMsgConstants.DEFAULT_PORT.getIntValue());
 
         // socket where clients subscribe data/messages
         ZMQ.Socket out = context.createSocket(ZMQ.XPUB);
+        out.setHWM(0);
         out.bind("tcp://*:" + (xMsgConstants.DEFAULT_PORT.getIntValue() + 1));
 
         // start poxy. this will block for ever

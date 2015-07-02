@@ -38,11 +38,12 @@ public class xMsgTest {
 
     private xMsgRegDriver driver;
     private xMsg core;
+    private String name = "asimov";
 
     @Before
     public void setup() throws Exception {
         driver = mock(xMsgRegDriver.class);
-        core = new xMsg(driver, 2);
+        core = new xMsg(name, driver, 2);
     }
 
 
@@ -50,9 +51,9 @@ public class xMsgTest {
     public void registerPublisher() throws Exception {
         xMsgTopic topic = xMsgTopic.wrap("writer:scifi:book");
 
-        core.registerPublisher("asimov", topic, "test pub");
+        core.registerPublisher(topic, "test pub");
 
-        RegValidator validator = new RegValidator("asimov", topic, true);
+        RegValidator validator = new RegValidator(topic, true);
         validator.desc = "test pub";
         validator.assertRegistration();
     }
@@ -62,9 +63,9 @@ public class xMsgTest {
     public void registerLocalPublisher() throws Exception {
         xMsgTopic topic = xMsgTopic.wrap("writer:scifi:book");
 
-        core.registerLocalPublisher("asimov", topic, "test pub");
+        core.registerLocalPublisher(topic, "test pub");
 
-        RegValidator validator = new RegValidator("asimov", topic, true);
+        RegValidator validator = new RegValidator(topic, true);
         validator.desc = "test pub";
         validator.assertLocalRegistration();
     }
@@ -74,9 +75,9 @@ public class xMsgTest {
     public void registerSubscriber() throws Exception {
         xMsgTopic topic = xMsgTopic.wrap("writer:scifi:book");
 
-        core.registerSubscriber("asimov", topic, "test sub");
+        core.registerSubscriber(topic, "test sub");
 
-        RegValidator validator = new RegValidator("asimov", topic, false);
+        RegValidator validator = new RegValidator(topic, false);
         validator.desc = "test sub";
         validator.assertRegistration();
     }
@@ -86,9 +87,9 @@ public class xMsgTest {
     public void registerLocalSubscriber() throws Exception {
         xMsgTopic topic = xMsgTopic.wrap("writer:scifi:book");
 
-        core.registerLocalSubscriber("asimov", topic, "test sub");
+        core.registerLocalSubscriber(topic, "test sub");
 
-        RegValidator validator = new RegValidator("asimov", topic, false);
+        RegValidator validator = new RegValidator(topic, false);
         validator.desc = "test sub";
         validator.assertLocalRegistration();
     }
@@ -98,9 +99,9 @@ public class xMsgTest {
     public void removePublisher() throws Exception {
         xMsgTopic topic = xMsgTopic.wrap("writer:scifi:book");
 
-        core.removePublisher("asimov", topic);
+        core.removePublisher(topic);
 
-        RegValidator validator = new RegValidator("asimov", topic, true);
+        RegValidator validator = new RegValidator(topic, true);
         validator.assertRemove();
     }
 
@@ -109,9 +110,9 @@ public class xMsgTest {
     public void removeLocalPublisher() throws Exception {
         xMsgTopic topic = xMsgTopic.wrap("writer:scifi:book");
 
-        core.removeLocalPublisher("asimov", topic);
+        core.removeLocalPublisher(topic);
 
-        RegValidator validator = new RegValidator("asimov", topic, true);
+        RegValidator validator = new RegValidator(topic, true);
         validator.assertLocalRemove();
     }
 
@@ -120,9 +121,9 @@ public class xMsgTest {
     public void removeSubscriber() throws Exception {
         xMsgTopic topic = xMsgTopic.wrap("writer:scifi:book");
 
-        core.removeSubscriber("asimov", topic);
+        core.removeSubscriber(topic);
 
-        RegValidator validator = new RegValidator("asimov", topic, false);
+        RegValidator validator = new RegValidator(topic, false);
         validator.assertRemove();
     }
 
@@ -131,9 +132,9 @@ public class xMsgTest {
     public void removeLocalSubscriber() throws Exception {
         xMsgTopic topic = xMsgTopic.wrap("writer:scifi:book");
 
-        core.removeLocalSubscriber("asimov", topic);
+        core.removeLocalSubscriber(topic);
 
-        RegValidator validator = new RegValidator("asimov", topic, false);
+        RegValidator validator = new RegValidator(topic, false);
         validator.assertLocalRemove();
     }
 
@@ -142,9 +143,9 @@ public class xMsgTest {
     public void findPublishers() throws Exception {
         xMsgTopic topic = xMsgTopic.wrap("writer:scifi:book");
 
-        core.findPublishers("sender", topic);
+        core.findPublishers(topic);
 
-        RegValidator validator = new RegValidator("sender", topic, true);
+        RegValidator validator = new RegValidator(topic, true);
         validator.assertFind();
     }
 
@@ -153,9 +154,9 @@ public class xMsgTest {
     public void findLocalPublishers() throws Exception {
         xMsgTopic topic = xMsgTopic.wrap("writer:scifi:book");
 
-        core.findLocalPublishers("sender", topic);
+        core.findLocalPublishers(topic);
 
-        RegValidator validator = new RegValidator("sender", topic, true);
+        RegValidator validator = new RegValidator(topic, true);
         validator.assertLocalFind();
     }
 
@@ -163,9 +164,9 @@ public class xMsgTest {
     @Test
     public void findSubscribers() throws Exception {
         xMsgTopic topic = xMsgTopic.wrap("writer:scifi");
-        core.findSubscribers("sender", topic);
+        core.findSubscribers(topic);
 
-        RegValidator validator = new RegValidator("sender", topic, false);
+        RegValidator validator = new RegValidator(topic, false);
         validator.assertFind();
     }
 
@@ -173,16 +174,15 @@ public class xMsgTest {
     @Test
     public void findLocalSubscribers() throws Exception {
         xMsgTopic topic = xMsgTopic.wrap("writer:scifi:book");
-        core.findLocalSubscribers("sender", topic);
+        core.findLocalSubscribers(topic);
 
-        RegValidator validator = new RegValidator("sender", topic, false);
+        RegValidator validator = new RegValidator(topic, false);
         validator.assertLocalFind();
     }
 
 
     private class RegValidator {
 
-        private String name;
         private String host;
         private int port;
         private xMsgTopic topic;
@@ -191,9 +191,8 @@ public class xMsgTest {
 
         private ArgumentCaptor<xMsgRegistration> dataArg;
 
-        public RegValidator(String name, xMsgTopic topic, boolean isPublisher)
+        public RegValidator(xMsgTopic topic, boolean isPublisher)
                 throws Exception {
-            this.name = name;
             this.host = xMsgUtil.toHostAddress("localhost");
             this.port = xMsgConstants.DEFAULT_PORT.getIntValue();
             this.topic = topic;

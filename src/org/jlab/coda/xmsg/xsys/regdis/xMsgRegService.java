@@ -58,7 +58,7 @@ import java.util.Set;
  * @since 1.0
  */
 
-public class xMsgRegService extends Thread {
+public class xMsgRegService implements Runnable {
 
     // zmq context.
     // Note. this class does not own the context.
@@ -121,20 +121,13 @@ public class xMsgRegService extends Thread {
          * Start a thread with periodic process (hard-coded 5 sec. interval) that
          * updates xMsgFE database with the data stored in the local databases.
          */
-        Thread t = new Thread(new xMsgRegUpdater(feHost, publishers, subscribers));
-        t.setUncaughtExceptionHandler(new Thread.UncaughtExceptionHandler() {
-            @Override
-            public void uncaughtException(Thread t, Throwable e) {
-                e.printStackTrace();
-            }
-        });
+        xMsgRegUpdater updater = new xMsgRegUpdater(feHost, publishers, subscribers);
+        Thread t = xMsgUtil.newThread("registration-updater", updater);
         t.start();
     }
 
     @Override
     public void run() {
-        super.run();
-
         log("Info: xMsg local registration and discovery server is started");
 
         ZMQ.Socket regSocket = context.createSocket(ZMQ.REP);

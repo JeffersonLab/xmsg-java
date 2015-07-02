@@ -63,6 +63,9 @@ import static org.jlab.coda.xmsg.xsys.regdis.xMsgRegDriver.__zmqSocket;
  */
 public class xMsg {
 
+    /** The unique identificator of this actor. */
+    protected final String myName;
+
     /** 0MQ context object. */
     private final ZContext context;
 
@@ -71,13 +74,15 @@ public class xMsg {
 
     /** Fixed size thread pool. */
     private final ExecutorService threadPool;
+
     /** Default thread pool size. */
     private final int poolSize;
 
     /** Access to the xMsg registrars. */
-    private xMsgRegDriver driver;
+    private final xMsgRegDriver driver;
 
-    private String localHostIp;
+    /** The localhost IP. */
+    protected final String localHostIp;
 
 
     /**
@@ -90,8 +95,8 @@ public class xMsg {
      * @throws xMsgException
      * @throws SocketException
      */
-    public xMsg(String feHost) throws xMsgException, SocketException {
-        this(new xMsgRegDriver(feHost), 2);
+    public xMsg(String name, String feHost) throws xMsgException, SocketException {
+        this(name, new xMsgRegDriver(feHost), 2);
     }
 
     /**
@@ -105,16 +110,19 @@ public class xMsg {
      * @throws SocketException
      * @throws xMsgException
      */
-    public xMsg(String feHost, int poolSize) throws xMsgException, SocketException {
+    public xMsg(String name, String feHost, int poolSize)
+            throws xMsgException, SocketException {
         /*
          * Calls xMsgRegDiscDriver class constructor that creates sockets to two registrar
          * request/reply servers running in the local xMsgNode and xMsgFE.
          */
-        this(new xMsgRegDriver(feHost), poolSize);
+        this(name, new xMsgRegDriver(feHost), poolSize);
     }
 
 
-    xMsg(xMsgRegDriver driver, int poolSize) throws SocketException, xMsgException {
+    xMsg(String name, xMsgRegDriver driver, int poolSize)
+            throws SocketException, xMsgException {
+        this.myName = name;
         this.localHostIp = xMsgUtil.toHostAddress("localhost");
         this.context = driver.getContext();
         this.driver = driver;
@@ -122,6 +130,27 @@ public class xMsg {
         // create fixed size thread pool
         this.poolSize = poolSize;
         this.threadPool = xMsgUtil.newFixedThreadPool(this.poolSize);
+    }
+
+    /**
+     * Destructor. Call this to gracefully terminate context and close any
+     * managed sockets.
+     */
+    public void destroy() {
+        context.destroy();
+        threadPool.shutdown();
+    }
+
+    /**
+     * Destructor. Call this to gracefully terminate context and close any
+     * managed sockets.
+     *
+     * @param linger the linger period for socket shutdown
+     * @see <a href="http://api.zeromq.org/3-2:zmq-setsockopt">ZMQ_LINGER</a>
+     */
+    public void destroy(int linger) {
+        context.setLinger(linger);
+        destroy();
     }
 
     /**
@@ -222,9 +251,6 @@ public class xMsg {
      * @throws xMsgException
      */
     public xMsgConnection getNewConnection(xMsgAddress address) throws xMsgException {
-
-        ZContext context = new ZContext();
-
         xMsgConnection feCon = new xMsgConnection();
         feCon.setAddress(address);
         feCon.setPubSock(__zmqSocket(context, ZMQ.PUB, address.getHost(),
@@ -236,259 +262,222 @@ public class xMsg {
     }
 
     /**
-     * Registers a local publisher in the global front-end registrar.
-     * The publisher should be periodically publishing data.
+     * Registers as a publisher in the global front-end registrar.
+     * This actor should be periodically publishing data.
      * Futures subscribers can use this registration to discover and listen to
      * the published messages.
-     * The local registration database is periodically updated to the front-end database.
-     * The publisher is expected to be running in the local node.
      *
-     * @param name the name of the publisher
      * @param topic the topic of the published messages
      * @param description a description of the publisher
      * @throws xMsgRegistrationException
+     * @see #publish
      */
-    public void registerPublisher(String name,
-                                  xMsgTopic topic,
+    public void registerPublisher(xMsgTopic topic,
                                   String description)
             throws xMsgRegistrationException {
-        xMsgRegistration.Builder regb = registrationBuilder(name, topic);
+        xMsgRegistration.Builder regb = registrationBuilder(topic);
         regb.setOwnerType(xMsgRegistration.OwnerType.PUBLISHER);
         regb.setDescription(description);
         xMsgRegistration regData = regb.build();
-        driver.registerFrontEnd(name, regData, true);
+        driver.registerFrontEnd(myName, regData, true);
     }
 
     /**
-     * Registers a local publisher in the local registrar.
-     * The publisher should be periodically publishing data.
+     * Registers as a publisher in the local registrar.
+     * This actor should be periodically publishing data.
      * Futures subscribers can use this registration to discover and listen to
      * the published messages.
      * The local registration database is periodically updated to the front-end database.
-     * The publisher is expected to be running in the local node.
      *
-     * @param name the name of the publisher
      * @param topic the topic of the published messages
      * @param description a description of the publisher
      * @throws xMsgRegistrationException
+     * @see #publish
      */
-    public void registerLocalPublisher(String name,
-                                       xMsgTopic topic,
+    public void registerLocalPublisher(xMsgTopic topic,
                                        String description)
             throws xMsgRegistrationException {
-        xMsgRegistration.Builder regb = registrationBuilder(name, topic);
+        xMsgRegistration.Builder regb = registrationBuilder(topic);
         regb.setOwnerType(xMsgRegistration.OwnerType.PUBLISHER);
         regb.setDescription(description);
         xMsgRegistration regData = regb.build();
-        driver.registerLocal(name, regData, true);
+        driver.registerLocal(myName, regData, true);
     }
 
     /**
-     * Registers a local subscriber in the global front-end registrar.
-     * The subscriber should be listening for messages of the wanted topic.
+     * Registers as a subscriber in the global front-end registrar.
+     * This actor should be listening for messages of the wanted topic.
      * Future publishers might express an interest to publish data to a a
      * required topic of interest or might publish data only if there are active
      * listeners/subscribers to their published topic.
-     * The local registration database is periodically updated to the front-end database.
-     * The subscriber is expected to be running in the local node.
      *
-     * @param name the name of the subscriber.
      * @param topic the topic of the subscription
      * @param description a description of the subscription
      * @throws xMsgRegistrationException
+     * @see #subscribe
      */
-    public void registerSubscriber(String name,
-                                   xMsgTopic topic,
+    public void registerSubscriber(xMsgTopic topic,
                                    String description)
             throws xMsgRegistrationException {
-        xMsgRegistration.Builder regb = registrationBuilder(name, topic);
+        xMsgRegistration.Builder regb = registrationBuilder(topic);
         regb.setOwnerType(xMsgRegistration.OwnerType.SUBSCRIBER);
         regb.setDescription(description);
         xMsgRegistration regData = regb.build();
-        driver.registerFrontEnd(name, regData, false);
+        driver.registerFrontEnd(myName, regData, false);
     }
 
     /**
-     * Registers a local subscriber in the local registrar.
-     * The subscriber should be listening for messages of the wanted topic.
+     * Registers as a subscriber in the local registrar.
+     * This actor should be listening for messages of the wanted topic.
      * Future publishers might express an interest to publish data to a a
      * required topic of interest or might publish data only if there are active
      * listeners/subscribers to their published topic.
      * The local registration database is periodically updated to the front-end database.
-     * The subscriber is expected to be running in the local node.
      *
-     * @param name the name of the subscriber.
      * @param topic the topic of the subscription
      * @param description a description of the subscription
      * @throws xMsgRegistrationException
+     * @see #subscribe
      */
-    public void registerLocalSubscriber(String name,
-                                        xMsgTopic topic,
+    public void registerLocalSubscriber(xMsgTopic topic,
                                         String description)
             throws xMsgRegistrationException {
-        xMsgRegistration.Builder regb = registrationBuilder(name, topic);
+        xMsgRegistration.Builder regb = registrationBuilder(topic);
         regb.setOwnerType(xMsgRegistration.OwnerType.SUBSCRIBER);
         regb.setDescription(description);
         xMsgRegistration regData = regb.build();
-        driver.registerLocal(name, regData, false);
+        driver.registerLocal(myName, regData, false);
     }
 
     /**
-     * Removes a local publisher from the global front-end registration.
+     * Removes as publisher from the global front-end registration.
      *
-     * @param name the name of the publisher
      * @param topic the topic of the published messages
      * @throws xMsgRegistrationException
      */
-    public void removePublisher(String name,
-                                xMsgTopic topic)
+    public void removePublisher(xMsgTopic topic)
             throws xMsgRegistrationException {
-        xMsgRegistration.Builder regb = registrationBuilder(name, topic);
+        xMsgRegistration.Builder regb = registrationBuilder(topic);
         regb.setOwnerType(xMsgRegistration.OwnerType.PUBLISHER);
         xMsgRegistration regData = regb.build();
-        driver.removeRegistrationFrontEnd(name, regData, true);
+        driver.removeRegistrationFrontEnd(myName, regData, true);
     }
 
     /**
-     * Removes a local publisher from the local registration.
+     * Removes as publisher from the local registration.
      *
-     * @param name the name of the publisher
      * @param topic the topic of the published messages
      * @throws xMsgRegistrationException
      */
-    public void removeLocalPublisher(String name,
-                                     xMsgTopic topic)
+    public void removeLocalPublisher(xMsgTopic topic)
             throws xMsgRegistrationException {
-        xMsgRegistration.Builder regb = registrationBuilder(name, topic);
+        xMsgRegistration.Builder regb = registrationBuilder(topic);
         regb.setOwnerType(xMsgRegistration.OwnerType.PUBLISHER);
         xMsgRegistration regData = regb.build();
-        driver.removeRegistrationLocal(name, regData, true);
+        driver.removeRegistrationLocal(myName, regData, true);
     }
 
     /**
-     * Removes a local subscriber from the global front-end registration.
+     * Removes as subscriber from the global front-end registration.
      *
-     * @param name the name of the subscriber
      * @param topic the topic of the subscription
      * @throws xMsgRegistrationException
      */
-    public void removeSubscriber(String name,
-                                 xMsgTopic topic)
+    public void removeSubscriber(xMsgTopic topic)
             throws xMsgRegistrationException {
-        xMsgRegistration.Builder regb = registrationBuilder(name, topic);
+        xMsgRegistration.Builder regb = registrationBuilder(topic);
         regb.setOwnerType(xMsgRegistration.OwnerType.SUBSCRIBER);
         xMsgRegistration regData = regb.build();
-        driver.removeRegistrationLocal(name, regData, false);
-        driver.removeRegistrationFrontEnd(name, regData, false);
+        driver.removeRegistrationFrontEnd(myName, regData, false);
     }
 
     /**
-     * Removes a local subscriber from the local registration.
+     * Removes as subscriber from the local registration.
      *
-     * @param name the name of the subscriber
      * @param topic the topic of the subscription
      * @throws xMsgRegistrationException
      */
-    public void removeLocalSubscriber(String name,
-                                      xMsgTopic topic)
+    public void removeLocalSubscriber(xMsgTopic topic)
             throws xMsgRegistrationException {
-        xMsgRegistration.Builder regb = registrationBuilder(name, topic);
+        xMsgRegistration.Builder regb = registrationBuilder(topic);
         regb.setOwnerType(xMsgRegistration.OwnerType.SUBSCRIBER);
         xMsgRegistration regData = regb.build();
-        driver.removeRegistrationLocal(name, regData, false);
-        driver.removeRegistrationFrontEnd(name, regData, false);
+        driver.removeRegistrationLocal(myName, regData, false);
     }
 
     /**
      * Finds all publishers of the given topic.
      * The publishers are searched in the front-end registrar, and they could
      * be deployed anywhere in the xMsg cloud of nodes.
-     * <p>
-     * Note: xMsg defines a topic as {@code domain:subject:type}.
      *
-     * @param sender the name of the sender / requester
      * @param topic the topic of the published messages
      * @return set of {@link xMsgRegistration} objects, one per found publisher
      * @throws xMsgRegistrationException
      */
-    public Set<xMsgRegistration> findPublishers(String sender,
-                                                xMsgTopic topic)
+    public Set<xMsgRegistration> findPublishers(xMsgTopic topic)
             throws xMsgRegistrationException {
 
-        xMsgRegistration.Builder regb = registrationBuilder(sender, topic);
+        xMsgRegistration.Builder regb = registrationBuilder(topic);
         regb.setOwnerType(xMsgRegistration.OwnerType.PUBLISHER);
         xMsgRegistration regData = regb.build();
-        return driver.findGlobal(sender, regData, true);
+        return driver.findGlobal(myName, regData, true);
     }
 
     /**
      * Finds all local publishers of the given topic.
      * The publishers are searched in the local registrar, thus they are
      * deployed in the local node.
-     * <p>
-     * Note: xMsg defines a topic as {@code domain:subject:type}.
      *
-     * @param sender the name of the sender / requester
      * @param topic the topic of the published messages
      * @return set of {@link xMsgRegistration} objects, one per found publisher
      * @throws xMsgRegistrationException
      */
-    public Set<xMsgRegistration> findLocalPublishers(String sender,
-                                                     xMsgTopic topic)
+    public Set<xMsgRegistration> findLocalPublishers(xMsgTopic topic)
             throws xMsgRegistrationException {
-        xMsgRegistration.Builder regb = registrationBuilder(sender, topic);
+        xMsgRegistration.Builder regb = registrationBuilder(topic);
         regb.setOwnerType(xMsgRegistration.OwnerType.PUBLISHER);
         xMsgRegistration regData = regb.build();
-        return driver.findLocal(sender, regData, true);
+        return driver.findLocal(myName, regData, true);
     }
 
     /**
      * Finds all subscribers of the given topic.
      * The publishers are searched in the front-end registrar, and they could
      * be deployed anywhere in the xMsg cloud of nodes.
-     * <p>
-     * Note: xMsg defines a topic as {@code domain:subject:type}.
      *
-     * @param sender the name of the sender / requester
      * @param topic the topic of the subscription
      * @return set of {@link xMsgRegistration} objects, one per found subscribers
      * @throws xMsgRegistrationException
      */
-    public Set<xMsgRegistration> findSubscribers(String sender,
-                                                 xMsgTopic topic)
+    public Set<xMsgRegistration> findSubscribers(xMsgTopic topic)
             throws xMsgRegistrationException {
-        xMsgRegistration.Builder regb = registrationBuilder(sender, topic);
+        xMsgRegistration.Builder regb = registrationBuilder(topic);
         regb.setOwnerType(xMsgRegistration.OwnerType.SUBSCRIBER);
         xMsgRegistration regData = regb.build();
-        return driver.findGlobal(sender, regData, false);
+        return driver.findGlobal(myName, regData, false);
     }
 
     /**
      * Finds all local subscribers of the given topic.
      * The publishers are searched in the local registrar, thus they are
      * deployed in the local node.
-     * <p>
-     * Note: xMsg defines a topic as {@code domain:subject:type}.
      *
-     * @param sender the name of the sender / requester
      * @param topic the topic of the subscription
      * @return set of {@link xMsgRegistration} objects, one per found subscribers
      * @throws xMsgRegistrationException
      */
-    public Set<xMsgRegistration> findLocalSubscribers(String sender,
-                                                      xMsgTopic topic)
+    public Set<xMsgRegistration> findLocalSubscribers(xMsgTopic topic)
             throws xMsgRegistrationException {
 
-        xMsgRegistration.Builder regb = registrationBuilder(sender, topic);
+        xMsgRegistration.Builder regb = registrationBuilder(topic);
         regb.setOwnerType(xMsgRegistration.OwnerType.SUBSCRIBER);
         xMsgRegistration regData = regb.build();
-        return driver.findLocal(sender, regData, false);
+        return driver.findLocal(myName, regData, false);
     }
 
-    private Builder registrationBuilder(String name,
-                                        xMsgTopic topic) {
+    private Builder registrationBuilder(xMsgTopic topic) {
         xMsgRegistration.Builder regb = xMsgRegistration.newBuilder();
-        regb.setName(name);
+        regb.setName(myName);
         regb.setHost(localHostIp);
         regb.setPort(xMsgConstants.DEFAULT_PORT.getIntValue());
         regb.setDomain(topic.domain());
@@ -612,7 +601,7 @@ public class xMsg {
 
         // subscribe to the returnAddress
         SyncSendCallBack cb = new SyncSendCallBack();
-        SubscriptionHandler sh = subscribe(connection, xMsgTopic.wrap(returnAddress), cb);
+        xMsgSubscription sh = subscribe(connection, xMsgTopic.wrap(returnAddress), cb);
         cb.setSubscriptionHandler(sh);
 
         publish(connection, msg);
@@ -645,27 +634,18 @@ public class xMsg {
      * @return SubscriptionHandler object reference
      * @throws xMsgException
      */
-    public SubscriptionHandler subscribe(final xMsgConnection connection,
-                                         final xMsgTopic topic,
-                                         final xMsgCallBack cb)
+    public xMsgSubscription subscribe(final xMsgConnection connection,
+                                      final xMsgTopic topic,
+                                      final xMsgCallBack cb)
             throws xMsgException {
 
-        // check connection
-        final Socket con = connection.getSubSock();
-        if (con == null) {
-            System.out.println("Error: null connection object");
-            throw new xMsgException("Error: null connection object");
-        }
+        String name = "sub-" + myName + "-" + connection.getAddress().getKey() + "-" + topic;
 
-        // zmq subscribe
-        con.subscribe(topic.toString().getBytes(ZMQ.CHARSET));
-
-        SubscriptionHandler sHandle = new SubscriptionHandler(connection, topic) {
+        xMsgSubscription sHandle = new xMsgSubscription(name, connection, topic) {
             @Override
-            public void handle() throws xMsgException, IOException {
+            public void handle(ZMsg inputMsg) throws xMsgException, IOException {
                 final xMsgMessage callbackMsg;
 
-                ZMsg inputMsg = ZMsg.recvMsg(con);
                 ZFrame topicFrame = inputMsg.pop();       // get the topic frame = 1
                 ZFrame msgLocationFrame = inputMsg.pop(); // get the message location frame = 2
 
@@ -720,13 +700,11 @@ public class xMsg {
                         // we do not need the rest of frames as well as the z_msg
                         metadataFrame.destroy();
                         dataFrame.destroy();
-                        inputMsg.destroy();
 
                     } catch (InvalidProtocolBufferException e) {
                         metadataFrame.destroy();
                         dataFrame.destroy();
-                        inputMsg.destroy();
-                        throw new xMsgException(e.getMessage());
+                        throw new xMsgException("Could not parse protobuf", e);
                     }
                 } else {
                     callbackMsg = xMsgRegistrar.sharedMemory.get(msgLocation);
@@ -737,15 +715,7 @@ public class xMsg {
             }
         };
 
-        // wait for messages published to a required topic
-        Thread t = new Thread(sHandle);
-        t.setUncaughtExceptionHandler(new Thread.UncaughtExceptionHandler() {
-            @Override
-            public void uncaughtException(Thread t, Throwable e) {
-                e.printStackTrace();
-            }
-        });
-        t.start();
+        sHandle.start();
         return sHandle;
 
     }
@@ -783,9 +753,9 @@ public class xMsg {
      * @param handle SubscribeHandler object reference
      * @throws xMsgException
      */
-    public void unsubscribe(SubscriptionHandler handle)
+    public void unsubscribe(xMsgSubscription handle)
             throws xMsgException {
-        handle.unsubscribe();
+        handle.stop();
     }
 
 
@@ -803,17 +773,15 @@ public class xMsg {
     private class SyncSendCallBack implements xMsgCallBack {
 
         public xMsgMessage recvMsg = null;
-        public Boolean isReceived = false;
 
-        private SubscriptionHandler handler = null;
+        private xMsgSubscription handler = null;
 
-        public void setSubscriptionHandler(SubscriptionHandler handler) {
+        public void setSubscriptionHandler(xMsgSubscription handler) {
             this.handler = handler;
         }
 
         @Override
         public xMsgMessage callback(xMsgMessage msg) {
-            isReceived = true;
             recvMsg = msg;
             try {
                 if (handler != null) {

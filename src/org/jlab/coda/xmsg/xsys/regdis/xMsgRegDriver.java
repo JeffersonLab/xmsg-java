@@ -119,6 +119,8 @@ public class xMsgRegDriver {
             throw new xMsgException("null zmq socket-base");
         }
 
+        sb.setHWM(0);
+
         if (boc == xMsgConstants.BIND.getIntValue()) {
             // Bind socket to the host and port
             int bindPort = sb.bind("tcp://" + host + ":" + port);

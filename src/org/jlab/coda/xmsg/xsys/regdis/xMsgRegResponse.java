@@ -48,7 +48,6 @@ public class xMsgRegResponse {
     private final String status;
     private final Set<xMsgRegistration> data;
 
-
     /**
      * Constructs a success response. No registration data is returned.
      * The response status is set to

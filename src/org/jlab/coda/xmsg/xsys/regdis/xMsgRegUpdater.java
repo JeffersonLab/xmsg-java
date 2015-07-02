@@ -47,10 +47,9 @@ import java.net.SocketException;
  */
 public class xMsgRegUpdater extends xMsgRegDriver implements Runnable {
 
-    // xMsgNode database references
-    private xMsgRegDatabase publishers;
-    private xMsgRegDatabase subscribers;
-    private String name;
+    private final xMsgRegDatabase publishers;
+    private final xMsgRegDatabase subscribers;
+    private final String name;
 
     /**
      * Constructor accepts the front-end host name (IP form)
@@ -65,8 +64,8 @@ public class xMsgRegUpdater extends xMsgRegDriver implements Runnable {
      * @throws IOException
      */
     public xMsgRegUpdater(String feHost,
-                       xMsgRegDatabase publishers,
-                       xMsgRegDatabase subscribers
+                          xMsgRegDatabase publishers,
+                          xMsgRegDatabase subscribers
     ) throws SocketException, xMsgException {
         super(feHost);
         this.publishers = publishers;

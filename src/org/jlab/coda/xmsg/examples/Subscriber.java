@@ -47,13 +47,12 @@ public class Subscriber extends xMsg {
     private MyCallBack callback;
 
     public Subscriber() throws xMsgException, SocketException {
-        super("localhost");
+        super("test_subscriber", "localhost");
         callback = new MyCallBack();
     }
 
     public static void main(String[] args) {
         try {
-            final String myName = "test_subscriber";
             final String domain = "test_domain";
             final String subject = "test_subject";
             final String type = "test_type";
@@ -68,7 +67,7 @@ public class Subscriber extends xMsg {
             xMsgTopic topic = xMsgTopic.build(domain, subject, type);
 
             // Register this subscriber
-            subscriber.registerSubscriber(myName, topic, description);
+            subscriber.registerSubscriber(topic, description);
 
             // Subscribe by passing a callback to the subscription
             subscriber.subscribe(con, topic, subscriber.callback);
