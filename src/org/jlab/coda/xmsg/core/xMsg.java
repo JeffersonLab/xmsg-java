@@ -31,6 +31,7 @@ import org.jlab.coda.xmsg.excp.xMsgException;
 import org.jlab.coda.xmsg.excp.xMsgRegistrationException;
 import org.jlab.coda.xmsg.net.xMsgAddress;
 import org.jlab.coda.xmsg.net.xMsgConnection;
+import org.jlab.coda.xmsg.net.xMsgConnectionSetup;
 import org.jlab.coda.xmsg.xsys.regdis.xMsgRegDriver;
 import org.jlab.coda.xmsg.xsys.xMsgRegistrar;
 import org.zeromq.ZContext;
@@ -70,6 +71,9 @@ public class xMsg {
 
     /** Private database of stored connections. */
     private final Map<xMsgAddress, xMsgConnection> connections = new HashMap<>();
+
+    /** Default socket options. */
+    private xMsgConnectionSetup defaultSetup;
 
     /** Fixed size thread pool. */
     private final ExecutorService threadPool;
@@ -129,6 +133,18 @@ public class xMsg {
         // create fixed size thread pool
         this.poolSize = poolSize;
         this.threadPool = xMsgUtil.newFixedThreadPool(this.poolSize);
+
+        // default pub/sub socket options
+        defaultSetup = new xMsgConnectionSetup() {
+
+            @Override
+            public void preConnection(Socket socket) {
+                socket.setHWM(0);
+            }
+
+            @Override
+            public void postConnection() { }
+        };
     }
 
     /**
@@ -150,6 +166,16 @@ public class xMsg {
     public void destroy(int linger) {
         context.setLinger(linger);
         destroy();
+    }
+
+    /**
+     * Overwrites the default setup for every connection.
+     * This setup will be applied every time a new connection is created.
+     *
+     * @param setup the new default setup
+     */
+    public void setConnectionSetup(xMsgConnectionSetup setup) {
+        defaultSetup = setup;
     }
 
     /**
@@ -195,7 +221,24 @@ public class xMsg {
      * @throws xMsgException
      */
     public xMsgConnection connect(xMsgAddress address) throws xMsgException {
+        return connect(address, defaultSetup);
+    }
 
+    /**
+     * Returns the connection to the xMsg proxy in the specified host.
+     * If the connection is not created yet, it will be created,
+     * configured with the specified setup, stored into
+     * the cache of connections, and then returned.
+     * If there is a connection in the cache, that object will be returned then.
+     * The proxy should be running in the host.
+     *
+     * @param address the xMsg address of the host where the xMsg proxy is running
+     * @param setup the setup in case of creating a new connection
+     * @return the {@link xMsgConnection} object to the proxy
+     * @throws xMsgException
+     */
+    public xMsgConnection connect(xMsgAddress address, xMsgConnectionSetup setup)
+            throws xMsgException {
         /*
          * First check to see if we have already established connection
          * to this address
@@ -208,7 +251,7 @@ public class xMsg {
              * created connection object for the future use. Return the
              * reference to the connection object
              */
-            xMsgConnection connection = createConnection(address);
+            xMsgConnection connection = createConnection(address, setup);
             connections.put(address, connection);
             return connection;
         }
@@ -236,7 +279,24 @@ public class xMsg {
      * @throws xMsgException
      */
     public xMsgConnection getNewConnection(xMsgAddress address) throws xMsgException {
-        return createConnection(address);
+        return createConnection(address, defaultSetup);
+    }
+
+    /**
+     * Returns a new connection to the xMsg proxy in the specified host.
+     * A new connection is always created, and configured with the specified setup.
+     * This connection is not stored in the cache of connections
+     * (which may already contain a connection to the given host).
+     * The proxy should be running in the host.
+     *
+     * @param address the address of the host where the xMsg proxy is running
+     * @param setup the setup of the new connection
+     * @return the {@link xMsgConnection} object to the proxy
+     * @throws xMsgException
+     */
+    public xMsgConnection getNewConnection(xMsgAddress address, xMsgConnectionSetup setup)
+            throws xMsgException {
+        return createConnection(address, setup);
     }
 
     /**
@@ -244,16 +304,17 @@ public class xMsg {
      * @param address the address of the proxy to be connected
      * @return the created connection
      */
-    private xMsgConnection createConnection(xMsgAddress address) {
+    private xMsgConnection createConnection(xMsgAddress address, xMsgConnectionSetup setup) {
         Socket pubSock = context.createSocket(ZMQ.PUB);
         Socket subSock = context.createSocket(ZMQ.SUB);
-        pubSock.setHWM(0);
-        subSock.setHWM(0);
+        setup.preConnection(pubSock);
+        setup.preConnection(subSock);
 
         int pubPort = address.getPort();
         int subPort = pubPort + 1;
         pubSock.connect("tcp://" + address.getHost() + ":" + pubPort);
         subSock.connect("tcp://" + address.getHost() + ":" + subPort);
+        setup.postConnection();
 
         xMsgConnection connection = new xMsgConnection();
         connection.setAddress(address);
