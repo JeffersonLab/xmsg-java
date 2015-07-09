@@ -163,7 +163,6 @@ public class xMsgRegDiscDriver {
             if (!s_data.equals(xMsgConstants.SUCCESS.getStringValue())) {
                 throw new xMsgRegistrationException("failed");
             }
-            System.out.println(xMsgUtil.currentTime(2)+" " + name+" successfully registered.");
 
         } else {
             throw new xMsgRegistrationException("xMsg actor registration timeout");
