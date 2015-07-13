@@ -201,6 +201,22 @@ public class xMsg {
      * @throws xMsgException
      */
     public xMsgConnection connect(xMsgAddress address) throws xMsgException {
+        return connect(address, 0);
+    }
+
+    /**
+     * <p>
+     *     Connects to the xMsgNode by creating two sockets for publishing and
+     *     subscribing/receiving messages. It returns and the same time stores
+     *     in the local connection database created
+     *     {@link org.jlab.coda.xmsg.net.xMsgConnection} object.
+     * </p>
+     * @param address {@link xMsgAddress} object
+     * @param sleepTime {@link xMsgAddress} time to sleep after creating new connection (ms)
+     * @return {@link xMsgConnection} object
+     * @throws xMsgException
+     */
+    public xMsgConnection connect(xMsgAddress address, int sleepTime) throws xMsgException {
 
         /**
          * First check to see if we have already
@@ -224,6 +240,11 @@ public class xMsg {
                     address.getPort() + 1, xMsgConstants.CONNECT.getIntValue()));
 
             _connections.put(address.getKey(),feCon);
+
+            if (sleepTime > 0) {
+                xMsgUtil.sleep(sleepTime);
+            }
+
             return feCon;
         }
     }
@@ -1301,7 +1322,8 @@ public class xMsg {
                         }
                     } else {
                         threadPool.submit(new Runnable() {
-                                              public void run() {
+                                              @Override
+                                            public void run() {
                                                   cb.callback(cb_msg);
                                               }
                                           }
