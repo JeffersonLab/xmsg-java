@@ -27,6 +27,7 @@ import org.jlab.coda.xmsg.data.xMsgD.xMsgData;
 import org.jlab.coda.xmsg.data.xMsgM.xMsgMeta;
 import org.jlab.coda.xmsg.excp.xMsgException;
 import org.zeromq.ZFrame;
+import org.zeromq.ZMQ;
 import org.zeromq.ZMsg;
 
 /**
@@ -104,6 +105,21 @@ public class xMsgMessage {
         this.metaData = metaData;
         this.data = data;
     }
+
+
+    /**
+     * Constructs a message with string data.
+     *
+     * @param topic the topic of the message
+     * @param text the data of the message
+     */
+    public xMsgMessage(xMsgTopic topic, String text) {
+        this.topic = topic;
+        this.metaData = xMsgMeta.newBuilder();
+        this.metaData.setDataType("text/string");
+        this.data = text.getBytes(ZMQ.CHARSET);
+    }
+
 
     /**
      * Deserializes a received message.
@@ -216,5 +232,16 @@ public class xMsgMessage {
     public void setData(xMsgData data) {
         this.metaData.setDataType("native");
         this.data = data.toByteArray();
+    }
+
+
+    /**
+     * Sets an string as the message data.
+     *
+     * @param text the data of the message
+     */
+    public void setData(String text) {
+        this.metaData.setDataType("text/string");
+        this.data = text.getBytes(ZMQ.CHARSET);
     }
 }
