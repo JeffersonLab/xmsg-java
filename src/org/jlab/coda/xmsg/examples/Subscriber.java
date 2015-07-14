@@ -31,6 +31,8 @@ import org.jlab.coda.xmsg.data.xMsgD.xMsgData;
 import org.jlab.coda.xmsg.excp.xMsgException;
 import org.jlab.coda.xmsg.net.xMsgConnection;
 
+import com.google.protobuf.InvalidProtocolBufferException;
+
 import java.io.IOException;
 import java.net.SocketException;
 
@@ -97,7 +99,7 @@ public class Subscriber extends xMsg {
         @Override
         public xMsgMessage callback(xMsgMessage msg) {
             if (msg.getMetaData().getReplyTo().equals(xMsgConstants.UNDEFINED.getStringValue())) {
-                xMsgData.Builder data = (xMsgData.Builder) msg.getData();
+                parseData(msg);
                 if (nr == 0) {
                     t1 = System.currentTimeMillis();
                 }
@@ -116,6 +118,18 @@ public class Subscriber extends xMsg {
                 reply(msg);
             }
             return msg;
+        }
+
+        private int parseData(xMsgMessage msg) {
+            try {
+                xMsgData data = xMsgData.parseFrom(msg.getData());
+                if (data.hasFLSINT32()) {
+                    return data.getFLSINT32();
+                }
+            } catch (InvalidProtocolBufferException e) {
+                e.printStackTrace();
+            }
+            return -1;
         }
     }
 }

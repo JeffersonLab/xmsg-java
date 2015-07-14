@@ -21,14 +21,16 @@
 
 package org.jlab.coda.xmsg.core;
 
-import com.google.protobuf.ByteString;
+import com.google.protobuf.InvalidProtocolBufferException;
+
 import org.jlab.coda.xmsg.data.xMsgD.xMsgData;
 import org.jlab.coda.xmsg.data.xMsgM.xMsgMeta;
-
-import java.util.Arrays;
+import org.jlab.coda.xmsg.excp.xMsgException;
+import org.zeromq.ZFrame;
+import org.zeromq.ZMsg;
 
 /**
- * Defines a message to be serialized and passed through 0MQ.
+ * Defines a message to be passed through 0MQ.
  *
  * Uses {@link xMsgData} class generated as a result of the proto-buffer
  * description to pass Java primitive types and arrays of primitive types.
@@ -36,12 +38,9 @@ import java.util.Arrays;
  * object serialization.
  * <p>
  * This class will also contain complete metadata of the message data,
- * describing details of the data. In case an object is constructed
- * without a metadata, the default metadata will be created and the
- * proper data type will set based on the passed data parameter type.
- * <p>
- * Note that data that is an instance of {@code byte[]} will be considered to be
- * a serialization of a specific user object only in the case when a proper
+ * describing details of the data. In case a message is constructed
+ * without metadata, the default metadata will be created, and only the data
+ * type will be set.
  *
  * @author gurjyan
  * @version 2.x
@@ -50,179 +49,172 @@ import java.util.Arrays;
 public class xMsgMessage {
 
     private xMsgTopic topic;
-    private xMsgMeta.Builder metaData = null;
-    private Object data = null;
+    private xMsgMeta.Builder metaData;
+    private byte[] data;
 
+    /**
+     * Constructs a message with empty data.
+     *
+     * @param topic the topic of the message
+     */
     public xMsgMessage(xMsgTopic topic) {
         this.topic = topic;
-        setData(xMsgConstants.UNDEFINED.getStringValue(),"native");
+        this.metaData = xMsgMeta.newBuilder();
     }
 
     /**
-     * Constructor that will auto-create the metadata.
-     * This metadata will be based on the type of the passed data object.
+     * Constructs a message with full metadata and native xMsg data.
+     * Use {@link xMsgData} as a helper to send a message with primitive data
+     * that can be read by any xMsg implementation natively.
+     * This data will be serialized and then stored in the message.
      *
-     * @param topic of the communication
-     * @param data  of the communication
+     * @param topic the topic of the message
+     * @param metaData the full metadata of the message
+     * @param data the native data of the message
      */
-    public xMsgMessage(xMsgTopic topic,
-                       Object data, String dataType) {
+    public xMsgMessage(xMsgTopic topic, xMsgMeta.Builder metaData, xMsgData data) {
         this.topic = topic;
-        setData(data, dataType);
+        this.metaData = metaData;
+        this.data = data.toByteArray();
     }
 
     /**
-     * Constructor.
+     * Constructs a message with only raw data and default metadata.
+     * The mime-type of the data.
      *
-     * @param topic of the communication
-     * @param metadata of the communication
-     * @param data of the communication
+     * @param topic the topic of the message
+     * @param mimeType the mime-type of the data
+     * @param data the raw data of the message
      */
-    public xMsgMessage(xMsgTopic topic,
-                       xMsgMeta.Builder metadata,
-                       Object data) {
-        this.topic = topic;
-        this.metaData = metadata;
+    public xMsgMessage(xMsgTopic topic, String mimeType, byte[] data) {
+        this.metaData = xMsgMeta.newBuilder();
+        this.metaData.setDataType(mimeType);
         this.data = data;
     }
 
-    public boolean getIsDataSerialized() {
-        if (metaData != null) {
-            return metaData.getIsDataSerialized();
-        } else {
-            metaData = xMsgMeta.newBuilder();
-            return metaData.getIsDataSerialized();
+    /**
+     * Constructs a message with full metadata and raw data.
+     *
+     * @param topic the topic of the message
+     * @param metaData the full metadata of the message
+     * @param data the raw data of the message
+     */
+    public xMsgMessage(xMsgTopic topic, xMsgMeta.Builder metaData, byte[] data) {
+        this.topic = topic;
+        this.metaData = metaData;
+        this.data = data;
+    }
+
+    /**
+     * Deserializes a received message.
+     *
+     * @param msg the received ZMQ message
+     */
+    xMsgMessage(ZMsg msg) throws xMsgException {
+        ZFrame topicFrame = msg.pop();
+        ZFrame metaDataFrame = msg.pop();
+        ZFrame dataFrame = msg.pop();
+
+        try {
+            this.topic = xMsgTopic.wrap(topicFrame.getData());
+            xMsgMeta metaDataObj = xMsgMeta.parseFrom(metaDataFrame.getData());
+            this.metaData = metaDataObj.toBuilder();
+            this.data = dataFrame.getData();
+        } catch (InvalidProtocolBufferException e) {
+            throw new xMsgException("Could not parse metadata", e);
+        } finally {
+            topicFrame.destroy();
+            metaDataFrame.destroy();
+            dataFrame.destroy();
         }
     }
 
-    public void setIsDataSerialized(boolean b) {
-        if (metaData == null) {
-            metaData = xMsgMeta.newBuilder();
-            metaData.setIsDataSerialized(b);
-        } else {
-            metaData.setIsDataSerialized(b);
-        }
+    /**
+     * Serializes this message into a ZMQ message.
+     *
+     * @returns the ZMQ raw multi-part message
+     */
+    ZMsg serialize() {
+        ZMsg msg = new ZMsg();
+        msg.add(topic.toString());
+        msg.add(metaData.build().toByteArray());
+        msg.add(data);
+        return msg;
     }
 
+    /**
+     * Returns the topic of this message.
+     */
     public xMsgTopic getTopic() {
         return topic;
     }
 
+    /**
+     * Sets the topic of this message.
+     *
+     * @param topic the topic
+     */
     public void setTopic(xMsgTopic topic) {
         this.topic = topic;
     }
 
+    /**
+     * Returns the metadata of this message.
+     */
     public xMsgMeta.Builder getMetaData() {
         return metaData;
     }
 
+    /**
+     * Sets the metadata of this message.
+     * This will overwrite any mime-type already set.
+     *
+     * @param metaData the metatada
+     */
     public void setMetaData(xMsgMeta.Builder metaData) {
-        this.metaData = metaData;
+        this.metaData.mergeFrom(metaData.build());
     }
 
-    public Object getData() {
+    /**
+     * Returns the mime-type of the message data.
+     */
+    public String getMimeType() {
+        return metaData.getDataType();
+    }
+
+    /**
+     * Returns the message data.
+     */
+    public byte[] getData() {
         return data;
     }
 
     /**
-     * Sets the message data.
-     * <p>
-     * This method will check to see if passed objects are of
-     * primitive types or an array of primitive types, and will assume
-     * transferring them (serializing) through xMsgData object.
-     * Any other Java object will be considered to be passed as
-     * un-serialized J_Object.
-     * <p>
-     * Note. if you pass to this method a byte[] as a result of your
-     * own serialization process it will be set as the xMsgData byte[]
-     * with the type T_BYTES. In this case your actual data type will be
-     * lost. This is the mechanism to pass your own serialized byte[]
-     * through xMsgData (type = X_Object).
-     *
-     * @param data object
+     * Returns the size of the message data.
      */
-    public void setData(Object data, String dataType) {
-        if (metaData == null) {
-            metaData = xMsgMeta.newBuilder();
-        }
-
-        // xMsgData object for all primitive types
-        xMsgData.Builder d = xMsgData.newBuilder();
-        metaData.setDataType("native");
-        if (data instanceof String) {
-            d.setSTRING((String) data);
-            d.setType(xMsgData.Type.T_STRING);
-            this.data = d;
-        } else if (data instanceof Integer) {
-            d.setFLSINT32((Integer) data);
-            d.setType(xMsgData.Type.T_FLSINT32);
-            this.data = d;
-        } else if (data instanceof Long) {
-            d.setFLSINT64((Long) data);
-            d.setType(xMsgData.Type.T_FLSINT64);
-            this.data = d;
-        } else if (data instanceof Float) {
-            d.setFLOAT((Float) data);
-            d.setType(xMsgData.Type.T_FLOAT);
-            this.data = d;
-        } else if (data instanceof Double) {
-            d.setDOUBLE((Double) data);
-            d.setType(xMsgData.Type.T_DOUBLE);
-            this.data = d;
-
-        } else if (data instanceof Integer[]) {
-            Integer[] a = (Integer[]) data;
-            d.addAllFLSINT32A(Arrays.asList(a));
-            d.setType(xMsgData.Type.T_FLSINT32A);
-            this.data = d;
-
-        } else if (data instanceof Long[]) {
-            Long[] a = (Long[]) data;
-            d.addAllFLSINT64A(Arrays.asList(a));
-            d.setType(xMsgData.Type.T_FLSINT64A);
-            this.data = d;
-
-        } else if (data instanceof Float[]) {
-            Float[] a = (Float[]) data;
-            d.addAllFLOATA(Arrays.asList(a));
-            d.setType(xMsgData.Type.T_FLOATA);
-            this.data = d;
-
-        } else if (data instanceof Double[]) {
-            Double[] a = (Double[]) data;
-            d.addAllDOUBLEA(Arrays.asList(a));
-            d.setType(xMsgData.Type.T_DOUBLEA);
-            this.data = d;
-
-        } else if (data instanceof byte[]) {
-            d.setBYTES(ByteString.copyFrom((byte[]) data));
-            d.setType(xMsgData.Type.T_BYTES);
-            this.data = d;
-
-            // serialized xMsgData (X_Object)
-        } else if (data instanceof xMsgData) {
-            metaData.setIsDataSerialized(true);
-            this.data = data;
-
-            // un-serialized xMsgData object (X_Object)
-        } else if (data instanceof xMsgData.Builder) {
-            metaData.setIsDataSerialized(false);
-            this.data = data;
-
-            // Any custom object (un serialized)
-        } else {
-            metaData.setDataType(dataType);
-            metaData.setIsDataSerialized(false);
-            this.data = data;
-        }
-
+    public int getDataSize() {
+        return data != null ? data.length : 0;
     }
 
     /**
      * Sets the message data.
+     *
+     * @param mimeType the mime-type of the data
+     * @param data the raw data of the message
      */
-    public void setData(Object data, xMsgMeta.Builder metadata) {
+    public void setData(String mimeType, byte[] data) {
+        this.metaData.setDataType(mimeType);
         this.data = data;
-        this.metaData = metadata;
+    }
+
+    /**
+     * Sets the message data.
+     * This data will be serialized and then stored in the message.
+     *
+     * @param data the native data of the message
+     */
+    public void setData(xMsgData data) {
+        this.metaData.setDataType("native");
+        this.data = data.toByteArray();
     }
 }

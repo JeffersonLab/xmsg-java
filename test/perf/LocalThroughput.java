@@ -8,7 +8,6 @@ import org.jlab.coda.xmsg.core.xMsgMessage;
 import org.jlab.coda.xmsg.core.xMsgSubscription;
 import org.jlab.coda.xmsg.core.xMsgTopic;
 import org.jlab.coda.xmsg.core.xMsgUtil;
-import org.jlab.coda.xmsg.data.xMsgD.xMsgData;
 import org.jlab.coda.xmsg.excp.xMsgException;
 import org.jlab.coda.xmsg.net.xMsgAddress;
 import org.jlab.coda.xmsg.net.xMsgConnection;
@@ -50,9 +49,9 @@ public final class LocalThroughput {
 
                 @Override
                 public xMsgMessage callback(xMsgMessage msg) {
-                    xMsgData.Builder data = (xMsgData.Builder) msg.getData();
-                    if (data.getBYTES().size() != messageSize) {
-                        printf("message of incorrect size received " + data.getBYTES().size());
+                    int size = msg.getDataSize();
+                    if (size != messageSize) {
+                        printf("message of incorrect size received " + size);
                         System.exit(1);
                     }
                     int nr = ++timer.nr;

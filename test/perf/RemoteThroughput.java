@@ -33,7 +33,8 @@ public final class RemoteThroughput {
 
             byte[] data = new byte[messageSize];
             for (int i = 0; i < messageCount; i++) {
-                xMsgMessage msg = new xMsgMessage(topic, data);
+                xMsgMessage msg = new xMsgMessage(topic);
+                msg.setData("data/binary", data);
                 publisher.publish(connection, msg);
             }
 

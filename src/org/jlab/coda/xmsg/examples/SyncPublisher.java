@@ -4,6 +4,7 @@ import org.jlab.coda.xmsg.core.xMsg;
 import org.jlab.coda.xmsg.core.xMsgMessage;
 import org.jlab.coda.xmsg.core.xMsgTopic;
 import org.jlab.coda.xmsg.core.xMsgUtil;
+import org.jlab.coda.xmsg.data.xMsgD.xMsgData;
 import org.jlab.coda.xmsg.excp.xMsgException;
 import org.jlab.coda.xmsg.net.xMsgConnection;
 
@@ -32,7 +33,7 @@ public class SyncPublisher extends xMsg {
             publisher.registerPublisher(topic, description);
 
             xMsgMessage msg = new xMsgMessage(topic);
-            msg.setData(111, "native");
+            setData(msg, 111);
             int counter = 1;
             while (true) {
                 System.out.println("Publishing " + counter);
@@ -42,11 +43,18 @@ public class SyncPublisher extends xMsg {
                 long delta = (t2 - t1) / 1000000L;
                 System.out.printf("Received response = %s in %d ms%n", recData, delta);
                 counter++;
-                msg.setData(String.valueOf(counter), "native");
+                setData(msg, counter);
                 xMsgUtil.sleep(2000);
             }
         } catch (xMsgException | TimeoutException | IOException e) {
             e.printStackTrace();
         }
+    }
+
+
+    private static void setData(xMsgMessage msg, int value) {
+        xMsgData.Builder b = xMsgData.newBuilder();
+        b.setFLSINT32(value);
+        msg.setData(b.build());
     }
 }

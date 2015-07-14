@@ -21,10 +21,6 @@
 
 package org.jlab.coda.xmsg.core;
 
-import com.google.protobuf.InvalidProtocolBufferException;
-
-import org.jlab.coda.xmsg.data.xMsgD.xMsgData;
-import org.jlab.coda.xmsg.data.xMsgM.xMsgMeta;
 import org.jlab.coda.xmsg.data.xMsgR.xMsgRegistration;
 import org.jlab.coda.xmsg.data.xMsgR.xMsgRegistration.Builder;
 import org.jlab.coda.xmsg.excp.xMsgException;
@@ -32,9 +28,7 @@ import org.jlab.coda.xmsg.excp.xMsgRegistrationException;
 import org.jlab.coda.xmsg.net.xMsgAddress;
 import org.jlab.coda.xmsg.net.xMsgConnection;
 import org.jlab.coda.xmsg.xsys.regdis.xMsgRegDriver;
-import org.jlab.coda.xmsg.xsys.xMsgRegistrar;
 import org.zeromq.ZContext;
-import org.zeromq.ZFrame;
 import org.zeromq.ZMQ;
 import org.zeromq.ZMQ.Socket;
 import org.zeromq.ZMsg;
@@ -512,60 +506,8 @@ public class xMsg {
             throw new xMsgException("Error: null message");
         }
 
-        // byte array for holding the serialized metadata and data object
-        byte[] serialMetadata;
-        byte[] serialData;
-
         // send topic, sender, followed by the metadata and data
-        ZMsg outputMsg = new ZMsg();
-
-        // adding topic frame = 1
-        outputMsg.addString(msg.getTopic().toString());
-
-        xMsgMeta.Builder metadata = msg.getMetaData();
-
-        // publishing over process or network boundaries
-        if (metadata.getIsDataSerialized()) {
-
-            // adding message location frame = 2
-            outputMsg.add("envelope");
-
-            // adding metadata frame = 3
-            xMsgMeta md = metadata.build();
-            serialMetadata = md.toByteArray();
-            outputMsg.add(serialMetadata);
-
-            // We serialize here only X_Object and J_object type data.
-            // The rest we assume under user responsibility
-            if (metadata.getDataType().equals("native")) {
-                // Get the data from the xMsgMessage
-                xMsgData.Builder data = (xMsgData.Builder) msg.getData();
-                // xMsgData serialization
-                xMsgData dd = data.build();
-                serialData = dd.toByteArray();
-
-            }  else {
-                // NO serialization
-                serialData = (byte[]) msg.getData();
-            }
-
-            // adding data frame = 4
-            outputMsg.add(serialData);
-
-        } else {
-            // Publishing within the same process (for e.g. DPE). In this case
-            // xMsgMessage including the data and the metadata is in the shared memory.
-            // Check to see if the location of the object in the shared memory is defined
-
-            // Add the xMsgMessage (including metadata and data) to the shared memory
-            // Here we define a unique key for this message in the shared memory, using
-            // senders unique name and the communication ID set by the user.
-            String key = metadata.getSender() + "_" + metadata.getCommunicationId();
-            xMsgRegistrar.sharedMemory.put(key, msg);
-
-            // add message location frame = 2
-            outputMsg.add(key);
-        }
+        ZMsg outputMsg = msg.serialize();
 
         if (!outputMsg.send(con)) {
             System.out.println("Error: publishing the message");
@@ -644,80 +586,13 @@ public class xMsg {
         xMsgSubscription sHandle = new xMsgSubscription(name, connection, topic) {
             @Override
             public void handle(ZMsg inputMsg) throws xMsgException, IOException {
-                final xMsgMessage callbackMsg;
-
-                ZFrame topicFrame = inputMsg.pop();       // get the topic frame = 1
-                ZFrame msgLocationFrame = inputMsg.pop(); // get the message location frame = 2
-
-                // de-serialize received message components
-                xMsgTopic topic = xMsgTopic.wrap(topicFrame.getData());
-                String msgLocation = new String(msgLocationFrame.getData(), ZMQ.CHARSET);
-
-                // we do not need frames
-                topicFrame.destroy();
-                msgLocationFrame.destroy();
-
-                // Define/create received xMsgMessage
-                // by check the location of the message
-                if (msgLocation.equals("envelope")) {
-
-                    // Get the rest of the message components,
-                    // i.e. metadata and data are in the xMsg envelope
-                    // Read the rest of the zmq frames
-                    ZFrame metadataFrame = inputMsg.pop(); // get metadata frame = 3
-                    ZFrame dataFrame = inputMsg.pop();     // get the data frame = 4
-
-                    // metadata and data de-serialization
-                    try {
-                        xMsgMeta metadataObj = xMsgMeta.parseFrom(metadataFrame.getData());
-                        xMsgMeta.Builder metadata = metadataObj.toBuilder();
-
-                        // Find the type of the data passed, and de
-                        // serialize only X_Object and J_Object type data.
-                        // Note de-serialization of the other type data is assumed
-                        // to be a user responsibility
-                        if (metadata.getDataType().equals("native")) {
-
-                            // xMsgData de-serialization
-                            xMsgData dataObj = xMsgData.parseFrom(dataFrame.getData());
-                            xMsgData.Builder data = dataObj.toBuilder();
-
-                            // Create a message to be passed to the user callback method
-                            callbackMsg = new xMsgMessage(topic, metadata, data);
-                            // Calling user callback method with the received xMsgMessage
-                            callUserCallBack(connection, cb, callbackMsg);
-
-                        }  else {
-                            // NO de-serialization
-                            Object data = dataFrame.getData();
-
-                            // Create a message to be passed to the user callback method
-                            callbackMsg = new xMsgMessage(topic, metadata, data);
-                            // Calling user callback method with the received xMsgMessage
-                            callUserCallBack(connection, cb, callbackMsg);
-                        }
-
-                        // we do not need the rest of frames as well as the z_msg
-                        metadataFrame.destroy();
-                        dataFrame.destroy();
-
-                    } catch (InvalidProtocolBufferException e) {
-                        metadataFrame.destroy();
-                        dataFrame.destroy();
-                        throw new xMsgException("Could not parse protobuf", e);
-                    }
-                } else {
-                    callbackMsg = xMsgRegistrar.sharedMemory.get(msgLocation);
-
-                    // Calling user callback method with the received xMsgMessage
-                    callUserCallBack(connection, cb, callbackMsg);
-                }
+                final xMsgMessage callbackMsg = new xMsgMessage(inputMsg);
+                callUserCallBack(connection, cb, callbackMsg);
             }
         };
 
         sHandle.start();
         return sHandle;
-
     }
 
     private void callUserCallBack(final xMsgConnection connection,

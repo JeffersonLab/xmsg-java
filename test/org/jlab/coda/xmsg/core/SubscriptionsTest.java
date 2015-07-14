@@ -27,6 +27,7 @@ import java.util.concurrent.TimeoutException;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.atomic.AtomicLong;
 
+import org.jlab.coda.xmsg.data.xMsgD.xMsgData;
 import org.jlab.coda.xmsg.data.xMsgD.xMsgData.Builder;
 import org.jlab.coda.xmsg.excp.xMsgException;
 import org.jlab.coda.xmsg.net.xMsgConnection;
@@ -35,6 +36,8 @@ import org.jlab.coda.xmsg.xsys.xMsgProxy;
 import org.junit.Test;
 import org.junit.experimental.categories.Category;
 import org.zeromq.ZContext;
+
+import com.google.protobuf.InvalidProtocolBufferException;
 
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
@@ -97,8 +100,7 @@ public class SubscriptionsTest {
                     xMsgSubscription sub = actor.subscribe(connection, topic, new xMsgCallBack() {
                         @Override
                         public xMsgMessage callback(xMsgMessage msg) {
-                            Builder data = (Builder) msg.getData();
-                            int i = data.getFLSINT32();
+                            int i = parseData(msg);
                             check.counter.incrementAndGet();
                             check.sum.addAndGet(i);
                             return msg;
@@ -125,7 +127,7 @@ public class SubscriptionsTest {
                     xMsgUtil.sleep(100);
                     xMsgTopic topic = xMsgTopic.wrap("test_topic");
                     for (int i = 0; i < Check.N; i++) {
-                        xMsgMessage msg = new xMsgMessage(topic, i);
+                        xMsgMessage msg = createMessage(topic, i);
                         actor.publish(connection, msg);
                     }
                 } catch (IOException | xMsgException e) {
@@ -194,10 +196,10 @@ public class SubscriptionsTest {
                     xMsgUtil.sleep(100);
                     xMsgTopic pubTopic = xMsgTopic.wrap("test_topic");
                     for (int i = 0; i < Check.N; i++) {
-                        xMsgMessage msg = new xMsgMessage(pubTopic, i);
+                        xMsgMessage msg = createMessage(pubTopic, i);
                         xMsgMessage resMsg = pubActor.syncPublish(pubCon, msg, 1);
-                        Builder data = (Builder) resMsg.getData();
-                        check.sum += data.getFLSINT32();
+                        int data = parseData(resMsg);
+                        check.sum += data;
                         check.counter++;
                     }
                     subActor.unsubscribe(sub);
@@ -264,7 +266,7 @@ public class SubscriptionsTest {
                     xMsgConnection pubCon = pubActor.connect();
                     xMsgUtil.sleep(100);
                     xMsgTopic pubTopic = xMsgTopic.wrap("test_topic");
-                    xMsgMessage msg = new xMsgMessage(pubTopic, 1);
+                    xMsgMessage msg = createMessage(pubTopic, 1);
                     try {
                         pubActor.syncPublish(pubCon, msg, 1);
                     } catch (TimeoutException e) {
@@ -286,5 +288,24 @@ public class SubscriptionsTest {
 
         assertTrue("not received", check.received);
         assertTrue("no timeout", check.timeout);
+    }
+
+
+    private xMsgMessage createMessage(xMsgTopic topic, int data) {
+        xMsgMessage msg = new xMsgMessage(topic);
+        Builder b = xMsgData.newBuilder();
+        b.setFLSINT32(data);
+        msg.setData(b.build());
+        return msg;
+    }
+
+
+    private int parseData(xMsgMessage msg) {
+        try {
+            xMsgData data = xMsgData.parseFrom(msg.getData());
+            return data.getFLSINT32();
+        } catch (InvalidProtocolBufferException e) {
+            throw new RuntimeException(e);
+        }
     }
 }
