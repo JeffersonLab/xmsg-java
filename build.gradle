@@ -4,11 +4,12 @@ apply plugin: 'maven'
 apply plugin: 'eclipse'
 apply plugin: 'idea'
 
-eclipse {
-    classpath {
-        defaultOutputDir = file("${buildDir}/eclipse-classes")
-    }
-}
+
+group = 'org.jlab.coda'
+archivesBaseName = 'xmsg'
+version = '1.0.4-SNAPSHOT'
+
+defaultTasks 'build'
 
 
 sourceSets {
@@ -58,13 +59,6 @@ artifacts {
 }
 
 
-group = 'org.jlab.coda'
-archivesBaseName = 'xmsg'
-version = '1.0.4-SNAPSHOT'
-
-defaultTasks 'build'
-
-
 task(startFE, dependsOn: 'classes', type: JavaExec) {
     main = 'org.jlab.coda.xmsg.xsys.xMsgFE'
     classpath = sourceSets.main.runtimeClasspath
@@ -93,7 +87,6 @@ task(runSub, dependsOn: 'classes', type: JavaExec) {
 
 
 
-
 task(localThr, dependsOn: 'classes', type: JavaExec) {
     main = 'perf.LocalThroughput'
     if (project.hasProperty("locThrArgs")) {
@@ -108,4 +101,12 @@ task(remoteThr, dependsOn: 'classes', type: JavaExec) {
         args Eval.me(remThrArgs)
     }
     classpath = sourceSets.test.runtimeClasspath
+}
+
+
+
+eclipse {
+    classpath {
+        defaultOutputDir = file("${buildDir}/eclipse-classes")
+    }
 }
