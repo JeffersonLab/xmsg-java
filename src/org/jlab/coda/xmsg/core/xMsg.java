@@ -536,7 +536,7 @@ public class xMsg {
         xMsgRegistration.Builder regb = xMsgRegistration.newBuilder();
         regb.setName(myName);
         regb.setHost(localHostIp);
-        regb.setPort(xMsgConstants.DEFAULT_PORT.getIntValue());
+        regb.setPort(xMsgConstants.DEFAULT_PORT.toInteger());
         regb.setDomain(topic.domain());
         regb.setSubject(topic.subject());
         regb.setType(topic.type());
@@ -620,7 +620,7 @@ public class xMsg {
         if (t >= timeout * 1000) {
             throw new TimeoutException("Error: no response for time_out = " + t);
         }
-        msg.getMetaData().setReplyTo(xMsgConstants.UNDEFINED.getStringValue());
+        msg.getMetaData().setReplyTo(xMsgConstants.UNDEFINED.toString());
         return cb.recvMsg;
     }
 
@@ -666,7 +666,7 @@ public class xMsg {
         // Check if it is sync request
         // sync request
         String requester = callbackMsg.getMetaData().getReplyTo();
-        if (!requester.equals(xMsgConstants.UNDEFINED.getStringValue())) {
+        if (!requester.equals(xMsgConstants.UNDEFINED.toString())) {
             xMsgMessage rm = callback.callback(callbackMsg);
             if (rm != null) {
                 rm.setTopic(xMsgTopic.wrap(requester));

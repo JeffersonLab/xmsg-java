@@ -71,10 +71,10 @@ public class xMsgRegService implements Runnable {
     private final xMsgRegDatabase subscribers = new xMsgRegDatabase();
 
     // Registrar accepted requests from any host (*)
-    private final String host = xMsgConstants.ANY.getStringValue();
+    private final String host = xMsgConstants.ANY.toString();
 
     // Default port of the registrar
-    private final int port = xMsgConstants.REGISTRAR_PORT.getIntValue();
+    private final int port = xMsgConstants.REGISTRAR_PORT.toInteger();
 
     // Used as a prefix to the name of this registrar.
     // The name of the registrar is used to set the sender field
@@ -160,8 +160,8 @@ public class xMsgRegService implements Runnable {
 
 
     ZMsg processRequest(ZMsg requestMsg) {
-        String topic = xMsgConstants.UNDEFINED.getStringValue();
-        String sender = localhost + ":" + xMsgConstants.REGISTRAR.getStringValue();
+        String topic = xMsgConstants.UNDEFINED.toString();
+        String sender = localhost + ":" + xMsgConstants.REGISTRAR.toString();
 
         xMsgRegResponse reply;
 
@@ -170,29 +170,29 @@ public class xMsgRegService implements Runnable {
             xMsgRegRequest request = new xMsgRegRequest(requestMsg);
             topic = request.topic();
 
-            if (topic.equals(xMsgConstants.REGISTER_PUBLISHER.getStringValue())) {
+            if (topic.equals(xMsgConstants.REGISTER_PUBLISHER.toString())) {
                 publishers.register(request.data());
 
-            } else if (topic.equals(xMsgConstants.REGISTER_SUBSCRIBER.getStringValue())) {
+            } else if (topic.equals(xMsgConstants.REGISTER_SUBSCRIBER.toString())) {
                 subscribers.register(request.data());
 
-            } else if (topic.equals(xMsgConstants.REMOVE_PUBLISHER.getStringValue())) {
+            } else if (topic.equals(xMsgConstants.REMOVE_PUBLISHER.toString())) {
                 publishers.remove(request.data());
 
-            } else if (topic.equals(xMsgConstants.REMOVE_SUBSCRIBER.getStringValue())) {
+            } else if (topic.equals(xMsgConstants.REMOVE_SUBSCRIBER.toString())) {
                 subscribers.remove(request.data());
 
-            } else if (topic.equals(xMsgConstants.REMOVE_ALL_REGISTRATION.getStringValue())) {
+            } else if (topic.equals(xMsgConstants.REMOVE_ALL_REGISTRATION.toString())) {
                 publishers.remove(request.text());
                 subscribers.remove(request.text());
 
-            } else if (topic.equals(xMsgConstants.FIND_PUBLISHER.getStringValue())) {
+            } else if (topic.equals(xMsgConstants.FIND_PUBLISHER.toString())) {
                 xMsgRegistration data = request.data();
                 registration = publishers.find(data.getDomain(),
                                                data.getSubject(),
                                                data.getType());
 
-            } else if (topic.equals(xMsgConstants.FIND_SUBSCRIBER.getStringValue())) {
+            } else if (topic.equals(xMsgConstants.FIND_SUBSCRIBER.toString())) {
                 xMsgRegistration data = request.data();
                 registration = subscribers.find(data.getDomain(),
                                                 data.getSubject(),

@@ -48,7 +48,7 @@ public class xMsgAddress {
      */
     public xMsgAddress(String host) throws SocketException, xMsgException {
         this.host = toHostAddress(host);
-        this.port = xMsgConstants.DEFAULT_PORT.getIntValue();
+        this.port = xMsgConstants.DEFAULT_PORT.toInteger();
     }
 
     /**

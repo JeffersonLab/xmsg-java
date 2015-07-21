@@ -71,7 +71,7 @@ public final class xMsgTopic {
 
     private final String topic;
 
-    public static final String ANY = xMsgConstants.ANY.getStringValue();
+    public static final String ANY = xMsgConstants.ANY.toString();
     public static final String SEPARATOR = ":";
 
 

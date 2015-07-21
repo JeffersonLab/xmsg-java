@@ -60,7 +60,7 @@ public class xMsgRegResponse {
     public xMsgRegResponse(String topic, String sender) {
         this.topic = topic;
         this.sender = sender;
-        this.status = xMsgConstants.SUCCESS.getStringValue();
+        this.status = xMsgConstants.SUCCESS.toString();
         this.data = new HashSet<xMsgRegistration>();
     }
 
@@ -78,7 +78,7 @@ public class xMsgRegResponse {
     public xMsgRegResponse(String topic, String sender, Set<xMsgRegistration> data) {
         this.topic = topic;
         this.sender = sender;
-        this.status = xMsgConstants.SUCCESS.getStringValue();
+        this.status = xMsgConstants.SUCCESS.toString();
         this.data = data;
     }
 
@@ -121,7 +121,7 @@ public class xMsgRegResponse {
             topic = new String(topicFrame.getData(), ZMQ.CHARSET);
             sender = new String(senderFrame.getData(), ZMQ.CHARSET);
             status = new String(statusFrame.getData(), ZMQ.CHARSET);
-            if (!status.equals(xMsgConstants.SUCCESS.getStringValue())) {
+            if (!status.equals(xMsgConstants.SUCCESS.toString())) {
                 throw new xMsgRegistrationException(status);
             }
 

@@ -70,11 +70,12 @@ public enum xMsgConstants {
         this.stringValue = stringValue;
     }
 
-    public int getIntValue() {
+    public int toInteger() {
         return intValue;
     }
 
-    public String getStringValue() {
+    @Override
+    public String toString() {
         return stringValue;
     }
 }

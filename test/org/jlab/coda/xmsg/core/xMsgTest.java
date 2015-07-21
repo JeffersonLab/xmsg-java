@@ -194,7 +194,7 @@ public class xMsgTest {
         public RegValidator(xMsgTopic topic, boolean isPublisher)
                 throws Exception {
             this.host = xMsgUtil.toHostAddress("localhost");
-            this.port = xMsgConstants.DEFAULT_PORT.getIntValue();
+            this.port = xMsgConstants.DEFAULT_PORT.toInteger();
             this.topic = topic;
             this.desc = "";
 

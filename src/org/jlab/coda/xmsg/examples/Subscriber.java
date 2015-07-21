@@ -98,7 +98,7 @@ public class Subscriber extends xMsg {
 
         @Override
         public xMsgMessage callback(xMsgMessage msg) {
-            if (msg.getMetaData().getReplyTo().equals(xMsgConstants.UNDEFINED.getStringValue())) {
+            if (msg.getMetaData().getReplyTo().equals(xMsgConstants.UNDEFINED.toString())) {
                 parseData(msg);
                 if (nr == 0) {
                     t1 = System.currentTimeMillis();

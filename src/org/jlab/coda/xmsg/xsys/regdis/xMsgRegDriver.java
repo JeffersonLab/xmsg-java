@@ -96,7 +96,7 @@ public class xMsgRegDriver {
     private Socket connect(String host) {
         Socket sb = _context.createSocket(ZMQ.REQ);
         sb.setHWM(0);
-        sb.connect("tcp://" + host + ":" + xMsgConstants.REGISTRAR_PORT.getIntValue());
+        sb.connect("tcp://" + host + ":" + xMsgConstants.REGISTRAR_PORT.toInteger());
         return sb;
     }
 
@@ -128,7 +128,7 @@ public class xMsgRegDriver {
             try {
                 xMsgRegResponse response = new xMsgRegResponse(responseMsg);
                 String status = response.status();
-                if (!status.equals(xMsgConstants.SUCCESS.getStringValue())) {
+                if (!status.equals(xMsgConstants.SUCCESS.toString())) {
                     throw new xMsgRegistrationException(status);
                 }
                 return response;
@@ -170,9 +170,9 @@ public class xMsgRegDriver {
 
         _validateData(data);
 
-        String topic = isPublisher ? xMsgConstants.REGISTER_PUBLISHER.getStringValue() :
-                                     xMsgConstants.REGISTER_SUBSCRIBER.getStringValue();
-        int timeout = xMsgConstants.REGISTER_REQUEST_TIMEOUT.getIntValue();
+        String topic = isPublisher ? xMsgConstants.REGISTER_PUBLISHER.toString() :
+                                     xMsgConstants.REGISTER_SUBSCRIBER.toString();
+        int timeout = xMsgConstants.REGISTER_REQUEST_TIMEOUT.toInteger();
 
         xMsgRegRequest request = new xMsgRegRequest(topic, name, data);
         request(socket, request, timeout);
@@ -200,9 +200,9 @@ public class xMsgRegDriver {
 
         _validateData(data);
 
-        String topic = isPublisher ? xMsgConstants.REMOVE_PUBLISHER.getStringValue() :
-                                     xMsgConstants.REMOVE_SUBSCRIBER.getStringValue();
-        int timeout = xMsgConstants.REMOVE_REQUEST_TIMEOUT.getIntValue();
+        String topic = isPublisher ? xMsgConstants.REMOVE_PUBLISHER.toString() :
+                                     xMsgConstants.REMOVE_SUBSCRIBER.toString();
+        int timeout = xMsgConstants.REMOVE_REQUEST_TIMEOUT.toInteger();
 
         xMsgRegRequest request = new xMsgRegRequest(topic, name, data);
         request(socket, request, timeout);
@@ -224,8 +224,8 @@ public class xMsgRegDriver {
                                         String name)
             throws xMsgRegistrationException {
 
-        String topic = xMsgConstants.REMOVE_ALL_REGISTRATION.getStringValue();
-        int timeout = xMsgConstants.REMOVE_REQUEST_TIMEOUT.getIntValue();
+        String topic = xMsgConstants.REMOVE_ALL_REGISTRATION.toString();
+        int timeout = xMsgConstants.REMOVE_REQUEST_TIMEOUT.toInteger();
 
         xMsgRegRequest request = new xMsgRegRequest(topic, name, host);
         request(_feConnection, request, timeout);
@@ -254,9 +254,9 @@ public class xMsgRegDriver {
 
         _validateData(data);
 
-        String topic = isPublisher ? xMsgConstants.FIND_PUBLISHER.getStringValue() :
-                                     xMsgConstants.FIND_SUBSCRIBER.getStringValue();
-        int timeout = xMsgConstants.FIND_REQUEST_TIMEOUT.getIntValue();
+        String topic = isPublisher ? xMsgConstants.FIND_PUBLISHER.toString() :
+                                     xMsgConstants.FIND_SUBSCRIBER.toString();
+        int timeout = xMsgConstants.FIND_REQUEST_TIMEOUT.toInteger();
 
         xMsgRegRequest request = new xMsgRegRequest(topic, name, data);
         xMsgRegResponse response = request(socket, request, timeout);

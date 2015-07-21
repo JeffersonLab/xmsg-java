@@ -60,7 +60,7 @@ public class xMsgRegDriverTest {
         publisher = xMsgRegistration.newBuilder();
         publisher.setName("bradbury_pub");
         publisher.setHost("localhost");
-        publisher.setPort(xMsgConstants.DEFAULT_PORT.getIntValue());
+        publisher.setPort(xMsgConstants.DEFAULT_PORT.toInteger());
         publisher.setDomain("writer");
         publisher.setSubject("scifi");
         publisher.setType("books");
@@ -70,7 +70,7 @@ public class xMsgRegDriverTest {
         subscriber = xMsgRegistration.newBuilder();
         subscriber.setName("bradbury_sub");
         subscriber.setHost("localhost");
-        subscriber.setPort(xMsgConstants.DEFAULT_PORT.getIntValue());
+        subscriber.setPort(xMsgConstants.DEFAULT_PORT.toInteger());
         subscriber.setDomain("writer");
         subscriber.setSubject("scifi");
         subscriber.setType("books");
@@ -268,16 +268,16 @@ public class xMsgRegDriverTest {
     private void assertRequest(String name, xMsgRegistration data, Socket socket,
                                xMsgConstants topic, xMsgConstants timeout)
             throws Exception {
-        xMsgRegRequest request = new xMsgRegRequest(topic.getStringValue(), name, data);
-        verify(driver).request(socket, request, timeout.getIntValue());
+        xMsgRegRequest request = new xMsgRegRequest(topic.toString(), name, data);
+        verify(driver).request(socket, request, timeout.toInteger());
     }
 
 
     private void assertRequest(String name, String data, Socket socket,
                                xMsgConstants topic, xMsgConstants timeout)
             throws Exception {
-        xMsgRegRequest request = new xMsgRegRequest(topic.getStringValue(), name, data);
-        verify(driver).request(socket, request, timeout.getIntValue());
+        xMsgRegRequest request = new xMsgRegRequest(topic.toString(), name, data);
+        verify(driver).request(socket, request, timeout.toInteger());
     }
 
 
