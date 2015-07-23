@@ -139,6 +139,9 @@ public class xMsg {
             @Override
             public void postConnection() { }
         };
+
+        // fix default linger
+        this.context.setLinger(-1);
     }
 
     /**

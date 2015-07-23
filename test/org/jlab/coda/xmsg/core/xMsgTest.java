@@ -27,12 +27,14 @@ import org.jlab.coda.xmsg.xsys.regdis.xMsgRegDriver;
 import org.junit.Before;
 import org.junit.Test;
 import org.mockito.ArgumentCaptor;
+import org.zeromq.ZContext;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.is;
 import static org.mockito.Mockito.eq;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
 
 public class xMsgTest {
 
@@ -43,6 +45,7 @@ public class xMsgTest {
     @Before
     public void setup() throws Exception {
         driver = mock(xMsgRegDriver.class);
+        when(driver.getContext()).thenReturn(mock(ZContext.class));
         core = new xMsg(name, driver, 2);
     }
 
