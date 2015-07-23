@@ -261,8 +261,8 @@ public class SubscriptionsTest {
                     @Override
                     public void run() {
                         try {
-                            xMsgProxy proxy = new xMsgProxy();
-                            proxy.startProxy(context);
+                            xMsgProxy proxy = new xMsgProxy(context);
+                            proxy.start();
                         } catch (xMsgException e) {
                             e.printStackTrace();
                         }
