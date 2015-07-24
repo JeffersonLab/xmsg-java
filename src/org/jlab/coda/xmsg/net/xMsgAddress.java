@@ -30,17 +30,14 @@ import static org.jlab.coda.xmsg.core.xMsgUtil.toHostAddress;
 
 /**
  * xMsg network address.
- * Defines a key constructed as {@code host:port} (xMsg convention) for storing
- * xMsgConnection objects.
  *
  * @author gurjyan
  * @since 1.0
  */
 public class xMsgAddress {
 
-    private String host = xMsgConstants.UNDEFINED.getStringValue();
-    private int port = xMsgConstants.DEFAULT_PORT.getIntValue();
-    private String key = xMsgConstants.UNDEFINED.getStringValue();
+    private final String host;
+    private final int port;
 
     /**
      * Creates an address using the provided host and the default port.
@@ -51,7 +48,7 @@ public class xMsgAddress {
      */
     public xMsgAddress(String host) throws SocketException, xMsgException {
         this.host = toHostAddress(host);
-        key = this.host + ":" + this.port;
+        this.port = xMsgConstants.DEFAULT_PORT.getIntValue();
     }
 
     /**
@@ -65,7 +62,6 @@ public class xMsgAddress {
     public xMsgAddress(String host, int port) throws SocketException, xMsgException {
         this.host = toHostAddress(host);
         this.port = port;
-        key = this.host + ":" + this.port;
     }
 
     /**
@@ -82,23 +78,38 @@ public class xMsgAddress {
         return port;
     }
 
-    /**
-     * Allows changing the port number.
-     * This method should be used with caution, making sure that the
-     * xMsgConnection associated with this address is actually created using
-     * this new port.
-     *
-     * @param port the new port number
-     */
-    public void setPort(int port) {
-        this.port = port;
-        key = this.host + ":" + this.port;
+    @Override
+    public String toString() {
+        return this.host + ":" + this.port;
     }
 
-    /**
-     * Returns xMsg address key, constructed as {@code host:port}.
-     */
-    public String getKey() {
-        return key;
+    @Override
+    public int hashCode() {
+        final int prime = 31;
+        int result = 1;
+        result = prime * result + host.hashCode();
+        result = prime * result + port;
+        return result;
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+        if (this == obj) {
+            return true;
+        }
+        if (obj == null) {
+            return false;
+        }
+        if (getClass() != obj.getClass()) {
+            return false;
+        }
+        xMsgAddress other = (xMsgAddress) obj;
+        if (!host.equals(other.host)) {
+            return false;
+        }
+        if (port != other.port) {
+            return false;
+        }
+        return true;
     }
 }

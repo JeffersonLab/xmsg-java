@@ -112,7 +112,7 @@ public class xMsgRegService implements Runnable {
      * @throws SocketException
      * @throws IOException
      */
-    public xMsgRegService(String feHost, ZContext context)
+    public xMsgRegService(ZContext context, String feHost)
             throws SocketException, xMsgException {
         this.context = context;
         localhost = xMsgUtil.toHostAddress("localhost");
@@ -121,7 +121,8 @@ public class xMsgRegService implements Runnable {
          * Start a thread with periodic process (hard-coded 5 sec. interval) that
          * updates xMsgFE database with the data stored in the local databases.
          */
-        xMsgRegUpdater updater = new xMsgRegUpdater(feHost, publishers, subscribers);
+        xMsgRegDriver driver = new xMsgRegDriver(feHost);
+        xMsgRegUpdater updater = new xMsgRegUpdater(driver, publishers, subscribers);
         Thread t = xMsgUtil.newThread("registration-updater", updater);
         t.start();
     }

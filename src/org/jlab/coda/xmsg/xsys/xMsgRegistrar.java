@@ -23,7 +23,6 @@ package org.jlab.coda.xmsg.xsys;
 
 import org.jlab.coda.xmsg.core.xMsgUtil;
 import org.jlab.coda.xmsg.excp.xMsgException;
-import org.jlab.coda.xmsg.xsys.regdis.xMsgRegDriver;
 import org.jlab.coda.xmsg.xsys.regdis.xMsgRegService;
 import org.zeromq.ZContext;
 
@@ -36,10 +35,10 @@ import java.net.SocketException;
  * @author gurjyan
  * @since 1.0
  */
-public class xMsgRegistrar extends xMsgRegDriver {
+public class xMsgRegistrar {
 
     private final Thread regServiceThread;
-    private final ZContext context;
+    private final ZContext context = new ZContext();
 
     /**
      * Starts a local registrar service.
@@ -52,9 +51,6 @@ public class xMsgRegistrar extends xMsgRegDriver {
      */
     public xMsgRegistrar() throws SocketException, xMsgException {
 
-        super("localhost");
-
-        context = getContext();
         ZContext shadowContext = ZContext.shadow(context);
 
         // start registrar service
@@ -84,17 +80,14 @@ public class xMsgRegistrar extends xMsgRegDriver {
      */
     public xMsgRegistrar(final String feHost) throws SocketException, xMsgException {
 
-        super(feHost);
-
         // Zmq context
-        context = getContext();
         ZContext shadowContext = ZContext.shadow(context);
 
         // Local registrar service.
         // In this case this specific constructor starts a thread
         // that periodically updates front-end registrar database with
         // the data from the local databases
-        xMsgRegService regService = new xMsgRegService(feHost, shadowContext);
+        xMsgRegService regService = new xMsgRegService(shadowContext, feHost);
         regServiceThread = xMsgUtil.newThread("registration-service", regService);
     }
 
