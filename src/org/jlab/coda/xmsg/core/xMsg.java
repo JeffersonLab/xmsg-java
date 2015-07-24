@@ -134,7 +134,8 @@ public class xMsg {
 
             @Override
             public void preConnection(Socket socket) {
-                socket.setHWM(0);
+                socket.setRcvHWM(0);
+                socket.setSndHWM(0);
             }
 
             @Override
