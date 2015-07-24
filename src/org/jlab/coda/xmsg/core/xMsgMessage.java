@@ -27,7 +27,6 @@ import org.jlab.coda.xmsg.data.xMsgD.xMsgData;
 import org.jlab.coda.xmsg.data.xMsgM.xMsgMeta;
 import org.jlab.coda.xmsg.excp.xMsgException;
 import org.zeromq.ZFrame;
-import org.zeromq.ZMQ;
 import org.zeromq.ZMsg;
 
 /**
@@ -117,7 +116,7 @@ public class xMsgMessage {
         this.topic = topic;
         this.metaData = xMsgMeta.newBuilder();
         this.metaData.setDataType("text/string");
-        this.data = text.getBytes(ZMQ.CHARSET);
+        this.data = text.getBytes();
     }
 
 
@@ -242,6 +241,6 @@ public class xMsgMessage {
      */
     public void setData(String text) {
         this.metaData.setDataType("text/string");
-        this.data = text.getBytes(ZMQ.CHARSET);
+        this.data = text.getBytes();
     }
 }

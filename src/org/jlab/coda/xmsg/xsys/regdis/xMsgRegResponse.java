@@ -28,7 +28,6 @@ import org.jlab.coda.xmsg.core.xMsgConstants;
 import org.jlab.coda.xmsg.data.xMsgR.xMsgRegistration;
 import org.jlab.coda.xmsg.excp.xMsgRegistrationException;
 import org.zeromq.ZFrame;
-import org.zeromq.ZMQ;
 import org.zeromq.ZMsg;
 
 import com.google.protobuf.InvalidProtocolBufferException;
@@ -118,9 +117,9 @@ public class xMsgRegResponse {
         ZFrame statusFrame = msg.pop();
 
         try {
-            topic = new String(topicFrame.getData(), ZMQ.CHARSET);
-            sender = new String(senderFrame.getData(), ZMQ.CHARSET);
-            status = new String(statusFrame.getData(), ZMQ.CHARSET);
+            topic = new String(topicFrame.getData());
+            sender = new String(senderFrame.getData());
+            status = new String(statusFrame.getData());
             if (!status.equals(xMsgConstants.SUCCESS.toString())) {
                 throw new xMsgRegistrationException(status);
             }

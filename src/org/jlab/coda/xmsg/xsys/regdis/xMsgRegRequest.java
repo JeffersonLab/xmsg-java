@@ -26,7 +26,6 @@ import java.util.Arrays;
 import org.jlab.coda.xmsg.data.xMsgR.xMsgRegistration;
 import org.jlab.coda.xmsg.excp.xMsgRegistrationException;
 import org.zeromq.ZFrame;
-import org.zeromq.ZMQ;
 import org.zeromq.ZMsg;
 
 import com.google.protobuf.InvalidProtocolBufferException;
@@ -64,7 +63,7 @@ class xMsgRegRequest {
     public xMsgRegRequest(String topic, String sender, String text) {
         this.topic = topic;
         this.sender = sender;
-        this.data = text.getBytes(ZMQ.CHARSET);
+        this.data = text.getBytes();
     }
 
 
@@ -85,8 +84,8 @@ class xMsgRegRequest {
         ZFrame dataFrame = msg.pop();
 
         try {
-            topic = new String(topicFrame.getData(), ZMQ.CHARSET);
-            sender = new String(senderFrame.getData(), ZMQ.CHARSET);
+            topic = new String(topicFrame.getData());
+            sender = new String(senderFrame.getData());
             data = dataFrame.getData();
         } finally {
             senderFrame.destroy();
@@ -139,7 +138,7 @@ class xMsgRegRequest {
      * Returns the text of the request.
      */
     public String text() {
-        return new String(data, ZMQ.CHARSET);
+        return new String(data);
     }
 
 

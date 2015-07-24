@@ -52,7 +52,7 @@ public abstract class xMsgSubscription {
         if (this.socket == null) {
             throw new IllegalArgumentException("Error: null subscription socket");
         }
-        this.socket.subscribe(topic.toString().getBytes(ZMQ.CHARSET));
+        this.socket.subscribe(topic.toString().getBytes());
         xMsgUtil.sleep(100);
 
         this.topic = topic.toString();
@@ -102,7 +102,7 @@ public abstract class xMsgSubscription {
         } catch (InterruptedException e) {
             Thread.currentThread().interrupt();
         }
-        socket.unsubscribe(topic.getBytes(ZMQ.CHARSET));
+        socket.unsubscribe(topic.getBytes());
     }
 
 
