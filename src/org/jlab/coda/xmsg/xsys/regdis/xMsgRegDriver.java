@@ -28,6 +28,7 @@ import org.jlab.coda.xmsg.excp.xMsgException;
 import org.jlab.coda.xmsg.excp.xMsgRegistrationException;
 import org.zeromq.ZContext;
 import org.zeromq.ZMQ;
+import org.zeromq.ZMQException;
 import org.zeromq.ZMQ.Socket;
 import org.zeromq.ZMsg;
 
@@ -114,9 +115,9 @@ public class xMsgRegDriver {
             throws xMsgRegistrationException {
         ZMsg requestMsg = request.msg();
         try {
-            if (!requestMsg.send(socket)) {
-                throw new xMsgRegistrationException("error sending the message");
-            }
+            requestMsg.send(socket);
+        } catch (ZMQException e) {
+            throw new xMsgRegistrationException("error sending the message");
         } finally {
             requestMsg.destroy();
         }

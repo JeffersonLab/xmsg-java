@@ -32,6 +32,7 @@ import org.jlab.coda.xmsg.xsys.regdis.xMsgRegDriver;
 import org.zeromq.ZContext;
 import org.zeromq.ZMQ;
 import org.zeromq.ZMQ.Socket;
+import org.zeromq.ZMQException;
 import org.zeromq.ZMsg;
 
 import java.io.IOException;
@@ -574,13 +575,13 @@ public class xMsg {
 
         // send topic, sender, followed by the metadata and data
         ZMsg outputMsg = msg.serialize();
-
-        if (!outputMsg.send(con)) {
-            System.out.println("Error: publishing the message");
+        try {
+            outputMsg.send(con);
+        } catch (ZMQException e) {
             throw new xMsgException("Error: publishing the message");
+        } finally {
+            outputMsg.destroy();
         }
-        outputMsg.destroy();
-
     }
 
     /**
