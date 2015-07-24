@@ -176,8 +176,6 @@ public class xMsgRegDriver {
 
         xMsgRegRequest request = new xMsgRegRequest(topic, name, data);
         request(socket, request, timeout);
-
-        System.out.println(xMsgUtil.currentTime(2) + " " + name + " successfully registered.");
     }
 
     /**
