@@ -12,8 +12,6 @@ import org.jlab.coda.xmsg.excp.xMsgException;
 import org.jlab.coda.xmsg.net.xMsgAddress;
 import org.jlab.coda.xmsg.net.xMsgConnection;
 
-import zmq.ZMQ;
-
 public final class LocalThroughput {
 
     private LocalThroughput() { }
@@ -56,9 +54,9 @@ public final class LocalThroughput {
                     }
                     int nr = ++timer.nr;
                     if (nr == 1) {
-                        timer.watch = ZMQ.zmq_stopwatch_start();
+                        timer.watch = startClock();
                     } else if (nr == messageCount) {
-                        timer.elapsed = ZMQ.zmq_stopwatch_stop(timer.watch);
+                        timer.elapsed = stopClock(timer.watch);
                         synchronized (lock) {
                             lock.notify();
                         }
@@ -105,5 +103,13 @@ public final class LocalThroughput {
 
     private static void printf(String str, Object ... args) {
         System.out.print(String.format(str, args));
+    }
+
+    public static long startClock() {
+        return System.nanoTime();
+    }
+
+    public static long stopClock(long watch) {
+        return (System.nanoTime() - watch) / 1000;
     }
 }
