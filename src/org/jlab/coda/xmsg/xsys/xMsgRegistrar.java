@@ -110,7 +110,7 @@ public class xMsgRegistrar {
 
     public static void main(String[] args) {
         try {
-            String localHost = xMsgUtil.toHostAddress("localhost");
+            String localHost = xMsgUtil.localhost();
             String frontEndHost = localHost;
             if (args.length == 2) {
                 if (args[0].equals("-fe_host")) {

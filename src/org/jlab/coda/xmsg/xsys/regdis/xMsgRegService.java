@@ -90,7 +90,7 @@ public class xMsgRegService implements Runnable {
      */
     public xMsgRegService(ZContext context) throws IOException {
         this.context = context;
-        localhost = xMsgUtil.toHostAddress("localhost");
+        localhost = xMsgUtil.localhost();
     }
 
 
@@ -115,7 +115,7 @@ public class xMsgRegService implements Runnable {
     public xMsgRegService(ZContext context, String feHost)
             throws IOException  {
         this.context = context;
-        localhost = xMsgUtil.toHostAddress("localhost");
+        localhost = xMsgUtil.localhost();
 
         /*
          * Start a thread with periodic process (hard-coded 5 sec. interval) that

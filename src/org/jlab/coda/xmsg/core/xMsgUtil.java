@@ -138,6 +138,15 @@ public final class xMsgUtil {
     }
 
     /**
+     * Returns the localhost IP.
+     *
+     * @throws SocketException if an I/O error occurs.
+     */
+    public static String localhost() throws IOException {
+        return toHostAddress("localhost");
+    }
+
+    /**
      * Returns the list of IP addresses of the local node.
      * Useful when the host can have multiple network cards, i.e. IP addresses.
      * <p>

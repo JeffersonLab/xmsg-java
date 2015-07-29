@@ -85,7 +85,7 @@ public class xMsgRegDriver {
         _context = context;
 
         _frontEndAddress = xMsgUtil.toHostAddress(feHost);
-        _localAddress = xMsgUtil.toHostAddress("localhost");
+        _localAddress = xMsgUtil.localhost();
 
         _feConnection = connect(_frontEndAddress);
         if (!_frontEndAddress.equals(_localAddress)) {
