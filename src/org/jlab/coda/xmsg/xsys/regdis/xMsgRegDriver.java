@@ -60,6 +60,12 @@ public class xMsgRegDriver {
     /** zmq context. */
     private final ZContext _context;
 
+    /** Local address. */
+    private final String _localAddress;
+
+    /** Front-End address. */
+    private final String _frontEndAddress;
+
     /**
      * Class constructor.
      * Creates sockets to both front-end and local registration and discovery
@@ -78,12 +84,12 @@ public class xMsgRegDriver {
     xMsgRegDriver(ZContext context, String feHost) throws IOException {
         _context = context;
 
-        feHost = xMsgUtil.toHostAddress(feHost);
-        String localHost = xMsgUtil.toHostAddress("localhost");
+        _frontEndAddress = xMsgUtil.toHostAddress(feHost);
+        _localAddress = xMsgUtil.toHostAddress("localhost");
 
-        _feConnection = connect(feHost);
-        if (!feHost.equals(localHost)) {
-            _lnConnection = connect(localHost);
+        _feConnection = connect(_frontEndAddress);
+        if (!_frontEndAddress.equals(_localAddress)) {
+            _lnConnection = connect(_localAddress);
         } else {
             _lnConnection = _feConnection;
         }
@@ -104,6 +110,20 @@ public class xMsgRegDriver {
      */
     public ZContext getContext() {
         return _context;
+    }
+
+    /**
+     * Returns the registered local address.
+     */
+    public String getLocalAddress() {
+        return _localAddress;
+    }
+
+    /**
+     * Returns the registered front-end address.
+     */
+    public String getFrontEndAddress() {
+        return _frontEndAddress;
     }
 
     /**

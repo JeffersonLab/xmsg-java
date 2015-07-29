@@ -78,9 +78,6 @@ public class xMsg {
     /** Access to the xMsg registrars. */
     private final xMsgRegDriver driver;
 
-    /** The localhost IP. */
-    protected final String localHostIp;
-
 
     /**
      * Constructor. Requires the name of the front-end host that is used to
@@ -97,7 +94,6 @@ public class xMsg {
 
     xMsg(String name, xMsgRegDriver driver) throws IOException  {
         this.myName = name;
-        this.localHostIp = xMsgUtil.toHostAddress("localhost");
         this.context = driver.getContext();
         this.driver = driver;
 
@@ -507,7 +503,7 @@ public class xMsg {
     private Builder registrationBuilder(xMsgTopic topic) {
         xMsgRegistration.Builder regb = xMsgRegistration.newBuilder();
         regb.setName(myName);
-        regb.setHost(localHostIp);
+        regb.setHost(driver.getLocalAddress());
         regb.setPort(xMsgConstants.DEFAULT_PORT.toInteger());
         regb.setDomain(topic.domain());
         regb.setSubject(topic.subject());

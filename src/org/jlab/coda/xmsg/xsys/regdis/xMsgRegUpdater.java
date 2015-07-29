@@ -26,8 +26,6 @@ import org.jlab.coda.xmsg.core.xMsgUtil;
 import org.jlab.coda.xmsg.data.xMsgR.xMsgRegistration;
 import org.jlab.coda.xmsg.excp.xMsgRegistrationException;
 
-import java.io.IOException;
-
 /**
  * A thread that periodically updates xMsg front-end registration database with
  * passed publishers and subscribers database contents. These passed databases
@@ -65,11 +63,11 @@ public class xMsgRegUpdater implements Runnable {
      */
     public xMsgRegUpdater(xMsgRegDriver driver,
                           xMsgRegDatabase publishers,
-                          xMsgRegDatabase subscribers) throws IOException {
+                          xMsgRegDatabase subscribers) {
         this.driver = driver;
         this.publishers = publishers;
         this.subscribers = subscribers;
-        this.name = xMsgUtil.toHostAddress("localhost") + "_registration_updater";
+        this.name = driver.getLocalAddress() + "_registration_updater";
     }
 
     @Override
