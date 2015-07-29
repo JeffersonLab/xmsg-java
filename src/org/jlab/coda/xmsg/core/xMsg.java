@@ -57,7 +57,7 @@ import java.util.concurrent.TimeoutException;
  */
 public class xMsg {
 
-    /** The unique identificator of this actor. */
+    /** The unique identifier of this actor. */
     protected final String myName;
 
     /** 0MQ context object. */
@@ -80,11 +80,13 @@ public class xMsg {
 
 
     /**
-     * Constructor. Requires the name of the front-end host that is used to
-     * create a connection to the registrar service running within the xMsgFE.
-     * Creates the 0MQ context object and thread pool for servicing received
-     * messages in a separate threads.
+     * Constructor. Requires the name of the front-end host.
+     * The the localhost is obtained automatically.
+     * Creates the ZMQ context, the connections to both local and front-end
+     * registration databases and a thread pool for servicing received messages
+     * in separated threads.
      *
+     * @param name an identifier for this actor
      * @param feHost host name of the front-end
      * @throws IOException if the host IP address could not be obtained.
      */
@@ -92,6 +94,9 @@ public class xMsg {
         this(name, new xMsgRegDriver(feHost));
     }
 
+    /**
+     * Constructor for testing. Can receive a mock driver.
+     */
     xMsg(String name, xMsgRegDriver driver) throws IOException  {
         this.myName = name;
         this.context = driver.getContext();
