@@ -40,7 +40,7 @@ import java.net.SocketException;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
-import java.util.concurrent.ExecutorService;
+import java.util.concurrent.ThreadPoolExecutor;
 import java.util.concurrent.TimeoutException;
 
 /**
@@ -71,10 +71,10 @@ public class xMsg {
     private xMsgConnectionSetup defaultSetup;
 
     /** Fixed size thread pool. */
-    private final ExecutorService threadPool;
+    private final ThreadPoolExecutor threadPool;
 
     /** Default thread pool size. */
-    private final int poolSize;
+    private static final int DEFAULT_POOL_SIZE = 2;
 
     /** Access to the xMsg registrars. */
     private final xMsgRegDriver driver;
@@ -94,31 +94,10 @@ public class xMsg {
      * @throws SocketException
      */
     public xMsg(String name, String feHost) throws xMsgException, SocketException {
-        this(name, new xMsgRegDriver(feHost), 2);
+        this(name, new xMsgRegDriver(feHost));
     }
 
-    /**
-     * Constructor. Requires the name of the front-end host that is used to
-     * create a connection to the registrar service running within the xMsgFE.
-     * Creates the zmq context object and thread pool for servicing received
-     * messages in a separate threads.
-     *
-     * @param feHost host name of the FE
-     * @param poolSize thread pool size for servicing subscription callbacks
-     * @throws SocketException
-     * @throws xMsgException
-     */
-    public xMsg(String name, String feHost, int poolSize)
-            throws xMsgException, SocketException {
-        /*
-         * Calls xMsgRegDiscDriver class constructor that creates sockets to two registrar
-         * request/reply servers running in the local xMsgNode and xMsgFE.
-         */
-        this(name, new xMsgRegDriver(feHost), poolSize);
-    }
-
-
-    xMsg(String name, xMsgRegDriver driver, int poolSize)
+    xMsg(String name, xMsgRegDriver driver)
             throws SocketException, xMsgException {
         this.myName = name;
         this.localHostIp = xMsgUtil.toHostAddress("localhost");
@@ -126,8 +105,7 @@ public class xMsg {
         this.driver = driver;
 
         // create fixed size thread pool
-        this.poolSize = poolSize;
-        this.threadPool = xMsgUtil.newFixedThreadPool(this.poolSize);
+        this.threadPool = xMsgUtil.newFixedThreadPool(DEFAULT_POOL_SIZE);
 
         // default pub/sub socket options
         defaultSetup = new xMsgConnectionSetup() {
@@ -702,12 +680,19 @@ public class xMsg {
     }
 
 
+    /**
+     * Change the size of the internal thread pool for subscription callbacks.
+     */
+    public void setPoolSize(int poolSize) {
+        threadPool.setCorePoolSize(poolSize);
+    }
+
 
     /**
-     * Returns the size of the internal thread pool.
+     * Returns the size of the internal thread pool for subscription callbacks.
      */
     public int getPoolSize() {
-        return poolSize;
+        return threadPool.getPoolSize();
     }
 
     /**

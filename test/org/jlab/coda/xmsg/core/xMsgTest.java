@@ -46,7 +46,7 @@ public class xMsgTest {
     public void setup() throws Exception {
         driver = mock(xMsgRegDriver.class);
         when(driver.getContext()).thenReturn(mock(ZContext.class));
-        core = new xMsg(name, driver, 2);
+        core = new xMsg(name, driver);
     }
 
 

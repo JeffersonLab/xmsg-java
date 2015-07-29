@@ -36,13 +36,14 @@ public final class LocalThroughput {
         final Timer timer = new Timer();
 
         try {
-            final xMsg subscriber = new xMsg("throughput_subscriber", "localhost", 1);
+            final xMsg subscriber = new xMsg("throughput_subscriber", "localhost");
             final xMsgAddress pubNode = new xMsgAddress(bindTo);
             final xMsgConnection connection = subscriber.getNewConnection(pubNode);
             final xMsgTopic topic = xMsgTopic.wrap("thr_topic");
 
             xMsgUtil.sleep(100);
 
+            subscriber.setPoolSize(1);
             xMsgSubscription sub = subscriber.subscribe(connection, topic, new xMsgCallBack() {
 
                 @Override

@@ -42,7 +42,6 @@ import java.util.Objects;
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.CancellationException;
 import java.util.concurrent.ExecutionException;
-import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Future;
 import java.util.concurrent.LinkedBlockingQueue;
 import java.util.concurrent.ThreadPoolExecutor;
@@ -326,7 +325,7 @@ public final class xMsgUtil {
     /**
      * Creates a new {@link FixedExecutor}.
      */
-    public static ExecutorService newFixedThreadPool(int nThreads) {
+    public static ThreadPoolExecutor newFixedThreadPool(int nThreads) {
         return new FixedExecutor(nThreads, nThreads,
                                       0L, TimeUnit.MILLISECONDS,
                                       new LinkedBlockingQueue<Runnable>());
