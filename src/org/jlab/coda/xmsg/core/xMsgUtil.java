@@ -23,8 +23,6 @@ package org.jlab.coda.xmsg.core;
 
 import com.google.protobuf.ByteString;
 
-import org.jlab.coda.xmsg.excp.xMsgException;
-
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.ObjectInputStream;
@@ -32,7 +30,6 @@ import java.io.ObjectOutputStream;
 import java.net.InetAddress;
 import java.net.NetworkInterface;
 import java.net.SocketException;
-import java.net.UnknownHostException;
 import java.text.DateFormat;
 import java.util.ArrayList;
 import java.util.Date;
@@ -189,10 +186,9 @@ public final class xMsgUtil {
      *
      * @param hostName The name of the host (accepts "localhost")
      * @return dotted notation of the IP address
-     * @throws SocketException
-     * @throws xMsgException
+     * @throws IOException if the IP could not be obtained
      */
-    public static String toHostAddress(String hostName) throws SocketException, xMsgException {
+    public static String toHostAddress(String hostName) throws IOException  {
         if (isIP(hostName)) {
             return hostName;
         }
@@ -205,14 +201,7 @@ public final class xMsgUtil {
                 return getLocalHostIps().get(0);
             }
         } else {
-
-            InetAddress address;
-            try {
-                address = InetAddress.getByName(hostName);
-            } catch (UnknownHostException e) {
-                throw new xMsgException(e.getMessage());
-            }
-            return address.getHostAddress();
+            return InetAddress.getByName(hostName).getHostAddress();
         }
     }
 

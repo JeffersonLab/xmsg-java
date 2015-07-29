@@ -32,7 +32,7 @@ import org.zeromq.ZMsg;
 
 import com.google.protobuf.InvalidProtocolBufferException;
 
-import java.net.SocketException;
+import java.io.IOException;
 import java.util.HashSet;
 import java.util.Set;
 
@@ -85,10 +85,10 @@ public class xMsgRegService implements Runnable {
      * Constructor for the front-end registration.
      *
      * @param context the shared 0MQ context
-     * @throws SocketException if an I/O error occurs.
      * @throws xMsgException if the host IP address could not be obtained.
+     * @throws IOException
      */
-    public xMsgRegService(ZContext context) throws SocketException, xMsgException {
+    public xMsgRegService(ZContext context) throws IOException {
         this.context = context;
         localhost = xMsgUtil.toHostAddress("localhost");
     }
@@ -113,7 +113,7 @@ public class xMsgRegService implements Runnable {
      * @throws IOException
      */
     public xMsgRegService(ZContext context, String feHost)
-            throws SocketException, xMsgException {
+            throws IOException  {
         this.context = context;
         localhost = xMsgUtil.toHostAddress("localhost");
 

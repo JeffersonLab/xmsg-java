@@ -22,7 +22,6 @@
 package org.jlab.coda.xmsg.core;
 
 import java.io.IOException;
-import java.net.SocketException;
 import java.util.concurrent.TimeoutException;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.atomic.AtomicLong;
@@ -110,7 +109,7 @@ public class SubscriptionsTest {
                         xMsgUtil.sleep(100);
                     }
                     actor.unsubscribe(sub);
-                } catch (SocketException | xMsgException e) {
+                } catch (IOException | xMsgException e) {
                     e.printStackTrace();
                 }
             }

@@ -24,10 +24,9 @@ package org.jlab.coda.xmsg.xsys.regdis;
 import org.jlab.coda.xmsg.core.xMsgTopic;
 import org.jlab.coda.xmsg.core.xMsgUtil;
 import org.jlab.coda.xmsg.data.xMsgR.xMsgRegistration;
-import org.jlab.coda.xmsg.excp.xMsgException;
 import org.jlab.coda.xmsg.excp.xMsgRegistrationException;
 
-import java.net.SocketException;
+import java.io.IOException;
 
 /**
  * A thread that periodically updates xMsg front-end registration database with
@@ -66,8 +65,7 @@ public class xMsgRegUpdater implements Runnable {
      */
     public xMsgRegUpdater(xMsgRegDriver driver,
                           xMsgRegDatabase publishers,
-                          xMsgRegDatabase subscribers
-    ) throws SocketException, xMsgException {
+                          xMsgRegDatabase subscribers) throws IOException {
         this.driver = driver;
         this.publishers = publishers;
         this.subscribers = subscribers;

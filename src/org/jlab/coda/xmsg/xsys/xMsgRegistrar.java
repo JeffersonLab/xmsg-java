@@ -22,11 +22,10 @@
 package org.jlab.coda.xmsg.xsys;
 
 import org.jlab.coda.xmsg.core.xMsgUtil;
-import org.jlab.coda.xmsg.excp.xMsgException;
 import org.jlab.coda.xmsg.xsys.regdis.xMsgRegService;
 import org.zeromq.ZContext;
 
-import java.net.SocketException;
+import java.io.IOException;
 
 /**
  * xMsgRegistrar.
@@ -45,11 +44,12 @@ public class xMsgRegistrar {
      * Note: this version assumes that xMsgNode and xMsgFE registrar services
      * use default registrar port:
      * {@link org.jlab.coda.xmsg.core.xMsgConstants#REGISTRAR_PORT}
+     * @throws IOException
      *
      * @throws SocketException
      * @throws xMsgException
      */
-    public xMsgRegistrar() throws SocketException, xMsgException {
+    public xMsgRegistrar() throws IOException {
 
         ZContext shadowContext = ZContext.shadow(context);
 
@@ -75,10 +75,10 @@ public class xMsgRegistrar {
      *
      * @param feHost xMsg front-end host. Host is passed through command line -h option,
      *               or through the environmental variable: XMSG_FE_HOST
-     * @throws SocketException
+     * @throws IOException
      * @throws xMsgException
      */
-    public xMsgRegistrar(final String feHost) throws SocketException, xMsgException {
+    public xMsgRegistrar(final String feHost) throws IOException {
 
         // Zmq context
         ZContext shadowContext = ZContext.shadow(context);
@@ -141,7 +141,7 @@ public class xMsgRegistrar {
 
             registrar.start();
 
-        } catch (xMsgException | SocketException e) {
+        } catch (IOException e) {
             System.out.println(e.getMessage());
             System.out.println("exiting...");
             System.exit(1);

@@ -28,7 +28,6 @@ import org.jlab.coda.xmsg.excp.xMsgException;
 import org.jlab.coda.xmsg.net.xMsgConnection;
 
 import java.io.IOException;
-import java.net.SocketException;
 
 /**
  * An example of a publisher that publishes data for ever.
@@ -46,10 +45,11 @@ public class Publisher extends xMsg {
      * <p>
      * In this case, localhost is expected to be the front-end.
      * Thus, an xMsg node must be running in the localhost.
+     * @throws IOException
      *
      * @throws xMsgException
      */
-    public Publisher() throws xMsgException, SocketException {
+    public Publisher() throws IOException {
         super("test_publisher", "localhost");
     }
 

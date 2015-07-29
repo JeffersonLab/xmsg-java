@@ -36,7 +36,6 @@ import org.zeromq.ZMQException;
 import org.zeromq.ZMsg;
 
 import java.io.IOException;
-import java.net.SocketException;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
@@ -90,15 +89,13 @@ public class xMsg {
      * messages in a separate threads.
      *
      * @param feHost host name of the front-end
-     * @throws xMsgException
-     * @throws SocketException
+     * @throws IOException if the host IP address could not be obtained.
      */
-    public xMsg(String name, String feHost) throws xMsgException, SocketException {
+    public xMsg(String name, String feHost) throws IOException {
         this(name, new xMsgRegDriver(feHost));
     }
 
-    xMsg(String name, xMsgRegDriver driver)
-            throws SocketException, xMsgException {
+    xMsg(String name, xMsgRegDriver driver) throws IOException  {
         this.myName = name;
         this.localHostIp = xMsgUtil.toHostAddress("localhost");
         this.context = driver.getContext();
@@ -163,10 +160,9 @@ public class xMsg {
      * The local proxy should be running.
      *
      * @return the {@link xMsgConnection} object to the local proxy
-     * @throws SocketException
-     * @throws xMsgException
+     * @throws IOException if the local IP address could not be obtained.
      */
-    public xMsgConnection connect() throws xMsgException, SocketException {
+    public xMsgConnection connect() throws IOException {
         return connect(new xMsgAddress("localhost"));
     }
 
@@ -179,10 +175,9 @@ public class xMsg {
      *
      * @param host the name of the host where the xMsg proxy is running
      * @return the {@link xMsgConnection} object to the proxy
-     * @throws SocketException
-     * @throws xMsgException
+     * @throws IOException if the host IP address could not be obtained.
      */
-    public xMsgConnection connect(String host) throws xMsgException, SocketException {
+    public xMsgConnection connect(String host) throws IOException {
         return connect(new xMsgAddress(host));
     }
 
@@ -195,9 +190,8 @@ public class xMsg {
      *
      * @param address the xMsg address of the host where the xMsg proxy is running
      * @return the {@link xMsgConnection} object to the proxy
-     * @throws xMsgException
      */
-    public xMsgConnection connect(xMsgAddress address) throws xMsgException {
+    public xMsgConnection connect(xMsgAddress address) {
         return connect(address, defaultSetup);
     }
 
@@ -212,10 +206,8 @@ public class xMsg {
      * @param address the xMsg address of the host where the xMsg proxy is running
      * @param setup the setup in case of creating a new connection
      * @return the {@link xMsgConnection} object to the proxy
-     * @throws xMsgException
      */
-    public xMsgConnection connect(xMsgAddress address, xMsgConnectionSetup setup)
-            throws xMsgException {
+    public xMsgConnection connect(xMsgAddress address, xMsgConnectionSetup setup) {
         /*
          * First check to see if we have already established connection
          * to this address
@@ -253,9 +245,8 @@ public class xMsg {
      *
      * @param address the xMsg address of the host where the xMsg proxy is running
      * @return the {@link xMsgConnection} object to the proxy
-     * @throws xMsgException
      */
-    public xMsgConnection getNewConnection(xMsgAddress address) throws xMsgException {
+    public xMsgConnection getNewConnection(xMsgAddress address) {
         return createConnection(address, defaultSetup);
     }
 
@@ -269,10 +260,8 @@ public class xMsg {
      * @param address the address of the host where the xMsg proxy is running
      * @param setup the setup of the new connection
      * @return the {@link xMsgConnection} object to the proxy
-     * @throws xMsgException
      */
-    public xMsgConnection getNewConnection(xMsgAddress address, xMsgConnectionSetup setup)
-            throws xMsgException {
+    public xMsgConnection getNewConnection(xMsgAddress address, xMsgConnectionSetup setup) {
         return createConnection(address, setup);
     }
 

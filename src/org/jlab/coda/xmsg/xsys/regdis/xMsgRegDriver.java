@@ -24,7 +24,6 @@ package org.jlab.coda.xmsg.xsys.regdis;
 import org.jlab.coda.xmsg.core.xMsgConstants;
 import org.jlab.coda.xmsg.core.xMsgUtil;
 import org.jlab.coda.xmsg.data.xMsgR.xMsgRegistration;
-import org.jlab.coda.xmsg.excp.xMsgException;
 import org.jlab.coda.xmsg.excp.xMsgRegistrationException;
 import org.zeromq.ZContext;
 import org.zeromq.ZMQ;
@@ -32,7 +31,7 @@ import org.zeromq.ZMQException;
 import org.zeromq.ZMQ.Socket;
 import org.zeromq.ZMsg;
 
-import java.net.SocketException;
+import java.io.IOException;
 import java.util.Set;
 
 /**
@@ -67,17 +66,16 @@ public class xMsgRegDriver {
      * servers. Uses default port.
      *
      * @param feHost the hostname of the front-end
-     * @throws SocketException if an I/O error occurs.
-     * @throws xMsgException if the host IP address could not be obtained.
+     * @throws IOException if the host IP address could not be obtained.
      */
-    public xMsgRegDriver(String feHost) throws SocketException, xMsgException {
+    public xMsgRegDriver(String feHost) throws IOException {
         this(new ZContext(), feHost);
     }
 
     /**
      * Constructor for testing. Can receive a mock context.
      */
-    xMsgRegDriver(ZContext context, String feHost) throws SocketException, xMsgException {
+    xMsgRegDriver(ZContext context, String feHost) throws IOException {
         _context = context;
 
         feHost = xMsgUtil.toHostAddress(feHost);

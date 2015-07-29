@@ -9,12 +9,11 @@ import org.jlab.coda.xmsg.excp.xMsgException;
 import org.jlab.coda.xmsg.net.xMsgConnection;
 
 import java.io.IOException;
-import java.net.SocketException;
 import java.util.concurrent.TimeoutException;
 
 public class SyncPublisher extends xMsg {
 
-    public SyncPublisher() throws xMsgException, SocketException {
+    public SyncPublisher() throws IOException {
         super("test_sync_publisher", "localhost");
     }
 

@@ -1,6 +1,6 @@
 package perf;
 
-import java.net.SocketException;
+import java.io.IOException;
 
 import org.jlab.coda.xmsg.core.xMsg;
 import org.jlab.coda.xmsg.core.xMsgCallBack;
@@ -87,7 +87,7 @@ public final class LocalThroughput {
             subscriber.unsubscribe(sub);
             subscriber.destroy();
 
-        } catch (SocketException | xMsgException e) {
+        } catch (IOException | xMsgException e) {
             e.printStackTrace();
             System.exit(1);
         } catch (InterruptedException e) {

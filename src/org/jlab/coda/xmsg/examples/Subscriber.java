@@ -34,7 +34,6 @@ import org.jlab.coda.xmsg.net.xMsgConnection;
 import com.google.protobuf.InvalidProtocolBufferException;
 
 import java.io.IOException;
-import java.net.SocketException;
 
 /**
  * An example of a subscriber. It will receive any message of the given topic
@@ -48,7 +47,7 @@ public class Subscriber extends xMsg {
     private static xMsgConnection con;
     private MyCallBack callback;
 
-    public Subscriber() throws xMsgException, SocketException {
+    public Subscriber() throws IOException {
         super("test_subscriber", "localhost");
         callback = new MyCallBack();
     }
@@ -75,7 +74,7 @@ public class Subscriber extends xMsg {
             subscriber.subscribe(con, topic, subscriber.callback);
 
             xMsgUtil.keepAlive();
-        } catch (xMsgException | SocketException e) {
+        } catch (xMsgException | IOException e) {
             e.printStackTrace();
         }
     }
