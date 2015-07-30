@@ -700,6 +700,20 @@ public class xMsg {
     }
 
     /**
+     * Returns the registered local address.
+     */
+    public String getLocalAddress() {
+        return driver.getLocalAddress();
+    }
+
+    /**
+     * Returns the registered front-end address.
+     */
+    public String getFrontEndAddress() {
+        return driver.getFrontEndAddress();
+    }
+
+    /**
      * Private inner class used to organize sync send/publish communications.
      */
     private class SyncSendCallBack implements xMsgCallBack {
