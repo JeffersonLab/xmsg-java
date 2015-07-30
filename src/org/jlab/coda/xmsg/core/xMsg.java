@@ -713,6 +713,14 @@ public class xMsg {
         return driver.getFrontEndAddress();
     }
 
+
+    /**
+     * Returns the given unique identifier.
+     */
+    public String getName() {
+        return myName;
+    }
+
     /**
      * Private inner class used to organize sync send/publish communications.
      */
