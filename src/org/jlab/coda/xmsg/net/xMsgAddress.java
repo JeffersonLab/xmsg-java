@@ -21,11 +21,8 @@
 
 package org.jlab.coda.xmsg.net;
 
-import java.io.IOException;
-
 import org.jlab.coda.xmsg.core.xMsgConstants;
-
-import static org.jlab.coda.xmsg.core.xMsgUtil.toHostAddress;
+import org.jlab.coda.xmsg.core.xMsgUtil;
 
 /**
  * xMsg network address.
@@ -39,25 +36,23 @@ public class xMsgAddress {
     private final int port;
 
     /**
-     * Creates an address using the provided host and the default port.
+     * Creates an address using the provided IP and the default port.
      *
-     * @param host the host name
-     * @throws IOException if the host IP address could not be obtained.
+     * @param hostAddress the host IP address
      */
-    public xMsgAddress(String host) throws IOException {
-        this.host = toHostAddress(host);
+    public xMsgAddress(String hostAddress) {
+        this.host = xMsgUtil.validateIP(hostAddress);
         this.port = xMsgConstants.DEFAULT_PORT.toInteger();
     }
 
     /**
-     * Creates an address using provided host and port.
+     * Creates an address using provided IP and port.
      *
-     * @param host the host name
+     * @param hostAddress the host IP address
      * @param port the port number
-     * @throws IOException if the host IP address could not be obtained.
      */
-    public xMsgAddress(String host, int port) throws IOException {
-        this.host = toHostAddress(host);
+    public xMsgAddress(String hostAddress, int port) {
+        this.host = xMsgUtil.validateIP(hostAddress);
         this.port = port;
     }
 

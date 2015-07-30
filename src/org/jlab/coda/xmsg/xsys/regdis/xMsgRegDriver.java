@@ -31,7 +31,6 @@ import org.zeromq.ZMQException;
 import org.zeromq.ZMQ.Socket;
 import org.zeromq.ZMsg;
 
-import java.io.IOException;
 import java.util.Set;
 
 /**
@@ -71,21 +70,21 @@ public class xMsgRegDriver {
      * Creates sockets to both front-end and local registration and discovery
      * servers. Uses default port.
      *
-     * @param feHost the hostname of the front-end
-     * @throws IOException if the host IP address could not be obtained.
+     * @param localAddress the IP address of the local host
+     * @param frontEndAddress the IP address of the front-end host
      */
-    public xMsgRegDriver(String feHost) throws IOException {
-        this(new ZContext(), feHost);
+    public xMsgRegDriver(String localAddress, String frontEndAddress) {
+        this(new ZContext(), localAddress, frontEndAddress);
     }
 
     /**
      * Constructor for testing. Can receive a mock context.
      */
-    xMsgRegDriver(ZContext context, String feHost) throws IOException {
+    xMsgRegDriver(ZContext context, String localAddress, String frontEndAddress) {
         _context = context;
 
-        _frontEndAddress = xMsgUtil.toHostAddress(feHost);
-        _localAddress = xMsgUtil.localhost();
+        _frontEndAddress = xMsgUtil.validateIP(frontEndAddress);
+        _localAddress = xMsgUtil.validateIP(localAddress);
 
         _feConnection = connect(_frontEndAddress);
         if (!_frontEndAddress.equals(_localAddress)) {

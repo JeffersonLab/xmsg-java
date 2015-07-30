@@ -80,24 +80,40 @@ public class xMsg {
 
 
     /**
-     * Constructor. Requires the name of the front-end host.
-     * The the localhost is obtained automatically.
+     * Constructor. Requires the address of the front-end node.
+     * The address of the local node is obtained automatically.
      * Creates the ZMQ context, the connections to both local and front-end
      * registration databases and a thread pool for servicing received messages
      * in separated threads.
      *
      * @param name an identifier for this actor
-     * @param feHost host name of the front-end
-     * @throws IOException if the host IP address could not be obtained.
+     * @param frontEndAddress the IP address of the front-end node
+     * @throws IOException if the local IP address could not be obtained.
      */
-    public xMsg(String name, String feHost) throws IOException {
-        this(name, new xMsgRegDriver(feHost));
+    public xMsg(String name, String frontEndAddress) throws IOException {
+        this(name, new xMsgRegDriver(xMsgUtil.localhost(), frontEndAddress));
+    }
+
+    /**
+     * Constructor. Requires the addresses of both the local node and the
+     * front-end node.
+     * Creates the ZMQ context, the connections to both local and front-end
+     * registration databases and a thread pool for servicing received messages
+     * in separated threads.
+     *
+     * @param name an identifier for this actor
+     * @param localAddress the IP address of the local node
+     * @param frontEndAddress the IP address of the front-end node
+     * @throws IOException
+     */
+    public xMsg(String name, String localAddress, String frontEndAddress) {
+        this(name, new xMsgRegDriver(localAddress, frontEndAddress));
     }
 
     /**
      * Constructor for testing. Can receive a mock driver.
      */
-    xMsg(String name, xMsgRegDriver driver) throws IOException  {
+    xMsg(String name, xMsgRegDriver driver) {
         this.myName = name;
         this.context = driver.getContext();
         this.driver = driver;
@@ -161,9 +177,8 @@ public class xMsg {
      * The local proxy should be running.
      *
      * @return the {@link xMsgConnection} object to the local proxy
-     * @throws IOException if the local IP address could not be obtained.
      */
-    public xMsgConnection connect() throws IOException {
+    public xMsgConnection connect() {
         return connect(new xMsgAddress("localhost"));
     }
 
@@ -174,12 +189,11 @@ public class xMsg {
      * If there is a connection in the cache, that object will be returned then.
      * The proxy should be running in the host.
      *
-     * @param host the name of the host where the xMsg proxy is running
+     * @param hostAddress the IP address of the host where the xMsg proxy is running
      * @return the {@link xMsgConnection} object to the proxy
-     * @throws IOException if the host IP address could not be obtained.
      */
-    public xMsgConnection connect(String host) throws IOException {
-        return connect(new xMsgAddress(host));
+    public xMsgConnection connect(String hostAddress) {
+        return connect(new xMsgAddress(hostAddress));
     }
 
     /**

@@ -228,6 +228,23 @@ public final class xMsgUtil {
     }
 
     /**
+     * Checks if the argument is a valid IP address.
+     *
+     * @param address the address to be validated
+     * @return the given address
+     * @throws IllegalArgumentException if the address is null or not a valid IP
+     */
+    public static String validateIP(String address) {
+        if (address == null) {
+            throw new IllegalArgumentException("Null IP address");
+        }
+        if (!isIP(address)) {
+            throw new IllegalArgumentException("Invalid IP address: " + address);
+        }
+        return address;
+    }
+
+    /**
      * Serializes an Object into a protobuf {@link ByteString}.
      *
      * @param object a serializable object

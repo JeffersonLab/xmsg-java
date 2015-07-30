@@ -88,7 +88,7 @@ public class xMsgRegDriverTest {
         feCon = context.createSocket(ZMQ.REQ);
         when(context.createSocket(anyInt())).thenReturn(feCon, localCon);
 
-        driver = spy(new xMsgRegDriver(context, "10.2.9.100"));
+        driver = spy(new xMsgRegDriver(context, "10.2.9.1", "10.2.9.100"));
         setResponse(new xMsgRegResponse("", ""));
     }
 
