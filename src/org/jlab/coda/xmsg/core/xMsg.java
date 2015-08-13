@@ -78,6 +78,20 @@ public class xMsg {
     /** Access to the xMsg registrars. */
     private final xMsgRegDriver driver;
 
+    /**
+     * Constructor. The local node is used as front-end.
+     * The local address is obtained automatically.
+     * Creates the ZMQ context, the connections to both local and front-end
+     * registration databases and a thread pool for servicing received messages
+     * in separated threads.
+     *
+     * @param name an identifier for this actor
+     * @param frontEndAddress the IP address of the front-end node
+     * @throws IOException if the local IP address could not be obtained.
+     */
+    public xMsg(String name) throws IOException {
+        this(name, new xMsgRegDriver(xMsgUtil.localhost(), xMsgUtil.localhost()));
+    }
 
     /**
      * Constructor. Requires the address of the front-end node.
