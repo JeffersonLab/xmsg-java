@@ -1,0 +1,26 @@
+To run the performance tests, go to the base directory and run the following
+on several terminals:
+
+1. Start an xMsg node:
+
+    $ gradle startNode
+
+2. Start the subscriber. Pass the message size and the expected number of
+   messages:
+
+   $ ./scripts/perf/local_thr localhost 50000 100000
+
+2. Start the publisher. Pass the message size and the number of
+   messages to be sent:
+
+   $ ./scripts/perf/remote_thr localhost 50000 100000
+
+Once all the messages have been received, the subscriber will print the
+performance and throughput results:
+
+    message elapsed: 6,331 [s]
+    message size: 50000 [B]
+    message count: 100000
+    mean transfer time: 63,311 [us]
+    mean transfer rate: 15794 [msg/s]
+    mean throughput: 6317,600 [Mb/s]
