@@ -86,7 +86,6 @@ public class xMsg {
      * in separated threads.
      *
      * @param name an identifier for this actor
-     * @param frontEndAddress the IP address of the front-end node
      * @throws IOException if the local IP address could not be obtained.
      */
     public xMsg(String name) throws IOException {
