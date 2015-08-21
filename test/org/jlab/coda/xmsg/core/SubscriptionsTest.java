@@ -50,7 +50,7 @@ public class SubscriptionsTest {
     @Test
     public void unsuscribeStopsThread() throws Exception {
 
-        xMsg actor = new xMsg("test", "localhost");
+        xMsg actor = new xMsg("test");
         xMsgConnection connection = actor.connect();
 
         xMsgSubscription subscription = actor.subscribe(connection, xMsgTopic.wrap("topic"), null);
@@ -92,7 +92,7 @@ public class SubscriptionsTest {
             @Override
             public void run() {
                 try {
-                    xMsg actor = new xMsg("test_publisher", "localhost");
+                    xMsg actor = new xMsg("test_publisher");
                     xMsgConnection connection = actor.connect();
                     xMsgUtil.sleep(100);
                     xMsgTopic topic = xMsgTopic.wrap("test_topic");
@@ -121,7 +121,7 @@ public class SubscriptionsTest {
             @Override
             public void run() {
                 try {
-                    xMsg actor = new xMsg("test_publisher", "localhost");
+                    xMsg actor = new xMsg("test_publisher");
                     xMsgConnection connection = actor.connect();
                     xMsgUtil.sleep(100);
                     xMsgTopic topic = xMsgTopic.wrap("test_topic");
@@ -179,7 +179,7 @@ public class SubscriptionsTest {
             @Override
             public void run() {
                 try {
-                    xMsg subActor = new xMsg("test_publisher", "localhost");
+                    xMsg subActor = new xMsg("test_publisher");
                     xMsgConnection subCon = subActor.connect();
                     xMsgUtil.sleep(100);
                     xMsgTopic subTopic = xMsgTopic.wrap("test_topic");
@@ -190,7 +190,7 @@ public class SubscriptionsTest {
                         }
                     });
                     xMsgUtil.sleep(100);
-                    xMsg pubActor = new xMsg("test_publisher", "localhost");
+                    xMsg pubActor = new xMsg("test_publisher");
                     xMsgConnection pubCon = pubActor.connect();
                     xMsgUtil.sleep(100);
                     xMsgTopic pubTopic = xMsgTopic.wrap("test_topic");
@@ -248,7 +248,7 @@ public class SubscriptionsTest {
             @Override
             public void run() {
                 try {
-                    xMsg subActor = new xMsg("test_publisher", "localhost");
+                    xMsg subActor = new xMsg("test_publisher");
                     xMsgConnection subCon = subActor.connect();
                     xMsgUtil.sleep(100);
                     xMsgTopic subTopic = xMsgTopic.wrap("test_topic");
@@ -261,7 +261,7 @@ public class SubscriptionsTest {
                         }
                     });
                     xMsgUtil.sleep(100);
-                    xMsg pubActor = new xMsg("test_publisher", "localhost");
+                    xMsg pubActor = new xMsg("test_publisher");
                     xMsgConnection pubCon = pubActor.connect();
                     xMsgUtil.sleep(100);
                     xMsgTopic pubTopic = xMsgTopic.wrap("test_topic");
