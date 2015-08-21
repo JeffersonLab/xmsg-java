@@ -117,7 +117,6 @@ public class xMsg {
      * @param name an identifier for this actor
      * @param localAddress the IP address of the local node
      * @param frontEndAddress the IP address of the front-end node
-     * @throws IOException
      */
     public xMsg(String name, String localAddress, String frontEndAddress) {
         this(name, new xMsgRegDriver(localAddress, frontEndAddress));
@@ -190,9 +189,10 @@ public class xMsg {
      * The local proxy should be running.
      *
      * @return the {@link xMsgConnection} object to the local proxy
+     * @throws IOException if the local IP address could not be obtained.
      */
-    public xMsgConnection connect() {
-        return connect(new xMsgAddress("localhost"));
+    public xMsgConnection connect() throws IOException {
+        return connect(new xMsgAddress(xMsgUtil.localhost()));
     }
 
     /**
