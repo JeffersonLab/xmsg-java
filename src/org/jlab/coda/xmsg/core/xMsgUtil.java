@@ -343,10 +343,22 @@ public final class xMsgUtil {
      * Creates a new {@link FixedExecutor}.
      */
     public static ThreadPoolExecutor newFixedThreadPool(int nThreads, String namePrefix) {
+        return newFixedThreadPool(nThreads,
+                                  namePrefix,
+                                  new LinkedBlockingQueue<Runnable>());
+    }
+
+
+    /**
+     * Creates a new {@link FixedExecutor} with a user controlled queue.
+     */
+    public static ThreadPoolExecutor newFixedThreadPool(int nThreads,
+                                                        String namePrefix,
+                                                        BlockingQueue<Runnable> workQueue) {
         DefaultThreadFactory threadFactory = new DefaultThreadFactory(namePrefix);
         return new FixedExecutor(nThreads, nThreads,
                                       0L, TimeUnit.MILLISECONDS,
-                                      new LinkedBlockingQueue<Runnable>(),
+                                      workQueue,
                                       threadFactory);
     }
 
