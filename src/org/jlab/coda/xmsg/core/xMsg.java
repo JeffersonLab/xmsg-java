@@ -191,8 +191,8 @@ public class xMsg {
      * @return the {@link xMsgConnection} object to the local proxy
      * @throws IOException if the local IP address could not be obtained.
      */
-    public xMsgConnection connect() throws IOException {
-        return connect(new xMsgAddress(xMsgUtil.localhost()));
+    public xMsgConnection connect() {
+        return connect(new xMsgAddress(driver.getLocalAddress()));
     }
 
     /**
