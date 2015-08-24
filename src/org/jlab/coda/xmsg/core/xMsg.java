@@ -131,7 +131,7 @@ public class xMsg {
         this.driver = driver;
 
         // create fixed size thread pool
-        this.threadPool = xMsgUtil.newFixedThreadPool(DEFAULT_POOL_SIZE);
+        this.threadPool = xMsgUtil.newFixedThreadPool(DEFAULT_POOL_SIZE, name);
 
         // default pub/sub socket options
         defaultSetup = new xMsgConnectionSetup() {

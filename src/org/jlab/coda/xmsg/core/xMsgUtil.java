@@ -41,8 +41,10 @@ import java.util.concurrent.CancellationException;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Future;
 import java.util.concurrent.LinkedBlockingQueue;
+import java.util.concurrent.ThreadFactory;
 import java.util.concurrent.ThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
+import java.util.concurrent.atomic.AtomicInteger;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -340,10 +342,12 @@ public final class xMsgUtil {
     /**
      * Creates a new {@link FixedExecutor}.
      */
-    public static ThreadPoolExecutor newFixedThreadPool(int nThreads) {
+    public static ThreadPoolExecutor newFixedThreadPool(int nThreads, String namePrefix) {
+        DefaultThreadFactory threadFactory = new DefaultThreadFactory(namePrefix);
         return new FixedExecutor(nThreads, nThreads,
                                       0L, TimeUnit.MILLISECONDS,
-                                      new LinkedBlockingQueue<Runnable>());
+                                      new LinkedBlockingQueue<Runnable>(),
+                                      threadFactory);
     }
 
 
@@ -353,8 +357,9 @@ public final class xMsgUtil {
     public static class FixedExecutor extends ThreadPoolExecutor {
 
         public FixedExecutor(int corePoolSize, int maximumPoolSize, long keepAliveTime,
-                                TimeUnit unit, BlockingQueue<Runnable> workQueue) {
-            super(corePoolSize, maximumPoolSize, keepAliveTime, unit, workQueue);
+                                TimeUnit unit, BlockingQueue<Runnable> workQueue,
+                                ThreadFactory factory) {
+            super(corePoolSize, maximumPoolSize, keepAliveTime, unit, workQueue, factory);
         }
 
         @Override
@@ -377,6 +382,31 @@ public final class xMsgUtil {
             if (t != null) {
                 t.printStackTrace();
             }
+        }
+    }
+
+
+    /**
+     * A thread pool factory with custom thread names.
+     */
+    private static final class DefaultThreadFactory implements ThreadFactory {
+        private final AtomicInteger threadNumber = new AtomicInteger(1);
+        private final String namePrefix;
+
+        private DefaultThreadFactory(String name) {
+            namePrefix = name + "-thread-";
+        }
+
+        @Override
+        public Thread newThread(Runnable r) {
+            Thread t = new Thread(r, namePrefix + threadNumber.getAndIncrement());
+            if (t.isDaemon()) {
+                t.setDaemon(false);
+            }
+            if (t.getPriority() != Thread.NORM_PRIORITY) {
+                t.setPriority(Thread.NORM_PRIORITY);
+            }
+            return t;
         }
     }
 }
