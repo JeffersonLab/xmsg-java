@@ -691,9 +691,9 @@ public class xMsg {
      * @param handle SubscribeHandler object reference
      * @throws xMsgException
      */
-    public void unsubscribe(xMsgSubscription handle)
+    public void unsubscribe(xMsgSubscription handler)
             throws xMsgException {
-        handle.stop();
+        handler.stop();
     }
 
 
