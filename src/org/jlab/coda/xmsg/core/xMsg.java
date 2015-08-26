@@ -625,23 +625,20 @@ public class xMsg {
     }
 
     /**
-     * <p>
-     *     Subscribes to a specified xMsg topic.
-     *     Supplied user callback object must implement xMsgCallBack interface.
-     *     This method will de-serialize received xMsgData object and pass it
-     *     to the user implemented callback method of the interface.
-     *     In the case the request is async the method will
-     *     utilize private thread pool to run user callback method in a separate thread.
-     * </p>
-     * @param connection socket to a xMsgNode proxy output port.
+     * Subscribes to a specified xMsg topic on the given connection.
+     * This method will pass the received message to the user callback.
+     * In the case the request is asynchronous the method will utilize a thread
+     * pool to run user callback method in a separate thread.
+     *
+     * @param connection the connection to be used to listen for messages
      * @param topic topic of the subscription
-     * @param cb {@link xMsgCallBack} implemented object reference
-     * @return SubscriptionHandler object reference
+     * @param callback implemented object reference
+     * @return a reference to the subscription, to be passed to {@link #unsubscribe}
      * @throws xMsgException
      */
     public xMsgSubscription subscribe(final xMsgConnection connection,
                                       final xMsgTopic topic,
-                                      final xMsgCallBack cb)
+                                      final xMsgCallBack callback)
             throws xMsgException {
 
         String name = "sub-" + myName + "-" + connection.getAddress() + "-" + topic;
@@ -650,7 +647,7 @@ public class xMsg {
             @Override
             public void handle(ZMsg inputMsg) throws xMsgException, IOException {
                 final xMsgMessage callbackMsg = new xMsgMessage(inputMsg);
-                callUserCallBack(connection, cb, callbackMsg);
+                callUserCallBack(connection, callback, callbackMsg);
             }
         };
 
@@ -684,11 +681,9 @@ public class xMsg {
     }
 
     /**
-     * <p>
-     *     Un-subscribes  subscription. This will stop
-     *     thread and perform xmq un-subscribe
-     * </p>
-     * @param handle SubscribeHandler object reference
+     * Unsubscribes from the given topic.
+     *
+     * @param handler the reference to the subscription
      * @throws xMsgException
      */
     public void unsubscribe(xMsgSubscription handler)
