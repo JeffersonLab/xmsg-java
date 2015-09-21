@@ -51,24 +51,16 @@ public class xMsgRegDriver {
      */
     private final Socket _connectionSocket;
 
-    /**
-     * 0MQ context.
-     */
+    /** 0MQ context.*/
     private final ZContext _context;
 
-    /**
-     * Registrar service host IP.
-     */
+    /** Registrar service host IP.*/
     private final String _registrarIp;
 
-    /**
-     * Registrar service listening port.
-     */
+    /** Registrar service listening port.*/
     private int _registrarPort = xMsgConstants.REGISTRAR_PORT.toInteger();
 
-    /**
-     * Registrar service connection address
-     */
+    /** Registrar service connection address */
     private String _address;
 
 

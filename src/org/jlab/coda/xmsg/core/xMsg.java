@@ -44,18 +44,22 @@ import java.util.concurrent.TimeoutException;
 
 /**
  * <p>
- * xMsg base class that provides methods for organizing pub/sub communications.
+ *    xMsg base class that provides methods
+ *    for organizing pub/sub communications.
  *
- * This class provides a private database of xMsgCommunications for publishing
- * and/or subscribing messages without requesting registration information from
- * the local registrar services.
+ *    This class provides a private database
+ *    of xMsgCommunications for publishing
+ *    and/or subscribing messages without
+ *    requesting registration information from
+ *    the local registrar services.
  *
- * This class also provides a thread pool for servicing received messages (as a
- * result of a subscription) in separate threads.
+ *    This class also provides a thread pool for
+ *    servicing received messages (as a result of
+ *    a subscription) in separate threads.
  * </p>
  *
  * @author gurjyan
- * @since 1.0
+ * @since 2.x
  */
 public class xMsg {
 
@@ -63,20 +67,20 @@ public class xMsg {
      * Default thread pool size.
      */
     private static final int DEFAULT_POOL_SIZE = 2;
+
     /** The unique identifier of this actor. */
     protected final String myName;
-    /** 0MQ context object. */
-    private final ZContext context;
     /** Private database of stored connections. */
     private final Map<xMsgAddress, xMsgConnection> connections = new HashMap<>();
     /** Fixed size thread pool. */
     private final ThreadPoolExecutor threadPool;
-
     /** Access to the xMsg registrars. */
-    private final xMsgRegDriver driver;
+    private final xMsgRegDriver regDriver;
     /**
-     * Default socket options.
+     * 0MQ context object
      */
+    private ZContext context = xMsgContext.getContext();
+    /** Default socket options.*/
     private xMsgConnectionSetup defaultSetup;
 
     /**
@@ -89,9 +93,9 @@ public class xMsg {
      * @param name an identifier for this actor
      * @throws IOException if the local IP address could not be obtained.
      */
-    public xMsg(String name) throws IOException {
-        this(name, new xMsgRegDriver(xMsgUtil.localhost(), xMsgUtil.localhost()));
-    }
+//    public xMsg(String name) throws IOException {
+//        this(name, new xMsgRegDriver(context, xMsgUtil.localhost()));
+//    }
 
     /**
      * Constructor. Requires the address of the front-end node.
@@ -104,9 +108,9 @@ public class xMsg {
      * @param frontEndAddress the IP address of the front-end node
      * @throws IOException if the local IP address could not be obtained.
      */
-    public xMsg(String name, String frontEndAddress) throws IOException {
-        this(name, new xMsgRegDriver(xMsgUtil.localhost(), frontEndAddress));
-    }
+//    public xMsg(String name, String frontEndAddress) throws IOException {
+//        this(name, new xMsgRegDriver(xMsgUtil.localhost(), frontEndAddress));
+//    }
 
     /**
      * Constructor. Requires the addresses of both the local node and the
@@ -119,17 +123,20 @@ public class xMsg {
      * @param localAddress the IP address of the local node
      * @param frontEndAddress the IP address of the front-end node
      */
-    public xMsg(String name, String localAddress, String frontEndAddress) {
-        this(name, new xMsgRegDriver(localAddress, frontEndAddress));
-    }
+//    public xMsg(String name, String localAddress, String frontEndAddress) {
+//        this(name, new xMsgRegDriver(localAddress, frontEndAddress));
+//    }
 
     /**
      * Constructor for testing. Can receive a mock driver.
      */
-    xMsg(String name, xMsgRegDriver driver) {
+    xMsg(String name) throws IOException {
+
+        // We need to have a name for an actor
         this.myName = name;
-        this.context = driver.getContext();
-        this.driver = driver;
+
+        // create the registration driver object
+        regDriver = new xMsgRegDriver(context, xMsgUtil.localhost());
 
         // create fixed size thread pool
         this.threadPool = xMsgUtil.newFixedThreadPool(DEFAULT_POOL_SIZE, name);
