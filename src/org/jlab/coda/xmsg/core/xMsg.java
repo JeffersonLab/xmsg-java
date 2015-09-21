@@ -71,6 +71,7 @@ public class xMsg {
     private final Map<xMsgAddress, xMsgConnection> connections = new HashMap<>();
     /** Fixed size thread pool. */
     private final ThreadPoolExecutor threadPool;
+
     /** Access to the xMsg registrars. */
     private final xMsgRegDriver driver;
     /**
