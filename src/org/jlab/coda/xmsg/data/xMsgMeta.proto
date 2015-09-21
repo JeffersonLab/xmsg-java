@@ -78,15 +78,12 @@ message xMsgMeta {
     // further clarify what type of Java object is this.
     optional string datTypeDescription = 15;
 
-    // Defines if data passed is serialized
-    optional bool isDataSerialized = 16 [default = true];
-
     // Sync request reply_to address
-    optional string replyTo = 17 [default = "undefined"];
+    optional string replyTo = 16 [default = "undefined"];
 
     // Byte ordering in case data
     // sub-type is T_BYTES/T_BYTESA
-    optional Endian byteOrder = 18;
+    optional Endian byteOrder = 17;
 
 
     // Data processing status

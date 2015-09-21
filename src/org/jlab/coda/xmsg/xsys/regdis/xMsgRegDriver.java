@@ -27,8 +27,8 @@ import org.jlab.coda.xmsg.data.xMsgR.xMsgRegistration;
 import org.jlab.coda.xmsg.excp.xMsgRegistrationException;
 import org.zeromq.ZContext;
 import org.zeromq.ZMQ;
-import org.zeromq.ZMQException;
 import org.zeromq.ZMQ.Socket;
+import org.zeromq.ZMQException;
 import org.zeromq.ZMsg;
 
 import java.util.Set;
@@ -204,8 +204,7 @@ public class xMsgRegDriver {
      *
      * @param socket socket to the local or front-end registration server
      * @param name the name of the sender
-     * @param data {@link org.jlab.coda.xmsg.data.xMsgR.xMsgRegistration} object
-     * @param data the registration data object
+     * @param data {@link xMsgRegistration} the registration data object
      * @param isPublisher if true then this is a request to remove a publisher,
      *                     otherwise this is a request to remove a subscriber
      * @throws xMsgRegistrationException
@@ -261,7 +260,6 @@ public class xMsgRegDriver {
      * @param isPublisher if true then this is a request to find publishers,
      *                     otherwise this is a request to find subscribers
      * @return list of publishers or subscribers to the required topic
-     * @throws xMsgDiscoverException
      * @throws xMsgRegistrationException
      */
     private Set<xMsgRegistration> _find(Socket socket,
@@ -357,7 +355,6 @@ public class xMsgRegDriver {
      *                     otherwise this is a request to find subscribers
      * @return list of publishers or subscribers to the required topic
      * @throws xMsgRegistrationException
-     * @throws xMsgDiscoverException
      */
     public Set<xMsgRegistration> findLocal(String name,
                                            xMsgRegistration data,
@@ -377,7 +374,6 @@ public class xMsgRegDriver {
      * @param isPublisher if true then this is a request to find publishers,
      *                     otherwise this is a request to find subscribers
      * @return list of publishers or subscribers to the required topic
-     * @throws xMsgDiscoverException
      */
     public Set<xMsgRegistration> findGlobal(String name,
                                             xMsgRegistration data,

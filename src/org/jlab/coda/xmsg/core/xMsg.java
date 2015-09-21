@@ -43,40 +43,40 @@ import java.util.concurrent.ThreadPoolExecutor;
 import java.util.concurrent.TimeoutException;
 
 /**
+ * <p>
  * xMsg base class that provides methods for organizing pub/sub communications.
  *
- * This class provides a local database of xMsgCommunication for publishing
+ * This class provides a private database of xMsgCommunications for publishing
  * and/or subscribing messages without requesting registration information from
  * the local registrar services.
  *
  * This class also provides a thread pool for servicing received messages (as a
  * result of a subscription) in separate threads.
+ * </p>
  *
  * @author gurjyan
  * @since 1.0
  */
 public class xMsg {
 
+    /**
+     * Default thread pool size.
+     */
+    private static final int DEFAULT_POOL_SIZE = 2;
     /** The unique identifier of this actor. */
     protected final String myName;
-
     /** 0MQ context object. */
     private final ZContext context;
-
     /** Private database of stored connections. */
     private final Map<xMsgAddress, xMsgConnection> connections = new HashMap<>();
-
-    /** Default socket options. */
-    private xMsgConnectionSetup defaultSetup;
-
     /** Fixed size thread pool. */
     private final ThreadPoolExecutor threadPool;
-
-    /** Default thread pool size. */
-    private static final int DEFAULT_POOL_SIZE = 2;
-
     /** Access to the xMsg registrars. */
     private final xMsgRegDriver driver;
+    /**
+     * Default socket options.
+     */
+    private xMsgConnectionSetup defaultSetup;
 
     /**
      * Constructor. The local node is used as front-end.
@@ -696,20 +696,18 @@ public class xMsg {
         handle.stop();
     }
 
+    /**
+     * Returns the size of the internal thread pool for subscription callbacks.
+     */
+    public int getPoolSize() {
+        return threadPool.getPoolSize();
+    }
 
     /**
      * Change the size of the internal thread pool for subscription callbacks.
      */
     public void setPoolSize(int poolSize) {
         threadPool.setCorePoolSize(poolSize);
-    }
-
-
-    /**
-     * Returns the size of the internal thread pool for subscription callbacks.
-     */
-    public int getPoolSize() {
-        return threadPool.getPoolSize();
     }
 
     /**

@@ -26,9 +26,6 @@ import org.jlab.coda.xmsg.core.xMsgUtil;
 
 /**
  * xMsg network address.
- *
- * @author gurjyan
- * @since 1.0
  */
 public class xMsgAddress {
 
@@ -99,9 +96,6 @@ public class xMsgAddress {
         if (!host.equals(other.host)) {
             return false;
         }
-        if (port != other.port) {
-            return false;
-        }
-        return true;
+        return port == other.port;
     }
 }

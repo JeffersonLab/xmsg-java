@@ -22,7 +22,6 @@
 package org.jlab.coda.xmsg.core;
 
 import com.google.protobuf.InvalidProtocolBufferException;
-
 import org.jlab.coda.xmsg.data.xMsgD.xMsgData;
 import org.jlab.coda.xmsg.data.xMsgM.xMsgMeta;
 import org.jlab.coda.xmsg.excp.xMsgException;
@@ -147,7 +146,7 @@ public class xMsgMessage {
     /**
      * Serializes this message into a ZMQ message.
      *
-     * @returns the ZMQ raw multi-part message
+     * @return the ZMQ raw multi-part message
      */
     ZMsg serialize() {
         ZMsg msg = new ZMsg();
@@ -205,24 +204,6 @@ public class xMsgMessage {
     }
 
     /**
-     * Returns the size of the message data.
-     */
-    public int getDataSize() {
-        return data != null ? data.length : 0;
-    }
-
-    /**
-     * Sets the message data.
-     *
-     * @param mimeType the mime-type of the data
-     * @param data the raw data of the message
-     */
-    public void setData(String mimeType, byte[] data) {
-        this.metaData.setDataType(mimeType);
-        this.data = data;
-    }
-
-    /**
      * Sets the message data.
      * This data will be serialized and then stored in the message.
      *
@@ -233,7 +214,6 @@ public class xMsgMessage {
         this.data = data.toByteArray();
     }
 
-
     /**
      * Sets an string as the message data.
      *
@@ -242,5 +222,23 @@ public class xMsgMessage {
     public void setData(String text) {
         this.metaData.setDataType("text/string");
         this.data = text.getBytes();
+    }
+
+    /**
+     * Returns the size of the message data.
+     */
+    public int getDataSize() {
+        return data != null ? data.length : 0;
+    }
+
+    /**
+     * Sets the message data.
+     *
+     * @param mimeType the mime-type of the data
+     * @param data     the raw data of the message
+     */
+    public void setData(String mimeType, byte[] data) {
+        this.metaData.setDataType(mimeType);
+        this.data = data;
     }
 }

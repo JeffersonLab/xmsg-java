@@ -28,7 +28,7 @@ import java.util.StringTokenizer;
  * The main identification for xMsg pub/sub communications.
  * xMsg is a <b>topic-based</b> system, and messages are published to given
  * "topics", or named channels, defined by <i>publishers</i>.
- * <i>Subscribers</i> can received the messages published to the "topics" to
+ * <i>Subscribers</i> can receive the messages published to the "topics" to
  * which they are interested, by subscribing to them.
  * <p>
  * In xMsg, a topic is composed of three parts: a <b>domain</b>, a
@@ -69,69 +69,9 @@ import java.util.StringTokenizer;
  */
 public final class xMsgTopic {
 
-    private final String topic;
-
     public static final String ANY = xMsgConstants.ANY.toString();
     public static final String SEPARATOR = ":";
-
-
-    /**
-     * Builds a new topic with only a domain part.
-     *
-     * @param domain the domain of the topic
-     */
-    public static xMsgTopic build(String domain) {
-        return new xMsgTopic(domain, ANY, ANY);
-    }
-
-
-    /**
-     * Builds a new topic with only domain and subject parts.
-     *
-     * @param domain the domain of the topic
-     * @param subject the subject of the topic
-     */
-    public static xMsgTopic build(String domain, String subject) {
-        return new xMsgTopic(domain, subject, ANY);
-    }
-
-
-    /**
-     * Builds a new full topic with domain, subject and type.
-     *
-     * @param domain the domain of the topic
-     * @param subject the subject of the topic
-     * @param type the type of the subject
-     */
-    public static xMsgTopic build(String domain, String subject, String type) {
-        return new xMsgTopic(domain, subject, type);
-    }
-
-
-    /**
-     * Use the given string as an xMsg topic.
-     * No validation is done to the string.
-     * The caller must be sure it is a valid topic.
-     * This factory method is provided for speed purposes.
-     * It should be used with caution.
-     *
-     * @param topic a valid xMsg topic string
-     */
-    public static xMsgTopic wrap(String topic) {
-        return new xMsgTopic(topic);
-    }
-
-
-    /**
-     * Use the given data as an xMsg topic.
-     * This factory method is provided as a shortcut to get the topic from a 0MQ
-     * frame.
-     *
-     * @param topic binary representation of a valid xMsg topic
-     */
-    static xMsgTopic wrap(byte[] bytes) {
-        return new xMsgTopic(new String(bytes, Charset.forName("UTF-8")));
-    }
+    private final String topic;
 
 
     /**
@@ -170,9 +110,62 @@ public final class xMsgTopic {
         this.topic = topic;
     }
 
+    /**
+     * Builds a new topic with only a domain part.
+     *
+     * @param domain the domain of the topic
+     */
+    public static xMsgTopic build(String domain) {
+        return new xMsgTopic(domain, ANY, ANY);
+    }
 
     /**
-     * Returns the type part of the topic.
+     * Builds a new topic with only domain and subject parts.
+     *
+     * @param domain the domain of the topic
+     * @param subject the subject of the topic
+     */
+    public static xMsgTopic build(String domain, String subject) {
+        return new xMsgTopic(domain, subject, ANY);
+    }
+
+    /**
+     * Builds a new full topic with domain, subject and type.
+     *
+     * @param domain the domain of the topic
+     * @param subject the subject of the topic
+     * @param type the type of the subject
+     */
+    public static xMsgTopic build(String domain, String subject, String type) {
+        return new xMsgTopic(domain, subject, type);
+    }
+
+    /**
+     * Use the given string as an xMsg topic.
+     * No validation is done to the string.
+     * The caller must be sure it is a valid topic.
+     * This factory method is provided for speed purposes.
+     * It should be used with caution.
+     *
+     * @param topic a valid xMsg topic string
+     */
+    public static xMsgTopic wrap(String topic) {
+        return new xMsgTopic(topic);
+    }
+
+    /**
+     * Use the given data as an xMsg topic.
+     * This factory method is provided as a shortcut to get the topic from a 0MQ
+     * frame.
+     *
+     * @param bytes binary representation of a valid xMsg topic
+     */
+    static xMsgTopic wrap(byte[] bytes) {
+        return new xMsgTopic(new String(bytes, Charset.forName("UTF-8")));
+    }
+
+    /**
+     * Returns the domain part of the topic.
      */
     public String domain() {
         int firstSep = topic.indexOf(SEPARATOR);
@@ -184,7 +177,7 @@ public final class xMsgTopic {
 
 
     /**
-     * Returns the type part of the topic. If the topic has no subject, then
+     * Returns the subject part of the topic. If the topic has no subject, then
      * {@code "*"} is returned.
      */
     public String subject() {

@@ -21,6 +21,7 @@
 
 package org.jlab.coda.xmsg.xsys.regdis;
 
+import com.google.protobuf.InvalidProtocolBufferException;
 import org.jlab.coda.xmsg.core.xMsgConstants;
 import org.jlab.coda.xmsg.core.xMsgUtil;
 import org.jlab.coda.xmsg.data.xMsgR.xMsgRegistration;
@@ -29,8 +30,6 @@ import org.zeromq.ZContext;
 import org.zeromq.ZMQ;
 import org.zeromq.ZMQException;
 import org.zeromq.ZMsg;
-
-import com.google.protobuf.InvalidProtocolBufferException;
 
 import java.io.IOException;
 import java.util.HashSet;
@@ -54,8 +53,6 @@ import java.util.Set;
  * </ul>
  * TODO: add functionality to remove publisher/subscriber
  *
- * @author gurjyan
- * @since 1.0
  */
 
 public class xMsgRegService implements Runnable {
@@ -109,7 +106,6 @@ public class xMsgRegService implements Runnable {
      * @param feHost the host of the front-end
      * @param context the shared 0MQ context
      * @throws xMsgException
-     * @throws SocketException
      * @throws IOException
      */
     public xMsgRegService(ZContext context, String feHost)

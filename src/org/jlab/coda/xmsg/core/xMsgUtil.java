@@ -31,19 +31,8 @@ import java.net.InetAddress;
 import java.net.NetworkInterface;
 import java.net.SocketException;
 import java.text.DateFormat;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.Enumeration;
-import java.util.List;
-import java.util.Objects;
-import java.util.concurrent.BlockingQueue;
-import java.util.concurrent.CancellationException;
-import java.util.concurrent.ExecutionException;
-import java.util.concurrent.Future;
-import java.util.concurrent.LinkedBlockingQueue;
-import java.util.concurrent.ThreadFactory;
-import java.util.concurrent.ThreadPoolExecutor;
-import java.util.concurrent.TimeUnit;
+import java.util.*;
+import java.util.concurrent.*;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -290,10 +279,10 @@ public final class xMsgUtil {
     }
 
     /**
-     * Deserializes a protobuf {@link ByteString} into an Object.
+     * De-serializes a protobuf {@link ByteString} into an Object.
      *
      * @param bytes the serialization of the object
-     * @return the deserialized Object or null in case of error
+     * @return the de-serialized Object or null in case of error
      */
     public static Object deserialize(ByteString bytes) {
         byte[] bb = bytes.toByteArray();
@@ -301,10 +290,10 @@ public final class xMsgUtil {
     }
 
     /**
-     * Deserializes a byte array into an Object.
+     * De-serializes a byte array into an Object.
      *
      * @param bytes the serialization of the object
-     * @return the deserialized Object or null in case of error
+     * @return the de-serialized Object or null in case of error
      */
     public static Object deserialize(byte[] bytes) {
         try (ByteArrayInputStream bs = new ByteArrayInputStream(bytes);
