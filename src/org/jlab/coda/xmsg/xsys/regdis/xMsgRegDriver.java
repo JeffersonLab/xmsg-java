@@ -34,99 +34,158 @@ import org.zeromq.ZMsg;
 import java.util.Set;
 
 /**
- * Methods for registration and discovery of xMsg actors, i.e. publishers and
- * subscribers.
  * <p>
- * This class also contains the base method used by all xMsg extending classes
- * to create 0MQ socket for communications. This means that this class owns the
- * 0MQ context.
- * The sockets use the default registrar port: {@link xMsgConstants#REGISTRAR_PORT}.
- * <br>
- * TODO: in the future this class may allow custom port number.
+ *     xMsg registration driver. Provides methods for registration and
+ *     discovery of xMsg actors, i.e. publishers and subscribers.
+ *     Creates 0MQ socket connection to the xMsg registrar service
+ *     {@link org.jlab.coda.xmsg.xsys.regdis.xMsgRegService}
+ * </p>
  *
  * @author gurjyan
- * @since 1.0
+ * @since 2.x
  */
-// CHECKSTYLE.OFF: MethodName
 public class xMsgRegDriver {
 
-    /** Front-end registrar server (req/rep) connection socket. */
-    private final Socket _feConnection;
+    /**
+     * Registrar service server (req/rep) connection socket.
+     */
+    private final Socket _connectionSocket;
 
-    /** Local registrar server (req/rep) connection socket. */
-    private final Socket _lnConnection;
-
-    /** zmq context. */
+    /**
+     * 0MQ context.
+     */
     private final ZContext _context;
 
-    /** Local address. */
-    private final String _localAddress;
-
-    /** Front-End address. */
-    private final String _frontEndAddress;
+    /**
+     * Registrar service host IP.
+     */
+    private final String _registrarIp;
 
     /**
-     * Class constructor.
-     * Creates sockets to both front-end and local registration and discovery
-     * servers. Uses default port.
-     *
-     * @param localAddress the IP address of the local host
-     * @param frontEndAddress the IP address of the front-end host
+     * Registrar service listening port.
      */
-    public xMsgRegDriver(String localAddress, String frontEndAddress) {
-        this(new ZContext(), localAddress, frontEndAddress);
-    }
+    private int _registrarPort = xMsgConstants.REGISTRAR_PORT.toInteger();
 
     /**
-     * Constructor for testing. Can receive a mock context.
+     * Registrar service connection address
      */
-    xMsgRegDriver(ZContext context, String localAddress, String frontEndAddress) {
+    private String _address;
+
+
+    /**
+     * <p>
+     *     Constructor
+     * </p>
+     * @param context 0MQ context
+     * @param ip registrar service IP address
+     * @param port registrar service listening port
+     */
+    public xMsgRegDriver(ZContext context, String ip, int port) {
         _context = context;
+        _registrarIp = xMsgUtil.validateIP(ip);
+        _registrarPort = port;
+        _address = "tcp://" + _registrarIp + ":" + _registrarPort;
 
-        _frontEndAddress = xMsgUtil.validateIP(frontEndAddress);
-        _localAddress = xMsgUtil.validateIP(localAddress);
-
-        _feConnection = connect(_frontEndAddress);
-        if (!_frontEndAddress.equals(_localAddress)) {
-            _lnConnection = connect(_localAddress);
-        } else {
-            _lnConnection = _feConnection;
-        }
+        _connectionSocket = connect();
     }
 
     /**
-     * Creates and returns 0MQ socket.
+     * <p>
+     * Constructor. Uses xMsg registrar service default port
+     * {@link org.jlab.coda.xmsg.core.xMsgConstants#REGISTRAR_PORT}
+     * </p>
+     *
+     * @param context 0MQ context
+     * @param ip      registrar service IP address
      */
-    private Socket connect(String host) {
+    public xMsgRegDriver(ZContext context, String ip) {
+        _context = context;
+        _registrarIp = xMsgUtil.validateIP(ip);
+        _address = "tcp://" + _registrarIp + ":" + _registrarPort;
+
+        _connectionSocket = connect();
+    }
+
+    /**
+     * <p>
+     *     Creates and returns 0MQ socket to the Registrar service
+     * </p>
+     *
+     * @return 0MQ socket {@link org.zeromq.ZMQ.Socket}
+     */
+    private Socket connect() {
         Socket sb = _context.createSocket(ZMQ.REQ);
         sb.setHWM(0);
-        sb.connect("tcp://" + host + ":" + xMsgConstants.REGISTRAR_PORT.toInteger());
+        sb.connect(_address);
         return sb;
     }
 
     /**
-     * Returns the main 0MQ context.
+     * <p>
+     *     Utility method that returns 0MQ context that
+     *     was used to create this xMsg registration driver.
+     * </p>
+     * @return 0MQ context {@link org.zeromq.ZContext}
      */
     public ZContext getContext() {
         return _context;
     }
 
     /**
-     * Returns the registered local address.
+     * <p>
+     *     Utility method that returns IP address of the
+     *     registrar service that was used to create this
+     *     xMsg registration driver.
+     * </p>
+     * @return IP address of the registrar service
      */
-    public String getLocalAddress() {
-        return _localAddress;
+    public String getIp() {
+        return _registrarIp;
     }
 
     /**
-     * Returns the registered front-end address.
+     * <p>
+     * Utility method that returns port of the
+     * registrar service that was used to create this
+     * xMsg registration driver.
+     * </p>
+     *
+     * @return port of the registrar service
      */
-    public String getFrontEndAddress() {
-        return _frontEndAddress;
+    public int getPort() {
+        return _registrarPort;
     }
 
     /**
-     * Sends a request to the given registrar server and waits the response.
+     * <p>
+     * Utility method that returns server address of the
+     * registrar service that was used to create this
+     * xMsg registration driver.
+     * </p>
+     *
+     * @return server address the registrar service
+     */
+    public String getAddress() {
+        return _address;
+    }
+
+    /**
+     * <p>
+     *     Sends sync request to the registrar service and
+     *     receives the xMsg response object
+     *     {@link org.jlab.coda.xmsg.xsys.regdis.xMsgRegResponse}
+     * </p>
+     *
+     * @param socket 0MQ socket to the registrar service
+     * @param request xMsg request object
+     *                {@link org.jlab.coda.xmsg.xsys.regdis.xMsgRegRequest}
+     *
+     * @param timeout timeout in milli seconds
+     *
+     * @return xMsg response object
+     *         {@link org.jlab.coda.xmsg.xsys.regdis.xMsgRegResponse}
+     *
+     * @throws xMsgRegistrationException
      */
     protected xMsgRegResponse request(Socket socket, xMsgRegRequest request, int timeout)
             throws xMsgRegistrationException {
@@ -134,7 +193,7 @@ public class xMsgRegDriver {
         try {
             requestMsg.send(socket);
         } catch (ZMQException e) {
-            throw new xMsgRegistrationException("error sending the message");
+            throw new xMsgRegistrationException("xMsgRegDriver: Error sending the message");
         } finally {
             requestMsg.destroy();
         }
@@ -154,231 +213,137 @@ public class xMsgRegDriver {
                 responseMsg.destroy();
             }
         } else {
-            throw new xMsgRegistrationException("xMsg actor registration timeout");
+            throw new xMsgRegistrationException("xMsgRegDriver: Actor registration timeout");
         }
     }
 
     /**
-     * Checks if the registration data is initialized.
+     * <p>
+     *     Checks the validity of the registration data
+     * </p>
+     * @param data registration data
+     *             {@link org.jlab.coda.xmsg.data.xMsgR.xMsgRegistration}
+     * @throws xMsgRegistrationException
      */
     private void _validateData(xMsgRegistration data) throws xMsgRegistrationException {
         if (!data.isInitialized()) {
-            throw new xMsgRegistrationException("The registration data is not complete");
+            throw new xMsgRegistrationException("xMsgRegDriver: The registration data is incomplete");
         }
     }
 
     /**
-     * Sends a registration request to the given registrar server.
-     * Request is wired using xMsg message construct, that have 3 part: topic,
-     * sender, and data.
-     * Data is a {@link org.jlab.coda.xmsg.data.xMsgR.xMsgRegistration} object.
+     * <p>
+     *     Sends a registration request to the registrar service,
+     *     defined at the constructor. Request is wired using xMsg
+     *     message construct, that have 3 part: topic, sender, and data.
+     * </p>
      *
-     * @param socket socket to the local or front-end registration server
-     * @param name the name of the sender
      * @param data the registration data object
+     *             {@link org.jlab.coda.xmsg.data.xMsgR.xMsgRegistration}
      * @param isPublisher if true then this is a request to register a publisher,
      *                     otherwise this is a request to register a subscriber
      * @throws xMsgRegistrationException
      */
-    private void _register(Socket socket,
-                           String name,
-                           xMsgRegistration data,
-                           boolean isPublisher)
+    public void register(xMsgRegistration data,
+                         boolean isPublisher)
             throws xMsgRegistrationException {
 
         _validateData(data);
 
         String topic = isPublisher ? xMsgConstants.REGISTER_PUBLISHER.toString() :
-                                     xMsgConstants.REGISTER_SUBSCRIBER.toString();
+                xMsgConstants.REGISTER_SUBSCRIBER.toString();
         int timeout = xMsgConstants.REGISTER_REQUEST_TIMEOUT.toInteger();
 
-        xMsgRegRequest request = new xMsgRegRequest(topic, name, data);
-        request(socket, request, timeout);
+        xMsgRegRequest request = new xMsgRegRequest(topic, data.getName(), data);
+        request(_connectionSocket, request, timeout);
     }
 
     /**
-     * Sends a registration request to the given registrar server.
-     * Request is wired using xMsg message construct, that have 3 part: topic,
-     * sender, and data.
-     * Data is a {@link org.jlab.coda.xmsg.data.xMsgR.xMsgRegistration} object.
+     * <p>
+     *     Sends a remove registration request to the registrar service,
+     *     defined at the constructor. Request is wired using xMsg
+     *     message construct, that have 3 part: topic, sender, and data.
+     * </p>
      *
-     * @param socket socket to the local or front-end registration server
-     * @param name the name of the sender
-     * @param data {@link xMsgRegistration} the registration data object
-     * @param isPublisher if true then this is a request to remove a publisher,
-     *                     otherwise this is a request to remove a subscriber
+     * @param data the registration data object
+     *             {@link org.jlab.coda.xmsg.data.xMsgR.xMsgRegistration}
+     * @param isPublisher if true then this is a request to register a publisher,
+     *                     otherwise this is a request to register a subscriber
      * @throws xMsgRegistrationException
      */
-    private void _removeRegistration(Socket socket,
-                                     String name,
-                                     xMsgRegistration data,
-                                     boolean isPublisher)
+    public void removeRegistration(xMsgRegistration data,
+                                   boolean isPublisher)
             throws xMsgRegistrationException {
 
         _validateData(data);
 
         String topic = isPublisher ? xMsgConstants.REMOVE_PUBLISHER.toString() :
-                                     xMsgConstants.REMOVE_SUBSCRIBER.toString();
+                xMsgConstants.REMOVE_SUBSCRIBER.toString();
         int timeout = xMsgConstants.REMOVE_REQUEST_TIMEOUT.toInteger();
 
-        xMsgRegRequest request = new xMsgRegRequest(topic, name, data);
-        request(socket, request, timeout);
+        xMsgRegRequest request = new xMsgRegRequest(topic, data.getName(), data);
+        request(_connectionSocket, request, timeout);
     }
 
     /**
-     * Removes registration of all xMsg actors of the specified node.
-     * This will remove all publishers and subscribers from the global
-     * registration database in the front-end that were previously registered on
-     * the local database of the specified host.
-     * This method is usually called by the xMsgNode registrar when
-     * it shuts down or gets interrupted.
+     * <p>
+     *     Removes registration of all xMsg actors of the registrar service,
+     *     defined at the constructor. This will remove all publishers and
+     *     subscribers from the registrar service registration database.
+     *     This method is usually called by the xMsgNode registrar when
+     *     it shuts down or gets interrupted.
+     * </p>
      *
-     * @param host host name of the xMsgNode
-     * @param name the name of the sender
      * @throws xMsgRegistrationException
      */
-    public void removeAllRegistrationFE(String host,
-                                        String name)
+    public void removeAll()
             throws xMsgRegistrationException {
 
         String topic = xMsgConstants.REMOVE_ALL_REGISTRATION.toString();
         int timeout = xMsgConstants.REMOVE_REQUEST_TIMEOUT.toInteger();
 
-        xMsgRegRequest request = new xMsgRegRequest(topic, name, host);
-        request(_feConnection, request, timeout);
+        xMsgRegRequest request = new xMsgRegRequest(topic, "anonymous", _registrarIp);
+        request(_connectionSocket, request, timeout);
     }
 
     /**
-     * Searches a registration database for the given topic.
-     * This will search the database defined by the specified socket, for
-     * publishers or subscribers to the required topic.
-     * The xMsg topic components are defined within the registration data.
+     * <p>
+     *     Searched the registration database of the registrar service,
+     *     defined bu the constructor. This will search the database for
+     *     publishers aor subscribers to a specific topic. The topic of
+     *     an interest is defined within the xMsgRegistration data object
+     *     {@link org.jlab.coda.xmsg.data.xMsgR.xMsgRegistration}
+     * </p>
      *
-     * @param socket socket to the local or front-end registration server
-     * @param name the name of the sender
      * @param data the registration data object
      * @param isPublisher if true then this is a request to find publishers,
      *                     otherwise this is a request to find subscribers
-     * @return list of publishers or subscribers to the required topic
+     * @return set of publishers or subscribers to the required topic.
      * @throws xMsgRegistrationException
      */
-    private Set<xMsgRegistration> _find(Socket socket,
-                                        String name,
-                                        xMsgRegistration data,
-                                        boolean isPublisher)
+    public Set<xMsgRegistration> findRegistration(xMsgRegistration data,
+                                                  boolean isPublisher)
             throws xMsgRegistrationException {
 
         _validateData(data);
 
         String topic = isPublisher ? xMsgConstants.FIND_PUBLISHER.toString() :
-                                     xMsgConstants.FIND_SUBSCRIBER.toString();
+                xMsgConstants.FIND_SUBSCRIBER.toString();
         int timeout = xMsgConstants.FIND_REQUEST_TIMEOUT.toInteger();
 
-        xMsgRegRequest request = new xMsgRegRequest(topic, name, data);
-        xMsgRegResponse response = request(socket, request, timeout);
+        xMsgRegRequest request = new xMsgRegRequest(topic, data.getName(), data);
+        xMsgRegResponse response = request(_connectionSocket, request, timeout);
         return response.data();
     }
 
     /**
-     * Registers xMsg actor with the front-end registration and discovery server.
-     *
-     * @param name the name of the requester/sender
-     * @param data the registration data of the actor
-     * @param isPublisher if true this is a request to register a publisher,
-     *                    otherwise this is a request to register a subscriber
-     * @throws xMsgRegistrationException
+     * <p>
+     *     Closes disconnects from the registrar
+     *     service and closes 0MQ socket.
+     * </p>
      */
-    public void registerFrontEnd(String name,
-                                 xMsgRegistration data,
-                                 boolean isPublisher)
-            throws xMsgRegistrationException {
-        _register(_feConnection, name, data, isPublisher);
-    }
-
-    /**
-     * Registers xMsg actor with the local registration and discovery server.
-     *
-     * @param name the name of the requester/sender
-     * @param data the registration data of the actor
-     * @param isPublisher if true this is a request to register a publisher,
-     *                    otherwise this is a request to register a subscriber
-     * @throws xMsgRegistrationException
-     */
-    public void registerLocal(String name,
-                              xMsgRegistration data,
-                              boolean isPublisher)
-            throws xMsgRegistrationException {
-        _register(_lnConnection, name, data, isPublisher);
-    }
-
-    /**
-     * Removes xMsg actor from the front-end registration and discovery server.
-     *
-     * @param name the name of the requester/sender
-     * @param data the registration data of the actor
-     * @param isPublisher if true this is a request to remove a publisher,
-     *                    otherwise this is a request to remove a subscriber
-     * @throws xMsgRegistrationException
-     */
-    public void removeRegistrationFrontEnd(String name,
-                                           xMsgRegistration data,
-                                           boolean isPublisher)
-            throws xMsgRegistrationException {
-        _removeRegistration(_feConnection, name, data, isPublisher);
-    }
-
-    /**
-     * Removes xMsg actor from the local registration and discovery server.
-     *
-     * @param name the name of the requester/sender
-     * @param data the registration data of the actor
-     * @param isPublisher if true this is a request to remove a publisher,
-     *                    otherwise this is a request to remove a subscriber
-     * @throws xMsgRegistrationException
-     */
-    public void removeRegistrationLocal(String name,
-                                        xMsgRegistration data,
-                                        boolean isPublisher)
-            throws xMsgRegistrationException {
-        _removeRegistration(_lnConnection, name, data, isPublisher);
-    }
-
-    /**
-     * Searches the local registration database for the given topic.
-     * This will search the local registration and discovery database, for
-     * publishers or subscribers to the required topic.
-     * The xMsg topic components are defined within the registration data.
-     *
-     * @param name the name of the sender
-     * @param data the registration data object
-     * @param isPublisher if true then this is a request to find publishers,
-     *                     otherwise this is a request to find subscribers
-     * @return list of publishers or subscribers to the required topic
-     * @throws xMsgRegistrationException
-     */
-    public Set<xMsgRegistration> findLocal(String name,
-                                           xMsgRegistration data,
-                                           boolean isPublisher)
-           throws xMsgRegistrationException {
-        return _find(_lnConnection, name, data, isPublisher);
-    }
-
-    /**
-     * Searches the front-end registration database for the given topic.
-     * This will search the local registration and discovery database, for
-     * publishers or subscribers to the required topic.
-     * The xMsg topic components are defined within the registration data.
-     *
-     * @param name the name of the sender
-     * @param data the registration data object
-     * @param isPublisher if true then this is a request to find publishers,
-     *                     otherwise this is a request to find subscribers
-     * @return list of publishers or subscribers to the required topic
-     */
-    public Set<xMsgRegistration> findGlobal(String name,
-                                            xMsgRegistration data,
-                                            boolean isPublisher)
-            throws xMsgRegistrationException {
-        return _find(_feConnection, name, data, isPublisher);
+    public void disconnect() {
+        _connectionSocket.disconnect(_address);
+        _connectionSocket.close();
     }
 }
