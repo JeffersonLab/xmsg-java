@@ -36,7 +36,6 @@ import java.util.concurrent.TimeoutException;
  *
  * @author gurjyan
  * @version 2.x
- * @since 3/6/15
  */
 public abstract class xMsgSubscription {
 
@@ -62,6 +61,23 @@ public abstract class xMsgSubscription {
 
     abstract void handle(ZMsg msg) throws xMsgException, TimeoutException, IOException;
 
+    void start() {
+        thread.start();
+    }
+
+    void stop() {
+        isRunning = false;
+        try {
+            thread.join();
+        } catch (InterruptedException e) {
+            Thread.currentThread().interrupt();
+        }
+        socket.unsubscribe(topic.getBytes());
+    }
+
+    public boolean isAlive() {
+        return isRunning;
+    }
 
     private class Handler implements Runnable {
 
@@ -87,26 +103,5 @@ public abstract class xMsgSubscription {
                 }
             }
         }
-    }
-
-
-    void start() {
-        thread.start();
-    }
-
-
-    void stop() {
-        isRunning = false;
-        try {
-            thread.join();
-        } catch (InterruptedException e) {
-            Thread.currentThread().interrupt();
-        }
-        socket.unsubscribe(topic.getBytes());
-    }
-
-
-    public boolean isAlive() {
-        return isRunning;
     }
 }

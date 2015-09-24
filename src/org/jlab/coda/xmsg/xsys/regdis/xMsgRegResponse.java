@@ -21,16 +21,15 @@
 
 package org.jlab.coda.xmsg.xsys.regdis;
 
-import java.util.HashSet;
-import java.util.Set;
-
+import com.google.protobuf.InvalidProtocolBufferException;
 import org.jlab.coda.xmsg.core.xMsgConstants;
 import org.jlab.coda.xmsg.data.xMsgR.xMsgRegistration;
 import org.jlab.coda.xmsg.excp.xMsgRegistrationException;
 import org.zeromq.ZFrame;
 import org.zeromq.ZMsg;
 
-import com.google.protobuf.InvalidProtocolBufferException;
+import java.util.HashSet;
+import java.util.Set;
 
 /**
  * A wrapper for a response to a registration or discovery request.
@@ -59,7 +58,7 @@ public class xMsgRegResponse {
     public xMsgRegResponse(String topic, String sender) {
         this.topic = topic;
         this.sender = sender;
-        this.status = xMsgConstants.SUCCESS.toString();
+        this.status = xMsgConstants.SUCCESS.getStringValue();
         this.data = new HashSet<xMsgRegistration>();
     }
 
@@ -77,7 +76,7 @@ public class xMsgRegResponse {
     public xMsgRegResponse(String topic, String sender, Set<xMsgRegistration> data) {
         this.topic = topic;
         this.sender = sender;
-        this.status = xMsgConstants.SUCCESS.toString();
+        this.status = xMsgConstants.SUCCESS.getStringValue();
         this.data = data;
     }
 
@@ -120,7 +119,7 @@ public class xMsgRegResponse {
             topic = new String(topicFrame.getData());
             sender = new String(senderFrame.getData());
             status = new String(statusFrame.getData());
-            if (!status.equals(xMsgConstants.SUCCESS.toString())) {
+            if (!status.equals(xMsgConstants.SUCCESS.getStringValue())) {
                 throw new xMsgRegistrationException(status);
             }
 

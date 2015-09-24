@@ -27,7 +27,7 @@ import org.jlab.coda.xmsg.excp.xMsgException;
 import org.jlab.coda.xmsg.excp.xMsgRegistrationException;
 import org.jlab.coda.xmsg.net.xMsgAddress;
 import org.jlab.coda.xmsg.net.xMsgConnection;
-import org.jlab.coda.xmsg.net.xMsgConnectionSetup;
+import org.jlab.coda.xmsg.net.xMsgSocketOption;
 import org.jlab.coda.xmsg.xsys.regdis.xMsgRegDriver;
 import org.zeromq.ZContext;
 import org.zeromq.ZMQ;
@@ -63,86 +63,60 @@ import java.util.concurrent.TimeoutException;
  */
 public class xMsg {
 
+    /** The unique identifier of this actor. */
+    protected final String myName;
+    /**
+     * Database of stored proxy connections.
+     */
+    private final Map<xMsgAddress, xMsgConnection> connections = new HashMap<>();
+    /**
+     * Database of stored registration server driver objects
+     */
+    private final Map<String, xMsgRegDriver> regDrivers = new HashMap<>();
+    /** Fixed size thread pool. */
+    private final ThreadPoolExecutor threadPool;
+    /**
+     * Default proxy host IP
+     */
+    private String myProxyIp;
+    /**
+     * Default proxy port
+     */
+    private int myProxyPort;
     /**
      * Default thread pool size.
      */
-    private static final int DEFAULT_POOL_SIZE = 2;
-
-    /** The unique identifier of this actor. */
-    protected final String myName;
-    /** Private database of stored connections. */
-    private final Map<xMsgAddress, xMsgConnection> connections = new HashMap<>();
-    /** Fixed size thread pool. */
-    private final ThreadPoolExecutor threadPool;
-    /** Access to the xMsg registrars. */
-    private final xMsgRegDriver regDriver;
-    /**
-     * 0MQ context object
-     */
+    private int myPoolSize;
+    /** 0MQ context object */
     private ZContext context = xMsgContext.getContext();
+
     /** Default socket options.*/
-    private xMsgConnectionSetup defaultSetup;
+    private xMsgSocketOption defaultSocketSetup;
+
 
     /**
-     * Constructor. The local node is used as front-end.
-     * The local address is obtained automatically.
-     * Creates the ZMQ context, the connections to both local and front-end
-     * registration databases and a thread pool for servicing received messages
-     * in separated threads.
      *
-     * @param name an identifier for this actor
-     * @throws IOException if the local IP address could not be obtained.
+     * @param name
+     * @param proxyIp
+     * @param proxyPort
+     * @param poolSize
+     * @throws IOException
      */
-//    public xMsg(String name) throws IOException {
-//        this(name, new xMsgRegDriver(context, xMsgUtil.localhost()));
-//    }
-
-    /**
-     * Constructor. Requires the address of the front-end node.
-     * The address of the local node is obtained automatically.
-     * Creates the ZMQ context, the connections to both local and front-end
-     * registration databases and a thread pool for servicing received messages
-     * in separated threads.
-     *
-     * @param name an identifier for this actor
-     * @param frontEndAddress the IP address of the front-end node
-     * @throws IOException if the local IP address could not be obtained.
-     */
-//    public xMsg(String name, String frontEndAddress) throws IOException {
-//        this(name, new xMsgRegDriver(xMsgUtil.localhost(), frontEndAddress));
-//    }
-
-    /**
-     * Constructor. Requires the addresses of both the local node and the
-     * front-end node.
-     * Creates the ZMQ context, the connections to both local and front-end
-     * registration databases and a thread pool for servicing received messages
-     * in separated threads.
-     *
-     * @param name an identifier for this actor
-     * @param localAddress the IP address of the local node
-     * @param frontEndAddress the IP address of the front-end node
-     */
-//    public xMsg(String name, String localAddress, String frontEndAddress) {
-//        this(name, new xMsgRegDriver(localAddress, frontEndAddress));
-//    }
-
-    /**
-     * Constructor for testing. Can receive a mock driver.
-     */
-    xMsg(String name) throws IOException {
+    public xMsg(String name, String proxyIp, int proxyPort, int poolSize) throws IOException {
 
         // We need to have a name for an actor
         this.myName = name;
 
-        // create the registration driver object
-        regDriver = new xMsgRegDriver(context, xMsgUtil.localhost());
+        this.myProxyIp = proxyIp;
+        this.myProxyPort = proxyPort;
+        this.myPoolSize = poolSize;
+
 
         // create fixed size thread pool
-        this.threadPool = xMsgUtil.newFixedThreadPool(DEFAULT_POOL_SIZE, name);
+        this.threadPool = xMsgUtil.newFixedThreadPool(myPoolSize, name);
 
         // default pub/sub socket options
-        defaultSetup = new xMsgConnectionSetup() {
+        defaultSocketSetup = new xMsgSocketOption() {
 
             @Override
             public void preConnection(Socket socket) {
@@ -156,157 +130,691 @@ public class xMsg {
 
         // fix default linger
         this.context.setLinger(-1);
+
+        // connect to the default proxy
+        connect(myProxyIp, myProxyPort);
     }
 
     /**
-     * Destructor. Call this to gracefully terminate context and close any
-     * managed sockets.
-     */
-    public void destroy() {
-        context.destroy();
-        threadPool.shutdown();
-    }
-
-    /**
-     * Destructor. Call this to gracefully terminate context and close any
-     * managed sockets.
      *
-     * @param linger the linger period for socket shutdown
-     * @see <a href="http://api.zeromq.org/3-2:zmq-setsockopt">ZMQ_LINGER</a>
+     * @param name
+     * @param poolSize
+     * @throws IOException
      */
-    public void destroy(int linger) {
-        context.setLinger(linger);
-        destroy();
+    public xMsg(String name, int poolSize) throws IOException {
+        this(name, xMsgUtil.localhost(), xMsgConstants.DEFAULT_PORT.getIntValue(), poolSize);
     }
 
     /**
-     * Overwrites the default setup for every connection.
-     * This setup will be applied every time a new connection is created.
      *
-     * @param setup the new default setup
+     * @param name
+     * @throws IOException
      */
-    public void setConnectionSetup(xMsgConnectionSetup setup) {
-        defaultSetup = setup;
+    public xMsg(String name) throws IOException {
+        this(name, xMsgUtil.localhost(),
+                xMsgConstants.DEFAULT_PORT.getIntValue(),
+                xMsgConstants.DEFAULT_POOL_SIZE.getIntValue());
     }
 
     /**
-     * Returns the connection to the local xMsg proxy.
-     * If the connection is not created yet, it will be created and stored into
-     * the cache of connections, and then returned.
-     * If there is a connection in the cache, that object will be returned then.
-     * The local proxy should be running.
      *
-     * @return the {@link xMsgConnection} object to the local proxy
-     * @throws IOException if the local IP address could not be obtained.
+     * @return
      */
-    public xMsgConnection connect() {
-        return connect(new xMsgAddress(driver.getLocalAddress()));
+    public String getName() {
+        return myName;
     }
 
     /**
-     * Returns the connection to the xMsg proxy in the specified host.
-     * If the connection is not created yet, it will be created and stored into
-     * the cache of connections, and then returned.
-     * If there is a connection in the cache, that object will be returned then.
-     * The proxy should be running in the host.
      *
-     * @param hostAddress the IP address of the host where the xMsg proxy is running
-     * @return the {@link xMsgConnection} object to the proxy
+     * @return
      */
-    public xMsgConnection connect(String hostAddress) {
-        return connect(new xMsgAddress(hostAddress));
+    public String getProxyIp() {
+        return myProxyIp;
     }
 
     /**
-     * Returns the connection to the xMsg proxy in the specified host.
-     * If the connection is not created yet, it will be created and stored into
-     * the cache of connections, and then returned.
-     * If there is a connection in the cache, that object will be returned then.
-     * The proxy should be running in the host.
      *
-     * @param address the xMsg address of the host where the xMsg proxy is running
-     * @return the {@link xMsgConnection} object to the proxy
+     * @return
      */
-    public xMsgConnection connect(xMsgAddress address) {
-        return connect(address, defaultSetup);
+    public int getProxyPort() {
+        return myProxyPort;
     }
 
     /**
-     * Returns the connection to the xMsg proxy in the specified host.
-     * If the connection is not created yet, it will be created,
-     * configured with the specified setup, stored into
-     * the cache of connections, and then returned.
-     * If there is a connection in the cache, that object will be returned then.
-     * The proxy should be running in the host.
      *
-     * @param address the xMsg address of the host where the xMsg proxy is running
-     * @param setup the setup in case of creating a new connection
-     * @return the {@link xMsgConnection} object to the proxy
+     * @return
      */
-    public xMsgConnection connect(xMsgAddress address, xMsgConnectionSetup setup) {
-        /*
-         * First check to see if we have already established connection
-         * to this address
-         */
+    public int getPoolSize() {
+        return myPoolSize;
+    }
+
+    /**
+     * @return
+     */
+    public xMsgSocketOption getDefaultSocketSetup() {
+        return defaultSocketSetup;
+    }
+
+    /**
+     * @param defaultSocketSetup
+     */
+    public void setDefaultSocketSetup(xMsgSocketOption defaultSocketSetup) {
+        this.defaultSocketSetup = defaultSocketSetup;
+    }
+
+    /**
+     * @param proxyIp
+     * @param proxyPort
+     * @return
+     */
+    public xMsgConnection connect(String proxyIp, int proxyPort) {
+        return connect(new xMsgAddress(proxyIp, proxyPort), defaultSocketSetup);
+    }
+
+    /**
+     * @param proxyIp
+     * @param proxyPort
+     * @return
+     */
+    public xMsgConnection reConnect(String proxyIp, int proxyPort) {
+        xMsgAddress address = new xMsgAddress(proxyIp,proxyPort);
         if (connections.containsKey(address)) {
-            return connections.get(address);
-        } else {
-            /*
-             * Otherwise create sockets to the requested address, and store the
-             * created connection object for the future use. Return the
-             * reference to the connection object
-             */
-            xMsgConnection connection = createConnection(address, setup);
-            connections.put(address, connection);
-            return connection;
+            disconnect(connections.get(address));
         }
+        return createConnection(address, defaultSocketSetup);
     }
 
     /**
-     * Closes the sockets and removes the connection from the cache.
      *
-     * @param connection the connection to be destroyed
+     * @param connection
      */
-    public void destroyConnection(xMsgConnection connection) {
+    public void disconnect(xMsgConnection connection) {
         context.destroySocket(connection.getPubSock());
         context.destroySocket(connection.getSubSock());
         connections.remove(connection.getAddress());
     }
 
+
     /**
-     * Returns a new connection to the xMsg proxy in the specified host.
-     * A new connection is always created. This connection is not stored in the
-     * cache of connections (which may already contain a connection to the given
-     * host). The proxy should be running in the host.
      *
-     * @param address the xMsg address of the host where the xMsg proxy is running
-     * @return the {@link xMsgConnection} object to the proxy
      */
-    public xMsgConnection getNewConnection(xMsgAddress address) {
-        return createConnection(address, defaultSetup);
+    public void destruct() {
+        context.destroy();
+        threadPool.shutdown();
+        connections.clear();
     }
 
     /**
-     * Returns a new connection to the xMsg proxy in the specified host.
-     * A new connection is always created, and configured with the specified setup.
-     * This connection is not stored in the cache of connections
-     * (which may already contain a connection to the given host).
-     * The proxy should be running in the host.
      *
-     * @param address the address of the host where the xMsg proxy is running
-     * @param setup the setup of the new connection
-     * @return the {@link xMsgConnection} object to the proxy
+     * @param linger
      */
-    public xMsgConnection getNewConnection(xMsgAddress address, xMsgConnectionSetup setup) {
-        return createConnection(address, setup);
+    public void destruct(int linger) {
+        context.setLinger(linger);
+        destruct();
+    }
+
+
+    /**
+     *
+     * @param regServerIp
+     * @param regServPort
+     * @param topic
+     * @param description
+     * @throws xMsgRegistrationException
+     * @throws IOException
+     */
+    public void registerAsPublisher(String regServerIp,
+                                    int regServPort,
+                                    xMsgTopic topic,
+                                    String description)
+            throws xMsgRegistrationException, IOException {
+        register(regServerIp, regServPort, topic, description, true);
     }
 
     /**
-     * Creates a new connection to the specified proxy.
-     * @param address the address of the proxy to be connected
-     * @return the created connection
+     *
+     * @param topic
+     * @param description
+     * @throws xMsgRegistrationException
+     * @throws IOException
      */
-    private xMsgConnection createConnection(xMsgAddress address, xMsgConnectionSetup setup) {
+    public void registerAsPublisher(xMsgTopic topic,
+                                    String description)
+            throws xMsgRegistrationException, IOException {
+        register(xMsgUtil.localhost(), xMsgConstants.REGISTRAR_PORT.getIntValue(), topic, description, true);
+    }
+
+    /**
+     *
+     * @param regServerIp
+     * @param regServPort
+     * @param topic
+     * @param description
+     * @throws xMsgRegistrationException
+     * @throws IOException
+     */
+    public void registerAsSubscriber(String regServerIp,
+                                     int regServPort,
+                                     xMsgTopic topic,
+                                     String description)
+            throws xMsgRegistrationException, IOException {
+        register(regServerIp, regServPort, topic, description, false);
+    }
+
+    /**
+     *
+     * @param topic
+     * @param description
+     * @throws xMsgRegistrationException
+     * @throws IOException
+     */
+    public void registerAsSubscriber(xMsgTopic topic,
+                                     String description)
+            throws xMsgRegistrationException, IOException {
+        register(xMsgUtil.localhost(), xMsgConstants.REGISTRAR_PORT.getIntValue(), topic, description, false);
+    }
+
+    /**
+     *
+     * @param regServerIp
+     * @param regServPort
+     * @param topic
+     * @param description
+     * @throws xMsgRegistrationException
+     * @throws IOException
+     */
+    public void removePublisherRegistration(String regServerIp,
+                                            int regServPort,
+                                            xMsgTopic topic,
+                                            String description)
+            throws xMsgRegistrationException, IOException {
+        removeRegistration(regServerIp, regServPort, topic, description, true);
+    }
+
+    /**
+     *
+     * @param topic
+     * @param description
+     * @throws xMsgRegistrationException
+     * @throws IOException
+     */
+    public void removePublisherRegistration(xMsgTopic topic,
+                                            String description)
+            throws xMsgRegistrationException, IOException {
+        removeRegistration(xMsgUtil.localhost(), xMsgConstants.REGISTRAR_PORT.getIntValue(), topic, description, true);
+    }
+
+    /**
+     *
+     * @param regServerIp
+     * @param regServPort
+     * @param topic
+     * @param description
+     * @throws xMsgRegistrationException
+     * @throws IOException
+     */
+    public void removeSubscriberRegistration(String regServerIp,
+                                             int regServPort,
+                                             xMsgTopic topic,
+                                             String description)
+            throws xMsgRegistrationException, IOException {
+        removeRegistration(regServerIp, regServPort, topic, description, false);
+    }
+
+    /**
+     *
+     * @param topic
+     * @param description
+     * @throws xMsgRegistrationException
+     * @throws IOException
+     */
+    public void removeSubscriberRegistration(xMsgTopic topic,
+                                             String description)
+            throws xMsgRegistrationException, IOException {
+        removeRegistration(xMsgUtil.localhost(), xMsgConstants.REGISTRAR_PORT.getIntValue(), topic, description, false);
+    }
+
+    /**
+     *
+     * @param regServerIp
+     * @param regServPort
+     * @param topic
+     * @return
+     * @throws xMsgRegistrationException
+     */
+    public Set<xMsgRegistration> findPublishers(String regServerIp,
+                                                int regServPort,
+                                                xMsgTopic topic)
+            throws xMsgRegistrationException {
+
+        return findRegistration(regServerIp, regServPort,topic, true);
+    }
+
+    /**
+     *
+     * @param topic
+     * @return
+     * @throws xMsgRegistrationException
+     */
+    public Set<xMsgRegistration> findPublishers(xMsgTopic topic)
+            throws xMsgRegistrationException {
+
+        return findRegistration(myProxyIp, myProxyPort,topic, true);
+    }
+
+    /**
+     *
+     * @param regServerIp
+     * @param regServPort
+     * @param topic
+     * @return
+     * @throws xMsgRegistrationException
+     */
+    public Set<xMsgRegistration> findSubscribers(String regServerIp,
+                                                 int regServPort,
+                                                 xMsgTopic topic)
+            throws xMsgRegistrationException {
+
+        return findRegistration(regServerIp, regServPort,topic, false);
+    }
+
+    /**
+     *
+     * @param topic
+     * @return
+     * @throws xMsgRegistrationException
+     */
+    public Set<xMsgRegistration> findSubscribers(xMsgTopic topic)
+            throws xMsgRegistrationException {
+
+        return findRegistration(myProxyIp, myProxyPort,topic, false);
+    }
+
+    /**
+     *
+     * @param con
+     * @param msg
+     * @throws xMsgException
+     */
+    public void publish(xMsgConnection con, xMsgMessage msg) throws xMsgException {
+        try {
+            _publish(con, msg, -1);
+        } catch (TimeoutException e) {
+            e.printStackTrace();
+        }
+    }
+
+    /**
+     * @param proxyIp
+     * @param proxyPort
+     * @param data
+     * @throws xMsgException
+     * @throws IOException
+     */
+    public void publish(String proxyIp, int proxyPort,
+                        xMsgTopic topic, String mimeType,
+                        Object data)
+            throws xMsgException, IOException {
+        try {
+            _publish(proxyIp, proxyPort, topic, mimeType, data, -1);
+        } catch (TimeoutException e) {
+            e.printStackTrace();
+        }
+    }
+
+    /**
+     *
+     * @param proxyIp
+     * @param proxyPort
+     * @param data
+     * @throws xMsgException
+     * @throws IOException
+     */
+    public void publish(String proxyIp, int proxyPort,
+                        xMsgTopic topic,
+                        Object data)
+            throws xMsgException, IOException {
+        try {
+            _publish(proxyIp, proxyPort, topic, null, data, -1);
+        } catch (TimeoutException e) {
+            e.printStackTrace();
+        }
+    }
+
+    /**
+     * @param topic
+     * @param mimeType
+     * @param data
+     * @throws xMsgException
+     * @throws IOException
+     */
+    public void publish(xMsgTopic topic, String mimeType,
+                        Object data)
+            throws xMsgException, IOException {
+        try {
+            _publish(myProxyIp, myProxyPort, topic, mimeType, data, -1);
+        } catch (TimeoutException e) {
+            e.printStackTrace();
+        }
+    }
+
+    /**
+     * @param topic
+     * @param data
+     * @throws xMsgException
+     * @throws IOException
+     */
+    public void publish(xMsgTopic topic,
+                        Object data)
+            throws xMsgException, IOException {
+        try {
+            _publish(myProxyIp, myProxyPort, topic, null, data, -1);
+        } catch (TimeoutException e) {
+            e.printStackTrace();
+        }
+    }
+
+    /**
+     *
+     * @param con
+     * @param msg
+     * @param timeout
+     * @return
+     * @throws xMsgException
+     * @throws TimeoutException
+     */
+    public xMsgMessage syncPublish(xMsgConnection con,
+                                   xMsgMessage msg,
+                                   int timeout) throws xMsgException, TimeoutException {
+        return _publish(con, msg, timeout);
+    }
+
+    /**
+     * @param proxyIp
+     * @param proxyPort
+     * @param topic
+     * @param mimeType
+     * @param data
+     * @param timeout
+     * @return
+     * @throws xMsgException
+     * @throws IOException
+     * @throws TimeoutException
+     */
+    public xMsgMessage syncPublish(String proxyIp, int proxyPort,
+                                   xMsgTopic topic, String mimeType,
+                                   Object data, int timeout)
+            throws xMsgException, IOException, TimeoutException {
+        return _publish(proxyIp, proxyPort, topic, mimeType, data, timeout);
+    }
+
+    /**
+     * @param proxyIp
+     * @param proxyPort
+     * @param topic
+     * @param data
+     * @param timeout
+     * @return
+     * @throws xMsgException
+     * @throws IOException
+     * @throws TimeoutException
+     */
+    public xMsgMessage syncPublish(String proxyIp, int proxyPort,
+                                   xMsgTopic topic,
+                                   Object data, int timeout)
+            throws xMsgException, IOException, TimeoutException {
+        return _publish(proxyIp, proxyPort, topic, null, data, timeout);
+    }
+
+    /**
+     * @param topic
+     * @param mimeType
+     * @param data
+     * @param timeout
+     * @return
+     * @throws xMsgException
+     * @throws IOException
+     * @throws TimeoutException
+     */
+    public xMsgMessage syncPublish(xMsgTopic topic, String mimeType,
+                                   Object data, int timeout)
+            throws xMsgException, IOException, TimeoutException {
+        return _publish(myProxyIp, myProxyPort, topic, mimeType, data, timeout);
+    }
+
+    /**
+     *
+     * @param topic
+     * @param data
+     * @param timeout
+     * @return
+     * @throws xMsgException
+     * @throws IOException
+     * @throws TimeoutException
+     */
+    public xMsgMessage syncPublish(xMsgTopic topic,
+                                   Object data, int timeout)
+            throws xMsgException, IOException, TimeoutException {
+        return _publish(myProxyIp, myProxyPort, topic, null, data, timeout);
+    }
+
+    /**
+     *
+     * @param proxyIp
+     * @param proxyPort
+     * @param topic
+     * @param cb
+     * @return
+     * @throws xMsgException
+     */
+    public xMsgSubscription subscribe(final String proxyIp, final int proxyPort,
+                                      final xMsgTopic topic,
+                                      final xMsgCallBack cb)
+    throws xMsgException {
+
+        // get connection to the proxy
+        final xMsgConnection con = connect(proxyIp, proxyPort);
+
+        // get pub socket
+        Socket sock = con.getSubSock();
+        if (sock == null) {
+            throw new xMsgException("xMsg-Error: null sub socket");
+        }
+
+        String name = "sub-" + myName + "-" + con.getAddress() + "-" + topic;
+
+        xMsgSubscription sHandle = new xMsgSubscription(name, con, topic) {
+            @Override
+            public void handle(ZMsg inputMsg) throws xMsgException, IOException {
+                final xMsgMessage callbackMsg = new xMsgMessage(inputMsg);
+                callUserCallBack(con, cb, callbackMsg);
+            }
+        };
+
+        sHandle.start();
+        return sHandle;
+    }
+
+    /**
+     *
+     * @param topic
+     * @param cb
+     * @return
+     * @throws xMsgException
+     */
+    public xMsgSubscription subscribe(final xMsgTopic topic,
+                                      final xMsgCallBack cb)
+            throws xMsgException {
+        return subscribe(myProxyIp, myProxyPort, topic, cb);
+
+    }
+
+    /**
+     * <p>
+     *     Un-subscribes  subscription. This will stop
+     *     thread and perform xmq un-subscribe
+     * </p>
+     * @param handle SubscribeHandler object reference
+     * @throws xMsgException
+     */
+    public void unsubscribe(xMsgSubscription handle)
+            throws xMsgException {
+        handle.stop();
+    }
+
+    // ..............................................................//
+    //                        Private section
+    // ..............................................................//
+
+    /**
+     *
+     * @param topic
+     * @param description
+     * @return
+     */
+    private Builder createRegistration(xMsgTopic topic, String description) {
+        xMsgRegistration.Builder regb = xMsgRegistration.newBuilder();
+        regb.setName(myName);
+        regb.setHost(myProxyIp);
+        regb.setPort(myProxyPort);
+        regb.setDomain(topic.domain());
+        regb.setSubject(topic.subject());
+        regb.setType(topic.type());
+        regb.setDescription(description);
+        return regb;
+    }
+
+    /**
+     *
+     * @param regServerIp
+     * @param regServPort
+     * @param topic
+     * @param description
+     * @param isPublisher
+     * @throws xMsgRegistrationException
+     */
+    private void register(String regServerIp,
+                          int regServPort,
+                          xMsgTopic topic,
+                          String description,
+                          boolean isPublisher)
+            throws xMsgRegistrationException {
+
+        // Define the key for the registration server connection
+        // map, for storing and reusing registrar connections
+        String regDriverKey = regServerIp + "_" + regServPort;
+        xMsgRegDriver regDriver;
+        if (regDrivers.containsKey(regDriverKey)) {
+            regDriver = regDrivers.get(regDriverKey);
+        } else {
+            // create the registration driver object
+            regDriver = new xMsgRegDriver(context, regServerIp, regServPort);
+
+            // connected to the registrar service
+            regDriver.connect();
+
+            // put into the map of regDrivers
+            regDrivers.put(regDriverKey, regDriver);
+        }
+        xMsgRegistration.Builder regb = createRegistration(topic, description);
+        if (isPublisher) {
+            regb.setOwnerType(xMsgRegistration.OwnerType.PUBLISHER);
+        } else {
+            regb.setOwnerType(xMsgRegistration.OwnerType.SUBSCRIBER);
+        }
+        xMsgRegistration regData = regb.build();
+        regDriver.register(regData, isPublisher);
+    }
+
+    /**
+     *
+     * @param regServerIp
+     * @param regServPort
+     * @param topic
+     * @param description
+     * @param isPublisher
+     * @throws xMsgRegistrationException
+     */
+    private void removeRegistration(String regServerIp,
+                                    int regServPort,
+                                    xMsgTopic topic,
+                                    String description,
+                                    boolean isPublisher)
+            throws xMsgRegistrationException {
+
+        String regDriverKey = regServerIp + "_" + regServPort;
+        xMsgRegDriver regDriver;
+        if (regDrivers.containsKey(regDriverKey)) {
+            regDriver = regDrivers.get(regDriverKey);
+        } else {
+            // create the registration driver object
+            regDriver = new xMsgRegDriver(context, regServerIp, regServPort);
+
+            // connected to the registrar service
+            regDriver.connect();
+
+            // put into the map of regDrivers
+            regDrivers.put(regDriverKey, regDriver);
+        }
+        xMsgRegistration.Builder regb = createRegistration(topic, description);
+        if (isPublisher) {
+            regb.setOwnerType(xMsgRegistration.OwnerType.PUBLISHER);
+        } else {
+            regb.setOwnerType(xMsgRegistration.OwnerType.SUBSCRIBER);
+        }
+        xMsgRegistration regData = regb.build();
+        regDriver.removeRegistration(regData, isPublisher);
+    }
+
+    /**
+     *
+     * @param regServerIp
+     * @param regServPort
+     * @param topic
+     * @param isPublisher
+     * @return
+     * @throws xMsgRegistrationException
+     */
+    private Set<xMsgRegistration> findRegistration(String regServerIp,
+                                                   int regServPort,
+                                                   xMsgTopic topic,
+                                                   boolean isPublisher)
+            throws xMsgRegistrationException {
+
+        // Define the key for the registration server connection
+        // map, for storing and reusing registrar connections
+        String regDriverKey = regServerIp + "_" + regServPort;
+        xMsgRegDriver regDriver;
+        if (regDrivers.containsKey(regDriverKey)) {
+            regDriver = regDrivers.get(regDriverKey);
+        } else {
+            // create the registration driver object
+            regDriver = new xMsgRegDriver(context, regServerIp, regServPort);
+
+            // connected to the registrar service
+            regDriver.connect();
+
+            // put into the map of regDrivers
+            regDrivers.put(regDriverKey, regDriver);
+        }
+        xMsgRegistration.Builder regb = createRegistration(topic, "");
+        if (isPublisher) {
+            regb.setOwnerType(xMsgRegistration.OwnerType.PUBLISHER);
+        } else {
+            regb.setOwnerType(xMsgRegistration.OwnerType.SUBSCRIBER);
+        }
+        xMsgRegistration regData = regb.build();
+        return regDriver.findRegistration(regData, isPublisher);
+    }
+
+
+    /**
+     *
+     * @param address
+     * @param setup
+     * @return
+     */
+    private xMsgConnection createConnection(xMsgAddress address, xMsgSocketOption setup) {
         Socket pubSock = context.createSocket(ZMQ.PUB);
         Socket subSock = context.createSocket(ZMQ.SUB);
         setup.preConnection(pubSock);
@@ -327,345 +835,165 @@ public class xMsg {
     }
 
     /**
-     * Registers as a publisher in the global front-end registrar.
-     * This actor should be periodically publishing data.
-     * Futures subscribers can use this registration to discover and listen to
-     * the published messages.
      *
-     * @param topic the topic of the published messages
-     * @param description a description of the publisher
-     * @throws xMsgRegistrationException
-     * @see #publish
+     * @param address
+     * @param setup
+     * @return
      */
-    public void registerPublisher(xMsgTopic topic,
-                                  String description)
-            throws xMsgRegistrationException {
-        xMsgRegistration.Builder regb = registrationBuilder(topic);
-        regb.setOwnerType(xMsgRegistration.OwnerType.PUBLISHER);
-        regb.setDescription(description);
-        xMsgRegistration regData = regb.build();
-        driver.registerFrontEnd(myName, regData, true);
-    }
-
-    /**
-     * Registers as a publisher in the local registrar.
-     * This actor should be periodically publishing data.
-     * Futures subscribers can use this registration to discover and listen to
-     * the published messages.
-     * The local registration database is periodically updated to the front-end database.
-     *
-     * @param topic the topic of the published messages
-     * @param description a description of the publisher
-     * @throws xMsgRegistrationException
-     * @see #publish
-     */
-    public void registerLocalPublisher(xMsgTopic topic,
-                                       String description)
-            throws xMsgRegistrationException {
-        xMsgRegistration.Builder regb = registrationBuilder(topic);
-        regb.setOwnerType(xMsgRegistration.OwnerType.PUBLISHER);
-        regb.setDescription(description);
-        xMsgRegistration regData = regb.build();
-        driver.registerLocal(myName, regData, true);
-    }
-
-    /**
-     * Registers as a subscriber in the global front-end registrar.
-     * This actor should be listening for messages of the wanted topic.
-     * Future publishers might express an interest to publish data to a a
-     * required topic of interest or might publish data only if there are active
-     * listeners/subscribers to their published topic.
-     *
-     * @param topic the topic of the subscription
-     * @param description a description of the subscription
-     * @throws xMsgRegistrationException
-     * @see #subscribe
-     */
-    public void registerSubscriber(xMsgTopic topic,
-                                   String description)
-            throws xMsgRegistrationException {
-        xMsgRegistration.Builder regb = registrationBuilder(topic);
-        regb.setOwnerType(xMsgRegistration.OwnerType.SUBSCRIBER);
-        regb.setDescription(description);
-        xMsgRegistration regData = regb.build();
-        driver.registerFrontEnd(myName, regData, false);
-    }
-
-    /**
-     * Registers as a subscriber in the local registrar.
-     * This actor should be listening for messages of the wanted topic.
-     * Future publishers might express an interest to publish data to a a
-     * required topic of interest or might publish data only if there are active
-     * listeners/subscribers to their published topic.
-     * The local registration database is periodically updated to the front-end database.
-     *
-     * @param topic the topic of the subscription
-     * @param description a description of the subscription
-     * @throws xMsgRegistrationException
-     * @see #subscribe
-     */
-    public void registerLocalSubscriber(xMsgTopic topic,
-                                        String description)
-            throws xMsgRegistrationException {
-        xMsgRegistration.Builder regb = registrationBuilder(topic);
-        regb.setOwnerType(xMsgRegistration.OwnerType.SUBSCRIBER);
-        regb.setDescription(description);
-        xMsgRegistration regData = regb.build();
-        driver.registerLocal(myName, regData, false);
-    }
-
-    /**
-     * Removes as publisher from the global front-end registration.
-     *
-     * @param topic the topic of the published messages
-     * @throws xMsgRegistrationException
-     */
-    public void removePublisher(xMsgTopic topic)
-            throws xMsgRegistrationException {
-        xMsgRegistration.Builder regb = registrationBuilder(topic);
-        regb.setOwnerType(xMsgRegistration.OwnerType.PUBLISHER);
-        xMsgRegistration regData = regb.build();
-        driver.removeRegistrationFrontEnd(myName, regData, true);
-    }
-
-    /**
-     * Removes as publisher from the local registration.
-     *
-     * @param topic the topic of the published messages
-     * @throws xMsgRegistrationException
-     */
-    public void removeLocalPublisher(xMsgTopic topic)
-            throws xMsgRegistrationException {
-        xMsgRegistration.Builder regb = registrationBuilder(topic);
-        regb.setOwnerType(xMsgRegistration.OwnerType.PUBLISHER);
-        xMsgRegistration regData = regb.build();
-        driver.removeRegistrationLocal(myName, regData, true);
-    }
-
-    /**
-     * Removes as subscriber from the global front-end registration.
-     *
-     * @param topic the topic of the subscription
-     * @throws xMsgRegistrationException
-     */
-    public void removeSubscriber(xMsgTopic topic)
-            throws xMsgRegistrationException {
-        xMsgRegistration.Builder regb = registrationBuilder(topic);
-        regb.setOwnerType(xMsgRegistration.OwnerType.SUBSCRIBER);
-        xMsgRegistration regData = regb.build();
-        driver.removeRegistrationFrontEnd(myName, regData, false);
-    }
-
-    /**
-     * Removes as subscriber from the local registration.
-     *
-     * @param topic the topic of the subscription
-     * @throws xMsgRegistrationException
-     */
-    public void removeLocalSubscriber(xMsgTopic topic)
-            throws xMsgRegistrationException {
-        xMsgRegistration.Builder regb = registrationBuilder(topic);
-        regb.setOwnerType(xMsgRegistration.OwnerType.SUBSCRIBER);
-        xMsgRegistration regData = regb.build();
-        driver.removeRegistrationLocal(myName, regData, false);
-    }
-
-    /**
-     * Finds all publishers of the given topic.
-     * The publishers are searched in the front-end registrar, and they could
-     * be deployed anywhere in the xMsg cloud of nodes.
-     *
-     * @param topic the topic of the published messages
-     * @return set of {@link xMsgRegistration} objects, one per found publisher
-     * @throws xMsgRegistrationException
-     */
-    public Set<xMsgRegistration> findPublishers(xMsgTopic topic)
-            throws xMsgRegistrationException {
-
-        xMsgRegistration.Builder regb = registrationBuilder(topic);
-        regb.setOwnerType(xMsgRegistration.OwnerType.PUBLISHER);
-        xMsgRegistration regData = regb.build();
-        return driver.findGlobal(myName, regData, true);
-    }
-
-    /**
-     * Finds all local publishers of the given topic.
-     * The publishers are searched in the local registrar, thus they are
-     * deployed in the local node.
-     *
-     * @param topic the topic of the published messages
-     * @return set of {@link xMsgRegistration} objects, one per found publisher
-     * @throws xMsgRegistrationException
-     */
-    public Set<xMsgRegistration> findLocalPublishers(xMsgTopic topic)
-            throws xMsgRegistrationException {
-        xMsgRegistration.Builder regb = registrationBuilder(topic);
-        regb.setOwnerType(xMsgRegistration.OwnerType.PUBLISHER);
-        xMsgRegistration regData = regb.build();
-        return driver.findLocal(myName, regData, true);
-    }
-
-    /**
-     * Finds all subscribers of the given topic.
-     * The publishers are searched in the front-end registrar, and they could
-     * be deployed anywhere in the xMsg cloud of nodes.
-     *
-     * @param topic the topic of the subscription
-     * @return set of {@link xMsgRegistration} objects, one per found subscribers
-     * @throws xMsgRegistrationException
-     */
-    public Set<xMsgRegistration> findSubscribers(xMsgTopic topic)
-            throws xMsgRegistrationException {
-        xMsgRegistration.Builder regb = registrationBuilder(topic);
-        regb.setOwnerType(xMsgRegistration.OwnerType.SUBSCRIBER);
-        xMsgRegistration regData = regb.build();
-        return driver.findGlobal(myName, regData, false);
-    }
-
-    /**
-     * Finds all local subscribers of the given topic.
-     * The publishers are searched in the local registrar, thus they are
-     * deployed in the local node.
-     *
-     * @param topic the topic of the subscription
-     * @return set of {@link xMsgRegistration} objects, one per found subscribers
-     * @throws xMsgRegistrationException
-     */
-    public Set<xMsgRegistration> findLocalSubscribers(xMsgTopic topic)
-            throws xMsgRegistrationException {
-
-        xMsgRegistration.Builder regb = registrationBuilder(topic);
-        regb.setOwnerType(xMsgRegistration.OwnerType.SUBSCRIBER);
-        xMsgRegistration regData = regb.build();
-        return driver.findLocal(myName, regData, false);
-    }
-
-    private Builder registrationBuilder(xMsgTopic topic) {
-        xMsgRegistration.Builder regb = xMsgRegistration.newBuilder();
-        regb.setName(myName);
-        regb.setHost(driver.getLocalAddress());
-        regb.setPort(xMsgConstants.DEFAULT_PORT.toInteger());
-        regb.setDomain(topic.domain());
-        regb.setSubject(topic.subject());
-        regb.setType(topic.type());
-        return regb;
-    }
-
-
-    /**
-     * Publishes the given message.
-     *
-     * @param connection the connection to be used to send the message
-     * @param msg the message to be sent
-     * @throws IOException if the message could not be sent
-     * @throws xMsgException
-     */
-    public void publish(xMsgConnection connection,
-                        xMsgMessage msg)
-            throws xMsgException, IOException {
-
-        // check connection
-        Socket con = connection.getPubSock();
-        if (con == null) {
-            System.out.println("Error: null connection object");
-            throw new xMsgException("Error: null connection object");
+    private xMsgConnection connect(xMsgAddress address, xMsgSocketOption setup) {
+        /*
+         * First check to see if we have already established connection
+         * to this address
+         */
+        if (connections.containsKey(address)) {
+            return connections.get(address);
+        } else {
+            /*
+             * Otherwise create sockets to the requested address, and store the
+             * created connection object for the future use. Return the
+             * reference to the connection object
+             */
+            xMsgConnection connection = createConnection(address, setup);
+            connections.put(address, connection);
+            return connection;
         }
+    }
 
-        // check message
-        if (msg == null) {
-            System.out.println("Error: null message");
-            throw new xMsgException("Error: null message");
+
+    /**
+     * @param con
+     * @param msg
+     * @param timeout
+     * @return
+     * @throws xMsgException
+     * @throws TimeoutException
+     */
+    private xMsgMessage _publish(xMsgConnection con, xMsgMessage msg, int timeout) throws xMsgException, TimeoutException {
+
+        SyncSendCallBack cb = null;
+        // get pub socket
+        Socket sock = con.getPubSock();
+
+        if (timeout > 0) {
+            // address/topic where the subscriber should send the result
+            String returnAddress = "return:" + (int) (Math.random() * 100.0);
+
+            // set the return address as replyTo in the xMsgMessage
+            msg.getMetaData().setReplyTo(returnAddress);
+
+
+            // subscribe to the returnAddress
+            cb = new SyncSendCallBack();
+            xMsgSubscription sh = subscribe(con.getAddress().getHost(), con.getAddress().getPort(),
+                    xMsgTopic.wrap(returnAddress), cb);
+            cb.setSubscriptionHandler(sh);
         }
 
         // send topic, sender, followed by the metadata and data
         ZMsg outputMsg = msg.serialize();
         try {
-            outputMsg.send(con);
+            outputMsg.send(sock);
         } catch (ZMQException e) {
-            throw new xMsgException("Error: publishing the message");
+            throw new xMsgException("xMsg-Error: publishing failed. " + e.getMessage());
         } finally {
             outputMsg.destroy();
         }
-    }
 
-    /**
-     * Publishes the given message and waits for a response.
-     *
-     * @param connection the connection to be used to send the message
-     * @param msg the message to be sent
-     * @param timeout the time to wait for a response, in milliseconds
-     * @return the response message
-     * @throws IOException if the message could not be sent
-     * @throws TimeoutException if a response is not received
-     * @throws xMsgException
-     */
-    public xMsgMessage syncPublish(xMsgConnection connection,
-                                    xMsgMessage msg,
-                                    int timeout)
-            throws xMsgException,
-            TimeoutException,
-            IOException {
-
-        // address/topic where the subscriber should send the result
-        String returnAddress = "return:" + (int) (Math.random() * 100.0);
-
-        // set the return address as replyTo in the xMsgMessage
-        msg.getMetaData().setReplyTo(returnAddress);
-
-        // subscribe to the returnAddress
-        SyncSendCallBack cb = new SyncSendCallBack();
-        xMsgSubscription sh = subscribe(connection, xMsgTopic.wrap(returnAddress), cb);
-        cb.setSubscriptionHandler(sh);
-
-        publish(connection, msg);
-
-        // wait for the response
-        int t = 0;
-        while (cb.recvMsg == null && t < timeout * 1000) {
-            t++;
-            xMsgUtil.sleep(1);
-        }
-        if (t >= timeout * 1000) {
-            throw new TimeoutException("Error: no response for time_out = " + t);
-        }
-        msg.getMetaData().setReplyTo(xMsgConstants.UNDEFINED.toString());
-        return cb.recvMsg;
-    }
-
-    /**
-     * <p>
-     *     Subscribes to a specified xMsg topic.
-     *     Supplied user callback object must implement xMsgCallBack interface.
-     *     This method will de-serialize received xMsgData object and pass it
-     *     to the user implemented callback method of the interface.
-     *     In the case the request is async the method will
-     *     utilize private thread pool to run user callback method in a separate thread.
-     * </p>
-     * @param connection socket to a xMsgNode proxy output port.
-     * @param topic topic of the subscription
-     * @param cb {@link xMsgCallBack} implemented object reference
-     * @return SubscriptionHandler object reference
-     * @throws xMsgException
-     */
-    public xMsgSubscription subscribe(final xMsgConnection connection,
-                                      final xMsgTopic topic,
-                                      final xMsgCallBack cb)
-            throws xMsgException {
-
-        String name = "sub-" + myName + "-" + connection.getAddress() + "-" + topic;
-
-        xMsgSubscription sHandle = new xMsgSubscription(name, connection, topic) {
-            @Override
-            public void handle(ZMsg inputMsg) throws xMsgException, IOException {
-                final xMsgMessage callbackMsg = new xMsgMessage(inputMsg);
-                callUserCallBack(connection, cb, callbackMsg);
+        if (timeout > 0) {
+            // wait for the response
+            int t = 0;
+            while (cb.recvMsg == null && t < timeout * 1000) {
+                t++;
+                xMsgUtil.sleep(1);
             }
-        };
-
-        sHandle.start();
-        return sHandle;
+            if (t >= timeout * 1000) {
+                throw new TimeoutException("xMsg-Error: no response for time_out = " + t);
+            }
+            msg.getMetaData().setReplyTo(xMsgConstants.UNDEFINED.getStringValue());
+            return cb.recvMsg;
+        }
+        return null;
     }
 
+    /**
+     * @param proxyIp
+     * @param proxyPort
+     * @param mimeType
+     * @param data
+     * @throws xMsgException
+     * @throws IOException
+     */
+    private xMsgMessage _publish(String proxyIp, int proxyPort,
+                                 xMsgTopic topic,
+                                 String mimeType, Object data, int timeout)
+            throws xMsgException, IOException, TimeoutException {
+
+        SyncSendCallBack cb = null;
+
+        // get connection to the proxy
+        xMsgConnection con = connect(proxyIp, proxyPort);
+
+        // get pub socket
+        Socket sock = con.getPubSock();
+        if (sock == null) {
+            throw new xMsgException("xMsg-Error: null pub socket");
+        }
+
+        // create a message
+        xMsgMessage msg;
+        if (mimeType != null) {
+            msg = new xMsgMessage(topic, mimeType, data);
+        } else {
+            msg = new xMsgMessage(topic, data);
+        }
+
+        if (timeout > 0) {
+            // address/topic where the subscriber should send the result
+            String returnAddress = "return:" + (int) (Math.random() * 100.0);
+
+            // set the return address as replyTo in the xMsgMessage
+            msg.getMetaData().setReplyTo(returnAddress);
+
+
+            // subscribe to the returnAddress
+            cb = new SyncSendCallBack();
+            xMsgSubscription sh = subscribe(con.getAddress().getHost(), con.getAddress().getPort(),
+                    xMsgTopic.wrap(returnAddress), cb);
+            cb.setSubscriptionHandler(sh);
+        }
+
+        // send topic, sender, followed by the metadata and data
+        ZMsg outputMsg = msg.serialize();
+        try {
+            outputMsg.send(sock);
+        } catch (ZMQException e) {
+            throw new xMsgException("xMsg-Error: publishing failed. " + e.getMessage());
+        } finally {
+            outputMsg.destroy();
+        }
+        if (timeout > 0) {
+            // wait for the response
+            int t = 0;
+            while (cb.recvMsg == null && t < timeout * 1000) {
+                t++;
+                xMsgUtil.sleep(1);
+            }
+            if (t >= timeout * 1000) {
+                throw new TimeoutException("xMsg-Error: no response for time_out = " + t);
+            }
+            msg.getMetaData().setReplyTo(xMsgConstants.UNDEFINED.getStringValue());
+            return cb.recvMsg;
+        }
+        return null;
+    }
+
+    /**
+     * @param connection
+     * @param callback
+     * @param callbackMsg
+     * @throws xMsgException
+     * @throws IOException
+     */
     private void callUserCallBack(final xMsgConnection connection,
                                   final xMsgCallBack callback,
                                   final xMsgMessage callbackMsg)
@@ -674,7 +1002,7 @@ public class xMsg {
         // Check if it is sync request
         // sync request
         String requester = callbackMsg.getMetaData().getReplyTo();
-        if (!requester.equals(xMsgConstants.UNDEFINED.toString())) {
+        if (!requester.equals(xMsgConstants.UNDEFINED.getStringValue())) {
             xMsgMessage rm = callback.callback(callbackMsg);
             if (rm != null) {
                 rm.setTopic(xMsgTopic.wrap(requester));
@@ -691,54 +1019,6 @@ public class xMsg {
         }
     }
 
-    /**
-     * <p>
-     *     Un-subscribes  subscription. This will stop
-     *     thread and perform xmq un-subscribe
-     * </p>
-     * @param handle SubscribeHandler object reference
-     * @throws xMsgException
-     */
-    public void unsubscribe(xMsgSubscription handle)
-            throws xMsgException {
-        handle.stop();
-    }
-
-    /**
-     * Returns the size of the internal thread pool for subscription callbacks.
-     */
-    public int getPoolSize() {
-        return threadPool.getPoolSize();
-    }
-
-    /**
-     * Change the size of the internal thread pool for subscription callbacks.
-     */
-    public void setPoolSize(int poolSize) {
-        threadPool.setCorePoolSize(poolSize);
-    }
-
-    /**
-     * Returns the registered local address.
-     */
-    public String getLocalAddress() {
-        return driver.getLocalAddress();
-    }
-
-    /**
-     * Returns the registered front-end address.
-     */
-    public String getFrontEndAddress() {
-        return driver.getFrontEndAddress();
-    }
-
-
-    /**
-     * Returns the given unique identifier.
-     */
-    public String getName() {
-        return myName;
-    }
 
     /**
      * Private inner class used to organize sync send/publish communications.

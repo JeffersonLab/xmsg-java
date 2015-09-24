@@ -71,7 +71,7 @@ message xMsgMeta {
 
     // ... Data section ...
     // Type of the data
-    optional string dataType = 14 [ default = "native"];
+    required string dataType = 14 [default = "native"];
 
     // description of the type, for e.g. If data
     // type = J_Object then this can be used to

@@ -25,7 +25,12 @@ import org.jlab.coda.xmsg.core.xMsgConstants;
 import org.jlab.coda.xmsg.core.xMsgUtil;
 
 /**
- * xMsg network address.
+ * <p>
+ *     xMsg network address.
+ * </p>
+ *
+ * @author gurjyan
+ * @version 2.x
  */
 public class xMsgAddress {
 
@@ -39,7 +44,7 @@ public class xMsgAddress {
      */
     public xMsgAddress(String hostAddress) {
         this.host = xMsgUtil.validateIP(hostAddress);
-        this.port = xMsgConstants.DEFAULT_PORT.toInteger();
+        this.port = xMsgConstants.DEFAULT_PORT.getIntValue();
     }
 
     /**

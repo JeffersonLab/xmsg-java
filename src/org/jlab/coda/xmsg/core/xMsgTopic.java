@@ -66,10 +66,13 @@ import java.util.StringTokenizer;
  * "A:B:1"}, {@code "A:B:2"}, etc, but will reject {@code "A"} or {@code "A:C"}.
  * Similarly, a subscription to {@code "A:B:1"} will only accept that exact
  * topic, rejecting {@code "A:B:2"}, {@code "A:C"}, {@code "A"}, etc.
+ *
+ * @author smancill
+ * @version 2.x
  */
 public final class xMsgTopic {
 
-    public static final String ANY = xMsgConstants.ANY.toString();
+    public static final String ANY = xMsgConstants.ANY.getStringValue();
     public static final String SEPARATOR = ":";
     private final String topic;
 

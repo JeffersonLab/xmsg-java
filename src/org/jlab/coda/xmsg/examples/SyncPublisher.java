@@ -1,12 +1,9 @@
 package org.jlab.coda.xmsg.examples;
 
 import org.jlab.coda.xmsg.core.xMsg;
-import org.jlab.coda.xmsg.core.xMsgMessage;
 import org.jlab.coda.xmsg.core.xMsgTopic;
 import org.jlab.coda.xmsg.core.xMsgUtil;
-import org.jlab.coda.xmsg.data.xMsgD.xMsgData;
 import org.jlab.coda.xmsg.excp.xMsgException;
-import org.jlab.coda.xmsg.net.xMsgConnection;
 
 import java.io.IOException;
 import java.util.concurrent.TimeoutException;
@@ -14,7 +11,7 @@ import java.util.concurrent.TimeoutException;
 public class SyncPublisher extends xMsg {
 
     public SyncPublisher() throws IOException {
-        super("test_sync_publisher", "localhost");
+        super("test_sync_publisher");
     }
 
     public static void main(String[] args) {
@@ -26,34 +23,23 @@ public class SyncPublisher extends xMsg {
 
             SyncPublisher publisher = new SyncPublisher();
 
-            xMsgConnection con =  publisher.connect();
             xMsgTopic topic = xMsgTopic.build(domain, subject, type);
 
-            publisher.registerPublisher(topic, description);
+            publisher.registerAsPublisher(topic, description);
 
-            xMsgMessage msg = new xMsgMessage(topic);
-            setData(msg, 111);
             int counter = 1;
             while (true) {
                 System.out.println("Publishing " + counter);
                 long t1 = System.nanoTime();
-                Object recData = publisher.syncPublish(con, msg, 5);
+                Object recData = publisher.syncPublish(topic, 111, 5);
                 long t2 = System.nanoTime();
                 long delta = (t2 - t1) / 1000000L;
                 System.out.printf("Received response = %s in %d ms%n", recData, delta);
                 counter++;
-                setData(msg, counter);
                 xMsgUtil.sleep(2000);
             }
         } catch (xMsgException | TimeoutException | IOException e) {
             e.printStackTrace();
         }
-    }
-
-
-    private static void setData(xMsgMessage msg, int value) {
-        xMsgData.Builder b = xMsgData.newBuilder();
-        b.setFLSINT32(value);
-        msg.setData(b.build());
     }
 }

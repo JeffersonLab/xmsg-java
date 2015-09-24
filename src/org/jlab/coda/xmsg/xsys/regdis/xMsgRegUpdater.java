@@ -57,9 +57,6 @@ public class xMsgRegUpdater implements Runnable {
      * @param driver the registration driver
      * @param publishers reference to the xMsgNode publishers database
      * @param subscribers reference to the xMsgNode subscribers database
-     * @throws SocketException
-     * @throws xMsgException
-     * @throws IOException
      */
     public xMsgRegUpdater(xMsgRegDriver driver,
                           xMsgRegDatabase publishers,
@@ -67,7 +64,7 @@ public class xMsgRegUpdater implements Runnable {
         this.driver = driver;
         this.publishers = publishers;
         this.subscribers = subscribers;
-        this.name = driver.getLocalAddress() + "_registration_updater";
+        this.name = driver.getAddress() + "_registration_updater";
     }
 
     @Override
@@ -79,7 +76,7 @@ public class xMsgRegUpdater implements Runnable {
             for (xMsgTopic key : publishers.topics()) {
                 try {
                     for (xMsgRegistration r : publishers.get(key)) {
-                        driver.registerFrontEnd(name, r, true);
+                        driver.register(r, true);
                         xMsgUtil.sleep(500);
                     }
                 } catch (xMsgRegistrationException e) {
@@ -91,7 +88,7 @@ public class xMsgRegUpdater implements Runnable {
             for (xMsgTopic key : subscribers.topics()) {
                 try {
                     for (xMsgRegistration r : subscribers.get(key)) {
-                        driver.registerFrontEnd(name, r, false);
+                        driver.register(r, false);
                         xMsgUtil.sleep(500);
                     }
                 } catch (xMsgRegistrationException e) {

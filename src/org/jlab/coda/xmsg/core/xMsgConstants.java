@@ -29,9 +29,9 @@ package org.jlab.coda.xmsg.core;
  */
 public enum xMsgConstants {
 
-    UNDEFINED(0, "undefined"),
-    SUCCESS(1, "success"),
-    ANY(2, "*"),
+    UNDEFINED(20, "undefined"),
+    SUCCESS(21, "success"),
+    ANY(22, "*"),
 
     REGISTRAR(3, "xMsg_Registrar"),
 
@@ -59,8 +59,10 @@ public enum xMsgConstants {
     BIND(17, "bind"),
     CONNECT(18, "connect"),
 
-    DEFAULT_PORT(7771, "defaultPort"),
-    REGISTRAR_PORT(8888, "registrarPort");
+    DEFAULT_PORT(7771, "proxyPort"),
+    REGISTRAR_PORT(8888, "registrarPort"),
+
+    DEFAULT_POOL_SIZE(2, "defaultPoolSize");
 
     private final int intValue;
     private final String stringValue;
@@ -70,12 +72,11 @@ public enum xMsgConstants {
         this.stringValue = stringValue;
     }
 
-    public int toInteger() {
+    public int getIntValue() {
         return intValue;
     }
 
-    @Override
-    public String toString() {
+    public String getStringValue() {
         return stringValue;
     }
 }

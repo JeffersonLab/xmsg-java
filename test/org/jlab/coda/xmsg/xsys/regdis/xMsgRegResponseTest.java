@@ -21,10 +21,6 @@
 
 package org.jlab.coda.xmsg.xsys.regdis;
 
-import java.util.Arrays;
-import java.util.HashSet;
-import java.util.Set;
-
 import org.jlab.coda.xmsg.core.xMsgConstants;
 import org.jlab.coda.xmsg.data.xMsgR.xMsgRegistration;
 import org.jlab.coda.xmsg.excp.xMsgRegistrationException;
@@ -34,19 +30,21 @@ import org.junit.Test;
 import org.junit.rules.ExpectedException;
 import org.zeromq.ZMsg;
 
-import static org.jlab.coda.xmsg.xsys.regdis.RegistrationDataFactory.newRegistration;
+import java.util.Arrays;
+import java.util.HashSet;
+import java.util.Set;
+
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.empty;
 import static org.hamcrest.Matchers.is;
+import static org.jlab.coda.xmsg.xsys.regdis.RegistrationDataFactory.newRegistration;
 
 public class xMsgRegResponseTest {
 
-    private xMsgRegistration.Builder data1;
-    private xMsgRegistration.Builder data2;
-
     @Rule
     public ExpectedException expectedEx = ExpectedException.none();
-
+    private xMsgRegistration.Builder data1;
+    private xMsgRegistration.Builder data2;
 
     @Before
     public void setup() {
@@ -62,7 +60,7 @@ public class xMsgRegResponseTest {
 
         assertThat(recvResponse.topic(), is("foo:bar"));
         assertThat(recvResponse.sender(), is("registration_fe"));
-        assertThat(recvResponse.status(), is(xMsgConstants.SUCCESS.toString()));
+        assertThat(recvResponse.status(), is(xMsgConstants.SUCCESS.getStringValue()));
         assertThat(recvResponse.data(), is(empty()));
     }
 
@@ -86,7 +84,7 @@ public class xMsgRegResponseTest {
 
         assertThat(recvResponse.topic(), is("foo:bar"));
         assertThat(recvResponse.sender(), is("registration_fe"));
-        assertThat(recvResponse.status(), is(xMsgConstants.SUCCESS.toString()));
+        assertThat(recvResponse.status(), is(xMsgConstants.SUCCESS.getStringValue()));
         assertThat(recvResponse.data(), is(data));
     }
 
@@ -108,7 +106,7 @@ public class xMsgRegResponseTest {
         ZMsg msg = new ZMsg();
         msg.addString("foo:bar");
         msg.addString("foo_service");
-        msg.addString(xMsgConstants.SUCCESS.toString());
+        msg.addString(xMsgConstants.SUCCESS.getStringValue());
         msg.add(data2.build().toByteArray());
         msg.add(Arrays.copyOf(bb, bb.length - 10));
 

@@ -21,10 +21,6 @@
 
 package org.jlab.coda.xmsg.xsys.regdis;
 
-import java.util.Arrays;
-import java.util.HashSet;
-import java.util.Set;
-
 import org.jlab.coda.xmsg.core.xMsgConstants;
 import org.jlab.coda.xmsg.data.xMsgR.xMsgRegistration;
 import org.jlab.coda.xmsg.data.xMsgR.xMsgRegistration.Builder;
@@ -34,14 +30,13 @@ import org.zeromq.ZContext;
 import org.zeromq.ZMQ;
 import org.zeromq.ZMQ.Socket;
 
-import static org.mockito.Mockito.any;
-import static org.mockito.Mockito.anyInt;
-import static org.mockito.Mockito.doReturn;
-import static org.mockito.Mockito.spy;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
+import java.util.Arrays;
+import java.util.HashSet;
+import java.util.Set;
+
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.is;
+import static org.mockito.Mockito.*;
 
 public class xMsgRegDriverTest {
 
@@ -60,7 +55,7 @@ public class xMsgRegDriverTest {
         publisher = xMsgRegistration.newBuilder();
         publisher.setName("bradbury_pub");
         publisher.setHost("localhost");
-        publisher.setPort(xMsgConstants.DEFAULT_PORT.toInteger());
+        publisher.setPort(xMsgConstants.DEFAULT_PORT.getIntValue());
         publisher.setDomain("writer");
         publisher.setSubject("scifi");
         publisher.setType("books");
@@ -70,7 +65,7 @@ public class xMsgRegDriverTest {
         subscriber = xMsgRegistration.newBuilder();
         subscriber.setName("bradbury_sub");
         subscriber.setHost("localhost");
-        subscriber.setPort(xMsgConstants.DEFAULT_PORT.toInteger());
+        subscriber.setPort(xMsgConstants.DEFAULT_PORT.getIntValue());
         subscriber.setDomain("writer");
         subscriber.setSubject("scifi");
         subscriber.setType("books");
@@ -268,16 +263,16 @@ public class xMsgRegDriverTest {
     private void assertRequest(String name, xMsgRegistration data, Socket socket,
                                xMsgConstants topic, xMsgConstants timeout)
             throws Exception {
-        xMsgRegRequest request = new xMsgRegRequest(topic.toString(), name, data);
-        verify(driver).request(socket, request, timeout.toInteger());
+        xMsgRegRequest request = new xMsgRegRequest(topic.getStringValue(), name, data);
+        verify(driver).request(socket, request, timeout.getIntValue());
     }
 
 
     private void assertRequest(String name, String data, Socket socket,
                                xMsgConstants topic, xMsgConstants timeout)
             throws Exception {
-        xMsgRegRequest request = new xMsgRegRequest(topic.toString(), name, data);
-        verify(driver).request(socket, request, timeout.toInteger());
+        xMsgRegRequest request = new xMsgRegRequest(topic.getStringValue(), name, data);
+        verify(driver).request(socket, request, timeout.getIntValue());
     }
 
 

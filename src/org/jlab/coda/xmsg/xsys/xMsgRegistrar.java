@@ -32,7 +32,7 @@ import java.io.IOException;
  * Note that no arg constructed object can play master registrar role.
  *
  * @author gurjyan
- * @since 1.0
+ * @since 2.x
  */
 public class xMsgRegistrar {
 
@@ -46,8 +46,6 @@ public class xMsgRegistrar {
      * {@link org.jlab.coda.xmsg.core.xMsgConstants#REGISTRAR_PORT}
      * @throws IOException
      *
-     * @throws SocketException
-     * @throws xMsgException
      */
     public xMsgRegistrar() throws IOException {
 
@@ -76,7 +74,6 @@ public class xMsgRegistrar {
      * @param feHost xMsg front-end host. Host is passed through command line -h option,
      *               or through the environmental variable: XMSG_FE_HOST
      * @throws IOException
-     * @throws xMsgException
      */
     public xMsgRegistrar(final String feHost) throws IOException {
 
@@ -90,23 +87,6 @@ public class xMsgRegistrar {
         xMsgRegService regService = new xMsgRegService(shadowContext, feHost);
         regServiceThread = xMsgUtil.newThread("registration-service", regService);
     }
-
-
-    public void start() {
-        regServiceThread.start();
-    }
-
-
-    public void shutdown() {
-        try {
-            context.destroy();
-            regServiceThread.interrupt();
-            regServiceThread.join();
-        } catch (InterruptedException e) {
-            e.printStackTrace();
-        }
-    }
-
 
     public static void main(String[] args) {
         try {
@@ -145,6 +125,20 @@ public class xMsgRegistrar {
             System.out.println(e.getMessage());
             System.out.println("exiting...");
             System.exit(1);
+        }
+    }
+
+    public void start() {
+        regServiceThread.start();
+    }
+
+    public void shutdown() {
+        try {
+            context.destroy();
+            regServiceThread.interrupt();
+            regServiceThread.join();
+        } catch (InterruptedException e) {
+            e.printStackTrace();
         }
     }
 }

@@ -29,13 +29,13 @@ import org.zeromq.ZMQ.Socket;
  * subscribing xMsg messages respectfully.
  *
  * @author gurjyan
- * @since 1.0
+ * @since 2.x
  */
 public class xMsgConnection {
 
     private xMsgAddress address;
-    private Socket pubSock;
-    private Socket subSock;
+    private Socket pubSock = null;
+    private Socket subSock = null;
 
 
     public xMsgAddress getAddress() {

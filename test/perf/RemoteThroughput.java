@@ -1,13 +1,13 @@
 package perf;
 
-import java.io.IOException;
-
 import org.jlab.coda.xmsg.core.xMsg;
 import org.jlab.coda.xmsg.core.xMsgMessage;
 import org.jlab.coda.xmsg.core.xMsgTopic;
 import org.jlab.coda.xmsg.core.xMsgUtil;
 import org.jlab.coda.xmsg.excp.xMsgException;
 import org.jlab.coda.xmsg.net.xMsgConnection;
+
+import java.io.IOException;
 
 public final class RemoteThroughput {
 
@@ -38,7 +38,7 @@ public final class RemoteThroughput {
                 publisher.publish(connection, msg);
             }
 
-            publisher.destroy();
+            publisher.destruct();
 
         } catch (IOException | xMsgException e) {
             e.printStackTrace();

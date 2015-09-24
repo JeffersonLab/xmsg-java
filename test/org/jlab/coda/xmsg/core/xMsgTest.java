@@ -31,10 +31,7 @@ import org.zeromq.ZContext;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.is;
-import static org.mockito.Mockito.eq;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
+import static org.mockito.Mockito.*;
 
 public class xMsgTest {
 
@@ -55,7 +52,7 @@ public class xMsgTest {
     public void registerPublisher() throws Exception {
         xMsgTopic topic = xMsgTopic.wrap("writer:scifi:book");
 
-        core.registerPublisher(topic, "test pub");
+        core.registerAsPublisher(topic, "test pub");
 
         RegValidator validator = new RegValidator(topic, true);
         validator.desc = "test pub";
@@ -198,7 +195,7 @@ public class xMsgTest {
         public RegValidator(xMsgTopic topic, boolean isPublisher)
                 throws Exception {
             this.host = xMsgUtil.toHostAddress("localhost");
-            this.port = xMsgConstants.DEFAULT_PORT.toInteger();
+            this.port = xMsgConstants.DEFAULT_PORT.getIntValue();
             this.topic = topic;
             this.desc = "";
 

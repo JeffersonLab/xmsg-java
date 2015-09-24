@@ -46,19 +46,16 @@ import java.util.Set;
  */
 public class xMsgRegDriver {
 
+    /** 0MQ context.*/
+    private final ZContext _context;
+    /** Registrar service host IP.*/
+    private final String _registrarIp;
     /**
      * Registrar service server (req/rep) connection socket.
      */
-    private final Socket _connectionSocket;
-
-    /** 0MQ context.*/
-    private final ZContext _context;
-
-    /** Registrar service host IP.*/
-    private final String _registrarIp;
-
+    private Socket _connectionSocket = null;
     /** Registrar service listening port.*/
-    private int _registrarPort = xMsgConstants.REGISTRAR_PORT.toInteger();
+    private int _registrarPort = xMsgConstants.REGISTRAR_PORT.getIntValue();
 
     /** Registrar service connection address */
     private String _address;
@@ -77,8 +74,6 @@ public class xMsgRegDriver {
         _registrarIp = xMsgUtil.validateIP(ip);
         _registrarPort = port;
         _address = "tcp://" + _registrarIp + ":" + _registrarPort;
-
-        _connectionSocket = connect();
     }
 
     /**
@@ -94,8 +89,18 @@ public class xMsgRegDriver {
         _context = context;
         _registrarIp = xMsgUtil.validateIP(ip);
         _address = "tcp://" + _registrarIp + ":" + _registrarPort;
+    }
 
-        _connectionSocket = connect();
+    /**
+     * <p>
+     * Defines if the 0MQ socket has been
+     * created to the registrar services.
+     * </p>
+     *
+     * @return true if connection socket is made
+     */
+    public boolean isConnected() {
+        return _connectionSocket!=null;
     }
 
     /**
@@ -103,13 +108,22 @@ public class xMsgRegDriver {
      *     Creates and returns 0MQ socket to the Registrar service
      * </p>
      *
-     * @return 0MQ socket {@link org.zeromq.ZMQ.Socket}
      */
-    private Socket connect() {
-        Socket sb = _context.createSocket(ZMQ.REQ);
-        sb.setHWM(0);
-        sb.connect(_address);
-        return sb;
+    public void connect() {
+        _connectionSocket = _context.createSocket(ZMQ.REQ);
+        _connectionSocket.setHWM(0);
+        _connectionSocket.connect(_address);
+    }
+
+    /**
+     * <p>
+     *     Disconnects from the registrar
+     *     service and closes 0MQ socket.
+     * </p>
+     */
+    public void disconnect() {
+        _connectionSocket.disconnect(_address);
+        _connectionSocket.close();
     }
 
     /**
@@ -197,7 +211,7 @@ public class xMsgRegDriver {
             try {
                 xMsgRegResponse response = new xMsgRegResponse(responseMsg);
                 String status = response.status();
-                if (!status.equals(xMsgConstants.SUCCESS.toString())) {
+                if (!status.equals(xMsgConstants.SUCCESS.getStringValue())) {
                     throw new xMsgRegistrationException(status);
                 }
                 return response;
@@ -242,9 +256,9 @@ public class xMsgRegDriver {
 
         _validateData(data);
 
-        String topic = isPublisher ? xMsgConstants.REGISTER_PUBLISHER.toString() :
-                xMsgConstants.REGISTER_SUBSCRIBER.toString();
-        int timeout = xMsgConstants.REGISTER_REQUEST_TIMEOUT.toInteger();
+        String topic = isPublisher ? xMsgConstants.REGISTER_PUBLISHER.getStringValue() :
+                xMsgConstants.REGISTER_SUBSCRIBER.getStringValue();
+        int timeout = xMsgConstants.REGISTER_REQUEST_TIMEOUT.getIntValue();
 
         xMsgRegRequest request = new xMsgRegRequest(topic, data.getName(), data);
         request(_connectionSocket, request, timeout);
@@ -269,9 +283,9 @@ public class xMsgRegDriver {
 
         _validateData(data);
 
-        String topic = isPublisher ? xMsgConstants.REMOVE_PUBLISHER.toString() :
-                xMsgConstants.REMOVE_SUBSCRIBER.toString();
-        int timeout = xMsgConstants.REMOVE_REQUEST_TIMEOUT.toInteger();
+        String topic = isPublisher ? xMsgConstants.REMOVE_PUBLISHER.getStringValue() :
+                xMsgConstants.REMOVE_SUBSCRIBER.getStringValue();
+        int timeout = xMsgConstants.REMOVE_REQUEST_TIMEOUT.getIntValue();
 
         xMsgRegRequest request = new xMsgRegRequest(topic, data.getName(), data);
         request(_connectionSocket, request, timeout);
@@ -291,8 +305,8 @@ public class xMsgRegDriver {
     public void removeAll()
             throws xMsgRegistrationException {
 
-        String topic = xMsgConstants.REMOVE_ALL_REGISTRATION.toString();
-        int timeout = xMsgConstants.REMOVE_REQUEST_TIMEOUT.toInteger();
+        String topic = xMsgConstants.REMOVE_ALL_REGISTRATION.getStringValue();
+        int timeout = xMsgConstants.REMOVE_REQUEST_TIMEOUT.getIntValue();
 
         xMsgRegRequest request = new xMsgRegRequest(topic, "anonymous", _registrarIp);
         request(_connectionSocket, request, timeout);
@@ -319,23 +333,13 @@ public class xMsgRegDriver {
 
         _validateData(data);
 
-        String topic = isPublisher ? xMsgConstants.FIND_PUBLISHER.toString() :
-                xMsgConstants.FIND_SUBSCRIBER.toString();
-        int timeout = xMsgConstants.FIND_REQUEST_TIMEOUT.toInteger();
+        String topic = isPublisher ? xMsgConstants.FIND_PUBLISHER.getStringValue() :
+                xMsgConstants.FIND_SUBSCRIBER.getStringValue();
+        int timeout = xMsgConstants.FIND_REQUEST_TIMEOUT.getIntValue();
 
         xMsgRegRequest request = new xMsgRegRequest(topic, data.getName(), data);
         xMsgRegResponse response = request(_connectionSocket, request, timeout);
         return response.data();
     }
 
-    /**
-     * <p>
-     *     Closes disconnects from the registrar
-     *     service and closes 0MQ socket.
-     * </p>
-     */
-    public void disconnect() {
-        _connectionSocket.disconnect(_address);
-        _connectionSocket.close();
-    }
 }

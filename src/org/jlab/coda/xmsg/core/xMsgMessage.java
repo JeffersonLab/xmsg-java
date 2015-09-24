@@ -28,6 +28,9 @@ import org.jlab.coda.xmsg.excp.xMsgException;
 import org.zeromq.ZFrame;
 import org.zeromq.ZMsg;
 
+import java.io.IOException;
+import java.util.Arrays;
+
 /**
  * Defines a message to be passed through 0MQ.
  *
@@ -43,7 +46,6 @@ import org.zeromq.ZMsg;
  *
  * @author gurjyan
  * @version 2.x
- * @since 11/5/14
  */
 public class xMsgMessage {
 
@@ -51,80 +53,52 @@ public class xMsgMessage {
     private xMsgMeta.Builder metaData;
     private byte[] data;
 
+
     /**
-     * Constructs a message with empty data.
      *
-     * @param topic the topic of the message
+     * @param topic
+     * @param metaData
+     * @param data
+     * @throws IOException
      */
-    public xMsgMessage(xMsgTopic topic) {
-        this.topic = topic;
-        this.metaData = xMsgMeta.newBuilder();
+    public xMsgMessage(xMsgTopic topic, xMsgMeta.Builder metaData, Object data) throws IOException {
+        _construct(topic, metaData, data);
     }
 
     /**
-     * Constructs a message with full metadata and native xMsg data.
-     * Use {@link xMsgData} as a helper to send a message with primitive data
-     * that can be read by any xMsg implementation natively.
-     * This data will be serialized and then stored in the message.
      *
-     * @param topic the topic of the message
-     * @param metaData the full metadata of the message
-     * @param data the native data of the message
+     * @param topic
+     * @param mimeType
+     * @param data
+     * @throws xMsgException
+     * @throws IOException
      */
-    public xMsgMessage(xMsgTopic topic, xMsgMeta.Builder metaData, xMsgData data) {
-        this.topic = topic;
-        this.metaData = metaData;
-        this.data = data.toByteArray();
+    public xMsgMessage(xMsgTopic topic, String mimeType, Object data) throws xMsgException, IOException {
+        xMsgMeta.Builder md = xMsgMeta.newBuilder();
+        md.setDataType(mimeType);
+        _construct(topic, md, data);
     }
 
     /**
-     * Constructs a message with only raw data and default metadata.
-     * The mime-type of the data.
      *
-     * @param topic the topic of the message
-     * @param mimeType the mime-type of the data
-     * @param data the raw data of the message
+     * @param topic
+     * @param data
+     * @throws xMsgException
+     * @throws IOException
      */
-    public xMsgMessage(xMsgTopic topic, String mimeType, byte[] data) {
-        this.metaData = xMsgMeta.newBuilder();
-        this.metaData.setDataType(mimeType);
-        this.data = data;
+    public xMsgMessage(xMsgTopic topic, Object data) throws xMsgException, IOException {
+        this(topic, "binary/bytes", data);
     }
 
     /**
-     * Constructs a message with full metadata and raw data.
-     *
-     * @param topic the topic of the message
-     * @param metaData the full metadata of the message
-     * @param data the raw data of the message
-     */
-    public xMsgMessage(xMsgTopic topic, xMsgMeta.Builder metaData, byte[] data) {
-        this.topic = topic;
-        this.metaData = metaData;
-        this.data = data;
-    }
-
-
-    /**
-     * Constructs a message with string data.
-     *
-     * @param topic the topic of the message
-     * @param text the data of the message
-     */
-    public xMsgMessage(xMsgTopic topic, String text) {
-        this.topic = topic;
-        this.metaData = xMsgMeta.newBuilder();
-        this.metaData.setDataType("text/string");
-        this.data = text.getBytes();
-    }
-
-
-    /**
-     * Deserializes a received message.
+     * <p>
+     *     Create xMsgMessage off the wire, i.e.
+     *     de-serializes the received ZMsg message
+     * </p>
      *
      * @param msg the received ZMQ message
      */
-    xMsgMessage(ZMsg msg) throws xMsgException {
+    public xMsgMessage(ZMsg msg) throws xMsgException {
         ZFrame topicFrame = msg.pop();
         ZFrame metaDataFrame = msg.pop();
         ZFrame dataFrame = msg.pop();
@@ -144,11 +118,14 @@ public class xMsgMessage {
     }
 
     /**
-     * Serializes this message into a ZMQ message.
+     * <p>
+     *    Serializes this message into a ZMsg message,
+     *    to send it over the wire.
+     * </p>
      *
-     * @return the ZMQ raw multi-part message
+     * @return the ZMsg raw multi-part message
      */
-    ZMsg serialize() {
+    public ZMsg serialize() {
         ZMsg msg = new ZMsg();
         msg.add(topic.toString());
         msg.add(metaData.build().toByteArray());
@@ -156,89 +133,123 @@ public class xMsgMessage {
         return msg;
     }
 
-    /**
-     * Returns the topic of this message.
-     */
-    public xMsgTopic getTopic() {
-        return topic;
-    }
 
     /**
-     * Sets the topic of this message.
      *
-     * @param topic the topic
-     */
-    public void setTopic(xMsgTopic topic) {
-        this.topic = topic;
-    }
-
-    /**
-     * Returns the metadata of this message.
-     */
-    public xMsgMeta.Builder getMetaData() {
-        return metaData;
-    }
-
-    /**
-     * Sets the metadata of this message.
-     * This will overwrite any mime-type already set.
-     *
-     * @param metaData the metatada
-     */
-    public void setMetaData(xMsgMeta.Builder metaData) {
-        this.metaData.mergeFrom(metaData.build());
-    }
-
-    /**
-     * Returns the mime-type of the message data.
-     */
-    public String getMimeType() {
-        return metaData.getDataType();
-    }
-
-    /**
-     * Returns the message data.
-     */
-    public byte[] getData() {
-        return data;
-    }
-
-    /**
-     * Sets the message data.
-     * This data will be serialized and then stored in the message.
-     *
-     * @param data the native data of the message
-     */
-    public void setData(xMsgData data) {
-        this.metaData.setDataType("native");
-        this.data = data.toByteArray();
-    }
-
-    /**
-     * Sets an string as the message data.
-     *
-     * @param text the data of the message
-     */
-    public void setData(String text) {
-        this.metaData.setDataType("text/string");
-        this.data = text.getBytes();
-    }
-
-    /**
-     * Returns the size of the message data.
+     * @return
      */
     public int getDataSize() {
         return data != null ? data.length : 0;
     }
 
     /**
-     * Sets the message data.
-     *
-     * @param mimeType the mime-type of the data
-     * @param data     the raw data of the message
+     * @return
      */
-    public void setData(String mimeType, byte[] data) {
-        this.metaData.setDataType(mimeType);
-        this.data = data;
+    public xMsgTopic getTopic() {
+        return topic;
     }
+
+    /**
+     *
+     * @param topic
+     */
+    public void setTopic(xMsgTopic topic) {
+        this.topic = topic;
+    }
+
+    /**
+     *
+     * @return
+     */
+    public xMsgMeta.Builder getMetaData() {
+        return metaData;
+    }
+
+    /**
+     *
+     * @param metaData
+     */
+    public void setMetaData(xMsgMeta.Builder metaData) {
+        this.metaData = metaData;
+    }
+
+    /**
+     *
+     * @return
+     */
+    public byte[] getData() {
+        return data;
+    }
+
+    /**
+     *
+     * @param topic
+     * @param metaData
+     * @param data
+     * @throws IOException
+     */
+    private void _construct(xMsgTopic topic, xMsgMeta.Builder metaData, Object data) throws IOException {
+        this.topic = topic;
+        byte[] ba = null;
+
+        String mimeType = metaData.getDataType();
+
+        xMsgData.Builder xd = xMsgData.newBuilder();
+
+        // define the data mime-type
+        if (data instanceof Integer) {
+            mimeType = "binary/sfixed32";
+            xd.setFLSINT32((Integer) data);
+
+        } else if (data instanceof Long) {
+            mimeType = "binary/sfixed64";
+            xd.setFLSINT64((Long) data);
+
+        } else if (data instanceof Float) {
+            mimeType = "binary/float";
+            xd.setFLOAT((Float) data);
+
+        } else if (data instanceof Double) {
+            mimeType = "binary/double";
+            xd.setDOUBLE((Double) data);
+
+        } else if (data instanceof String) {
+            mimeType = "binary/string";
+            xd.setSTRING((String) data);
+
+        } else if (data instanceof Integer[]) {
+            mimeType = "binary/array-sfixed32";
+            xd.addAllFLSINT32A(Arrays.asList((Integer[]) data));
+
+        } else if (data instanceof Long[]) {
+            mimeType = "binary/array-sfixed64";
+            xd.addAllFLSINT64A(Arrays.asList((Long[]) data));
+
+        } else if (data instanceof Float[]) {
+            mimeType = "binary/array-float";
+            xd.addAllFLOATA(Arrays.asList((Float[]) data));
+
+        } else if (data instanceof Double[]) {
+            mimeType = "binary/array-double";
+            xd.addAllDOUBLEA(Arrays.asList((Double[]) data));
+
+        } else if (data instanceof String[]) {
+            mimeType = "binary/array-string";
+            xd.addAllSTRINGA(Arrays.asList((String[]) data));
+
+        } else if (data instanceof byte[]) {
+            ba = (byte[]) data;
+        } else {
+            ba = xMsgUtil.serializeToBytes(data);
+        }
+
+        metaData.setDataType(mimeType);
+        this.metaData = metaData;
+        if (ba != null) {
+            this.data = ba;
+        } else {
+            this.data = xd.build().toByteArray();
+        }
+    }
+
 }

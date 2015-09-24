@@ -43,30 +43,6 @@ message xMsgData {
     repeated string STRINGA = 15; // array of UTF-8 encoded or 7-bit ASCII strings
     repeated bytes BYTESA = 16; // array of arbitrary sequence of bytes
 
-    optional Type type = 17;
-
-    // Data sub-type
-    enum Type {
-        T_VLSINT32 = 1;   // variable length signed int32
-        T_VLSINT64 = 2;   // variable length signed int64
-        T_FLSINT32 = 3;   // fixed length signed int32
-        T_FLSINT64 = 4;   // fixed length signed int64
-        T_FLOAT = 5;
-        T_DOUBLE = 6;
-        T_STRING = 7;     // contains UTF-8 encoding or 7-bit ASCII text
-        T_BYTES = 8;      // contains arbitrary sequence of bytes
-
-        T_VLSINT32A = 9;  // array of variable length signed int32s
-        T_VLSINT64A = 10; // array of variable length signed int64s
-        T_FLSINT32A = 11; // array of fixed length signed int32s
-        T_FLSINT64A = 12; // array of fixed length signed int64s
-        T_FLOATA = 13;    // array of floats
-        T_DOUBLEA = 14;   // array of doubles
-        T_STRINGA = 15;   // array of UTF-8 encoded or 7-bit ASCII strings
-        T_BYTESA = 16;    // array of arbitrary sequence of bytes
-
-        T_PAYLOAD = 17;    // payload data type
-    }
 }
 
 //... Payload class ...

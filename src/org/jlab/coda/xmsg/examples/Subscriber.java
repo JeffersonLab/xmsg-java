@@ -21,17 +21,11 @@
 
 package org.jlab.coda.xmsg.examples;
 
-import org.jlab.coda.xmsg.core.xMsg;
-import org.jlab.coda.xmsg.core.xMsgCallBack;
-import org.jlab.coda.xmsg.core.xMsgConstants;
-import org.jlab.coda.xmsg.core.xMsgMessage;
-import org.jlab.coda.xmsg.core.xMsgTopic;
-import org.jlab.coda.xmsg.core.xMsgUtil;
+import com.google.protobuf.InvalidProtocolBufferException;
+import org.jlab.coda.xmsg.core.*;
 import org.jlab.coda.xmsg.data.xMsgD.xMsgData;
 import org.jlab.coda.xmsg.excp.xMsgException;
 import org.jlab.coda.xmsg.net.xMsgConnection;
-
-import com.google.protobuf.InvalidProtocolBufferException;
 
 import java.io.IOException;
 
@@ -48,7 +42,7 @@ public class Subscriber extends xMsg {
     private MyCallBack callback;
 
     public Subscriber() throws IOException {
-        super("test_subscriber", "localhost");
+        super("test_subscriber");
         callback = new MyCallBack();
     }
 
@@ -61,17 +55,14 @@ public class Subscriber extends xMsg {
 
             Subscriber subscriber = new Subscriber();
 
-            // Create the connection to the local xMsg node
-            con = subscriber.connect();
-
             // Create the topic
             xMsgTopic topic = xMsgTopic.build(domain, subject, type);
 
             // Register this subscriber
-            subscriber.registerSubscriber(topic, description);
+            subscriber.registerAsSubscriber(topic, description);
 
             // Subscribe by passing a callback to the subscription
-            subscriber.subscribe(con, topic, subscriber.callback);
+            subscriber.subscribe(topic, subscriber.callback);
 
             xMsgUtil.keepAlive();
         } catch (xMsgException | IOException e) {
@@ -84,8 +75,6 @@ public class Subscriber extends xMsg {
             publish(con, msg);
         } catch (xMsgException e) {
             e.printStackTrace();
-        } catch (IOException e) {
-            e.printStackTrace();
         }
     }
 
@@ -97,7 +86,7 @@ public class Subscriber extends xMsg {
 
         @Override
         public xMsgMessage callback(xMsgMessage msg) {
-            if (msg.getMetaData().getReplyTo().equals(xMsgConstants.UNDEFINED.toString())) {
+            if (msg.getMetaData().getReplyTo().equals(xMsgConstants.UNDEFINED.getStringValue())) {
                 parseData(msg);
                 if (nr == 0) {
                     t1 = System.currentTimeMillis();

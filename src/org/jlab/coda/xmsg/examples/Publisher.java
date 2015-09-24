@@ -22,10 +22,8 @@
 package org.jlab.coda.xmsg.examples;
 
 import org.jlab.coda.xmsg.core.xMsg;
-import org.jlab.coda.xmsg.core.xMsgMessage;
 import org.jlab.coda.xmsg.core.xMsgTopic;
 import org.jlab.coda.xmsg.excp.xMsgException;
-import org.jlab.coda.xmsg.net.xMsgConnection;
 
 import java.io.IOException;
 
@@ -47,10 +45,9 @@ public class Publisher extends xMsg {
      * Thus, an xMsg node must be running in the localhost.
      * @throws IOException
      *
-     * @throws xMsgException
      */
     public Publisher() throws IOException {
-        super("test_publisher", "localhost");
+        super("test_publisher");
     }
 
     public static void main(String[] args) {
@@ -69,26 +66,19 @@ public class Publisher extends xMsg {
 
             Publisher publisher = new Publisher();
 
-            // Create a connection to the local xMsg node
-            xMsgConnection con = publisher.connect();
-
             // Create the topic
             xMsgTopic topic = xMsgTopic.build(domain, subject, type);
 
             // Register this publisher
-            publisher.registerPublisher(topic, description);
-
-            // Create the message to be published
-            xMsgMessage msg = new xMsgMessage(topic);
+            publisher.registerAsPublisher(topic, description);
 
             // Fill data with a byte array the required size
             System.out.println("Byte array size = " + dataSize);
             byte[] b = new byte[dataSize];
-            msg.setData("data/binary", b);
 
             // Publish data for ever...
             while (true) {
-                publisher.publish(con, msg);
+                publisher.publish(topic, b);
             }
 
         } catch (xMsgException | IOException e) {

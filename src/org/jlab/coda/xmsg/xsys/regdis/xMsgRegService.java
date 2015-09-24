@@ -68,10 +68,10 @@ public class xMsgRegService implements Runnable {
     private final xMsgRegDatabase subscribers = new xMsgRegDatabase();
 
     // Registrar accepted requests from any host (*)
-    private final String host = xMsgConstants.ANY.toString();
+    private final String host = xMsgConstants.ANY.getStringValue();
 
     // Default port of the registrar
-    private final int port = xMsgConstants.REGISTRAR_PORT.toInteger();
+    private final int port = xMsgConstants.REGISTRAR_PORT.getIntValue();
 
     // Used as a prefix to the name of this registrar.
     // The name of the registrar is used to set the sender field
@@ -117,7 +117,7 @@ public class xMsgRegService implements Runnable {
          * Start a thread with periodic process (hard-coded 5 sec. interval) that
          * updates xMsgFE database with the data stored in the local databases.
          */
-        xMsgRegDriver driver = new xMsgRegDriver(localhost, feHost);
+        xMsgRegDriver driver = new xMsgRegDriver(context, feHost);
         xMsgRegUpdater updater = new xMsgRegUpdater(driver, publishers, subscribers);
         Thread t = xMsgUtil.newThread("registration-updater", updater);
         t.start();
@@ -156,8 +156,8 @@ public class xMsgRegService implements Runnable {
 
 
     ZMsg processRequest(ZMsg requestMsg) {
-        String topic = xMsgConstants.UNDEFINED.toString();
-        String sender = localhost + ":" + xMsgConstants.REGISTRAR.toString();
+        String topic = xMsgConstants.UNDEFINED.getStringValue();
+        String sender = localhost + ":" + xMsgConstants.REGISTRAR.getStringValue();
 
         xMsgRegResponse reply;
 
@@ -166,29 +166,29 @@ public class xMsgRegService implements Runnable {
             xMsgRegRequest request = new xMsgRegRequest(requestMsg);
             topic = request.topic();
 
-            if (topic.equals(xMsgConstants.REGISTER_PUBLISHER.toString())) {
+            if (topic.equals(xMsgConstants.REGISTER_PUBLISHER.getStringValue())) {
                 publishers.register(request.data());
 
-            } else if (topic.equals(xMsgConstants.REGISTER_SUBSCRIBER.toString())) {
+            } else if (topic.equals(xMsgConstants.REGISTER_SUBSCRIBER.getStringValue())) {
                 subscribers.register(request.data());
 
-            } else if (topic.equals(xMsgConstants.REMOVE_PUBLISHER.toString())) {
+            } else if (topic.equals(xMsgConstants.REMOVE_PUBLISHER.getStringValue())) {
                 publishers.remove(request.data());
 
-            } else if (topic.equals(xMsgConstants.REMOVE_SUBSCRIBER.toString())) {
+            } else if (topic.equals(xMsgConstants.REMOVE_SUBSCRIBER.getStringValue())) {
                 subscribers.remove(request.data());
 
-            } else if (topic.equals(xMsgConstants.REMOVE_ALL_REGISTRATION.toString())) {
+            } else if (topic.equals(xMsgConstants.REMOVE_ALL_REGISTRATION.getStringValue())) {
                 publishers.remove(request.text());
                 subscribers.remove(request.text());
 
-            } else if (topic.equals(xMsgConstants.FIND_PUBLISHER.toString())) {
+            } else if (topic.equals(xMsgConstants.FIND_PUBLISHER.getStringValue())) {
                 xMsgRegistration data = request.data();
                 registration = publishers.find(data.getDomain(),
                                                data.getSubject(),
                                                data.getType());
 
-            } else if (topic.equals(xMsgConstants.FIND_SUBSCRIBER.toString())) {
+            } else if (topic.equals(xMsgConstants.FIND_SUBSCRIBER.getStringValue())) {
                 xMsgRegistration data = request.data();
                 registration = subscribers.find(data.getDomain(),
                                                 data.getSubject(),
