@@ -3,7 +3,6 @@ package perf;
 import org.jlab.coda.xmsg.core.*;
 import org.jlab.coda.xmsg.excp.xMsgException;
 import org.jlab.coda.xmsg.net.xMsgAddress;
-import org.jlab.coda.xmsg.net.xMsgConnection;
 
 import java.io.IOException;
 
@@ -31,15 +30,13 @@ public final class LocalThroughput {
         final Timer timer = new Timer();
 
         try {
-            final xMsg subscriber = new xMsg("throughput_subscriber");
+            final xMsg subscriber = new xMsg("throughput_subscriber", 1);
             final xMsgAddress pubNode = new xMsgAddress(xMsgUtil.toHostAddress(bindTo));
-            final xMsgConnection connection = subscriber.newConnect(pubNode);
             final xMsgTopic topic = xMsgTopic.wrap("thr_topic");
 
             xMsgUtil.sleep(100);
 
-            subscriber.setPoolSize(1);
-            xMsgSubscription sub = subscriber.subscribe(connection, topic, new xMsgCallBack() {
+            xMsgSubscription sub = subscriber.subscribe(topic, new xMsgCallBack() {
 
                 @Override
                 public xMsgMessage callback(xMsgMessage msg) {

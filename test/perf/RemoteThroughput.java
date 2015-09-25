@@ -5,7 +5,6 @@ import org.jlab.coda.xmsg.core.xMsgMessage;
 import org.jlab.coda.xmsg.core.xMsgTopic;
 import org.jlab.coda.xmsg.core.xMsgUtil;
 import org.jlab.coda.xmsg.excp.xMsgException;
-import org.jlab.coda.xmsg.net.xMsgConnection;
 
 import java.io.IOException;
 
@@ -25,7 +24,6 @@ public final class RemoteThroughput {
 
         try {
             final xMsg publisher = new xMsg("thr_publisher");
-            final xMsgConnection connection = publisher.reConnect(xMsgUtil.toHostAddress(bindTo));
             final xMsgTopic topic = xMsgTopic.wrap("thr_topic");
 
             xMsgUtil.sleep(100);
@@ -33,9 +31,8 @@ public final class RemoteThroughput {
 
             byte[] data = new byte[messageSize];
             for (int i = 0; i < messageCount; i++) {
-                xMsgMessage msg = new xMsgMessage(topic);
-                msg.setData("data/binary", data);
-                publisher.publish(connection, msg);
+                xMsgMessage msg = new xMsgMessage(topic, data);
+                publisher.publish(msg);
             }
 
             publisher.destruct();

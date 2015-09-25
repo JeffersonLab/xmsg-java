@@ -23,7 +23,6 @@ package org.jlab.coda.xmsg.core;
 
 import com.google.protobuf.InvalidProtocolBufferException;
 import org.jlab.coda.xmsg.data.xMsgD.xMsgData;
-import org.jlab.coda.xmsg.data.xMsgD.xMsgData.Builder;
 import org.jlab.coda.xmsg.excp.xMsgException;
 import org.jlab.coda.xmsg.net.xMsgConnection;
 import org.jlab.coda.xmsg.testing.IntegrationTest;
@@ -50,9 +49,8 @@ public class SubscriptionsTest {
     public void unsuscribeStopsThread() throws Exception {
 
         xMsg actor = new xMsg("test");
-        xMsgConnection connection = actor.reConnect();
 
-        xMsgSubscription subscription = actor.subscribe(connection, xMsgTopic.wrap("topic"), null);
+        xMsgSubscription subscription = actor.subscribe(xMsgTopic.wrap("topic"), null);
         xMsgUtil.sleep(1000);
         actor.unsubscribe(subscription);
 
@@ -91,10 +89,9 @@ public class SubscriptionsTest {
             public void run() {
                 try {
                     xMsg actor = new xMsg("test_publisher");
-                    xMsgConnection connection = actor.reConnect();
                     xMsgUtil.sleep(100);
                     xMsgTopic topic = xMsgTopic.wrap("test_topic");
-                    xMsgSubscription sub = actor.subscribe(connection, topic, new xMsgCallBack() {
+                    xMsgSubscription sub = actor.subscribe(topic, new xMsgCallBack() {
                         @Override
                         public xMsgMessage callback(xMsgMessage msg) {
                             int i = parseData(msg);
@@ -177,10 +174,9 @@ public class SubscriptionsTest {
             public void run() {
                 try {
                     xMsg subActor = new xMsg("test_publisher");
-                    xMsgConnection subCon = subActor.reConnect();
                     xMsgUtil.sleep(100);
                     xMsgTopic subTopic = xMsgTopic.wrap("test_topic");
-                    xMsgSubscription sub = subActor.subscribe(subCon, subTopic, new xMsgCallBack() {
+                    xMsgSubscription sub = subActor.subscribe(subTopic, new xMsgCallBack() {
                         @Override
                         public xMsgMessage callback(xMsgMessage msg) {
                             return msg;
@@ -188,12 +184,11 @@ public class SubscriptionsTest {
                     });
                     xMsgUtil.sleep(100);
                     xMsg pubActor = new xMsg("test_publisher");
-                    xMsgConnection pubCon = pubActor.reConnect();
                     xMsgUtil.sleep(100);
                     xMsgTopic pubTopic = xMsgTopic.wrap("test_topic");
                     for (int i = 0; i < Check.N; i++) {
                         xMsgMessage msg = createMessage(pubTopic, i);
-                        xMsgMessage resMsg = pubActor.syncPublish(pubCon, msg, 1);
+                        xMsgMessage resMsg = pubActor.syncPublish(msg, 1);
                         int data = parseData(resMsg);
                         check.sum += data;
                         check.counter++;
@@ -249,7 +244,7 @@ public class SubscriptionsTest {
                     xMsgConnection subCon = subActor.reConnect();
                     xMsgUtil.sleep(100);
                     xMsgTopic subTopic = xMsgTopic.wrap("test_topic");
-                    xMsgSubscription sub = subActor.subscribe(subCon, subTopic, new xMsgCallBack() {
+                    xMsgSubscription sub = subActor.subscribe(subTopic, new xMsgCallBack() {
                         @Override
                         public xMsgMessage callback(xMsgMessage msg) {
                             check.received = true;
@@ -287,12 +282,8 @@ public class SubscriptionsTest {
     }
 
 
-    private xMsgMessage createMessage(xMsgTopic topic, int data) {
-        xMsgMessage msg = new xMsgMessage(topic);
-        Builder b = xMsgData.newBuilder();
-        b.setFLSINT32(data);
-        msg.setData(b.build());
-        return msg;
+    private xMsgMessage createMessage(xMsgTopic topic, int data) throws xMsgException, IOException {
+        return new xMsgMessage(topic, data);
     }
 
 

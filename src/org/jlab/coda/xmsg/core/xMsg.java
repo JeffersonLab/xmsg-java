@@ -212,6 +212,13 @@ public class xMsg {
     }
 
     /**
+     * @return
+     */
+    public xMsgConnection reConnect() {
+        return reConnect(myProxyIp, myProxyPort);
+    }
+
+    /**
      * @param proxyIp
      * @param proxyPort
      * @return
@@ -222,6 +229,14 @@ public class xMsg {
             disconnect(connections.get(address));
         }
         return reConnect(proxyIp, proxyPort);
+    }
+
+    /**
+     *
+     * @return
+     */
+    public xMsgConnection clearConnect() {
+        return clearConnect(myProxyIp, myProxyPort);
     }
 
     /**
@@ -345,29 +360,25 @@ public class xMsg {
      * @param regServerIp
      * @param regServPort
      * @param topic
-     * @param description
      * @throws xMsgRegistrationException
      * @throws IOException
      */
     public void removePublisherRegistration(String regServerIp,
                                             int regServPort,
-                                            xMsgTopic topic,
-                                            String description)
-            throws xMsgRegistrationException, IOException {
-        removeRegistration(regServerIp, regServPort, topic, description, true);
+                                            xMsgTopic topic)
+    throws xMsgRegistrationException, IOException {
+        _removeRegistration(regServerIp, regServPort, topic, "", true);
     }
 
     /**
      *
      * @param topic
-     * @param description
      * @throws xMsgRegistrationException
      * @throws IOException
      */
-    public void removePublisherRegistration(xMsgTopic topic,
-                                            String description)
-            throws xMsgRegistrationException, IOException {
-        removeRegistration(xMsgUtil.localhost(), xMsgConstants.REGISTRAR_PORT.getIntValue(), topic, description, true);
+    public void removePublisherRegistration(xMsgTopic topic)
+    throws xMsgRegistrationException, IOException {
+        _removeRegistration(xMsgUtil.localhost(), xMsgConstants.REGISTRAR_PORT.getIntValue(), topic, "", true);
     }
 
     /**
@@ -375,29 +386,25 @@ public class xMsg {
      * @param regServerIp
      * @param regServPort
      * @param topic
-     * @param description
      * @throws xMsgRegistrationException
      * @throws IOException
      */
     public void removeSubscriberRegistration(String regServerIp,
                                              int regServPort,
-                                             xMsgTopic topic,
-                                             String description)
-            throws xMsgRegistrationException, IOException {
-        removeRegistration(regServerIp, regServPort, topic, description, false);
+                                             xMsgTopic topic)
+    throws xMsgRegistrationException, IOException {
+        _removeRegistration(regServerIp, regServPort, topic, "", false);
     }
 
     /**
      *
      * @param topic
-     * @param description
      * @throws xMsgRegistrationException
      * @throws IOException
      */
-    public void removeSubscriberRegistration(xMsgTopic topic,
-                                             String description)
-            throws xMsgRegistrationException, IOException {
-        removeRegistration(xMsgUtil.localhost(), xMsgConstants.REGISTRAR_PORT.getIntValue(), topic, description, false);
+    public void removeSubscriberRegistration(xMsgTopic topic)
+    throws xMsgRegistrationException, IOException {
+        _removeRegistration(xMsgUtil.localhost(), xMsgConstants.REGISTRAR_PORT.getIntValue(), topic, "", false);
     }
 
     /**
@@ -465,6 +472,19 @@ public class xMsg {
     public void publish(xMsgConnection con, xMsgMessage msg) throws xMsgException {
         try {
             _publish(con, msg, -1);
+        } catch (TimeoutException e) {
+            e.printStackTrace();
+        }
+    }
+
+    /**
+     *
+     * @param msg
+     * @throws xMsgException
+     */
+    public void publish(xMsgMessage msg) throws xMsgException {
+        try {
+            _publish(reConnect(), msg, -1);
         } catch (TimeoutException e) {
             e.printStackTrace();
         }
@@ -553,6 +573,19 @@ public class xMsg {
                                    xMsgMessage msg,
                                    int timeout) throws xMsgException, TimeoutException {
         return _publish(con, msg, timeout);
+    }
+
+    /**
+     *
+     * @param msg
+     * @param timeout
+     * @return
+     * @throws xMsgException
+     * @throws TimeoutException
+     */
+    public xMsgMessage syncPublish(xMsgMessage msg,
+                                   int timeout) throws xMsgException, TimeoutException {
+        return _publish(reConnect(), msg, timeout);
     }
 
     /**
@@ -758,12 +791,12 @@ public class xMsg {
      * @param isPublisher
      * @throws xMsgRegistrationException
      */
-    private void removeRegistration(String regServerIp,
-                                    int regServPort,
-                                    xMsgTopic topic,
-                                    String description,
-                                    boolean isPublisher)
-            throws xMsgRegistrationException {
+    private void _removeRegistration(String regServerIp,
+                                     int regServPort,
+                                     xMsgTopic topic,
+                                     String description,
+                                     boolean isPublisher)
+    throws xMsgRegistrationException {
 
         String regDriverKey = regServerIp + "_" + regServPort;
         xMsgRegDriver regDriver;

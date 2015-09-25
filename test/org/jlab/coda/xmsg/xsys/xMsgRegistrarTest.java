@@ -21,11 +21,7 @@
 
 package org.jlab.coda.xmsg.xsys;
 
-import java.util.HashSet;
-import java.util.Iterator;
-import java.util.Random;
-import java.util.Set;
-
+import org.jlab.coda.xmsg.core.xMsgContext;
 import org.jlab.coda.xmsg.core.xMsgTopic;
 import org.jlab.coda.xmsg.core.xMsgUtil;
 import org.jlab.coda.xmsg.data.xMsgR.xMsgRegistration;
@@ -34,8 +30,13 @@ import org.jlab.coda.xmsg.excp.xMsgRegistrationException;
 import org.jlab.coda.xmsg.testing.IntegrationTest;
 import org.jlab.coda.xmsg.xsys.regdis.RegistrationDataFactory;
 import org.jlab.coda.xmsg.xsys.regdis.xMsgRegDriver;
-import org.junit.experimental.categories.Category;
 import org.junit.Test;
+import org.junit.experimental.categories.Category;
+
+import java.util.HashSet;
+import java.util.Iterator;
+import java.util.Random;
+import java.util.Set;
 
 import static org.junit.Assert.fail;
 
@@ -52,7 +53,7 @@ public class xMsgRegistrarTest {
     public void testRegistrationDataBase() throws Exception {
         try {
             String localHost = xMsgUtil.localhost();
-            driver = new xMsgRegDriver(localHost, localHost);
+            driver = new xMsgRegDriver(xMsgContext.getContext(), localHost);
             registrar = new xMsgRegistrar();
             registrar.start();
             xMsgUtil.sleep(200);
@@ -92,7 +93,7 @@ public class xMsgRegistrarTest {
         for (int i = 0; i < size; i++) {
             Builder rndReg = RegistrationDataFactory.randomRegistration();
             xMsgRegistration data = rndReg.build();
-            driver.registerLocal(data.getName(), data, checkPublisher(data));
+            driver.register(data, checkPublisher(data));
             registration.add(data);
         }
     }
@@ -112,7 +113,7 @@ public class xMsgRegistrarTest {
             xMsgRegistration reg = it.next();
             if (i >= first) {
                 it.remove();
-                driver.removeRegistrationLocal(name, reg, checkPublisher(reg));
+                driver.removeRegistration(reg, checkPublisher(reg));
             }
             i++;
         }
@@ -134,13 +135,13 @@ public class xMsgRegistrarTest {
                 it.remove();
             }
         }
-        driver.removeAllRegistrationFE(host, name);
+        driver.removeAll();
     }
 
 
     public void removeAll() throws xMsgRegistrationException {
         for (String host : RegistrationDataFactory.testHosts) {
-            driver.removeAllRegistrationFE(host, name);
+            driver.removeAll();
         }
         registration.clear();
     }
@@ -156,7 +157,7 @@ public class xMsgRegistrarTest {
         for (String topic : RegistrationDataFactory.testTopics) {
             Builder data = discoveryRequest(topic, isPublisher);
 
-            Set<xMsgRegistration> result = driver.findLocal(name, data.build(), isPublisher);
+            Set<xMsgRegistration> result = driver.findRegistration(data.build(), isPublisher);
             Set<xMsgRegistration> expected = find(topic, isPublisher);
 
             if (result.equals(expected)) {
