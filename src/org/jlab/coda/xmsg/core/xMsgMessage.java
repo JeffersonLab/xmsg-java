@@ -198,43 +198,43 @@ public class xMsgMessage {
 
         // define the data mime-type
         if (data instanceof Integer) {
-            mimeType = "binary/sfixed32";
+            mimeType = xMsgConstants.SFIXED32.getStringValue();
             xd.setFLSINT32((Integer) data);
 
         } else if (data instanceof Long) {
-            mimeType = "binary/sfixed64";
+            mimeType = xMsgConstants.SFIXED64.getStringValue();
             xd.setFLSINT64((Long) data);
 
         } else if (data instanceof Float) {
-            mimeType = "binary/float";
+            mimeType = xMsgConstants.FLOAT.getStringValue();
             xd.setFLOAT((Float) data);
 
         } else if (data instanceof Double) {
-            mimeType = "binary/double";
+            mimeType = xMsgConstants.DOUBLE.getStringValue();
             xd.setDOUBLE((Double) data);
 
         } else if (data instanceof String) {
-            mimeType = "binary/string";
+            mimeType = xMsgConstants.STRING.getStringValue();
             xd.setSTRING((String) data);
 
         } else if (data instanceof Integer[]) {
-            mimeType = "binary/array-sfixed32";
+            mimeType = xMsgConstants.ARRAY_SFIXED32.getStringValue();
             xd.addAllFLSINT32A(Arrays.asList((Integer[]) data));
 
         } else if (data instanceof Long[]) {
-            mimeType = "binary/array-sfixed64";
+            mimeType = xMsgConstants.ARRAY_SFIXED64.getStringValue();
             xd.addAllFLSINT64A(Arrays.asList((Long[]) data));
 
         } else if (data instanceof Float[]) {
-            mimeType = "binary/array-float";
+            mimeType = xMsgConstants.ARRAY_FLOAT.getStringValue();
             xd.addAllFLOATA(Arrays.asList((Float[]) data));
 
         } else if (data instanceof Double[]) {
-            mimeType = "binary/array-double";
+            mimeType = xMsgConstants.ARRAY_DOUBLE.getStringValue();
             xd.addAllDOUBLEA(Arrays.asList((Double[]) data));
 
         } else if (data instanceof String[]) {
-            mimeType = "binary/array-string";
+            mimeType = xMsgConstants.ARRAY_STRING.getStringValue();
             xd.addAllSTRINGA(Arrays.asList((String[]) data));
 
         } else if (data instanceof byte[]) {

@@ -74,6 +74,10 @@ public class xMsgRegDriver {
         _registrarIp = xMsgUtil.validateIP(ip);
         _registrarPort = port;
         _address = "tcp://" + _registrarIp + ":" + _registrarPort;
+        _connectionSocket = _context.createSocket(ZMQ.REQ);
+        _connectionSocket.setHWM(0);
+        _connectionSocket.connect(_address);
+
     }
 
     /**
@@ -89,6 +93,9 @@ public class xMsgRegDriver {
         _context = context;
         _registrarIp = xMsgUtil.validateIP(ip);
         _address = "tcp://" + _registrarIp + ":" + _registrarPort;
+        _connectionSocket = _context.createSocket(ZMQ.REQ);
+        _connectionSocket.setHWM(0);
+        _connectionSocket.connect(_address);
     }
 
     /**
@@ -101,18 +108,6 @@ public class xMsgRegDriver {
      */
     public boolean isConnected() {
         return _connectionSocket!=null;
-    }
-
-    /**
-     * <p>
-     *     Creates and returns 0MQ socket to the Registrar service
-     * </p>
-     *
-     */
-    public void connect() {
-        _connectionSocket = _context.createSocket(ZMQ.REQ);
-        _connectionSocket.setHWM(0);
-        _connectionSocket.connect(_address);
     }
 
     /**

@@ -21,6 +21,7 @@
 
 package org.jlab.coda.xmsg.xsys;
 
+import org.jlab.coda.xmsg.core.xMsgContext;
 import org.jlab.coda.xmsg.core.xMsgUtil;
 import org.jlab.coda.xmsg.xsys.regdis.xMsgRegService;
 import org.zeromq.ZContext;
@@ -37,7 +38,7 @@ import java.io.IOException;
 public class xMsgRegistrar {
 
     private final Thread regServiceThread;
-    private final ZContext context = new ZContext();
+    private final ZContext context = xMsgContext.getContext();
 
     /**
      * Starts a local registrar service.

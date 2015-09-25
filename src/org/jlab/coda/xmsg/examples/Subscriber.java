@@ -39,11 +39,12 @@ import java.io.IOException;
  */
 public class Subscriber extends xMsg {
     private static xMsgConnection con;
-    private MyCallBack callback;
+    private static MyCallBack callback;
 
     public Subscriber() throws IOException {
         super("test_subscriber");
         callback = new MyCallBack();
+        con = getDefaultConnection();
     }
 
     public static void main(String[] args) {
@@ -62,7 +63,7 @@ public class Subscriber extends xMsg {
             subscriber.registerAsSubscriber(topic, description);
 
             // Subscribe by passing a callback to the subscription
-            subscriber.subscribe(topic, subscriber.callback);
+            subscriber.subscribe(topic, callback);
 
             xMsgUtil.keepAlive();
         } catch (xMsgException | IOException e) {

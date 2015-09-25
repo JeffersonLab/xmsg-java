@@ -22,6 +22,7 @@
 package org.jlab.coda.xmsg.xsys;
 
 import org.jlab.coda.xmsg.core.xMsgConstants;
+import org.jlab.coda.xmsg.core.xMsgContext;
 import org.jlab.coda.xmsg.core.xMsgUtil;
 import org.jlab.coda.xmsg.excp.xMsgException;
 import org.zeromq.ZContext;
@@ -43,7 +44,7 @@ public class xMsgProxy {
     public static void main(String[] args) {
         try {
             xMsgProxy proxy = new xMsgProxy();
-            proxy.startProxy(new ZContext());
+            proxy.startProxy(xMsgContext.getContext());
         } catch (xMsgException e) {
             e.printStackTrace();
             System.exit(1);

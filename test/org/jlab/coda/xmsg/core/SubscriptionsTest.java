@@ -21,11 +21,7 @@
 
 package org.jlab.coda.xmsg.core;
 
-import java.io.IOException;
-import java.util.concurrent.TimeoutException;
-import java.util.concurrent.atomic.AtomicInteger;
-import java.util.concurrent.atomic.AtomicLong;
-
+import com.google.protobuf.InvalidProtocolBufferException;
 import org.jlab.coda.xmsg.data.xMsgD.xMsgData;
 import org.jlab.coda.xmsg.data.xMsgD.xMsgData.Builder;
 import org.jlab.coda.xmsg.excp.xMsgException;
@@ -36,12 +32,15 @@ import org.junit.Test;
 import org.junit.experimental.categories.Category;
 import org.zeromq.ZContext;
 
-import com.google.protobuf.InvalidProtocolBufferException;
+import java.io.IOException;
+import java.util.concurrent.TimeoutException;
+import java.util.concurrent.atomic.AtomicInteger;
+import java.util.concurrent.atomic.AtomicLong;
 
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertTrue;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.is;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertTrue;
 
 
 @Category(IntegrationTest.class)
@@ -51,7 +50,7 @@ public class SubscriptionsTest {
     public void unsuscribeStopsThread() throws Exception {
 
         xMsg actor = new xMsg("test");
-        xMsgConnection connection = actor.connect();
+        xMsgConnection connection = actor.reConnect();
 
         xMsgSubscription subscription = actor.subscribe(connection, xMsgTopic.wrap("topic"), null);
         xMsgUtil.sleep(1000);
@@ -64,11 +63,10 @@ public class SubscriptionsTest {
     @Test
     public void suscribeReceivesAllMessages() throws Exception {
         class Check {
-            AtomicInteger counter = new AtomicInteger();
-            AtomicLong sum = new AtomicLong();
-
             static final int N = 10000;
             static final long SUM_N = 49995000L;
+            AtomicInteger counter = new AtomicInteger();
+            AtomicLong sum = new AtomicLong();
         }
 
         final ZContext context = new ZContext();
@@ -93,7 +91,7 @@ public class SubscriptionsTest {
             public void run() {
                 try {
                     xMsg actor = new xMsg("test_publisher");
-                    xMsgConnection connection = actor.connect();
+                    xMsgConnection connection = actor.reConnect();
                     xMsgUtil.sleep(100);
                     xMsgTopic topic = xMsgTopic.wrap("test_topic");
                     xMsgSubscription sub = actor.subscribe(connection, topic, new xMsgCallBack() {
@@ -122,7 +120,7 @@ public class SubscriptionsTest {
             public void run() {
                 try {
                     xMsg actor = new xMsg("test_publisher");
-                    xMsgConnection connection = actor.connect();
+                    xMsgConnection connection = actor.reConnect();
                     xMsgUtil.sleep(100);
                     xMsgTopic topic = xMsgTopic.wrap("test_topic");
                     for (int i = 0; i < Check.N; i++) {
@@ -151,11 +149,10 @@ public class SubscriptionsTest {
     @Test
     public void syncPublicationReceivesAllResponses() throws Exception {
         class Check {
-            int counter = 0;
-            long sum = 0;
-
             static final int N = 100;
             static final long SUM_N = 4950L;
+            int counter = 0;
+            long sum = 0;
         }
 
         final ZContext context = new ZContext();
@@ -180,7 +177,7 @@ public class SubscriptionsTest {
             public void run() {
                 try {
                     xMsg subActor = new xMsg("test_publisher");
-                    xMsgConnection subCon = subActor.connect();
+                    xMsgConnection subCon = subActor.reConnect();
                     xMsgUtil.sleep(100);
                     xMsgTopic subTopic = xMsgTopic.wrap("test_topic");
                     xMsgSubscription sub = subActor.subscribe(subCon, subTopic, new xMsgCallBack() {
@@ -191,7 +188,7 @@ public class SubscriptionsTest {
                     });
                     xMsgUtil.sleep(100);
                     xMsg pubActor = new xMsg("test_publisher");
-                    xMsgConnection pubCon = pubActor.connect();
+                    xMsgConnection pubCon = pubActor.reConnect();
                     xMsgUtil.sleep(100);
                     xMsgTopic pubTopic = xMsgTopic.wrap("test_topic");
                     for (int i = 0; i < Check.N; i++) {
@@ -249,7 +246,7 @@ public class SubscriptionsTest {
             public void run() {
                 try {
                     xMsg subActor = new xMsg("test_publisher");
-                    xMsgConnection subCon = subActor.connect();
+                    xMsgConnection subCon = subActor.reConnect();
                     xMsgUtil.sleep(100);
                     xMsgTopic subTopic = xMsgTopic.wrap("test_topic");
                     xMsgSubscription sub = subActor.subscribe(subCon, subTopic, new xMsgCallBack() {
@@ -262,7 +259,7 @@ public class SubscriptionsTest {
                     });
                     xMsgUtil.sleep(100);
                     xMsg pubActor = new xMsg("test_publisher");
-                    xMsgConnection pubCon = pubActor.connect();
+                    xMsgConnection pubCon = pubActor.reConnect();
                     xMsgUtil.sleep(100);
                     xMsgTopic pubTopic = xMsgTopic.wrap("test_topic");
                     xMsgMessage msg = createMessage(pubTopic, 1);

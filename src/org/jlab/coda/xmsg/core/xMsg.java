@@ -132,7 +132,7 @@ public class xMsg {
         this.context.setLinger(-1);
 
         // connect to the default proxy
-        connect(myProxyIp, myProxyPort);
+        reConnect(myProxyIp, myProxyPort);
     }
 
     /**
@@ -207,8 +207,8 @@ public class xMsg {
      * @param proxyPort
      * @return
      */
-    public xMsgConnection connect(String proxyIp, int proxyPort) {
-        return connect(new xMsgAddress(proxyIp, proxyPort), defaultSocketSetup);
+    public xMsgConnection reConnect(String proxyIp, int proxyPort) {
+        return connectAndStore(new xMsgAddress(proxyIp, proxyPort), defaultSocketSetup);
     }
 
     /**
@@ -216,11 +216,38 @@ public class xMsg {
      * @param proxyPort
      * @return
      */
-    public xMsgConnection reConnect(String proxyIp, int proxyPort) {
+    public xMsgConnection clearConnect(String proxyIp, int proxyPort) {
         xMsgAddress address = new xMsgAddress(proxyIp,proxyPort);
         if (connections.containsKey(address)) {
             disconnect(connections.get(address));
         }
+        return reConnect(proxyIp, proxyPort);
+    }
+
+    /**
+     * @param proxyIp
+     * @param proxyPort
+     * @return
+     */
+    public xMsgConnection getConnection(String proxyIp, int proxyPort) {
+        xMsgAddress address = new xMsgAddress(proxyIp, proxyPort);
+        return connections.get(address);
+    }
+
+    /**
+     * @return
+     */
+    public xMsgConnection getDefaultConnection() {
+        return getConnection(myProxyIp, myProxyPort);
+    }
+
+    /**
+     * @param proxyIp
+     * @param proxyPort
+     * @return
+     */
+    public xMsgConnection connect(String proxyIp, int proxyPort) {
+        xMsgAddress address = new xMsgAddress(proxyIp, proxyPort);
         return createConnection(address, defaultSocketSetup);
     }
 
@@ -252,7 +279,6 @@ public class xMsg {
         context.setLinger(linger);
         destruct();
     }
-
 
     /**
      *
@@ -613,7 +639,7 @@ public class xMsg {
     throws xMsgException {
 
         // get connection to the proxy
-        final xMsgConnection con = connect(proxyIp, proxyPort);
+        final xMsgConnection con = reConnect(proxyIp, proxyPort);
 
         // get pub socket
         Socket sock = con.getSubSock();
@@ -710,9 +736,6 @@ public class xMsg {
             // create the registration driver object
             regDriver = new xMsgRegDriver(context, regServerIp, regServPort);
 
-            // connected to the registrar service
-            regDriver.connect();
-
             // put into the map of regDrivers
             regDrivers.put(regDriverKey, regDriver);
         }
@@ -749,9 +772,6 @@ public class xMsg {
         } else {
             // create the registration driver object
             regDriver = new xMsgRegDriver(context, regServerIp, regServPort);
-
-            // connected to the registrar service
-            regDriver.connect();
 
             // put into the map of regDrivers
             regDrivers.put(regDriverKey, regDriver);
@@ -790,9 +810,6 @@ public class xMsg {
         } else {
             // create the registration driver object
             regDriver = new xMsgRegDriver(context, regServerIp, regServPort);
-
-            // connected to the registrar service
-            regDriver.connect();
 
             // put into the map of regDrivers
             regDrivers.put(regDriverKey, regDriver);
@@ -840,7 +857,7 @@ public class xMsg {
      * @param setup
      * @return
      */
-    private xMsgConnection connect(xMsgAddress address, xMsgSocketOption setup) {
+    private xMsgConnection connectAndStore(xMsgAddress address, xMsgSocketOption setup) {
         /*
          * First check to see if we have already established connection
          * to this address
@@ -858,7 +875,6 @@ public class xMsg {
             return connection;
         }
     }
-
 
     /**
      * @param con
@@ -931,7 +947,7 @@ public class xMsg {
         SyncSendCallBack cb = null;
 
         // get connection to the proxy
-        xMsgConnection con = connect(proxyIp, proxyPort);
+        xMsgConnection con = reConnect(proxyIp, proxyPort);
 
         // get pub socket
         Socket sock = con.getPubSock();
