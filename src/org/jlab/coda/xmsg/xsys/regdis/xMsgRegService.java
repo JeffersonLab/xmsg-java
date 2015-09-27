@@ -69,14 +69,12 @@ public class xMsgRegService implements Runnable {
 
     // Registrar accepted requests from any host (*)
     private final String host = xMsgConstants.ANY.getStringValue();
-
-    // Default port of the registrar
-    private final int port = xMsgConstants.REGISTRAR_PORT.getIntValue();
-
     // Used as a prefix to the name of this registrar.
     // The name of the registrar is used to set the sender field
     // when it creates a request message to be sent to the requester.
-    private final String localhost;
+    private final String localProxyIp;
+    // Default port of the registrar
+    private int proxyPort = xMsgConstants.REGISTRAR_PORT.getIntValue();
 
     /**
      * Constructor for the front-end registration.
@@ -85,9 +83,10 @@ public class xMsgRegService implements Runnable {
      * @throws xMsgException if the host IP address could not be obtained.
      * @throws IOException
      */
-    public xMsgRegService(ZContext context) throws IOException {
+    public xMsgRegService(ZContext context, String proxyIp, int proxyPort) throws IOException {
         this.context = context;
-        localhost = xMsgUtil.localhost();
+        this.proxyPort = proxyPort;
+        localProxyIp = proxyIp;
     }
 
 
@@ -103,21 +102,22 @@ public class xMsgRegService implements Runnable {
      * only, however by introducing xMsgFE, xMsgNodes can come and go, thus
      * making xMsg message-space elastic.
      *
-     * @param feHost the host of the front-end
+     * @param feProxyIp the host of the front-end
+     * @param feProxyPort the port of the front-end proxy
+     * @param proxyPort the port of the local proxy
      * @param context the shared 0MQ context
      * @throws xMsgException
      * @throws IOException
      */
-    public xMsgRegService(ZContext context, String feHost)
+    public xMsgRegService(ZContext context, String proxyIp, int proxyPort,
+                          String feProxyIp, int feProxyPort)
             throws IOException  {
-        this.context = context;
-        localhost = xMsgUtil.localhost();
-
-        /*
+        this(context, proxyIp, proxyPort);
+         /*
          * Start a thread with periodic process (hard-coded 5 sec. interval) that
          * updates xMsgFE database with the data stored in the local databases.
          */
-        xMsgRegDriver driver = new xMsgRegDriver(context, feHost);
+        xMsgRegDriver driver = new xMsgRegDriver(context, feProxyIp, feProxyPort);
         xMsgRegUpdater updater = new xMsgRegUpdater(driver, publishers, subscribers);
         Thread t = xMsgUtil.newThread("registration-updater", updater);
         t.start();
@@ -128,7 +128,7 @@ public class xMsgRegService implements Runnable {
         log("Info: xMsg local registration and discovery server is started");
 
         ZMQ.Socket regSocket = context.createSocket(ZMQ.REP);
-        regSocket.bind("tcp://" + host + ":" + port);
+        regSocket.bind("tcp://" + host + ":" + proxyPort);
 
         while (!Thread.currentThread().isInterrupted()) {
             try {
@@ -157,7 +157,7 @@ public class xMsgRegService implements Runnable {
 
     ZMsg processRequest(ZMsg requestMsg) {
         String topic = xMsgConstants.UNDEFINED.getStringValue();
-        String sender = localhost + ":" + xMsgConstants.REGISTRAR.getStringValue();
+        String sender = localProxyIp + ":" + xMsgConstants.REGISTRAR.getStringValue();
 
         xMsgRegResponse reply;
 

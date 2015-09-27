@@ -21,6 +21,7 @@
 
 package org.jlab.coda.xmsg.xsys;
 
+import org.jlab.coda.xmsg.core.xMsgConstants;
 import org.jlab.coda.xmsg.core.xMsgContext;
 import org.jlab.coda.xmsg.core.xMsgUtil;
 import org.jlab.coda.xmsg.xsys.regdis.xMsgRegService;
@@ -53,7 +54,8 @@ public class xMsgRegistrar {
         ZContext shadowContext = ZContext.shadow(context);
 
         // start registrar service
-        xMsgRegService regService = new xMsgRegService(shadowContext);
+        xMsgRegService regService = new xMsgRegService(shadowContext,
+                xMsgUtil.localhost(), xMsgConstants.REGISTRAR_PORT.getIntValue());
         regServiceThread = xMsgUtil.newThread("registration-service", regService);
     }
 
@@ -72,20 +74,18 @@ public class xMsgRegistrar {
      * use default registrar port:
      * {@link org.jlab.coda.xmsg.core.xMsgConstants#REGISTRAR_PORT}
      *
-     * @param feHost xMsg front-end host. Host is passed through command line -h option,
+     * @param feProxyIp xMsg front-end host. Host is passed through command line -h option,
      *               or through the environmental variable: XMSG_FE_HOST
      * @throws IOException
      */
-    public xMsgRegistrar(final String feHost) throws IOException {
+    public xMsgRegistrar(final String feProxyIp, int feProxyPort) throws IOException {
 
-        // Zmq context
         ZContext shadowContext = ZContext.shadow(context);
 
-        // Local registrar service.
-        // In this case this specific constructor starts a thread
-        // that periodically updates front-end registrar database with
-        // the data from the local databases
-        xMsgRegService regService = new xMsgRegService(shadowContext, feHost);
+        // start registrar service
+        xMsgRegService regService = new xMsgRegService(shadowContext,
+                xMsgUtil.localhost(), xMsgConstants.REGISTRAR_PORT.getIntValue(),
+                feProxyIp, feProxyPort);
         regServiceThread = xMsgUtil.newThread("registration-service", regService);
     }
 
@@ -93,14 +93,14 @@ public class xMsgRegistrar {
         try {
             String localHost = xMsgUtil.localhost();
             String frontEndHost = localHost;
-            if (args.length == 2) {
+            if (args.length == 4) {
                 if (args[0].equals("-fe_host")) {
                     frontEndHost = xMsgUtil.toHostAddress(args[1]);
                 } else {
                     System.err.println("Wrong option. Accepts -fe_host option only.");
                     System.exit(1);
                 }
-            } else if (args.length != 0) {
+            } else if (args.length != 2) {
                 System.err.println("Wrong arguments. Accepts -fe_host option only.");
                 System.exit(1);
             }
@@ -110,7 +110,7 @@ public class xMsgRegistrar {
             if (frontEndHost.equals(localHost)) {
                 registrar = new xMsgRegistrar();
             } else {
-                registrar = new xMsgRegistrar(frontEndHost);
+                registrar = new xMsgRegistrar(frontEndHost, xMsgConstants.REGISTRAR_PORT.getIntValue());
             }
 
             Runtime.getRuntime().addShutdownHook(new Thread() {
