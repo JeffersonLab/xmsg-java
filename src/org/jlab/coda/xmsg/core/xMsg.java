@@ -36,8 +36,6 @@ import org.zeromq.ZMQException;
 import org.zeromq.ZMsg;
 
 import java.io.IOException;
-import java.util.HashMap;
-import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.ThreadPoolExecutor;
 import java.util.concurrent.TimeoutException;
@@ -65,28 +63,18 @@ public class xMsg {
 
     /** The unique identifier of this actor. */
     protected final String myName;
-    /**
-     * Database of stored proxy connections.
-     */
-    private final Map<xMsgAddress, xMsgConnection> connections = new HashMap<>();
-    /**
-     * Database of stored registration server driver objects
-     */
-    private final Map<String, xMsgRegDriver> regDrivers = new HashMap<>();
     /** Fixed size thread pool. */
     private final ThreadPoolExecutor threadPool;
-    /**
-     * Default proxy host IP
-     */
-    private String myProxyIp;
-    /**
-     * Default proxy port
-     */
-    private int myProxyPort;
     /**
      * Default thread pool size.
      */
     private int myPoolSize;
+    /**
+     * Default proxy connection
+     */
+    private xMsgConnection defaultProxyConnection;
+    private String defaultRegistrarHost;
+    private int defaultRegistrarPort;
     /** 0MQ context object */
     private ZContext context = xMsgContext.getContext();
 
@@ -97,20 +85,19 @@ public class xMsg {
     /**
      *
      * @param name
-     * @param proxyIp
-     * @param proxyPort
      * @param poolSize
      * @throws IOException
      */
-    public xMsg(String name, String proxyIp, int proxyPort, int poolSize) throws IOException {
+    public xMsg(String name, String defaultProxyHost, int defaultProxyPort,
+                String defaultRegistrarHost, int defaultRegistrarPort,
+                int poolSize) throws IOException {
 
         // We need to have a name for an actor
         this.myName = name;
 
-        this.myProxyIp = proxyIp;
-        this.myProxyPort = proxyPort;
         this.myPoolSize = poolSize;
-
+        this.defaultRegistrarHost = defaultRegistrarHost;
+        this.defaultRegistrarPort = defaultRegistrarPort;
 
         // create fixed size thread pool
         this.threadPool = xMsgUtil.newFixedThreadPool(myPoolSize, name);
@@ -131,8 +118,9 @@ public class xMsg {
         // fix default linger
         this.context.setLinger(-1);
 
-        // connect to the default proxy
-        reConnect(myProxyIp, myProxyPort);
+        // get default proxy connection
+        defaultProxyConnection = connect(defaultProxyHost, defaultProxyPort);
+
     }
 
     /**
@@ -142,18 +130,20 @@ public class xMsg {
      * @throws IOException
      */
     public xMsg(String name, int poolSize) throws IOException {
-        this(name, xMsgUtil.localhost(), xMsgConstants.DEFAULT_PORT.getIntValue(), poolSize);
+        this(name, xMsgUtil.localhost(), xMsgConstants.DEFAULT_PORT.getIntValue(),
+                xMsgUtil.localhost(), xMsgConstants.REGISTRAR_PORT.getIntValue(), poolSize);
+        myPoolSize = poolSize;
     }
 
     /**
-     *
      * @param name
      * @throws IOException
      */
     public xMsg(String name) throws IOException {
-        this(name, xMsgUtil.localhost(),
-                xMsgConstants.DEFAULT_PORT.getIntValue(),
+        this(name, xMsgUtil.localhost(), xMsgConstants.DEFAULT_PORT.getIntValue(),
+                xMsgUtil.localhost(), xMsgConstants.REGISTRAR_PORT.getIntValue(),
                 xMsgConstants.DEFAULT_POOL_SIZE.getIntValue());
+        myPoolSize = xMsgConstants.DEFAULT_POOL_SIZE.getIntValue();
     }
 
     /**
@@ -162,22 +152,6 @@ public class xMsg {
      */
     public String getName() {
         return myName;
-    }
-
-    /**
-     *
-     * @return
-     */
-    public String getProxyIp() {
-        return myProxyIp;
-    }
-
-    /**
-     *
-     * @return
-     */
-    public int getProxyPort() {
-        return myProxyPort;
     }
 
     /**
@@ -207,60 +181,6 @@ public class xMsg {
      * @param proxyPort
      * @return
      */
-    public xMsgConnection reConnect(String proxyIp, int proxyPort) {
-        return connectAndStore(new xMsgAddress(proxyIp, proxyPort), defaultSocketSetup);
-    }
-
-    /**
-     * @return
-     */
-    public xMsgConnection reConnect() {
-        return reConnect(myProxyIp, myProxyPort);
-    }
-
-    /**
-     * @param proxyIp
-     * @param proxyPort
-     * @return
-     */
-    public xMsgConnection clearConnect(String proxyIp, int proxyPort) {
-        xMsgAddress address = new xMsgAddress(proxyIp,proxyPort);
-        if (connections.containsKey(address)) {
-            disconnect(connections.get(address));
-        }
-        return reConnect(proxyIp, proxyPort);
-    }
-
-    /**
-     *
-     * @return
-     */
-    public xMsgConnection clearConnect() {
-        return clearConnect(myProxyIp, myProxyPort);
-    }
-
-    /**
-     * @param proxyIp
-     * @param proxyPort
-     * @return
-     */
-    public xMsgConnection getConnection(String proxyIp, int proxyPort) {
-        xMsgAddress address = new xMsgAddress(proxyIp, proxyPort);
-        return connections.get(address);
-    }
-
-    /**
-     * @return
-     */
-    public xMsgConnection getDefaultConnection() {
-        return getConnection(myProxyIp, myProxyPort);
-    }
-
-    /**
-     * @param proxyIp
-     * @param proxyPort
-     * @return
-     */
     public xMsgConnection connect(String proxyIp, int proxyPort) {
         xMsgAddress address = new xMsgAddress(proxyIp, proxyPort);
         return createConnection(address, defaultSocketSetup);
@@ -273,17 +193,22 @@ public class xMsg {
     public void disconnect(xMsgConnection connection) {
         context.destroySocket(connection.getPubSock());
         context.destroySocket(connection.getSubSock());
-        connections.remove(connection.getAddress());
     }
 
+    /**
+     *
+     */
+    public void disconnect() {
+        disconnect(defaultProxyConnection);
+    }
 
     /**
      *
      */
     public void destruct() {
+        disconnect();
         context.destroy();
         threadPool.shutdown();
-        connections.clear();
     }
 
     /**
@@ -322,7 +247,7 @@ public class xMsg {
     public void registerAsPublisher(xMsgTopic topic,
                                     String description)
             throws xMsgRegistrationException, IOException {
-        register(xMsgUtil.localhost(), xMsgConstants.REGISTRAR_PORT.getIntValue(), topic, description, true);
+        registerAsPublisher(defaultRegistrarHost, defaultRegistrarPort, topic, description);
     }
 
     /**
@@ -352,7 +277,7 @@ public class xMsg {
     public void registerAsSubscriber(xMsgTopic topic,
                                      String description)
             throws xMsgRegistrationException, IOException {
-        register(xMsgUtil.localhost(), xMsgConstants.REGISTRAR_PORT.getIntValue(), topic, description, false);
+        registerAsSubscriber(defaultRegistrarHost, defaultRegistrarPort, topic, description);
     }
 
     /**
@@ -366,7 +291,7 @@ public class xMsg {
     public void removePublisherRegistration(String regServerIp,
                                             int regServPort,
                                             xMsgTopic topic)
-    throws xMsgRegistrationException, IOException {
+            throws xMsgRegistrationException, IOException {
         _removeRegistration(regServerIp, regServPort, topic, "", true);
     }
 
@@ -377,8 +302,8 @@ public class xMsg {
      * @throws IOException
      */
     public void removePublisherRegistration(xMsgTopic topic)
-    throws xMsgRegistrationException, IOException {
-        _removeRegistration(xMsgUtil.localhost(), xMsgConstants.REGISTRAR_PORT.getIntValue(), topic, "", true);
+            throws xMsgRegistrationException, IOException {
+        removePublisherRegistration(defaultRegistrarHost, defaultRegistrarPort, topic);
     }
 
     /**
@@ -392,7 +317,7 @@ public class xMsg {
     public void removeSubscriberRegistration(String regServerIp,
                                              int regServPort,
                                              xMsgTopic topic)
-    throws xMsgRegistrationException, IOException {
+            throws xMsgRegistrationException, IOException {
         _removeRegistration(regServerIp, regServPort, topic, "", false);
     }
 
@@ -403,8 +328,8 @@ public class xMsg {
      * @throws IOException
      */
     public void removeSubscriberRegistration(xMsgTopic topic)
-    throws xMsgRegistrationException, IOException {
-        _removeRegistration(xMsgUtil.localhost(), xMsgConstants.REGISTRAR_PORT.getIntValue(), topic, "", false);
+            throws xMsgRegistrationException, IOException {
+        removeSubscriberRegistration(defaultRegistrarHost, defaultRegistrarPort, topic);
     }
 
     /**
@@ -432,7 +357,7 @@ public class xMsg {
     public Set<xMsgRegistration> findPublishers(xMsgTopic topic)
             throws xMsgRegistrationException {
 
-        return findRegistration(myProxyIp, myProxyPort,topic, true);
+        return findPublishers(defaultRegistrarHost, defaultRegistrarPort, topic);
     }
 
     /**
@@ -448,7 +373,7 @@ public class xMsg {
                                                  xMsgTopic topic)
             throws xMsgRegistrationException {
 
-        return findRegistration(regServerIp, regServPort,topic, false);
+        return findRegistration(regServerIp, regServPort, topic, false);
     }
 
     /**
@@ -460,7 +385,7 @@ public class xMsg {
     public Set<xMsgRegistration> findSubscribers(xMsgTopic topic)
             throws xMsgRegistrationException {
 
-        return findRegistration(myProxyIp, myProxyPort,topic, false);
+        return findSubscribers(defaultRegistrarHost, defaultRegistrarPort, topic);
     }
 
     /**
@@ -484,25 +409,23 @@ public class xMsg {
      */
     public void publish(xMsgMessage msg) throws xMsgException {
         try {
-            _publish(reConnect(), msg, -1);
+            _publish(defaultProxyConnection, msg, -1);
         } catch (TimeoutException e) {
             e.printStackTrace();
         }
     }
 
     /**
-     * @param proxyIp
-     * @param proxyPort
      * @param data
      * @throws xMsgException
      * @throws IOException
      */
-    public void publish(String proxyIp, int proxyPort,
+    public void publish(xMsgConnection con,
                         xMsgTopic topic, String mimeType,
                         Object data)
             throws xMsgException, IOException {
         try {
-            _publish(proxyIp, proxyPort, topic, mimeType, data, -1);
+            _publish(con, topic, mimeType, data, -1);
         } catch (TimeoutException e) {
             e.printStackTrace();
         }
@@ -510,24 +433,6 @@ public class xMsg {
 
     /**
      *
-     * @param proxyIp
-     * @param proxyPort
-     * @param data
-     * @throws xMsgException
-     * @throws IOException
-     */
-    public void publish(String proxyIp, int proxyPort,
-                        xMsgTopic topic,
-                        Object data)
-            throws xMsgException, IOException {
-        try {
-            _publish(proxyIp, proxyPort, topic, null, data, -1);
-        } catch (TimeoutException e) {
-            e.printStackTrace();
-        }
-    }
-
-    /**
      * @param topic
      * @param mimeType
      * @param data
@@ -538,7 +443,24 @@ public class xMsg {
                         Object data)
             throws xMsgException, IOException {
         try {
-            _publish(myProxyIp, myProxyPort, topic, mimeType, data, -1);
+            _publish(defaultProxyConnection, topic, mimeType, data, -1);
+        } catch (TimeoutException e) {
+            e.printStackTrace();
+        }
+    }
+
+    /**
+     * @param topic
+     * @param data
+     * @throws xMsgException
+     * @throws IOException
+     */
+    public void publish(xMsgConnection con,
+                        xMsgTopic topic,
+                        Object data)
+            throws xMsgException, IOException {
+        try {
+            _publish(con, topic, null, data, -1);
         } catch (TimeoutException e) {
             e.printStackTrace();
         }
@@ -554,7 +476,7 @@ public class xMsg {
                         Object data)
             throws xMsgException, IOException {
         try {
-            _publish(myProxyIp, myProxyPort, topic, null, data, -1);
+            _publish(defaultProxyConnection, topic, null, data, -1);
         } catch (TimeoutException e) {
             e.printStackTrace();
         }
@@ -585,12 +507,10 @@ public class xMsg {
      */
     public xMsgMessage syncPublish(xMsgMessage msg,
                                    int timeout) throws xMsgException, TimeoutException {
-        return _publish(reConnect(), msg, timeout);
+        return _publish(defaultProxyConnection, msg, timeout);
     }
 
     /**
-     * @param proxyIp
-     * @param proxyPort
      * @param topic
      * @param mimeType
      * @param data
@@ -600,29 +520,11 @@ public class xMsg {
      * @throws IOException
      * @throws TimeoutException
      */
-    public xMsgMessage syncPublish(String proxyIp, int proxyPort,
+    public xMsgMessage syncPublish(xMsgConnection con,
                                    xMsgTopic topic, String mimeType,
                                    Object data, int timeout)
             throws xMsgException, IOException, TimeoutException {
-        return _publish(proxyIp, proxyPort, topic, mimeType, data, timeout);
-    }
-
-    /**
-     * @param proxyIp
-     * @param proxyPort
-     * @param topic
-     * @param data
-     * @param timeout
-     * @return
-     * @throws xMsgException
-     * @throws IOException
-     * @throws TimeoutException
-     */
-    public xMsgMessage syncPublish(String proxyIp, int proxyPort,
-                                   xMsgTopic topic,
-                                   Object data, int timeout)
-            throws xMsgException, IOException, TimeoutException {
-        return _publish(proxyIp, proxyPort, topic, null, data, timeout);
+        return _publish(con, topic, mimeType, data, timeout);
     }
 
     /**
@@ -638,7 +540,23 @@ public class xMsg {
     public xMsgMessage syncPublish(xMsgTopic topic, String mimeType,
                                    Object data, int timeout)
             throws xMsgException, IOException, TimeoutException {
-        return _publish(myProxyIp, myProxyPort, topic, mimeType, data, timeout);
+        return _publish(defaultProxyConnection, topic, mimeType, data, timeout);
+    }
+
+    /**
+     * @param topic
+     * @param data
+     * @param timeout
+     * @return
+     * @throws xMsgException
+     * @throws IOException
+     * @throws TimeoutException
+     */
+    public xMsgMessage syncPublish(xMsgConnection con,
+                                   xMsgTopic topic,
+                                   Object data, int timeout)
+            throws xMsgException, IOException, TimeoutException {
+        return _publish(con, topic, null, data, timeout);
     }
 
     /**
@@ -654,25 +572,20 @@ public class xMsg {
     public xMsgMessage syncPublish(xMsgTopic topic,
                                    Object data, int timeout)
             throws xMsgException, IOException, TimeoutException {
-        return _publish(myProxyIp, myProxyPort, topic, null, data, timeout);
+        return _publish(defaultProxyConnection, topic, null, data, timeout);
     }
 
     /**
      *
-     * @param proxyIp
-     * @param proxyPort
      * @param topic
      * @param cb
      * @return
      * @throws xMsgException
      */
-    public xMsgSubscription subscribe(final String proxyIp, final int proxyPort,
+    public xMsgSubscription subscribe(final xMsgConnection con,
                                       final xMsgTopic topic,
                                       final xMsgCallBack cb)
-    throws xMsgException {
-
-        // get connection to the proxy
-        final xMsgConnection con = reConnect(proxyIp, proxyPort);
+            throws xMsgException {
 
         // get pub socket
         Socket sock = con.getSubSock();
@@ -704,8 +617,7 @@ public class xMsg {
     public xMsgSubscription subscribe(final xMsgTopic topic,
                                       final xMsgCallBack cb)
             throws xMsgException {
-        return subscribe(myProxyIp, myProxyPort, topic, cb);
-
+        return subscribe(defaultProxyConnection, topic, cb);
     }
 
     /**
@@ -734,8 +646,8 @@ public class xMsg {
     private Builder createRegistration(xMsgTopic topic, String description) {
         xMsgRegistration.Builder regb = xMsgRegistration.newBuilder();
         regb.setName(myName);
-        regb.setHost(myProxyIp);
-        regb.setPort(myProxyPort);
+        regb.setHost(defaultProxyConnection.getAddress().getHost());
+        regb.setPort(defaultProxyConnection.getAddress().getPort());
         regb.setDomain(topic.domain());
         regb.setSubject(topic.subject());
         regb.setType(topic.type());
@@ -759,19 +671,9 @@ public class xMsg {
                           boolean isPublisher)
             throws xMsgRegistrationException {
 
-        // Define the key for the registration server connection
-        // map, for storing and reusing registrar connections
-        String regDriverKey = regServerIp + "_" + regServPort;
-        xMsgRegDriver regDriver;
-        if (regDrivers.containsKey(regDriverKey)) {
-            regDriver = regDrivers.get(regDriverKey);
-        } else {
-            // create the registration driver object
-            regDriver = new xMsgRegDriver(context, regServerIp, regServPort);
+        // create the registration driver object
+        xMsgRegDriver regDriver = new xMsgRegDriver(context, regServerIp, regServPort);
 
-            // put into the map of regDrivers
-            regDrivers.put(regDriverKey, regDriver);
-        }
         xMsgRegistration.Builder regb = createRegistration(topic, description);
         if (isPublisher) {
             regb.setOwnerType(xMsgRegistration.OwnerType.PUBLISHER);
@@ -796,19 +698,11 @@ public class xMsg {
                                      xMsgTopic topic,
                                      String description,
                                      boolean isPublisher)
-    throws xMsgRegistrationException {
+            throws xMsgRegistrationException {
 
-        String regDriverKey = regServerIp + "_" + regServPort;
-        xMsgRegDriver regDriver;
-        if (regDrivers.containsKey(regDriverKey)) {
-            regDriver = regDrivers.get(regDriverKey);
-        } else {
-            // create the registration driver object
-            regDriver = new xMsgRegDriver(context, regServerIp, regServPort);
+        // create the registration driver object
+        xMsgRegDriver regDriver = new xMsgRegDriver(context, regServerIp, regServPort);
 
-            // put into the map of regDrivers
-            regDrivers.put(regDriverKey, regDriver);
-        }
         xMsgRegistration.Builder regb = createRegistration(topic, description);
         if (isPublisher) {
             regb.setOwnerType(xMsgRegistration.OwnerType.PUBLISHER);
@@ -834,19 +728,9 @@ public class xMsg {
                                                    boolean isPublisher)
             throws xMsgRegistrationException {
 
-        // Define the key for the registration server connection
-        // map, for storing and reusing registrar connections
-        String regDriverKey = regServerIp + "_" + regServPort;
-        xMsgRegDriver regDriver;
-        if (regDrivers.containsKey(regDriverKey)) {
-            regDriver = regDrivers.get(regDriverKey);
-        } else {
-            // create the registration driver object
-            regDriver = new xMsgRegDriver(context, regServerIp, regServPort);
+        // create the registration driver object
+        xMsgRegDriver regDriver = new xMsgRegDriver(context, regServerIp, regServPort);
 
-            // put into the map of regDrivers
-            regDrivers.put(regDriverKey, regDriver);
-        }
         xMsgRegistration.Builder regb = createRegistration(topic, "");
         if (isPublisher) {
             regb.setOwnerType(xMsgRegistration.OwnerType.PUBLISHER);
@@ -885,31 +769,6 @@ public class xMsg {
     }
 
     /**
-     *
-     * @param address
-     * @param setup
-     * @return
-     */
-    private xMsgConnection connectAndStore(xMsgAddress address, xMsgSocketOption setup) {
-        /*
-         * First check to see if we have already established connection
-         * to this address
-         */
-        if (connections.containsKey(address)) {
-            return connections.get(address);
-        } else {
-            /*
-             * Otherwise create sockets to the requested address, and store the
-             * created connection object for the future use. Return the
-             * reference to the connection object
-             */
-            xMsgConnection connection = createConnection(address, setup);
-            connections.put(address, connection);
-            return connection;
-        }
-    }
-
-    /**
      * @param con
      * @param msg
      * @param timeout
@@ -933,8 +792,7 @@ public class xMsg {
 
             // subscribe to the returnAddress
             cb = new SyncSendCallBack();
-            xMsgSubscription sh = subscribe(con.getAddress().getHost(), con.getAddress().getPort(),
-                    xMsgTopic.wrap(returnAddress), cb);
+            xMsgSubscription sh = subscribe(con, xMsgTopic.wrap(returnAddress), cb);
             cb.setSubscriptionHandler(sh);
         }
 
@@ -965,22 +823,17 @@ public class xMsg {
     }
 
     /**
-     * @param proxyIp
-     * @param proxyPort
      * @param mimeType
      * @param data
      * @throws xMsgException
      * @throws IOException
      */
-    private xMsgMessage _publish(String proxyIp, int proxyPort,
+    private xMsgMessage _publish(xMsgConnection con,
                                  xMsgTopic topic,
                                  String mimeType, Object data, int timeout)
             throws xMsgException, IOException, TimeoutException {
 
         SyncSendCallBack cb = null;
-
-        // get connection to the proxy
-        xMsgConnection con = reConnect(proxyIp, proxyPort);
 
         // get pub socket
         Socket sock = con.getPubSock();
@@ -1006,8 +859,7 @@ public class xMsg {
 
             // subscribe to the returnAddress
             cb = new SyncSendCallBack();
-            xMsgSubscription sh = subscribe(con.getAddress().getHost(), con.getAddress().getPort(),
-                    xMsgTopic.wrap(returnAddress), cb);
+            xMsgSubscription sh = subscribe(con, xMsgTopic.wrap(returnAddress), cb);
             cb.setSubscriptionHandler(sh);
         }
 
@@ -1020,7 +872,7 @@ public class xMsg {
         } finally {
             outputMsg.destroy();
         }
-        if (timeout > 0) {
+        if (timeout > 0 && cb != null) {
             // wait for the response
             int t = 0;
             while (cb.recvMsg == null && t < timeout * 1000) {
