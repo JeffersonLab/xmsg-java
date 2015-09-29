@@ -59,7 +59,7 @@ public class xMsgRegResponse {
         this.topic = topic;
         this.sender = sender;
         this.status = xMsgConstants.SUCCESS.getStringValue();
-        this.data = new HashSet<xMsgRegistration>();
+        this.data = new HashSet<>();
     }
 
 
@@ -97,7 +97,7 @@ public class xMsgRegResponse {
 
 
     /**
-     * Deserializes the response from the given message.
+     * De-serializes the response from the given message.
      *
      * @param msg the message with the response
      * @throws xMsgRegistrationException

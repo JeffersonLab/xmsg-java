@@ -22,8 +22,10 @@
 package org.jlab.coda.xmsg.examples;
 
 import org.jlab.coda.xmsg.core.xMsg;
+import org.jlab.coda.xmsg.core.xMsgMessage;
 import org.jlab.coda.xmsg.core.xMsgTopic;
 import org.jlab.coda.xmsg.excp.xMsgException;
+import org.jlab.coda.xmsg.net.xMsgConnection;
 
 import java.io.IOException;
 
@@ -65,6 +67,9 @@ public class Publisher extends xMsg {
             final String description = "test_description";
 
             Publisher publisher = new Publisher();
+            // creating default proxy (local host, default proxy port)
+            // connection
+            xMsgConnection con = publisher.connect();
 
             // Create the topic
             xMsgTopic topic = xMsgTopic.build(domain, subject, type);
@@ -75,10 +80,12 @@ public class Publisher extends xMsg {
             // Fill data with a byte array the required size
             System.out.println("Byte array size = " + dataSize);
             byte[] b = new byte[dataSize];
+            xMsgMessage msg = new xMsgMessage(topic, b);
 
-            // Publish data for ever...
+
+            // Publish data for ever
             while (true) {
-                publisher.publish(topic, b);
+                publisher.publish(con, msg);
             }
 
         } catch (xMsgException | IOException e) {

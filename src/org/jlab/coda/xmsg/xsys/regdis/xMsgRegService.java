@@ -51,7 +51,6 @@ import java.util.Set;
  *   <li>Find publisher</li>
  *   <li>Find subscriber</li>
  * </ul>
- * TODO: add functionality to remove publisher/subscriber
  *
  */
 
@@ -80,7 +79,6 @@ public class xMsgRegService implements Runnable {
      * Constructor for the front-end registration.
      *
      * @param context the shared 0MQ context
-     * @throws xMsgException if the host IP address could not be obtained.
      * @throws IOException
      */
     public xMsgRegService(ZContext context, String proxyIp, int proxyPort) throws IOException {
@@ -106,7 +104,6 @@ public class xMsgRegService implements Runnable {
      * @param feProxyPort the port of the front-end proxy
      * @param proxyPort the port of the local proxy
      * @param context the shared 0MQ context
-     * @throws xMsgException
      * @throws IOException
      */
     public xMsgRegService(ZContext context, String proxyIp, int proxyPort,

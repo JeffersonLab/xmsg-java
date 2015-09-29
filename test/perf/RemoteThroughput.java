@@ -32,7 +32,7 @@ public final class RemoteThroughput {
             byte[] data = new byte[messageSize];
             for (int i = 0; i < messageCount; i++) {
                 xMsgMessage msg = new xMsgMessage(topic, data);
-                publisher.publish(msg);
+                publisher.publish(publisher.getDefaultProxyConnection(), msg);
             }
 
             publisher.destruct();

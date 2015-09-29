@@ -32,11 +32,9 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
 
 /**
- * <p>
  *    A registration database of xMsg actors.
  *    Actors are grouped by topic, i.e., actors registered with the same topic will
  *    be in the same group.
- * </p>
  *
  * @author smancill
  * @version 2.x

@@ -21,6 +21,7 @@
 
 package org.jlab.coda.xmsg.xsys;
 
+import org.jlab.coda.xmsg.core.xMsgConstants;
 import org.jlab.coda.xmsg.core.xMsgContext;
 import org.jlab.coda.xmsg.core.xMsgUtil;
 import org.jlab.coda.xmsg.excp.xMsgException;
@@ -43,7 +44,22 @@ public class xMsgProxy {
     public static void main(String[] args) {
         try {
             xMsgProxy proxy = new xMsgProxy();
-            proxy.startProxy(xMsgContext.getContext(), Integer.parseInt(args[1]));
+            int port = 0;
+            if (args.length == 2) {
+                if (args[0].equals("-port")) {
+                    port = Integer.parseInt(args[1]);
+                } else {
+                    System.err.println("Wrong option. Accepts -port option only.");
+                    System.exit(1);
+                }
+            }
+
+            if (port <= 0) {
+                proxy.startProxy(xMsgContext.getContext(), xMsgConstants.DEFAULT_PORT.getIntValue());
+            } else {
+                proxy.startProxy(xMsgContext.getContext(), port);
+            }
+
         } catch (xMsgException | NumberFormatException e) {
             e.printStackTrace();
             System.exit(1);
@@ -56,7 +72,7 @@ public class xMsgProxy {
      * @param context zmq context object
      * @throws xMsgException
      */
-    public void startProxy(ZContext context, int proxyPort) throws xMsgException {
+    private void startProxy(ZContext context, int proxyPort) throws xMsgException {
 
         System.out.println(xMsgUtil.currentTime(4) +
                 " Info: Running xMsg proxy server on the localhost..." + "\n");

@@ -34,12 +34,10 @@ import org.zeromq.ZMsg;
 import java.util.Set;
 
 /**
- * <p>
  *     xMsg registration driver. Provides methods for registration and
  *     discovery of xMsg actors, i.e. publishers and subscribers.
  *     Creates 0MQ socket connection to the xMsg registrar service
  *     {@link org.jlab.coda.xmsg.xsys.regdis.xMsgRegService}
- * </p>
  *
  * @author gurjyan
  * @since 2.x

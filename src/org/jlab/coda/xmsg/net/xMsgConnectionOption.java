@@ -19,33 +19,37 @@
  * SUPPORT, UPDATES, ENHANCEMENTS, OR MODIFICATIONS.
  */
 
-package org.jlab.coda.xmsg.core;
+package org.jlab.coda.xmsg.net;
 
-import org.zeromq.ZContext;
-
+import org.zeromq.ZMQ.Socket;
 
 /**
- * Singleton class that provides unique 0MQ context
- * {@link org.zeromq.ZContext} for entire JVM process.
+ *    Advanced setup of an {@link xMsgConnection}.
  *
- * @author gurjyan
- * @since 2.x
+ * @author smancill
+ * @version 2.x
+ *
  */
-public class xMsgContext {
-    private static xMsgContext ourInstance = new xMsgContext();
+public interface xMsgConnectionOption {
 
-    private ZContext context;
+    /**
+     * Configures the socket before it is connected.
+     * This method will be called for both pub/sub sockets.
+     * It should be used to set options on the socket.
+     * <p>
+     * Leave empty if no configuration is required.
+     *
+     * @see <a href="http://api.zeromq.org/3-2:zmq-setsockopt">ZMQ_LINGER</a>
+     */
+    void preConnection(Socket socket);
 
-    private xMsgContext() {
-        context = new ZContext();
-    }
-
-    private static xMsgContext getInstance() {
-        return ourInstance;
-    }
-
-    public static ZContext getContext() {
-        return getInstance().context;
-    }
-
+    /**
+     * Runs after the two sockets have been connected.
+     * This method can be used to run some action after calling connect().
+     * For example, sleep a while to give time to the sockets to be actually
+     * connected internally.
+     * <p>
+     * Leave empty if no action is required.
+     */
+    void postConnection();
 }

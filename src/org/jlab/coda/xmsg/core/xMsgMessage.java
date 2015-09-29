@@ -54,16 +54,17 @@ public class xMsgMessage {
     private byte[] data;
 
 
-    /**
-     *
-     * @param topic
-     * @param metaData
-     * @param data
-     * @throws IOException
-     */
-    public xMsgMessage(xMsgTopic topic, xMsgMeta.Builder metaData, Object data) throws IOException {
-        _construct(topic, metaData, data);
+    public xMsgMessage(xMsgTopic topic, xMsgMeta.Builder metaData, byte[] data)
+            throws xMsgException, IOException {
+        if (metaData.hasByteOrder()) {
+            this.topic = topic;
+            this.metaData = metaData;
+            this.data = data;
+        } else {
+            throw new xMsgException("xMsg-Error: Unspecified byte order.");
+        }
     }
+
 
     /**
      *
@@ -90,15 +91,14 @@ public class xMsgMessage {
         this(topic, "binary/bytes", data);
     }
 
+
     /**
-     * <p>
      *     Create xMsgMessage off the wire, i.e.
      *     de-serializes the received ZMsg message
-     * </p>
      *
      * @param msg the received ZMQ message
      */
-    public xMsgMessage(ZMsg msg) throws xMsgException {
+    xMsgMessage(ZMsg msg) throws xMsgException {
         ZFrame topicFrame = msg.pop();
         ZFrame metaDataFrame = msg.pop();
         ZFrame dataFrame = msg.pop();
@@ -125,7 +125,7 @@ public class xMsgMessage {
      *
      * @return the ZMsg raw multi-part message
      */
-    public ZMsg serialize() {
+    ZMsg serialize() {
         ZMsg msg = new ZMsg();
         msg.add(topic.toString());
         msg.add(metaData.build().toByteArray());
@@ -151,27 +151,12 @@ public class xMsgMessage {
 
     /**
      *
-     * @param topic
-     */
-    public void setTopic(xMsgTopic topic) {
-        this.topic = topic;
-    }
-
-    /**
-     *
      * @return
      */
     public xMsgMeta.Builder getMetaData() {
         return metaData;
     }
 
-    /**
-     *
-     * @param metaData
-     */
-    public void setMetaData(xMsgMeta.Builder metaData) {
-        this.metaData = metaData;
-    }
 
     /**
      *

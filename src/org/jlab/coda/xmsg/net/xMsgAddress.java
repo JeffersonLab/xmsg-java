@@ -21,13 +21,10 @@
 
 package org.jlab.coda.xmsg.net;
 
-import org.jlab.coda.xmsg.core.xMsgConstants;
 import org.jlab.coda.xmsg.core.xMsgUtil;
 
 /**
- * <p>
- *     xMsg network address.
- * </p>
+ *  xMsg address.
  *
  * @author gurjyan
  * @version 2.x
@@ -36,16 +33,6 @@ public class xMsgAddress {
 
     private final String host;
     private final int port;
-
-    /**
-     * Creates an address using the provided IP and the default port.
-     *
-     * @param hostAddress the host IP address
-     */
-    public xMsgAddress(String hostAddress) {
-        this.host = xMsgUtil.validateIP(hostAddress);
-        this.port = xMsgConstants.DEFAULT_PORT.getIntValue();
-    }
 
     /**
      * Creates an address using provided IP and port.
@@ -97,10 +84,10 @@ public class xMsgAddress {
         if (getClass() != obj.getClass()) {
             return false;
         }
-        xMsgAddress other = (xMsgAddress) obj;
-        if (!host.equals(other.host)) {
+        xMsgPrxAddress other = (xMsgPrxAddress) obj;
+        if (!host.equals(other.getHost())) {
             return false;
         }
-        return port == other.port;
+        return port == other.getPort();
     }
 }

@@ -44,7 +44,10 @@ public class Subscriber extends xMsg {
     public Subscriber() throws IOException {
         super("test_subscriber");
         callback = new MyCallBack();
-        con = getDefaultConnection();
+
+        // creating default proxy (local host, default proxy port)
+        // connection
+        con = connect();
     }
 
     public static void main(String[] args) {
@@ -63,7 +66,7 @@ public class Subscriber extends xMsg {
             subscriber.registerAsSubscriber(topic, description);
 
             // Subscribe by passing a callback to the subscription
-            subscriber.subscribe(topic, callback);
+            subscriber.subscribe(con, topic, callback);
 
             xMsgUtil.keepAlive();
         } catch (xMsgException | IOException e) {
@@ -104,6 +107,7 @@ public class Subscriber extends xMsg {
                 }
             } else {
                 // sync request, create/update the xMsgMessage and send it to the sender
+                msg.getMetaData().setReplyTo(xMsgConstants.UNDEFINED.getStringValue());
                 reply(msg);
             }
             return msg;

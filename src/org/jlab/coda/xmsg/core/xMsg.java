@@ -25,9 +25,10 @@ import org.jlab.coda.xmsg.data.xMsgR.xMsgRegistration;
 import org.jlab.coda.xmsg.data.xMsgR.xMsgRegistration.Builder;
 import org.jlab.coda.xmsg.excp.xMsgException;
 import org.jlab.coda.xmsg.excp.xMsgRegistrationException;
-import org.jlab.coda.xmsg.net.xMsgAddress;
 import org.jlab.coda.xmsg.net.xMsgConnection;
-import org.jlab.coda.xmsg.net.xMsgSocketOption;
+import org.jlab.coda.xmsg.net.xMsgConnectionOption;
+import org.jlab.coda.xmsg.net.xMsgPrxAddress;
+import org.jlab.coda.xmsg.net.xMsgRegAddress;
 import org.jlab.coda.xmsg.xsys.regdis.xMsgRegDriver;
 import org.zeromq.ZContext;
 import org.zeromq.ZMQ;
@@ -63,24 +64,92 @@ public class xMsg {
 
     /** The unique identifier of this actor. */
     protected final String myName;
+
     /** Fixed size thread pool. */
     private final ThreadPoolExecutor threadPool;
+
     /**
      * Default thread pool size.
      */
     private int myPoolSize;
-    /**
-     * Default proxy connection
-     */
-    private xMsgConnection defaultProxyConnection;
+
+    private String defaultProxyHost;
+
+    private int defaultProxyPort;
+
     private String defaultRegistrarHost;
+
     private int defaultRegistrarPort;
+
     /** 0MQ context object */
     private ZContext context = xMsgContext.getContext();
 
     /** Default socket options.*/
-    private xMsgSocketOption defaultSocketSetup;
+    private xMsgConnectionOption defaultConnectionOption;
 
+
+    /**
+     *
+     * @param name
+     * @param poolSize
+     * @throws IOException
+     */
+    public xMsg(String name, int poolSize) throws IOException {
+        this(name, xMsgUtil.localhost(), xMsgConstants.DEFAULT_PORT.getIntValue(),
+                xMsgUtil.localhost(), xMsgConstants.REGISTRAR_PORT.getIntValue(), poolSize);
+        myPoolSize = poolSize;
+        defaultProxyHost = xMsgUtil.localhost();
+        defaultProxyPort = xMsgConstants.DEFAULT_PORT.getIntValue();
+        defaultRegistrarHost = xMsgUtil.localhost();
+        defaultRegistrarPort = xMsgConstants.REGISTRAR_PORT.getIntValue();
+    }
+
+    /**
+     * @param name
+     * @throws IOException
+     */
+    public xMsg(String name) throws IOException {
+        this(name, xMsgUtil.localhost(), xMsgConstants.DEFAULT_PORT.getIntValue(),
+                xMsgUtil.localhost(), xMsgConstants.REGISTRAR_PORT.getIntValue(),
+                xMsgConstants.DEFAULT_POOL_SIZE.getIntValue());
+        myPoolSize = xMsgConstants.DEFAULT_POOL_SIZE.getIntValue();
+        defaultProxyHost = xMsgUtil.localhost();
+        defaultProxyPort = xMsgConstants.DEFAULT_PORT.getIntValue();
+        defaultRegistrarHost = xMsgUtil.localhost();
+        defaultRegistrarPort = xMsgConstants.REGISTRAR_PORT.getIntValue();
+    }
+
+    /**
+     * @param name
+     * @param registrarHost
+     * @param poolSize
+     * @throws IOException
+     */
+    public xMsg(String name, String registrarHost, int poolSize) throws IOException {
+        this(name, xMsgUtil.localhost(), xMsgConstants.DEFAULT_PORT.getIntValue(),
+                registrarHost, xMsgConstants.REGISTRAR_PORT.getIntValue(), poolSize);
+        myPoolSize = poolSize;
+        defaultProxyHost = xMsgUtil.localhost();
+        defaultProxyPort = xMsgConstants.DEFAULT_PORT.getIntValue();
+        defaultRegistrarHost = registrarHost;
+        defaultRegistrarPort = xMsgConstants.REGISTRAR_PORT.getIntValue();
+    }
+
+    /**
+     * @param name
+     * @param registrarHost
+     * @throws IOException
+     */
+    public xMsg(String name, String registrarHost) throws IOException {
+        this(name, xMsgUtil.localhost(), xMsgConstants.DEFAULT_PORT.getIntValue(),
+                registrarHost, xMsgConstants.REGISTRAR_PORT.getIntValue(),
+                xMsgConstants.DEFAULT_POOL_SIZE.getIntValue());
+        myPoolSize = xMsgConstants.DEFAULT_POOL_SIZE.getIntValue();
+        defaultProxyHost = xMsgUtil.localhost();
+        defaultProxyPort = xMsgConstants.DEFAULT_PORT.getIntValue();
+        defaultRegistrarHost = registrarHost;
+        defaultRegistrarPort = xMsgConstants.REGISTRAR_PORT.getIntValue();
+    }
 
     /**
      *
@@ -98,12 +167,14 @@ public class xMsg {
         this.myPoolSize = poolSize;
         this.defaultRegistrarHost = defaultRegistrarHost;
         this.defaultRegistrarPort = defaultRegistrarPort;
+        this.defaultProxyHost = defaultProxyHost;
+        this.defaultProxyPort = defaultProxyPort;
 
         // create fixed size thread pool
         this.threadPool = xMsgUtil.newFixedThreadPool(myPoolSize, name);
 
         // default pub/sub socket options
-        defaultSocketSetup = new xMsgSocketOption() {
+        defaultConnectionOption = new xMsgConnectionOption() {
 
             @Override
             public void preConnection(Socket socket) {
@@ -118,32 +189,6 @@ public class xMsg {
         // fix default linger
         this.context.setLinger(-1);
 
-        // get default proxy connection
-        defaultProxyConnection = connect(defaultProxyHost, defaultProxyPort);
-
-    }
-
-    /**
-     *
-     * @param name
-     * @param poolSize
-     * @throws IOException
-     */
-    public xMsg(String name, int poolSize) throws IOException {
-        this(name, xMsgUtil.localhost(), xMsgConstants.DEFAULT_PORT.getIntValue(),
-                xMsgUtil.localhost(), xMsgConstants.REGISTRAR_PORT.getIntValue(), poolSize);
-        myPoolSize = poolSize;
-    }
-
-    /**
-     * @param name
-     * @throws IOException
-     */
-    public xMsg(String name) throws IOException {
-        this(name, xMsgUtil.localhost(), xMsgConstants.DEFAULT_PORT.getIntValue(),
-                xMsgUtil.localhost(), xMsgConstants.REGISTRAR_PORT.getIntValue(),
-                xMsgConstants.DEFAULT_POOL_SIZE.getIntValue());
-        myPoolSize = xMsgConstants.DEFAULT_POOL_SIZE.getIntValue();
     }
 
     /**
@@ -163,27 +208,45 @@ public class xMsg {
     }
 
     /**
+     * @param defaultConnectionOption
+     */
+    public void setDefaultConnectionOption(xMsgConnectionOption defaultConnectionOption) {
+        this.defaultConnectionOption = defaultConnectionOption;
+    }
+
+
+    /**
+     *
+     * @param address
      * @return
      */
-    public xMsgSocketOption getDefaultSocketSetup() {
-        return defaultSocketSetup;
+    public xMsgConnection connect(xMsgPrxAddress address) {
+        return createConnection(address, defaultConnectionOption);
     }
 
     /**
-     * @param defaultSocketSetup
+     *
+     * @param address
+     * @param setUp
+     * @return
      */
-    public void setDefaultSocketSetup(xMsgSocketOption defaultSocketSetup) {
-        this.defaultSocketSetup = defaultSocketSetup;
+    public xMsgConnection connect(xMsgPrxAddress address, xMsgConnectionOption setUp) {
+        return createConnection(address, setUp);
     }
 
     /**
-     * @param proxyIp
-     * @param proxyPort
+     *
+     * @param proxyHost
      * @return
      */
-    public xMsgConnection connect(String proxyIp, int proxyPort) {
-        xMsgAddress address = new xMsgAddress(proxyIp, proxyPort);
-        return createConnection(address, defaultSocketSetup);
+    public xMsgConnection connect(String proxyHost) {
+        xMsgPrxAddress address = new xMsgPrxAddress(proxyHost);
+        return createConnection(address, defaultConnectionOption);
+    }
+
+    public xMsgConnection connect() {
+        xMsgPrxAddress address = new xMsgPrxAddress(defaultProxyHost, defaultProxyPort);
+        return createConnection(address, defaultConnectionOption);
     }
 
     /**
@@ -195,18 +258,11 @@ public class xMsg {
         context.destroySocket(connection.getSubSock());
     }
 
-    /**
-     *
-     */
-    public void disconnect() {
-        disconnect(defaultProxyConnection);
-    }
 
     /**
      *
      */
     public void destruct() {
-        disconnect();
         context.destroy();
         threadPool.shutdown();
     }
@@ -220,21 +276,20 @@ public class xMsg {
         destruct();
     }
 
+
     /**
      *
-     * @param regServerIp
-     * @param regServPort
+     * @param address
      * @param topic
      * @param description
      * @throws xMsgRegistrationException
      * @throws IOException
      */
-    public void registerAsPublisher(String regServerIp,
-                                    int regServPort,
+    public void registerAsPublisher(xMsgRegAddress address,
                                     xMsgTopic topic,
                                     String description)
             throws xMsgRegistrationException, IOException {
-        register(regServerIp, regServPort, topic, description, true);
+        register(address.getHost(), address.getPort(), topic, description, true);
     }
 
     /**
@@ -247,24 +302,22 @@ public class xMsg {
     public void registerAsPublisher(xMsgTopic topic,
                                     String description)
             throws xMsgRegistrationException, IOException {
-        registerAsPublisher(defaultRegistrarHost, defaultRegistrarPort, topic, description);
+        register(defaultRegistrarHost, defaultRegistrarPort, topic, description, true);
     }
 
     /**
      *
-     * @param regServerIp
-     * @param regServPort
+     * @param address
      * @param topic
      * @param description
      * @throws xMsgRegistrationException
      * @throws IOException
      */
-    public void registerAsSubscriber(String regServerIp,
-                                     int regServPort,
+    public void registerAsSubscriber(xMsgRegAddress address,
                                      xMsgTopic topic,
                                      String description)
             throws xMsgRegistrationException, IOException {
-        register(regServerIp, regServPort, topic, description, false);
+        register(address.getHost(), address.getPort(), topic, description, false);
     }
 
     /**
@@ -277,22 +330,20 @@ public class xMsg {
     public void registerAsSubscriber(xMsgTopic topic,
                                      String description)
             throws xMsgRegistrationException, IOException {
-        registerAsSubscriber(defaultRegistrarHost, defaultRegistrarPort, topic, description);
+        register(defaultRegistrarHost, defaultRegistrarPort, topic, description, false);
     }
 
     /**
      *
-     * @param regServerIp
-     * @param regServPort
+     * @param address
      * @param topic
      * @throws xMsgRegistrationException
      * @throws IOException
      */
-    public void removePublisherRegistration(String regServerIp,
-                                            int regServPort,
+    public void removePublisherRegistration(xMsgRegAddress address,
                                             xMsgTopic topic)
             throws xMsgRegistrationException, IOException {
-        _removeRegistration(regServerIp, regServPort, topic, "", true);
+        _removeRegistration(address.getHost(), address.getPort(), topic, "", true);
     }
 
     /**
@@ -303,22 +354,20 @@ public class xMsg {
      */
     public void removePublisherRegistration(xMsgTopic topic)
             throws xMsgRegistrationException, IOException {
-        removePublisherRegistration(defaultRegistrarHost, defaultRegistrarPort, topic);
+        _removeRegistration(defaultRegistrarHost, defaultRegistrarPort, topic, "", true);
     }
 
     /**
      *
-     * @param regServerIp
-     * @param regServPort
+     * @param address
      * @param topic
      * @throws xMsgRegistrationException
      * @throws IOException
      */
-    public void removeSubscriberRegistration(String regServerIp,
-                                             int regServPort,
+    public void removeSubscriberRegistration(xMsgRegAddress address,
                                              xMsgTopic topic)
             throws xMsgRegistrationException, IOException {
-        _removeRegistration(regServerIp, regServPort, topic, "", false);
+        _removeRegistration(address.getHost(), address.getPort(), topic, "", false);
     }
 
     /**
@@ -329,23 +378,21 @@ public class xMsg {
      */
     public void removeSubscriberRegistration(xMsgTopic topic)
             throws xMsgRegistrationException, IOException {
-        removeSubscriberRegistration(defaultRegistrarHost, defaultRegistrarPort, topic);
+        _removeRegistration(defaultRegistrarHost, defaultRegistrarPort, topic, "", false);
     }
 
     /**
      *
-     * @param regServerIp
-     * @param regServPort
+     * @param address
      * @param topic
      * @return
      * @throws xMsgRegistrationException
      */
-    public Set<xMsgRegistration> findPublishers(String regServerIp,
-                                                int regServPort,
+    public Set<xMsgRegistration> findPublishers(xMsgRegAddress address,
                                                 xMsgTopic topic)
             throws xMsgRegistrationException {
 
-        return findRegistration(regServerIp, regServPort,topic, true);
+        return findRegistration(address.getHost(), address.getPort(), topic, true);
     }
 
     /**
@@ -357,23 +404,21 @@ public class xMsg {
     public Set<xMsgRegistration> findPublishers(xMsgTopic topic)
             throws xMsgRegistrationException {
 
-        return findPublishers(defaultRegistrarHost, defaultRegistrarPort, topic);
+        return findRegistration(defaultRegistrarHost, defaultRegistrarPort, topic, true);
     }
 
     /**
      *
-     * @param regServerIp
-     * @param regServPort
+     * @param address
      * @param topic
      * @return
      * @throws xMsgRegistrationException
      */
-    public Set<xMsgRegistration> findSubscribers(String regServerIp,
-                                                 int regServPort,
+    public Set<xMsgRegistration> findSubscribers(xMsgRegAddress address,
                                                  xMsgTopic topic)
             throws xMsgRegistrationException {
 
-        return findRegistration(regServerIp, regServPort, topic, false);
+        return findRegistration(address.getHost(), address.getPort(), topic, false);
     }
 
     /**
@@ -385,7 +430,7 @@ public class xMsg {
     public Set<xMsgRegistration> findSubscribers(xMsgTopic topic)
             throws xMsgRegistrationException {
 
-        return findSubscribers(defaultRegistrarHost, defaultRegistrarPort, topic);
+        return findRegistration(defaultRegistrarHost, defaultRegistrarPort, topic, false);
     }
 
     /**
@@ -402,85 +447,7 @@ public class xMsg {
         }
     }
 
-    /**
-     *
-     * @param msg
-     * @throws xMsgException
-     */
-    public void publish(xMsgMessage msg) throws xMsgException {
-        try {
-            _publish(defaultProxyConnection, msg, -1);
-        } catch (TimeoutException e) {
-            e.printStackTrace();
-        }
-    }
 
-    /**
-     * @param data
-     * @throws xMsgException
-     * @throws IOException
-     */
-    public void publish(xMsgConnection con,
-                        xMsgTopic topic, String mimeType,
-                        Object data)
-            throws xMsgException, IOException {
-        try {
-            _publish(con, topic, mimeType, data, -1);
-        } catch (TimeoutException e) {
-            e.printStackTrace();
-        }
-    }
-
-    /**
-     *
-     * @param topic
-     * @param mimeType
-     * @param data
-     * @throws xMsgException
-     * @throws IOException
-     */
-    public void publish(xMsgTopic topic, String mimeType,
-                        Object data)
-            throws xMsgException, IOException {
-        try {
-            _publish(defaultProxyConnection, topic, mimeType, data, -1);
-        } catch (TimeoutException e) {
-            e.printStackTrace();
-        }
-    }
-
-    /**
-     * @param topic
-     * @param data
-     * @throws xMsgException
-     * @throws IOException
-     */
-    public void publish(xMsgConnection con,
-                        xMsgTopic topic,
-                        Object data)
-            throws xMsgException, IOException {
-        try {
-            _publish(con, topic, null, data, -1);
-        } catch (TimeoutException e) {
-            e.printStackTrace();
-        }
-    }
-
-    /**
-     * @param topic
-     * @param data
-     * @throws xMsgException
-     * @throws IOException
-     */
-    public void publish(xMsgTopic topic,
-                        Object data)
-            throws xMsgException, IOException {
-        try {
-            _publish(defaultProxyConnection, topic, null, data, -1);
-        } catch (TimeoutException e) {
-            e.printStackTrace();
-        }
-    }
 
     /**
      *
@@ -497,83 +464,6 @@ public class xMsg {
         return _publish(con, msg, timeout);
     }
 
-    /**
-     *
-     * @param msg
-     * @param timeout
-     * @return
-     * @throws xMsgException
-     * @throws TimeoutException
-     */
-    public xMsgMessage syncPublish(xMsgMessage msg,
-                                   int timeout) throws xMsgException, TimeoutException {
-        return _publish(defaultProxyConnection, msg, timeout);
-    }
-
-    /**
-     * @param topic
-     * @param mimeType
-     * @param data
-     * @param timeout
-     * @return
-     * @throws xMsgException
-     * @throws IOException
-     * @throws TimeoutException
-     */
-    public xMsgMessage syncPublish(xMsgConnection con,
-                                   xMsgTopic topic, String mimeType,
-                                   Object data, int timeout)
-            throws xMsgException, IOException, TimeoutException {
-        return _publish(con, topic, mimeType, data, timeout);
-    }
-
-    /**
-     * @param topic
-     * @param mimeType
-     * @param data
-     * @param timeout
-     * @return
-     * @throws xMsgException
-     * @throws IOException
-     * @throws TimeoutException
-     */
-    public xMsgMessage syncPublish(xMsgTopic topic, String mimeType,
-                                   Object data, int timeout)
-            throws xMsgException, IOException, TimeoutException {
-        return _publish(defaultProxyConnection, topic, mimeType, data, timeout);
-    }
-
-    /**
-     * @param topic
-     * @param data
-     * @param timeout
-     * @return
-     * @throws xMsgException
-     * @throws IOException
-     * @throws TimeoutException
-     */
-    public xMsgMessage syncPublish(xMsgConnection con,
-                                   xMsgTopic topic,
-                                   Object data, int timeout)
-            throws xMsgException, IOException, TimeoutException {
-        return _publish(con, topic, null, data, timeout);
-    }
-
-    /**
-     *
-     * @param topic
-     * @param data
-     * @param timeout
-     * @return
-     * @throws xMsgException
-     * @throws IOException
-     * @throws TimeoutException
-     */
-    public xMsgMessage syncPublish(xMsgTopic topic,
-                                   Object data, int timeout)
-            throws xMsgException, IOException, TimeoutException {
-        return _publish(defaultProxyConnection, topic, null, data, timeout);
-    }
 
     /**
      *
@@ -608,19 +498,6 @@ public class xMsg {
     }
 
     /**
-     *
-     * @param topic
-     * @param cb
-     * @return
-     * @throws xMsgException
-     */
-    public xMsgSubscription subscribe(final xMsgTopic topic,
-                                      final xMsgCallBack cb)
-            throws xMsgException {
-        return subscribe(defaultProxyConnection, topic, cb);
-    }
-
-    /**
      * <p>
      *     Un-subscribes  subscription. This will stop
      *     thread and perform xmq un-subscribe
@@ -646,8 +523,8 @@ public class xMsg {
     private Builder createRegistration(xMsgTopic topic, String description) {
         xMsgRegistration.Builder regb = xMsgRegistration.newBuilder();
         regb.setName(myName);
-        regb.setHost(defaultProxyConnection.getAddress().getHost());
-        regb.setPort(defaultProxyConnection.getAddress().getPort());
+        regb.setHost(defaultProxyHost);
+        regb.setPort(defaultProxyPort);
         regb.setDomain(topic.domain());
         regb.setSubject(topic.subject());
         regb.setType(topic.type());
@@ -748,7 +625,7 @@ public class xMsg {
      * @param setup
      * @return
      */
-    private xMsgConnection createConnection(xMsgAddress address, xMsgSocketOption setup) {
+    private xMsgConnection createConnection(xMsgPrxAddress address, xMsgConnectionOption setup) {
         Socket pubSock = context.createSocket(ZMQ.PUB);
         Socket subSock = context.createSocket(ZMQ.SUB);
         setup.preConnection(pubSock);
@@ -776,7 +653,8 @@ public class xMsg {
      * @throws xMsgException
      * @throws TimeoutException
      */
-    private xMsgMessage _publish(xMsgConnection con, xMsgMessage msg, int timeout) throws xMsgException, TimeoutException {
+    private xMsgMessage _publish(xMsgConnection con, xMsgMessage msg, int timeout)
+            throws xMsgException, TimeoutException {
 
         SyncSendCallBack cb = null;
         // get pub socket
@@ -789,11 +667,15 @@ public class xMsg {
             // set the return address as replyTo in the xMsgMessage
             msg.getMetaData().setReplyTo(returnAddress);
 
-
             // subscribe to the returnAddress
             cb = new SyncSendCallBack();
             xMsgSubscription sh = subscribe(con, xMsgTopic.wrap(returnAddress), cb);
             cb.setSubscriptionHandler(sh);
+        } else {
+
+            // just make sure that receiver knows that this is not a sync request.
+            // need this in case we reuse messages.
+            msg.getMetaData().setReplyTo(xMsgConstants.UNDEFINED.getStringValue());
         }
 
         // send topic, sender, followed by the metadata and data
@@ -809,6 +691,7 @@ public class xMsg {
         if (timeout > 0) {
             // wait for the response
             int t = 0;
+            assert cb != null : "xMsg-Error: null callback at sync publish";
             while (cb.recvMsg == null && t < timeout * 1000) {
                 t++;
                 xMsgUtil.sleep(1);
@@ -833,14 +716,6 @@ public class xMsg {
                                  String mimeType, Object data, int timeout)
             throws xMsgException, IOException, TimeoutException {
 
-        SyncSendCallBack cb = null;
-
-        // get pub socket
-        Socket sock = con.getPubSock();
-        if (sock == null) {
-            throw new xMsgException("xMsg-Error: null pub socket");
-        }
-
         // create a message
         xMsgMessage msg;
         if (mimeType != null) {
@@ -849,46 +724,15 @@ public class xMsg {
             msg = new xMsgMessage(topic, data);
         }
 
-        if (timeout > 0) {
-            // address/topic where the subscriber should send the result
-            String returnAddress = "return:" + (int) (Math.random() * 100.0);
-
-            // set the return address as replyTo in the xMsgMessage
-            msg.getMetaData().setReplyTo(returnAddress);
-
-
-            // subscribe to the returnAddress
-            cb = new SyncSendCallBack();
-            xMsgSubscription sh = subscribe(con, xMsgTopic.wrap(returnAddress), cb);
-            cb.setSubscriptionHandler(sh);
-        }
-
-        // send topic, sender, followed by the metadata and data
-        ZMsg outputMsg = msg.serialize();
-        try {
-            outputMsg.send(sock);
-        } catch (ZMQException e) {
-            throw new xMsgException("xMsg-Error: publishing failed. " + e.getMessage());
-        } finally {
-            outputMsg.destroy();
-        }
-        if (timeout > 0 && cb != null) {
-            // wait for the response
-            int t = 0;
-            while (cb.recvMsg == null && t < timeout * 1000) {
-                t++;
-                xMsgUtil.sleep(1);
-            }
-            if (t >= timeout * 1000) {
-                throw new TimeoutException("xMsg-Error: no response for time_out = " + t);
-            }
-            msg.getMetaData().setReplyTo(xMsgConstants.UNDEFINED.getStringValue());
-            return cb.recvMsg;
-        }
-        return null;
+        return _publish(con, msg, timeout);
     }
 
     /**
+     *
+     * Executes a user callback implementing {@link org.jlab.coda.xmsg.core.xMsgCallBack}
+     * interface. Note that it is under user responsibility to check metadata "replyTo"
+     * to define if this is a sync request and send the result to the topic = replyTo.
+     *
      * @param connection
      * @param callback
      * @param callbackMsg
@@ -900,24 +744,13 @@ public class xMsg {
                                   final xMsgMessage callbackMsg)
             throws xMsgException, IOException {
 
-        // Check if it is sync request
-        // sync request
-        String requester = callbackMsg.getMetaData().getReplyTo();
-        if (!requester.equals(xMsgConstants.UNDEFINED.getStringValue())) {
-            xMsgMessage rm = callback.callback(callbackMsg);
-            if (rm != null) {
-                rm.setTopic(xMsgTopic.wrap(requester));
-                publish(connection, rm);
+        // async request
+        threadPool.submit(new Runnable() {
+            @Override
+            public void run() {
+                callback.callback(callbackMsg);
             }
-        } else {
-            // async request
-            threadPool.submit(new Runnable() {
-                @Override
-                public void run() {
-                    callback.callback(callbackMsg);
-                }
-            });
-        }
+        });
     }
 
 

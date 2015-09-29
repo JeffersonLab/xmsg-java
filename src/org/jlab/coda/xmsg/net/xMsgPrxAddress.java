@@ -19,33 +19,25 @@
  * SUPPORT, UPDATES, ENHANCEMENTS, OR MODIFICATIONS.
  */
 
-package org.jlab.coda.xmsg.core;
+package org.jlab.coda.xmsg.net;
 
-import org.zeromq.ZContext;
 
+import org.jlab.coda.xmsg.core.xMsgConstants;
 
 /**
- * Singleton class that provides unique 0MQ context
- * {@link org.zeromq.ZContext} for entire JVM process.
+ * xMsg proxy address.
  *
  * @author gurjyan
- * @since 2.x
+ * @version 2.x
  */
-public class xMsgContext {
-    private static xMsgContext ourInstance = new xMsgContext();
+public class xMsgPrxAddress extends xMsgAddress {
 
-    private ZContext context;
-
-    private xMsgContext() {
-        context = new ZContext();
+    public xMsgPrxAddress(String host, int port) {
+        super(host, port);
     }
 
-    private static xMsgContext getInstance() {
-        return ourInstance;
-    }
-
-    public static ZContext getContext() {
-        return getInstance().context;
+    public xMsgPrxAddress(String host) {
+        super(host, xMsgConstants.DEFAULT_PORT.getIntValue());
     }
 
 }

@@ -33,16 +33,16 @@ import org.zeromq.ZMQ.Socket;
  */
 public class xMsgConnection {
 
-    private xMsgAddress address;
+    private xMsgPrxAddress address;
     private Socket pubSock = null;
     private Socket subSock = null;
 
 
-    public xMsgAddress getAddress() {
+    public xMsgPrxAddress getAddress() {
         return address;
     }
 
-    public void setAddress(xMsgAddress address) {
+    public void setAddress(xMsgPrxAddress address) {
         this.address = address;
     }
 
