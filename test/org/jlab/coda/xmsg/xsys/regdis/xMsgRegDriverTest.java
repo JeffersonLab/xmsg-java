@@ -83,25 +83,25 @@ public class xMsgRegDriverTest {
         feCon = context.createSocket(ZMQ.REQ);
         when(context.createSocket(anyInt())).thenReturn(feCon, localCon);
 
-        driver = spy(new xMsgRegDriver(context, "10.2.9.1", "10.2.9.100"));
+        driver = spy(new xMsgRegDriver(context, "10.2.9.1"));
         setResponse(new xMsgRegResponse("", ""));
     }
 
 
     @Test
     public void sendLocalPublisherRegistration() throws Exception {
-        driver.registerLocal("bradbury_pub", publisher.build(), true);
+        driver.register(publisher.build(), true);
         assertRequest("bradbury_pub",
-                      publisher.build(),
-                      localCon,
-                      xMsgConstants.REGISTER_PUBLISHER,
-                      xMsgConstants.REGISTER_REQUEST_TIMEOUT);
+                publisher.build(),
+                localCon,
+                xMsgConstants.REGISTER_PUBLISHER,
+                xMsgConstants.REGISTER_REQUEST_TIMEOUT);
     }
 
 
     @Test
     public void sendLocalSubscriberRegistration() throws Exception {
-        driver.registerLocal("bradbury_sub", subscriber.build(), false);
+        driver.register(subscriber.build(), false);
         assertRequest("bradbury_sub",
                       subscriber.build(),
                       localCon,
@@ -113,141 +113,141 @@ public class xMsgRegDriverTest {
     @Test
     public void sendFrontEndPublisherRegistration() throws Exception {
 
-        driver.registerFrontEnd("bradbury_pub", publisher.build(), true);
+        driver.register(publisher.build(), true);
 
         assertRequest("bradbury_pub",
-                      publisher.build(),
-                      feCon,
-                      xMsgConstants.REGISTER_PUBLISHER,
-                      xMsgConstants.REGISTER_REQUEST_TIMEOUT);
+                publisher.build(),
+                feCon,
+                xMsgConstants.REGISTER_PUBLISHER,
+                xMsgConstants.REGISTER_REQUEST_TIMEOUT);
     }
 
 
     @Test
     public void sendFrontEndSubscriberRegistration() throws Exception {
 
-        driver.registerFrontEnd("bradbury_sub", subscriber.build(), false);
+        driver.register(subscriber.build(), false);
 
         assertRequest("bradbury_sub",
-                      subscriber.build(),
-                      feCon,
-                      xMsgConstants.REGISTER_SUBSCRIBER,
-                      xMsgConstants.REGISTER_REQUEST_TIMEOUT);
+                subscriber.build(),
+                feCon,
+                xMsgConstants.REGISTER_SUBSCRIBER,
+                xMsgConstants.REGISTER_REQUEST_TIMEOUT);
     }
 
 
 
     @Test
     public void sendLocalPublisherRemoval() throws Exception {
-        driver.removeRegistrationLocal("bradbury_pub", publisher.build(), true);
+        driver.removeRegistration(publisher.build(), true);
         assertRequest("bradbury_pub",
-                      publisher.build(),
-                      localCon,
-                      xMsgConstants.REMOVE_PUBLISHER,
-                      xMsgConstants.REMOVE_REQUEST_TIMEOUT);
+                publisher.build(),
+                localCon,
+                xMsgConstants.REMOVE_PUBLISHER,
+                xMsgConstants.REMOVE_REQUEST_TIMEOUT);
     }
 
 
     @Test
     public void sendLocalSubscriberRemoval() throws Exception {
-        driver.removeRegistrationLocal("bradbury_sub", subscriber.build(), false);
+        driver.removeRegistration(subscriber.build(), false);
         assertRequest("bradbury_sub",
-                      subscriber.build(),
-                      localCon,
-                      xMsgConstants.REMOVE_SUBSCRIBER,
-                      xMsgConstants.REMOVE_REQUEST_TIMEOUT);
+                subscriber.build(),
+                localCon,
+                xMsgConstants.REMOVE_SUBSCRIBER,
+                xMsgConstants.REMOVE_REQUEST_TIMEOUT);
     }
 
 
     @Test
     public void sendFrontEndPublisherRemoval() throws Exception {
-        driver.removeRegistrationFrontEnd("bradbury_pub", publisher.build(), true);
+        driver.removeRegistration(publisher.build(), true);
         assertRequest("bradbury_pub",
-                      publisher.build(),
-                      feCon,
-                      xMsgConstants.REMOVE_PUBLISHER,
-                      xMsgConstants.REMOVE_REQUEST_TIMEOUT);
+                publisher.build(),
+                feCon,
+                xMsgConstants.REMOVE_PUBLISHER,
+                xMsgConstants.REMOVE_REQUEST_TIMEOUT);
     }
 
 
     @Test
     public void sendFrontEndSubscriberRemoval() throws Exception {
 
-        driver.removeRegistrationFrontEnd("bradbury_sub", subscriber.build(), false);
+        driver.removeRegistration(subscriber.build(), false);
 
         assertRequest("bradbury_sub",
-                      subscriber.build(),
-                      feCon,
-                      xMsgConstants.REMOVE_SUBSCRIBER,
-                      xMsgConstants.REMOVE_REQUEST_TIMEOUT);
+                subscriber.build(),
+                feCon,
+                xMsgConstants.REMOVE_SUBSCRIBER,
+                xMsgConstants.REMOVE_REQUEST_TIMEOUT);
     }
 
 
     @Test
     public void sendHostRemoval() throws Exception {
-        driver.removeAllRegistrationFE("10.2.9.1", "10.2.9.1_node");
+        driver.removeAll();
 
         assertRequest("10.2.9.1_node",
-                      "10.2.9.1",
-                      feCon,
-                      xMsgConstants.REMOVE_ALL_REGISTRATION,
-                      xMsgConstants.REMOVE_REQUEST_TIMEOUT);
+                "10.2.9.1",
+                feCon,
+                xMsgConstants.REMOVE_ALL_REGISTRATION,
+                xMsgConstants.REMOVE_REQUEST_TIMEOUT);
     }
 
 
 
     @Test
     public void sendLocalPublisherFind() throws Exception {
-        driver.findLocal("10.2.9.1_node", publisher.build(), true);
+        driver.findRegistration(publisher.build(), true);
 
         assertRequest("10.2.9.1_node",
-                      publisher.build(),
-                      localCon,
-                      xMsgConstants.FIND_PUBLISHER,
-                      xMsgConstants.FIND_REQUEST_TIMEOUT);
+                publisher.build(),
+                localCon,
+                xMsgConstants.FIND_PUBLISHER,
+                xMsgConstants.FIND_REQUEST_TIMEOUT);
     }
 
 
     @Test
     public void sendLocalSubscriberFind() throws Exception {
-        driver.findLocal("10.2.9.1_node", subscriber.build(), false);
+        driver.findRegistration(subscriber.build(), false);
 
         assertRequest("10.2.9.1_node",
-                      subscriber.build(),
-                      localCon,
-                      xMsgConstants.FIND_SUBSCRIBER,
-                      xMsgConstants.FIND_REQUEST_TIMEOUT);
+                subscriber.build(),
+                localCon,
+                xMsgConstants.FIND_SUBSCRIBER,
+                xMsgConstants.FIND_REQUEST_TIMEOUT);
     }
 
 
     @Test
     public void sendFrontEndPublisherFind() throws Exception {
-        driver.findGlobal("10.2.9.1_node", publisher.build(), true);
+        driver.findRegistration(publisher.build(), true);
 
         assertRequest("10.2.9.1_node",
-                      publisher.build(),
-                      feCon,
-                      xMsgConstants.FIND_PUBLISHER,
-                      xMsgConstants.FIND_REQUEST_TIMEOUT);
+                publisher.build(),
+                feCon,
+                xMsgConstants.FIND_PUBLISHER,
+                xMsgConstants.FIND_REQUEST_TIMEOUT);
     }
 
 
     @Test
     public void sendFrontEndSubscriberFind() throws Exception {
-        driver.findGlobal("10.2.9.1_node", subscriber.build(), false);
+        driver.findRegistration(subscriber.build(), false);
 
         assertRequest("10.2.9.1_node",
-                      subscriber.build(),
-                      feCon,
-                      xMsgConstants.FIND_SUBSCRIBER,
-                      xMsgConstants.FIND_REQUEST_TIMEOUT);
+                subscriber.build(),
+                feCon,
+                xMsgConstants.FIND_SUBSCRIBER,
+                xMsgConstants.FIND_REQUEST_TIMEOUT);
     }
 
 
     @Test
     public void getRegistrationFromLocalFind() throws Exception {
         setResponse(new xMsgRegResponse("", "", registration));
-        Set<xMsgRegistration> res = driver.findLocal("10.2.9.1_node", subscriber.build(), false);
+        Set<xMsgRegistration> res = driver.findRegistration(subscriber.build(), false);
         assertThat(res, is(registration));
     }
 
@@ -255,7 +255,7 @@ public class xMsgRegDriverTest {
     @Test
     public void getRegistrationFromGlobalFind() throws Exception {
         setResponse(new xMsgRegResponse("", "", registration));
-        Set<xMsgRegistration> res = driver.findGlobal("10.2.9.1_node", subscriber.build(), false);
+        Set<xMsgRegistration> res = driver.findRegistration(subscriber.build(), false);
         assertThat(res, is(registration));
     }
 

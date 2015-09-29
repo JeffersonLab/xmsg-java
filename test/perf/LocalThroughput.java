@@ -2,6 +2,7 @@ package perf;
 
 import org.jlab.coda.xmsg.core.*;
 import org.jlab.coda.xmsg.excp.xMsgException;
+import org.jlab.coda.xmsg.net.xMsgConnection;
 
 import java.io.IOException;
 
@@ -30,11 +31,12 @@ public final class LocalThroughput {
 
         try {
             final xMsg subscriber = new xMsg("throughput_subscriber", 1);
+            xMsgConnection con = subscriber.connect();
             final xMsgTopic topic = xMsgTopic.wrap("thr_topic");
 
             xMsgUtil.sleep(100);
 
-            xMsgSubscription sub = subscriber.subscribe(subscriber.getDefaultProxyConnection(),
+            xMsgSubscription sub = subscriber.subscribe(con,
                     topic, new xMsgCallBack() {
 
                 @Override
