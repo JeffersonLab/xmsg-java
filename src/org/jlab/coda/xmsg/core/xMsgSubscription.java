@@ -42,11 +42,12 @@ public abstract class xMsgSubscription {
     private final Socket socket;
     private final String topic;
     private final Thread thread;
-
+    private String name;
     private volatile boolean isRunning = true;
 
 
     xMsgSubscription(String name, xMsgConnection connection, xMsgTopic topic) {
+        this.name = name;
         this.socket = connection.getSubSock();
         if (this.socket == null) {
             throw new IllegalArgumentException("Error: null subscription socket");
@@ -73,6 +74,10 @@ public abstract class xMsgSubscription {
             Thread.currentThread().interrupt();
         }
         socket.unsubscribe(topic.getBytes());
+    }
+
+    public String getName() {
+        return name;
     }
 
     public boolean isAlive() {
