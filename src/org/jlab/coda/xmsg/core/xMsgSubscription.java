@@ -32,25 +32,45 @@ import java.io.IOException;
 import java.util.concurrent.TimeoutException;
 
 /**
- * xMsg subscription handler.
+ * xMsg subscription handler. This gets the sub socket from the xMsgConnection
+ * input parameter, calls the subscribe method of the socket, passing the topic
+ * of the subscription. Then it starts a separate thread to start polling the
+ * socket for the publishing results. As soon as the results arrive from a
+ * publisher the abstract method: handle of this method will be called.
  *
  * @author gurjyan
  * @version 2.x
  */
 public abstract class xMsgSubscription {
 
+    // 0MQ sub socket
     private final Socket socket;
+
+    // string of the topic
     private final String topic;
+
+    // thread to wait for the published message and run the handle
     private final Thread thread;
+
+    // the name for the subscription
     private String name;
+
+    // handle to stop the subscription
     private volatile boolean isRunning = true;
 
 
+    /**
+     * xMsg subscription constructor
+     *
+     * @param name       the name of the subscription
+     * @param connection the {@link org.jlab.coda.xmsg.net.xMsgConnection} object
+     * @param topic      {@link org.jlab.coda.xmsg.core.xMsgTopic} object
+     */
     xMsgSubscription(String name, xMsgConnection connection, xMsgTopic topic) {
         this.name = name;
         this.socket = connection.getSubSock();
         if (this.socket == null) {
-            throw new IllegalArgumentException("Error: null subscription socket");
+            throw new IllegalArgumentException("xMsg-Error: null subscription socket");
         }
         this.socket.subscribe(topic.toString().getBytes());
         xMsgUtil.sleep(100);
@@ -60,12 +80,29 @@ public abstract class xMsgSubscription {
     }
 
 
+    /**
+     * An abstract method to be implemented by the user's subscription callback
+     *
+     * @param msg {@link org.zeromq.ZMsg} object of the wire
+     * @throws xMsgException
+     * @throws TimeoutException
+     * @throws IOException
+     */
     abstract void handle(ZMsg msg) throws xMsgException, TimeoutException, IOException;
 
+
+    /**
+     * Starts the subscription thread
+     */
     void start() {
         thread.start();
     }
 
+    /**
+     * Stops the running subscription thread. This also
+     * calls unsubscribe method of the 0MQ socket:
+     * {@link org.zeromq.ZMQ.Socket#unsubscribe(byte[])}
+     */
     void stop() {
         isRunning = false;
         try {
@@ -76,14 +113,26 @@ public abstract class xMsgSubscription {
         socket.unsubscribe(topic.getBytes());
     }
 
+    /**
+     * Returns this subscription name
+     * @return the name of the subscription
+     */
     public String getName() {
         return name;
     }
 
+    /**
+     * Indicates if the subscription thread is running
+     * @return true/false
+     */
     public boolean isAlive() {
         return isRunning;
     }
 
+
+    /**
+     * Private runnable that runs user's subscription callback.
+     */
     private class Handler implements Runnable {
 
         @Override

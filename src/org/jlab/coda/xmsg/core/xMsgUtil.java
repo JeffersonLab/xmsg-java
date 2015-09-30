@@ -305,7 +305,6 @@ public final class xMsgUtil {
         }
     }
 
-
     /**
      * Creates a new Thread that reports uncaught exceptions.
      *
@@ -329,7 +328,7 @@ public final class xMsgUtil {
 
 
     /**
-     * Creates a new {@link FixedExecutor}.
+     * Creates a new {@link org.jlab.coda.xmsg.core.xMsgUtil.FixedExecutor}.
      */
     public static ThreadPoolExecutor newFixedThreadPool(int nThreads, String namePrefix) {
         return newFixedThreadPool(nThreads,
@@ -337,9 +336,8 @@ public final class xMsgUtil {
                                   new LinkedBlockingQueue<Runnable>());
     }
 
-
     /**
-     * Creates a new {@link FixedExecutor} with a user controlled queue.
+     * Creates a new {@link org.jlab.coda.xmsg.core.xMsgUtil.FixedExecutor} with a user controlled queue.
      */
     public static ThreadPoolExecutor newFixedThreadPool(int nThreads,
                                                         String namePrefix,
@@ -351,9 +349,8 @@ public final class xMsgUtil {
                                       threadFactory);
     }
 
-
     /**
-     * A thread pool executor that prints the stacktrace of uncaught exceptions.
+     * A thread pool executor that prints the stackTrace of uncaught exceptions.
      */
     public static class FixedExecutor extends ThreadPoolExecutor {
 
@@ -385,7 +382,6 @@ public final class xMsgUtil {
             }
         }
     }
-
 
     /**
      * A thread pool factory with custom thread names.
