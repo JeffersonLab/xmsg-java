@@ -25,7 +25,7 @@ package org.jlab.coda.xmsg.excp;
  * Base xMsg exception class.
  *
  * @author gurjyan
- * @since 1.0
+ * @since 2.x
  */
 public class xMsgException extends Exception {
 

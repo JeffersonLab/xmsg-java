@@ -24,10 +24,12 @@ package org.jlab.coda.xmsg.examples;
 import com.google.protobuf.InvalidProtocolBufferException;
 import org.jlab.coda.xmsg.core.*;
 import org.jlab.coda.xmsg.data.xMsgD.xMsgData;
+import org.jlab.coda.xmsg.data.xMsgM;
 import org.jlab.coda.xmsg.excp.xMsgException;
 import org.jlab.coda.xmsg.net.xMsgConnection;
 
 import java.io.IOException;
+import java.util.List;
 
 /**
  * An example of a subscriber. It will receive any message of the given topic
@@ -36,37 +38,45 @@ import java.io.IOException;
  * every arrival of the data.
  *
  * @author gurjyan
+ * @version 2.x
  */
 public class Subscriber extends xMsg {
-    private static xMsgConnection con;
-    private static MyCallBack callback;
 
-    public Subscriber() throws IOException {
+    xMsgConnection con;
+    xMsgTopic topic;
+
+    /**
+     * Calls the parent constructor.
+     * Registers with a local registrar.
+     * subscribes to a hardcoded topic.
+     *
+     * @throws IOException
+     */
+    public Subscriber() throws IOException, xMsgException {
         super("test_subscriber");
-        callback = new MyCallBack();
 
-        // creating default proxy (local host, default proxy port)
-        // connection
+        // connect to default proxy (local host, default proxy port)
         con = connect();
+
+        // build the subscribing topic (hard codded)
+        final String domain = "test_domain";
+        final String subject = "test_subject";
+        final String type = "test_type";
+        final String description = "test_description";
+        topic = xMsgTopic.build(domain, subject, type);
+
+        // Register this subscriber
+        registerAsSubscriber(topic, description);
+
+        // Subscribe by passing a callback to the subscription
+        subscribe(con, topic, new MyCallBack());
+
     }
 
     public static void main(String[] args) {
         try {
-            final String domain = "test_domain";
-            final String subject = "test_subject";
-            final String type = "test_type";
-            final String description = "test_description";
-
-            Subscriber subscriber = new Subscriber();
-
-            // Create the topic
-            xMsgTopic topic = xMsgTopic.build(domain, subject, type);
-
-            // Register this subscriber
-            subscriber.registerAsSubscriber(topic, description);
-
-            // Subscribe by passing a callback to the subscription
-            subscriber.subscribe(con, topic, callback);
+            // create a subscriber object
+            new Subscriber();
 
             xMsgUtil.keepAlive();
         } catch (xMsgException | IOException e) {
@@ -74,7 +84,14 @@ public class Subscriber extends xMsg {
         }
     }
 
-    public void reply(xMsgMessage msg) {
+    /**
+     * Publishes a message using the same proxy used to receive the message.
+     * This method is used in case the request (the publisher)
+     * publishes data in sync ( required a response back).
+     *
+     * @param msg {@link org.jlab.coda.xmsg.core.xMsgMessage} object
+     */
+    public void respondBack(xMsgMessage msg) {
         try {
             publish(con, msg);
         } catch (xMsgException e) {
@@ -82,16 +99,23 @@ public class Subscriber extends xMsg {
         }
     }
 
-
+    /**
+     * Private callback class
+     */
     private class MyCallBack implements xMsgCallBack {
+
+        // variables for naive benchmarking
         long nr = 0;
         long t1;
         long t2;
 
         @Override
-        public xMsgMessage callback(xMsgMessage msg) {
+        public xMsgMessage callback(xMsgMessage msg) throws IOException {
             if (msg.getMetaData().getReplyTo().equals(xMsgConstants.UNDEFINED.getStringValue())) {
-                parseData(msg);
+
+                // we get the data, but will not do anything with itt for communication benchmarking purposes.
+                List<Integer> data = parseData(msg);
+
                 if (nr == 0) {
                     t1 = System.currentTimeMillis();
                 }
@@ -106,23 +130,35 @@ public class Subscriber extends xMsg {
                     nr = 0;
                 }
             } else {
-                // sync request, create/update the xMsgMessage and send it to the sender
+                // sync request, updates the received xMsgMessage and sends it to the sender
+                // reset relyTo metadata field
                 msg.getMetaData().setReplyTo(xMsgConstants.UNDEFINED.getStringValue());
-                reply(msg);
+
+                // sends back "Done" string
+                msg.updateData("Done");
+                respondBack(msg);
             }
             return msg;
         }
 
-        private int parseData(xMsgMessage msg) {
+        /**
+         * De-serializes received message and retrieves List of integers
+         * Note this method is not checking the metadata for the mimeType.
+         *
+         * @param msg {@link org.jlab.coda.xmsg.core.xMsgMessage} object
+         * @return data of the message, otherwise null
+         */
+        private List<Integer> parseData(xMsgMessage msg) {
             try {
-                xMsgData data = xMsgData.parseFrom(msg.getData());
-                if (data.hasFLSINT32()) {
-                    return data.getFLSINT32();
+                xMsgM.xMsgMeta.Builder metadata = msg.getMetaData();
+                if (metadata.getDataType().equals(xMsgConstants.ARRAY_SFIXED32.getStringValue())) {
+                    xMsgData data = xMsgData.parseFrom(msg.getData());
+                    return data.getFLSINT32AList();
                 }
             } catch (InvalidProtocolBufferException e) {
                 e.printStackTrace();
             }
-            return -1;
+            return null;
         }
     }
 }

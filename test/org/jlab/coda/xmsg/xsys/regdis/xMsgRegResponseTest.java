@@ -23,7 +23,7 @@ package org.jlab.coda.xmsg.xsys.regdis;
 
 import org.jlab.coda.xmsg.core.xMsgConstants;
 import org.jlab.coda.xmsg.data.xMsgR.xMsgRegistration;
-import org.jlab.coda.xmsg.excp.xMsgRegistrationException;
+import org.jlab.coda.xmsg.excp.xMsgException;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
@@ -70,7 +70,7 @@ public class xMsgRegResponseTest {
         String error = "could not handle request";
         xMsgRegResponse sendResponse = new xMsgRegResponse("foo:bar", "registration_fe", error);
 
-        expectedEx.expect(xMsgRegistrationException.class);
+        expectedEx.expect(xMsgException.class);
         expectedEx.expectMessage(error);
         new xMsgRegResponse(sendResponse.msg());
     }
@@ -94,7 +94,7 @@ public class xMsgRegResponseTest {
         msg.addString("foo:bar");
         msg.addString("foo_service");
 
-        expectedEx.expect(xMsgRegistrationException.class);
+        expectedEx.expect(xMsgException.class);
         expectedEx.expectMessage("xMsg message format violation");
         new xMsgRegResponse(msg);
     }
@@ -110,7 +110,7 @@ public class xMsgRegResponseTest {
         msg.add(data2.build().toByteArray());
         msg.add(Arrays.copyOf(bb, bb.length - 10));
 
-        expectedEx.expect(xMsgRegistrationException.class);
+        expectedEx.expect(xMsgException.class);
         expectedEx.expectMessage("Could not deserialize data");
         new xMsgRegResponse(msg);
     }

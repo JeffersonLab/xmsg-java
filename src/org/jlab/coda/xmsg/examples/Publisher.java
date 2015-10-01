@@ -32,60 +32,71 @@ import java.io.IOException;
 /**
  * An example of a publisher that publishes data for ever.
  * It does not matter who is subscribing to the messages.
+ * This publisher uses the  proxy, running
+ * on a localhost, with the default poxy port to publish data.
+ *
+ * Published data is a int[] with a specified size.
  *
  * @author gurjyan
  * @version 2.x
  */
 public class Publisher extends xMsg {
 
+    public xMsgConnection con;
+    public xMsgTopic topic;
+
     /**
-     * Constructor, requires the name of the front-end node.
-     * The name is used to open a connection to the registrar service
-     * running in the front-end.
-     * <p>
-     * In this case, localhost is expected to be the front-end.
-     * Thus, an xMsg node must be running in the localhost.
+     * Calls the parent constructor, connects to the
+     * local proxy and creates a topic of conversation,
+     * as well as registers with the local registrar.
+     *
      * @throws IOException
      *
      */
-    public Publisher() throws IOException {
+    public Publisher() throws IOException, xMsgException {
         super("test_publisher");
+
+        // connect to default proxy (local host, default proxy port)
+        con = connect();
+
+        // build the publishing topic (hard codded)
+        final String domain = "test_domain";
+        final String subject = "test_subject";
+        final String type = "test_type";
+        final String description = "test_description";
+        topic = xMsgTopic.build(domain, subject, type);
+
+        // Register this publisher
+        registerAsPublisher(topic, description);
+
     }
 
     public static void main(String[] args) {
         try {
             if (args.length != 1) {
-                System.err.println("Usage: Publisher <data_size_kb>");
+                System.err.println("Usage: Publisher <data_size in KB>");
                 System.exit(1);
             }
 
-            int dataSize = Integer.parseInt(args[0]);
-
-            final String domain = "test_domain";
-            final String subject = "test_subject";
-            final String type = "test_type";
-            final String description = "test_description";
-
+            // create a publisher object
             Publisher publisher = new Publisher();
-            // creating default proxy (local host, default proxy port)
-            // connection
-            xMsgConnection con = publisher.connect();
 
-            // Create the topic
-            xMsgTopic topic = xMsgTopic.build(domain, subject, type);
-
-            // Register this publisher
-            publisher.registerAsPublisher(topic, description);
-
-            // Fill data with a byte array the required size
+            // get the data size to be sent periodically
+            int dataSize = Integer.parseInt(args[0]);
             System.out.println("Byte array size = " + dataSize);
+
+            // create a byte array the required size and set it in a new message
             byte[] b = new byte[dataSize];
-            xMsgMessage msg = new xMsgMessage(topic, b);
 
+            // note that this constructor will create a metadata automatically
+            // based on the type of passed object. In this case since data
+            // is of the int[] object, the metadata will be created with
+            // data type = xMsgConstants.ARRAY_SFIXED32
+            xMsgMessage msg = new xMsgMessage(publisher.topic, b);
 
-            // Publish data for ever
+            // Async publish data for ever
             while (true) {
-                publisher.publish(con, msg);
+                publisher.publish(publisher.con, msg);
             }
 
         } catch (xMsgException | IOException e) {

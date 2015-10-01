@@ -21,19 +21,18 @@
 
 package org.jlab.coda.xmsg.xsys.regdis;
 
-import java.util.Arrays;
-
+import com.google.protobuf.InvalidProtocolBufferException;
 import org.jlab.coda.xmsg.data.xMsgR.xMsgRegistration;
-import org.jlab.coda.xmsg.excp.xMsgRegistrationException;
+import org.jlab.coda.xmsg.excp.xMsgException;
 import org.junit.Before;
 import org.junit.Test;
 import org.zeromq.ZMsg;
 
-import com.google.protobuf.InvalidProtocolBufferException;
+import java.util.Arrays;
 
-import static org.jlab.coda.xmsg.xsys.regdis.RegistrationDataFactory.newRegistration;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.is;
+import static org.jlab.coda.xmsg.xsys.regdis.RegistrationDataFactory.newRegistration;
 
 public class xMsgRegRequestTest {
 
@@ -67,7 +66,7 @@ public class xMsgRegRequestTest {
     }
 
 
-    @Test(expected = xMsgRegistrationException.class)
+    @Test(expected = xMsgException.class)
     public void failWithMalformedMessage() throws Exception {
         ZMsg msg = new ZMsg();
         msg.addString("foo:bar");

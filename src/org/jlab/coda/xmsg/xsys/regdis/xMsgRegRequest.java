@@ -21,17 +21,19 @@
 
 package org.jlab.coda.xmsg.xsys.regdis;
 
-import java.util.Arrays;
-
+import com.google.protobuf.InvalidProtocolBufferException;
 import org.jlab.coda.xmsg.data.xMsgR.xMsgRegistration;
-import org.jlab.coda.xmsg.excp.xMsgRegistrationException;
+import org.jlab.coda.xmsg.excp.xMsgException;
 import org.zeromq.ZFrame;
 import org.zeromq.ZMsg;
 
-import com.google.protobuf.InvalidProtocolBufferException;
+import java.util.Arrays;
 
 /**
- * A wrapper for a a registration or discovery request.
+ * A wrapper for a a registration request.
+ *
+ * @author gurjyan
+ * @since 2.x
  */
 class xMsgRegRequest {
 
@@ -40,11 +42,12 @@ class xMsgRegRequest {
     private final byte[] data;
 
     /**
-     * Constructs a data request.
+     * Constructs registration request using xMsgRegistration data object
      *
      * @param topic the request being responded
      * @param sender the sender of the response
-     * @param data the registration data of the request
+     * @param data the registration data of the request:
+     *             object of {@link org.jlab.coda.xmsg.data.xMsgR.xMsgRegistration}
      */
     public xMsgRegRequest(String topic, String sender, xMsgRegistration data) {
         this.topic = topic;
@@ -52,9 +55,8 @@ class xMsgRegRequest {
         this.data = data.toByteArray();
     }
 
-
     /**
-     * Constructs a text request.
+     * Constructs registration request using String representation of the request
      *
      * @param topic the request being responded
      * @param sender the sender of the response
@@ -66,17 +68,16 @@ class xMsgRegRequest {
         this.data = text.getBytes();
     }
 
-
     /**
-     * Deserializes the request from the given message.
+     * De-serializes the request from the given message.
      *
      * @param msg the message with the response
-     * @throws xMsgRegistrationException when the message is malformed
+     * @throws xMsgException
      */
-    public xMsgRegRequest(ZMsg msg) throws xMsgRegistrationException {
+    public xMsgRegRequest(ZMsg msg) throws xMsgException {
 
         if (msg.size() != 3) {
-            throw new xMsgRegistrationException("xMsg message format violation");
+            throw new xMsgException("xMsg-Error: registration message format violation");
         }
 
         ZFrame topicFrame = msg.pop();
@@ -93,7 +94,6 @@ class xMsgRegRequest {
         }
     }
 
-
     /**
      * Serializes the request into a message.
      *
@@ -107,14 +107,12 @@ class xMsgRegRequest {
         return msg;
     }
 
-
     /**
      * Returns the topic of the request.
      */
     public String topic() {
         return topic;
     }
-
 
     /**
      * Returns the sender of the request.
@@ -123,19 +121,17 @@ class xMsgRegRequest {
         return sender;
     }
 
-
     /**
      * Returns the data of the request.
      *
-     * @throws InvalidProtocolBufferException when the data is corrupted,
+     * @throws InvalidProtocolBufferException when the data is corrupted
      */
     public xMsgRegistration data() throws InvalidProtocolBufferException {
         return xMsgRegistration.parseFrom(data);
     }
 
-
     /**
-     * Returns the text of the request.
+     * Returns the text of the registration request.
      */
     public String text() {
         return new String(data);

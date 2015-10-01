@@ -24,7 +24,7 @@ package org.jlab.coda.xmsg.xsys.regdis;
 import org.jlab.coda.xmsg.core.xMsgConstants;
 import org.jlab.coda.xmsg.core.xMsgUtil;
 import org.jlab.coda.xmsg.data.xMsgR.xMsgRegistration;
-import org.jlab.coda.xmsg.excp.xMsgRegistrationException;
+import org.jlab.coda.xmsg.excp.xMsgException;
 import org.zeromq.ZContext;
 import org.zeromq.ZMQ;
 import org.zeromq.ZMQ.Socket;
@@ -44,25 +44,25 @@ import java.util.Set;
  */
 public class xMsgRegDriver {
 
-    /** 0MQ context.*/
+    // 0MQ context.
     private final ZContext _context;
-    /** Registrar service host IP.*/
-    private final String _registrarIp;
-    /**
-     * Registrar service server (req/rep) connection socket.
-     */
-    private Socket _connectionSocket = null;
-    /** Registrar service listening port.*/
-    private int _registrarPort = xMsgConstants.REGISTRAR_PORT.getIntValue();
 
-    /** Registrar service connection address */
+    // Registrar host name
+    private final String _registrarIp;
+
+    // Registrar tcp address
     private String _address;
 
+    // Registrar server listening port.
+    private int _registrarPort;
+
+    // Registrar server (req/rep) connection socket.
+    private Socket _connectionSocket = null;
+
 
     /**
-     * <p>
-     *     Constructor
-     * </p>
+     * Constructor
+     *
      * @param context 0MQ context
      * @param ip registrar service IP address
      * @param port registrar service listening port
@@ -79,10 +79,8 @@ public class xMsgRegDriver {
     }
 
     /**
-     * <p>
      * Constructor. Uses xMsg registrar service default port
      * {@link org.jlab.coda.xmsg.core.xMsgConstants#REGISTRAR_PORT}
-     * </p>
      *
      * @param context 0MQ context
      * @param ip      registrar service IP address
@@ -90,6 +88,7 @@ public class xMsgRegDriver {
     public xMsgRegDriver(ZContext context, String ip) {
         _context = context;
         _registrarIp = xMsgUtil.validateIP(ip);
+        _registrarPort = xMsgConstants.REGISTRAR_PORT.getIntValue();
         _address = "tcp://" + _registrarIp + ":" + _registrarPort;
         _connectionSocket = _context.createSocket(ZMQ.REQ);
         _connectionSocket.setHWM(0);
@@ -97,22 +96,18 @@ public class xMsgRegDriver {
     }
 
     /**
-     * <p>
      * Defines if the 0MQ socket has been
      * created to the registrar services.
-     * </p>
      *
-     * @return true if connection socket is made
+     * @return true if connection socket to the registrar address is made
      */
     public boolean isConnected() {
         return _connectionSocket!=null;
     }
 
     /**
-     * <p>
      *     Disconnects from the registrar
-     *     service and closes 0MQ socket.
-     * </p>
+     *     and closes 0MQ socket.
      */
     public void disconnect() {
         _connectionSocket.disconnect(_address);
@@ -120,10 +115,9 @@ public class xMsgRegDriver {
     }
 
     /**
-     * <p>
      *     Utility method that returns 0MQ context that
      *     was used to create this xMsg registration driver.
-     * </p>
+     *
      * @return 0MQ context {@link org.zeromq.ZContext}
      */
     public ZContext getContext() {
@@ -131,23 +125,20 @@ public class xMsgRegDriver {
     }
 
     /**
-     * <p>
      *     Utility method that returns IP address of the
      *     registrar service that was used to create this
      *     xMsg registration driver.
-     * </p>
+     *
      * @return IP address of the registrar service
      */
-    public String getIp() {
+    public String getHost() {
         return _registrarIp;
     }
 
     /**
-     * <p>
      * Utility method that returns port of the
      * registrar service that was used to create this
      * xMsg registration driver.
-     * </p>
      *
      * @return port of the registrar service
      */
@@ -156,11 +147,9 @@ public class xMsgRegDriver {
     }
 
     /**
-     * <p>
      * Utility method that returns server address of the
      * registrar service that was used to create this
      * xMsg registration driver.
-     * </p>
      *
      * @return server address the registrar service
      */
@@ -169,11 +158,9 @@ public class xMsgRegDriver {
     }
 
     /**
-     * <p>
      *     Sends sync request to the registrar service and
-     *     receives the xMsg response object
+     *     receives the xMsg registration response object
      *     {@link org.jlab.coda.xmsg.xsys.regdis.xMsgRegResponse}
-     * </p>
      *
      * @param socket 0MQ socket to the registrar service
      * @param request xMsg request object
@@ -184,15 +171,16 @@ public class xMsgRegDriver {
      * @return xMsg response object
      *         {@link org.jlab.coda.xmsg.xsys.regdis.xMsgRegResponse}
      *
-     * @throws xMsgRegistrationException
+     * @throws xMsgException
      */
     protected xMsgRegResponse request(Socket socket, xMsgRegRequest request, int timeout)
-            throws xMsgRegistrationException {
+            throws xMsgException {
         ZMsg requestMsg = request.msg();
         try {
             requestMsg.send(socket);
         } catch (ZMQException e) {
-            throw new xMsgRegistrationException("xMsgRegDriver: Error sending the message");
+            throw new xMsgException("xMsg-Error: sending registration message. " +
+                    e.getMessage(), e.getCause());
         } finally {
             requestMsg.destroy();
         }
@@ -205,47 +193,44 @@ public class xMsgRegDriver {
                 xMsgRegResponse response = new xMsgRegResponse(responseMsg);
                 String status = response.status();
                 if (!status.equals(xMsgConstants.SUCCESS.getStringValue())) {
-                    throw new xMsgRegistrationException(status);
+                    throw new xMsgException("xMsg-Error: unsuccessful registration. status = " + status);
                 }
                 return response;
             } finally {
                 responseMsg.destroy();
             }
         } else {
-            throw new xMsgRegistrationException("xMsgRegDriver: Actor registration timeout");
+            throw new xMsgException("xMsg-Error: Actor registration timeout");
         }
     }
 
     /**
-     * <p>
      *     Checks the validity of the registration data
-     * </p>
+     *
      * @param data registration data
      *             {@link org.jlab.coda.xmsg.data.xMsgR.xMsgRegistration}
-     * @throws xMsgRegistrationException
+     * @throws xMsgException
      */
-    private void _validateData(xMsgRegistration data) throws xMsgRegistrationException {
+    private void _validateData(xMsgRegistration data) throws xMsgException {
         if (!data.isInitialized()) {
-            throw new xMsgRegistrationException("xMsgRegDriver: The registration data is incomplete");
+            throw new xMsgException("xMsg-Error: registration data is incomplete");
         }
     }
 
     /**
-     * <p>
      *     Sends a registration request to the registrar service,
-     *     defined at the constructor. Request is wired using xMsg
-     *     message construct, that have 3 part: topic, sender, and data.
-     * </p>
+     *     defined at the constructor. Request is constructed using xMsg
+     *     message construct, that has 3 part: topic, sender, and data.
      *
      * @param data the registration data object
      *             {@link org.jlab.coda.xmsg.data.xMsgR.xMsgRegistration}
      * @param isPublisher if true then this is a request to register a publisher,
      *                     otherwise this is a request to register a subscriber
-     * @throws xMsgRegistrationException
+     * @throws xMsgException
      */
     public void register(xMsgRegistration data,
                          boolean isPublisher)
-            throws xMsgRegistrationException {
+            throws xMsgException {
 
         _validateData(data);
 
@@ -258,21 +243,19 @@ public class xMsgRegDriver {
     }
 
     /**
-     * <p>
      *     Sends a remove registration request to the registrar service,
-     *     defined at the constructor. Request is wired using xMsg
+     *     defined at the constructor. Request is constructed using xMsg
      *     message construct, that have 3 part: topic, sender, and data.
-     * </p>
      *
      * @param data the registration data object
      *             {@link org.jlab.coda.xmsg.data.xMsgR.xMsgRegistration}
      * @param isPublisher if true then this is a request to register a publisher,
      *                     otherwise this is a request to register a subscriber
-     * @throws xMsgRegistrationException
+     * @throws xMsgException
      */
     public void removeRegistration(xMsgRegistration data,
                                    boolean isPublisher)
-            throws xMsgRegistrationException {
+            throws xMsgException {
 
         _validateData(data);
 
@@ -285,18 +268,16 @@ public class xMsgRegDriver {
     }
 
     /**
-     * <p>
      *     Removes registration of all xMsg actors of the registrar service,
      *     defined at the constructor. This will remove all publishers and
      *     subscribers from the registrar service registration database.
      *     This method is usually called by the xMsgNode registrar when
      *     it shuts down or gets interrupted.
-     * </p>
      *
-     * @throws xMsgRegistrationException
+     * @throws xMsgException
      */
     public void removeAll()
-            throws xMsgRegistrationException {
+            throws xMsgException {
 
         String topic = xMsgConstants.REMOVE_ALL_REGISTRATION.getStringValue();
         int timeout = xMsgConstants.REMOVE_REQUEST_TIMEOUT.getIntValue();
@@ -306,23 +287,21 @@ public class xMsgRegDriver {
     }
 
     /**
-     * <p>
      *     Searched the registration database of the registrar service,
-     *     defined bu the constructor. This will search the database for
-     *     publishers aor subscribers to a specific topic. The topic of
+     *     defined by the constructor. This will search the database for
+     *     publishers sor subscribers to a specific topic. The topic of
      *     an interest is defined within the xMsgRegistration data object
      *     {@link org.jlab.coda.xmsg.data.xMsgR.xMsgRegistration}
-     * </p>
      *
      * @param data the registration data object
      * @param isPublisher if true then this is a request to find publishers,
      *                     otherwise this is a request to find subscribers
      * @return set of publishers or subscribers to the required topic.
-     * @throws xMsgRegistrationException
+     * @throws xMsgException
      */
     public Set<xMsgRegistration> findRegistration(xMsgRegistration data,
                                                   boolean isPublisher)
-            throws xMsgRegistrationException {
+            throws xMsgException {
 
         _validateData(data);
 

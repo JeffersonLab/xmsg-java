@@ -201,12 +201,27 @@ public class xMsgMessage {
     }
 
     /**
+     * Replaces the data with the new object. This method will
+     * do it's best to figure out the type of the object, updating accordingly the
+     * data mimeType. It will also serialize the object and store it as a byte[].
+     * Note that this will fail in case the passed object is not serializable.
+     * So, serializable java objects will be serialized and metadata dataType will
+     * be assigned to the mimeType = "binary/bytes".
+     *
+     * @param data
+     * @throws IOException
+     */
+    public void updateData(Object data) throws IOException {
+        _construct(topic, metaData, data);
+    }
+
+    /**
      * Constructs a message, data of which is passed as an Object. This method will
      * do it's best to figure out the type of the object, updating accordingly the
      * data mimeType. It will also serialize the object and store it as a byte[].
      * Note that this will fail in case the passed object is not serializable.
      * So, serializable java objects will be serialized and metadata dataType will
-     * be assigned to the mimeType input parameter.
+     * be assigned to the mimeType = "binary/bytes".
      *
      * @param topic the topic of the message:
      *              object of {@link org.jlab.coda.xmsg.core.xMsgTopic}

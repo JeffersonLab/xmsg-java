@@ -24,7 +24,6 @@ package org.jlab.coda.xmsg.core;
 import org.jlab.coda.xmsg.data.xMsgR.xMsgRegistration;
 import org.jlab.coda.xmsg.data.xMsgR.xMsgRegistration.Builder;
 import org.jlab.coda.xmsg.excp.xMsgException;
-import org.jlab.coda.xmsg.excp.xMsgRegistrationException;
 import org.jlab.coda.xmsg.net.xMsgConnection;
 import org.jlab.coda.xmsg.net.xMsgConnectionOption;
 import org.jlab.coda.xmsg.net.xMsgPrxAddress;
@@ -363,13 +362,13 @@ public class xMsg {
      * @param topic the topic to which messages will be published:
      *              object of {@link org.jlab.coda.xmsg.core.xMsgTopic}
      * @param description textual description of the published message
-     * @throws xMsgRegistrationException {@link org.jlab.coda.xmsg.excp.xMsgRegistrationException}
+     * @throws xMsgException {@link org.jlab.coda.xmsg.excp.xMsgException}
      * @throws IOException
      */
     public void registerAsPublisher(xMsgRegAddress address,
                                     xMsgTopic topic,
                                     String description)
-            throws xMsgRegistrationException, IOException {
+            throws xMsgException, IOException {
         register(address.getHost(), address.getPort(), topic, description, true);
     }
 
@@ -380,12 +379,12 @@ public class xMsg {
      * @param topic the topic to which messages will be published:
      *              object of {@link org.jlab.coda.xmsg.core.xMsgTopic}
      * @param description textual description of the published message
-     * @throws xMsgRegistrationException {@link org.jlab.coda.xmsg.excp.xMsgRegistrationException}
+     * @throws xMsgException {@link org.jlab.coda.xmsg.excp.xMsgException}
      * @throws IOException
      */
     public void registerAsPublisher(xMsgTopic topic,
                                     String description)
-            throws xMsgRegistrationException, IOException {
+            throws xMsgException, IOException {
         register(defaultRegistrarHost, defaultRegistrarPort, topic, description, true);
     }
 
@@ -397,13 +396,13 @@ public class xMsg {
      * @param topic the subscription topic:
      *              object of {@link org.jlab.coda.xmsg.core.xMsgTopic}
      * @param description textual description of the subscription
-     * @throws xMsgRegistrationException {@link org.jlab.coda.xmsg.excp.xMsgRegistrationException}
+     * @throws xMsgException {@link org.jlab.coda.xmsg.excp.xMsgException}
      * @throws IOException
      */
     public void registerAsSubscriber(xMsgRegAddress address,
                                      xMsgTopic topic,
                                      String description)
-            throws xMsgRegistrationException, IOException {
+            throws xMsgException, IOException {
         register(address.getHost(), address.getPort(), topic, description, false);
     }
 
@@ -414,12 +413,12 @@ public class xMsg {
      * @param topic the subscription topic:
      *              object of {@link org.jlab.coda.xmsg.core.xMsgTopic}
      * @param description textual description of the subscription
-     * @throws xMsgRegistrationException {@link org.jlab.coda.xmsg.excp.xMsgRegistrationException}
+     * @throws xMsgException {@link org.jlab.coda.xmsg.excp.xMsgException}
      * @throws IOException
      */
     public void registerAsSubscriber(xMsgTopic topic,
                                      String description)
-            throws xMsgRegistrationException, IOException {
+            throws xMsgException, IOException {
         register(defaultRegistrarHost, defaultRegistrarPort, topic, description, false);
     }
 
@@ -430,12 +429,12 @@ public class xMsg {
      *                object of {@link org.jlab.coda.xmsg.net.xMsgRegAddress}
      * @param topic the subscription topic:
      *              object of {@link org.jlab.coda.xmsg.core.xMsgTopic}
-     * @throws xMsgRegistrationException
+     * @throws xMsgException
      * @throws IOException
      */
     public void removePublisherRegistration(xMsgRegAddress address,
                                             xMsgTopic topic)
-            throws xMsgRegistrationException, IOException {
+            throws xMsgException, IOException {
         _removeRegistration(address.getHost(), address.getPort(), topic, "", true);
     }
 
@@ -445,11 +444,11 @@ public class xMsg {
      *
      * @param topic the subscription topic:
      *              object of {@link org.jlab.coda.xmsg.core.xMsgTopic}
-     * @throws xMsgRegistrationException
+     * @throws xMsgException
      * @throws IOException
      */
     public void removePublisherRegistration(xMsgTopic topic)
-            throws xMsgRegistrationException, IOException {
+            throws xMsgException, IOException {
         _removeRegistration(defaultRegistrarHost, defaultRegistrarPort, topic, "", true);
     }
 
@@ -460,12 +459,12 @@ public class xMsg {
      *                object of {@link org.jlab.coda.xmsg.net.xMsgRegAddress}
      * @param topic the subscription topic:
      *              object of {@link org.jlab.coda.xmsg.core.xMsgTopic}
-     * @throws xMsgRegistrationException
+     * @throws xMsgException
      * @throws IOException
      */
     public void removeSubscriberRegistration(xMsgRegAddress address,
                                              xMsgTopic topic)
-            throws xMsgRegistrationException, IOException {
+            throws xMsgException, IOException {
         _removeRegistration(address.getHost(), address.getPort(), topic, "", false);
     }
 
@@ -475,11 +474,11 @@ public class xMsg {
      *
      * @param topic the subscription topic:
      *              object of {@link org.jlab.coda.xmsg.core.xMsgTopic}
-     * @throws xMsgRegistrationException
+     * @throws xMsgException
      * @throws IOException
      */
     public void removeSubscriberRegistration(xMsgTopic topic)
-            throws xMsgRegistrationException, IOException {
+            throws xMsgException, IOException {
         _removeRegistration(defaultRegistrarHost, defaultRegistrarPort, topic, "", false);
     }
 
@@ -491,11 +490,11 @@ public class xMsg {
      * @param topic the subscription topic:
      *              object of {@link org.jlab.coda.xmsg.core.xMsgTopic}
      * @return Set of {@link org.jlab.coda.xmsg.data.xMsgR.xMsgRegistration} objects
-     * @throws xMsgRegistrationException
+     * @throws xMsgException
      */
     public Set<xMsgRegistration> findPublishers(xMsgRegAddress address,
                                                 xMsgTopic topic)
-            throws xMsgRegistrationException {
+            throws xMsgException {
 
         return findRegistration(address.getHost(), address.getPort(), topic, true);
     }
@@ -507,10 +506,10 @@ public class xMsg {
      * @param topic the subscription topic:
      *              object of {@link org.jlab.coda.xmsg.core.xMsgTopic}
      * @return Set of {@link org.jlab.coda.xmsg.data.xMsgR.xMsgRegistration} objects
-     * @throws xMsgRegistrationException
+     * @throws xMsgException
      */
     public Set<xMsgRegistration> findPublishers(xMsgTopic topic)
-            throws xMsgRegistrationException {
+            throws xMsgException {
 
         return findRegistration(defaultRegistrarHost, defaultRegistrarPort, topic, true);
     }
@@ -523,11 +522,11 @@ public class xMsg {
      * @param topic the subscription topic:
      *              object of {@link org.jlab.coda.xmsg.core.xMsgTopic}
      * @return Set of {@link org.jlab.coda.xmsg.data.xMsgR.xMsgRegistration} objects
-     * @throws xMsgRegistrationException
+     * @throws xMsgException
      */
     public Set<xMsgRegistration> findSubscribers(xMsgRegAddress address,
                                                  xMsgTopic topic)
-            throws xMsgRegistrationException {
+            throws xMsgException {
 
         return findRegistration(address.getHost(), address.getPort(), topic, false);
     }
@@ -539,10 +538,10 @@ public class xMsg {
      * @param topic the subscription topic:
      *              object of {@link org.jlab.coda.xmsg.core.xMsgTopic}
      * @return Set of {@link org.jlab.coda.xmsg.data.xMsgR.xMsgRegistration} objects
-     * @throws xMsgRegistrationException
+     * @throws xMsgException
      */
     public Set<xMsgRegistration> findSubscribers(xMsgTopic topic)
-            throws xMsgRegistrationException {
+            throws xMsgException {
 
         return findRegistration(defaultRegistrarHost, defaultRegistrarPort, topic, false);
     }
@@ -681,14 +680,14 @@ public class xMsg {
      * @param description textual description of the actor
      * @param isPublisher boolean defines the type of the actor:
      *                    true = publisher, false = subscriber
-     * @throws xMsgRegistrationException
+     * @throws xMsgException
      */
     private void register(String regServerIp,
                           int regServPort,
                           xMsgTopic topic,
                           String description,
                           boolean isPublisher)
-            throws xMsgRegistrationException {
+            throws xMsgException {
 
         // create the registration driver object
         xMsgRegDriver regDriver = new xMsgRegDriver(context, regServerIp, regServPort);
@@ -714,14 +713,14 @@ public class xMsg {
      * @param description textual description of the actor
      * @param isPublisher boolean defines the type of the actor:
      *                    true = publisher, false = subscriber
-     * @throws xMsgRegistrationException
+     * @throws xMsgException
      */
     private void _removeRegistration(String regServerIp,
                                      int regServPort,
                                      xMsgTopic topic,
                                      String description,
                                      boolean isPublisher)
-            throws xMsgRegistrationException {
+            throws xMsgException {
 
         // create the registration driver object
         xMsgRegDriver regDriver = new xMsgRegDriver(context, regServerIp, regServPort);
@@ -746,13 +745,13 @@ public class xMsg {
      *              object of {@link org.jlab.coda.xmsg.core.xMsgTopic}
      * @param isPublisher boolean defines the type of the actor:
      *                    true = publisher, false = subscriber
-     * @throws xMsgRegistrationException
+     * @throws xMsgException
      */
     private Set<xMsgRegistration> findRegistration(String regServerIp,
                                                    int regServPort,
                                                    xMsgTopic topic,
                                                    boolean isPublisher)
-            throws xMsgRegistrationException {
+            throws xMsgException {
 
         // create the registration driver object
         xMsgRegDriver regDriver = new xMsgRegDriver(context, regServerIp, regServPort);
@@ -918,7 +917,11 @@ public class xMsg {
         threadPool.submit(new Runnable() {
             @Override
             public void run() {
-                callback.callback(callbackMsg);
+                try {
+                    callback.callback(callbackMsg);
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
             }
         });
     }

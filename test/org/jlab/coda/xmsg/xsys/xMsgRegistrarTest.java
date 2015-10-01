@@ -26,7 +26,7 @@ import org.jlab.coda.xmsg.core.xMsgTopic;
 import org.jlab.coda.xmsg.core.xMsgUtil;
 import org.jlab.coda.xmsg.data.xMsgR.xMsgRegistration;
 import org.jlab.coda.xmsg.data.xMsgR.xMsgRegistration.Builder;
-import org.jlab.coda.xmsg.excp.xMsgRegistrationException;
+import org.jlab.coda.xmsg.excp.xMsgException;
 import org.jlab.coda.xmsg.testing.IntegrationTest;
 import org.jlab.coda.xmsg.xsys.regdis.RegistrationDataFactory;
 import org.jlab.coda.xmsg.xsys.regdis.xMsgRegDriver;
@@ -88,7 +88,7 @@ public class xMsgRegistrarTest {
     }
 
 
-    public void addRandom(int size) throws xMsgRegistrationException {
+    public void addRandom(int size) throws xMsgException {
         System.out.println("INFO: Registering " + size + " random actors...");
         for (int i = 0; i < size; i++) {
             Builder rndReg = RegistrationDataFactory.randomRegistration();
@@ -99,7 +99,7 @@ public class xMsgRegistrarTest {
     }
 
 
-    public void removeRandom(int size) throws xMsgRegistrationException {
+    public void removeRandom(int size) throws xMsgException {
         System.out.println("INFO: Removing " + size + " random actors...");
 
         int first = new Random().nextInt(registration.size() - size);
@@ -120,13 +120,13 @@ public class xMsgRegistrarTest {
     }
 
 
-    public void removeRandomHost() throws xMsgRegistrationException {
+    public void removeRandomHost() throws xMsgException {
         String host = RegistrationDataFactory.random(RegistrationDataFactory.testHosts);
         removeHost(host);
     }
 
 
-    private void removeHost(String host) throws xMsgRegistrationException {
+    private void removeHost(String host) throws xMsgException {
         System.out.println("INFO: Removing host " + host);
         Iterator<xMsgRegistration> it = registration.iterator();
         while (it.hasNext()) {
@@ -139,7 +139,7 @@ public class xMsgRegistrarTest {
     }
 
 
-    public void removeAll() throws xMsgRegistrationException {
+    public void removeAll() throws xMsgException {
         for (String host : RegistrationDataFactory.testHosts) {
             driver.removeAll();
         }
@@ -147,13 +147,13 @@ public class xMsgRegistrarTest {
     }
 
 
-    public void check() throws xMsgRegistrationException {
+    public void check() throws xMsgException {
         check(true);
         check(false);
     }
 
 
-    private void check(boolean isPublisher) throws xMsgRegistrationException {
+    private void check(boolean isPublisher) throws xMsgException {
         for (String topic : RegistrationDataFactory.testTopics) {
             Builder data = discoveryRequest(topic, isPublisher);
 

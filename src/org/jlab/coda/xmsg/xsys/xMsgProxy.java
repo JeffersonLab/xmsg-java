@@ -28,11 +28,13 @@ import org.jlab.coda.xmsg.excp.xMsgException;
 import org.zeromq.ZContext;
 import org.zeromq.ZMQ;
 
+import java.io.IOException;
+
 /**
- * Runs xMsg pub-sub proxy.
+ * xMsg pub-sub proxy executable.
  * This is a simple stateless message switch, i.e. a device that forwards
  * messages without inspecting them. This simplifies dynamic discovery problem.
- * All xMsg clients (publishers and subscribers) connect to the proxy, instead
+ * All xMsg actors (publishers and subscribers) connect to the proxy, instead
  * of to each other. It becomes trivial to add more subscribers or publishers.
  *
  * @author gurjyan
@@ -60,22 +62,23 @@ public class xMsgProxy {
                 proxy.startProxy(xMsgContext.getContext(), port);
             }
 
-        } catch (xMsgException | NumberFormatException e) {
+        } catch (xMsgException | NumberFormatException | IOException e) {
             e.printStackTrace();
             System.exit(1);
         }
     }
 
     /**
-     * Starts the proxy server of the xMsgNode on a local host.
+     * Starts the proxy on a local host, with specified port.
      *
      * @param context zmq context object
      * @throws xMsgException
      */
-    private void startProxy(ZContext context, int proxyPort) throws xMsgException {
+    private void startProxy(ZContext context, int proxyPort) throws xMsgException, IOException {
 
         System.out.println(xMsgUtil.currentTime(4) +
-                " Info: Running xMsg proxy server on the localhost..." + "\n");
+                " xMsg-Info: Running xMsg proxy on the host = " +
+                xMsgUtil.localhost() + " port = " + proxyPort + "\n");
 
         // setting up the xMsg proxy
         // socket where clients publish their data/messages

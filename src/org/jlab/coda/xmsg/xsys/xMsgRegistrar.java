@@ -30,8 +30,8 @@ import org.zeromq.ZContext;
 import java.io.IOException;
 
 /**
- * xMsgRegistrar.
- * Note that no arg constructed object can play master registrar role.
+ * xMsgRegistrar executable. Starts a local registrar service in it's own thread.
+ *
  *
  * @author gurjyan
  * @since 2.x
@@ -42,30 +42,33 @@ public class xMsgRegistrar {
     private final ZContext context = xMsgContext.getContext();
 
     /**
-     * Starts a local registrar service.
-     * Note: this version assumes that xMsgNode and xMsgFE registrar services
-     * use default registrar port:
+     * This constructor assumes registrar port =
      * {@link org.jlab.coda.xmsg.core.xMsgConstants#REGISTRAR_PORT}
+     *
      * @throws IOException
      *
      */
     public xMsgRegistrar() throws IOException {
-
-        ZContext shadowContext = ZContext.shadow(context);
-
-        // start registrar service
-        xMsgRegService regService = new xMsgRegService(shadowContext,
-                xMsgUtil.localhost(), xMsgConstants.REGISTRAR_PORT.getIntValue());
-        regServiceThread = xMsgUtil.newThread("registration-service", regService);
+        this(xMsgConstants.REGISTRAR_PORT.getIntValue());
     }
 
+    /**
+     * Creates {@link org.jlab.coda.xmsg.xsys.regdis.xMsgRegService} object
+     * with a specified port number.
+     *
+     * @param port registrar port number
+     * @throws IOException
+     */
     public xMsgRegistrar(int port) throws IOException {
 
         ZContext shadowContext = ZContext.shadow(context);
 
-        // start registrar service
+        // create registrar service object
         xMsgRegService regService = new xMsgRegService(shadowContext,
                 xMsgUtil.localhost(), port);
+
+        // create a new thread that will satisfy registration and discovery requests
+        // using created registrar runnable object
         regServiceThread = xMsgUtil.newThread("registration-service", regService);
     }
 
@@ -82,7 +85,6 @@ public class xMsgRegistrar {
                 }
             }
 
-
             final xMsgRegistrar registrar;
             if (port <= 0) {
                 registrar = new xMsgRegistrar();
@@ -97,6 +99,7 @@ public class xMsgRegistrar {
                 }
             });
 
+            // start the thread to service the requests
             registrar.start();
 
         } catch (IOException e) {
@@ -106,10 +109,16 @@ public class xMsgRegistrar {
         }
     }
 
+    /**
+     * Starts the registration and discovery servicing thread
+     */
     public void start() {
         regServiceThread.start();
     }
 
+    /**
+     * Registrar servicing thread shutdown routine
+     */
     public void shutdown() {
         try {
             context.destroy();

@@ -36,14 +36,12 @@ import java.util.HashSet;
 import java.util.Set;
 
 /**
- * The main registrar service, always running in a separate thread.
+ * The main registrar service or registrar (names are used interchangeably).
+ * Note that the object of this class always running in a separate thread.
+ * This class is used by the xMsgRegistrar executable.
  * <p>
- * Contains two separate databases to store publishers and subscribers
- * registration data. The key for the data base is the xMsg topic, constructed
- * as: {@code domain:subject:type}.
+ * Creates and maintains two separate databases to store publishers and subscribers
  * <p>
- * A 0MQ REP socket is created on the default port
- * {@link org.jlab.coda.xmsg.core.xMsgConstants#REGISTRAR_PORT}.
  * The following requests will be serviced:
  * <ul>
  *   <li>Register publisher</li>
@@ -52,12 +50,13 @@ import java.util.Set;
  *   <li>Find subscriber</li>
  * </ul>
  *
+ * @author gurjyan
+ * @since 2.x
  */
 
 public class xMsgRegService implements Runnable {
 
-    // zmq context.
-    // Note. this class does not own the context.
+    // 0MQ context.
     private final ZContext context;
 
     // Database to store publishers
@@ -66,66 +65,33 @@ public class xMsgRegService implements Runnable {
     // database to store subscribers
     private final xMsgRegDatabase subscribers = new xMsgRegDatabase();
 
-    // Registrar accepted requests from any host (*)
-    private final String host = xMsgConstants.ANY.getStringValue();
-    // Used as a prefix to the name of this registrar.
-    // The name of the registrar is used to set the sender field
-    // when it creates a request message to be sent to the requester.
-    private final String localProxyIp;
+    private final String registrarHost;
+
     // Default port of the registrar
-    private int proxyPort = xMsgConstants.REGISTRAR_PORT.getIntValue();
+    private int registrarPort = xMsgConstants.REGISTRAR_PORT.getIntValue();
+
 
     /**
-     * Constructor for the front-end registration.
+     * Creates a xMsg registrar object.
      *
-     * @param context the shared 0MQ context
+     * @param context 0MQ context
+     * @param registrarHost host of the registrar
+     * @param registrarPort the port of the registrar
      * @throws IOException
      */
-    public xMsgRegService(ZContext context, String proxyIp, int proxyPort) throws IOException {
+    public xMsgRegService(ZContext context, String registrarHost, int registrarPort) throws IOException {
         this.context = context;
-        this.proxyPort = proxyPort;
-        localProxyIp = proxyIp;
-    }
-
-
-    /**
-     * Constructor for the common node registration.
-     * <p>
-     * An xMsg node periodically reports/update the front-end registration
-     * database with the data stored in its local database.
-     * This process makes sure there is a proper duplication of the registration
-     * data for clients seeking global discovery of publishers/subscribers.
-     * <p>
-     * It is true that discovery can be done using xMsgNode registrar service
-     * only, however by introducing xMsgFE, xMsgNodes can come and go, thus
-     * making xMsg message-space elastic.
-     *
-     * @param feProxyIp the host of the front-end
-     * @param feProxyPort the port of the front-end proxy
-     * @param proxyPort the port of the local proxy
-     * @param context the shared 0MQ context
-     * @throws IOException
-     */
-    public xMsgRegService(ZContext context, String proxyIp, int proxyPort,
-                          String feProxyIp, int feProxyPort)
-            throws IOException  {
-        this(context, proxyIp, proxyPort);
-         /*
-         * Start a thread with periodic process (hard-coded 5 sec. interval) that
-         * updates xMsgFE database with the data stored in the local databases.
-         */
-        xMsgRegDriver driver = new xMsgRegDriver(context, feProxyIp, feProxyPort);
-        xMsgRegUpdater updater = new xMsgRegUpdater(driver, publishers, subscribers);
-        Thread t = xMsgUtil.newThread("registration-updater", updater);
-        t.start();
+        this.registrarPort = registrarPort;
+        this.registrarHost = registrarHost;
     }
 
     @Override
     public void run() {
-        log("Info: xMsg local registration and discovery server is started");
+        log(xMsgUtil.currentTime(4) + " xMsg-Info: registration and discovery server is started at address = " +
+                "tcp://" + registrarHost + ":" + registrarPort);
 
         ZMQ.Socket regSocket = context.createSocket(ZMQ.REP);
-        regSocket.bind("tcp://" + host + ":" + proxyPort);
+        regSocket.bind("tcp://" + registrarHost + ":" + registrarPort);
 
         while (!Thread.currentThread().isInterrupted()) {
             try {
@@ -148,19 +114,35 @@ public class xMsgRegService implements Runnable {
             }
         }
         context.destroy();
-        log("Info: shutting down xMsg local registration and discovery server");
+        log("xMsg-Info: shutting down xMsg registration and discovery server");
     }
 
-
+    /**
+     * Registration request processing routine that runs in this thread.
+     *
+     * @param requestMsg serialized 0MQ message of the wire
+     * @return serialized response: 0MQ message ready to go over the wire
+     */
     ZMsg processRequest(ZMsg requestMsg) {
-        String topic = xMsgConstants.UNDEFINED.getStringValue();
-        String sender = localProxyIp + ":" + xMsgConstants.REGISTRAR.getStringValue();
 
+        // Preparing fields to furnish the response back.
+        // Note these fields do not play any critical role what so ever, due to
+        // the fact that registration is done using client-server type communication,
+        // and are always synchronous.
+        String topic = xMsgConstants.UNDEFINED.getStringValue();
+        String sender = registrarHost + ":" + xMsgConstants.REGISTRAR.getStringValue();
+
+        // response message
         xMsgRegResponse reply;
 
         try {
+            // prepare the set to store registration info going back to the requester
             Set<xMsgRegistration> registration = new HashSet<>();
+
+            // create a xMsgRegRequest object from the serialized 0MQ message
             xMsgRegRequest request = new xMsgRegRequest(requestMsg);
+
+            // retrieve the topic
             topic = request.topic();
 
             if (topic.equals(xMsgConstants.REGISTER_PUBLISHER.getStringValue())) {
@@ -191,7 +173,7 @@ public class xMsgRegService implements Runnable {
                                                 data.getSubject(),
                                                 data.getType());
             } else {
-                log("Warning: unknown registration request type...");
+                log("xMsg-Warning: unknown registration request type");
                 reply = new xMsgRegResponse(topic, sender, "unknown registration request");
                 return reply.msg();
             }
@@ -206,14 +188,22 @@ public class xMsgRegService implements Runnable {
         return reply.msg();
     }
 
-
+    /**
+     * Prints on a stdio with an appropriate time stamp.
+     *
+     * @param msg
+     */
     private void log(String msg) {
         System.out.println(xMsgUtil.currentTime(4) + " " + msg);
     }
 
-
+    /**
+     * Prints exception stackTrace with an appropriate time stamp.
+     * @param e
+     */
     private void log(Exception e) {
-        System.err.print(xMsgUtil.currentTime(4) + " ");
+        System.err.print(xMsgUtil.currentTime(4) +
+                " message = " + e.getMessage() + " cause = " + e.getCause()+" ");
         e.printStackTrace();
     }
 }

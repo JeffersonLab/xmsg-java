@@ -21,6 +21,8 @@
 
 package org.jlab.coda.xmsg.core;
 
+import java.io.IOException;
+
 /**
  * xMsg callback interface.
  *
@@ -29,5 +31,5 @@ package org.jlab.coda.xmsg.core;
  */
 public interface xMsgCallBack {
 
-    xMsgMessage callback(xMsgMessage msg);
+    xMsgMessage callback(xMsgMessage msg) throws IOException;
 }

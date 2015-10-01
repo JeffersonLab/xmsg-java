@@ -41,7 +41,7 @@ import java.util.regex.Pattern;
  * xMsg utility methods.
  *
  * @author gurjyan
- * @since 1.0
+ * @since 2.0
  */
 
 public final class xMsgUtil {
