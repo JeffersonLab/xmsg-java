@@ -335,7 +335,7 @@ public class xMsg {
      *
      * @throws xMsgException
      */
-    public void destruct() throws xMsgException {
+    public void destroy() throws xMsgException {
         for (xMsgSubscription sh : mySubscriptions.values()) {
             unsubscribe(sh);
         }
@@ -349,9 +349,9 @@ public class xMsg {
      * @param linger linger period for closing the 0MQ context
      * @throws xMsgException
      */
-    public void destruct(int linger) throws xMsgException {
+    public void destroy(int linger) throws xMsgException {
         context.setLinger(linger);
-        destruct();
+        destroy();
     }
 
     /**

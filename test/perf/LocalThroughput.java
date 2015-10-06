@@ -78,7 +78,7 @@ public final class LocalThroughput {
             printf("mean throughput: %.3f [Mb/s]%n", megabits);
 
             subscriber.unsubscribe(sub);
-            subscriber.destruct();
+            subscriber.destroy();
 
         } catch (IOException | xMsgException e) {
             e.printStackTrace();

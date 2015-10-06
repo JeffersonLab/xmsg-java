@@ -37,7 +37,7 @@ public final class RemoteThroughput {
                 publisher.publish(con, msg);
             }
 
-            publisher.destruct();
+            publisher.destroy();
 
         } catch (IOException | xMsgException e) {
             e.printStackTrace();
