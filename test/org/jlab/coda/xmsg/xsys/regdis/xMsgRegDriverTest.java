@@ -22,12 +22,15 @@
 package org.jlab.coda.xmsg.xsys.regdis;
 
 import org.jlab.coda.xmsg.core.xMsgConstants;
+import org.jlab.coda.xmsg.core.xMsgTopic;
+import org.jlab.coda.xmsg.core.xMsgUtil;
 import org.jlab.coda.xmsg.data.xMsgR.xMsgRegistration;
 import org.jlab.coda.xmsg.data.xMsgR.xMsgRegistration.Builder;
 import org.junit.Before;
 import org.junit.Test;
 import org.zeromq.ZContext;
 
+import java.io.IOException;
 import java.util.Arrays;
 import java.util.HashSet;
 import java.util.Set;
@@ -50,23 +53,11 @@ public class xMsgRegDriverTest {
 
 
     public xMsgRegDriverTest() {
-        publisher = xMsgRegistration.newBuilder();
-        publisher.setName("bradbury_pub");
-        publisher.setHost("localhost");
-        publisher.setPort(xMsgConstants.DEFAULT_PORT.getIntValue());
-        publisher.setDomain("writer");
-        publisher.setSubject("scifi");
-        publisher.setType("books");
+        publisher = createRegData("bradbury_pub", "writer:scifi:books");
         publisher.setOwnerType(xMsgRegistration.OwnerType.PUBLISHER);
         publisher.setDescription("bradbury books");
 
-        subscriber = xMsgRegistration.newBuilder();
-        subscriber.setName("bradbury_sub");
-        subscriber.setHost("localhost");
-        subscriber.setPort(xMsgConstants.DEFAULT_PORT.getIntValue());
-        subscriber.setDomain("writer");
-        subscriber.setSubject("scifi");
-        subscriber.setType("books");
+        subscriber = createRegData("bradbury_sub", "writer:scifi:books");
         subscriber.setOwnerType(xMsgRegistration.OwnerType.SUBSCRIBER);
         subscriber.setDescription("bradbury books");
 
@@ -181,5 +172,22 @@ public class xMsgRegDriverTest {
 
     private void setResponse(xMsgRegResponse response) throws Exception {
         doReturn(response).when(driver).request(any(xMsgRegRequest.class), anyInt());
+    }
+
+
+    private xMsgRegistration.Builder createRegData(String name, String topic) {
+        try {
+            xMsgTopic xtopic = xMsgTopic.wrap(topic);
+            xMsgRegistration.Builder data = xMsgRegistration.newBuilder();
+            data.setName(name);
+            data.setHost(xMsgUtil.localhost());
+            data.setPort(xMsgConstants.DEFAULT_PORT.getIntValue());
+            data.setDomain(xtopic.domain());
+            data.setSubject(xtopic.subject());
+            data.setType(xtopic.type());
+            return data;
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
     }
 }
