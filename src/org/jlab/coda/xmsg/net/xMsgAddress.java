@@ -21,29 +21,18 @@
 
 package org.jlab.coda.xmsg.net;
 
-import org.jlab.coda.xmsg.core.xMsgConstants;
 import org.jlab.coda.xmsg.core.xMsgUtil;
 
 /**
- * xMsg network address.
+ *  xMsg address.
  *
  * @author gurjyan
- * @since 1.0
+ * @version 2.x
  */
 public class xMsgAddress {
 
     private final String host;
     private final int port;
-
-    /**
-     * Creates an address using the provided IP and the default port.
-     *
-     * @param hostAddress the host IP address
-     */
-    public xMsgAddress(String hostAddress) {
-        this.host = xMsgUtil.validateIP(hostAddress);
-        this.port = xMsgConstants.DEFAULT_PORT.toInteger();
-    }
 
     /**
      * Creates an address using provided IP and port.
@@ -75,33 +64,24 @@ public class xMsgAddress {
         return this.host + ":" + this.port;
     }
 
+
     @Override
-    public int hashCode() {
-        final int prime = 31;
-        int result = 1;
-        result = prime * result + host.hashCode();
-        result = prime * result + port;
-        return result;
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (!(o instanceof xMsgAddress)) return false;
+
+        xMsgAddress that = (xMsgAddress) o;
+
+        if (port != that.port) return false;
+        if (host != null ? !host.equals(that.host) : that.host != null) return false;
+
+        return true;
     }
 
     @Override
-    public boolean equals(Object obj) {
-        if (this == obj) {
-            return true;
-        }
-        if (obj == null) {
-            return false;
-        }
-        if (getClass() != obj.getClass()) {
-            return false;
-        }
-        xMsgAddress other = (xMsgAddress) obj;
-        if (!host.equals(other.host)) {
-            return false;
-        }
-        if (port != other.port) {
-            return false;
-        }
-        return true;
+    public int hashCode() {
+        int result = host != null ? host.hashCode() : 0;
+        result = 31 * result + port;
+        return result;
     }
 }

@@ -21,6 +21,8 @@
 
 package org.jlab.coda.xmsg.xsys;
 
+import org.jlab.coda.xmsg.core.xMsgConstants;
+import org.jlab.coda.xmsg.core.xMsgContext;
 import org.jlab.coda.xmsg.core.xMsgUtil;
 import org.jlab.coda.xmsg.xsys.regdis.xMsgRegService;
 import org.zeromq.ZContext;
@@ -28,108 +30,66 @@ import org.zeromq.ZContext;
 import java.io.IOException;
 
 /**
- * xMsgRegistrar.
- * Note that no arg constructed object can play master registrar role.
+ * xMsgRegistrar executable. Starts a local registrar service in it's own thread.
+ *
  *
  * @author gurjyan
- * @since 1.0
+ * @since 2.x
  */
 public class xMsgRegistrar {
 
     private final Thread regServiceThread;
-    private final ZContext context = new ZContext();
+    private final ZContext context = xMsgContext.getContext();
 
     /**
-     * Starts a local registrar service.
-     * Note: this version assumes that xMsgNode and xMsgFE registrar services
-     * use default registrar port:
+     * This constructor assumes registrar port =
      * {@link org.jlab.coda.xmsg.core.xMsgConstants#REGISTRAR_PORT}
+     *
      * @throws IOException
      *
-     * @throws SocketException
-     * @throws xMsgException
      */
     public xMsgRegistrar() throws IOException {
-
-        ZContext shadowContext = ZContext.shadow(context);
-
-        // start registrar service
-        xMsgRegService regService = new xMsgRegService(shadowContext);
-        regServiceThread = xMsgUtil.newThread("registration-service", regService);
+        this(xMsgConstants.REGISTRAR_PORT.getIntValue());
     }
-
 
     /**
-     * Starts a local registrar service.
-     * Constructor of the {@link xMsgRegService} class will start a
-     * thread that will periodically report local registration database to
-     * xMsgRegistrar service that is defined to be a master Registrar service
-     * (FE).
-     * This way registration data is distributed/duplicated between xMsgNode and
-     * xMsgFE registrar services.
-     * That is the reason we need to pass xMsg front-end host name.
-     * <p>
-     * Note: this version assumes that xMsgNode and xMsgFE registrar services
-     * use default registrar port:
-     * {@link org.jlab.coda.xmsg.core.xMsgConstants#REGISTRAR_PORT}
+     * Creates {@link org.jlab.coda.xmsg.xsys.regdis.xMsgRegService} object
+     * with a specified port number.
      *
-     * @param feHost xMsg front-end host. Host is passed through command line -h option,
-     *               or through the environmental variable: XMSG_FE_HOST
+     * @param port registrar port number
      * @throws IOException
-     * @throws xMsgException
      */
-    public xMsgRegistrar(final String feHost) throws IOException {
+    public xMsgRegistrar(int port) throws IOException {
 
-        // Zmq context
         ZContext shadowContext = ZContext.shadow(context);
 
-        // Local registrar service.
-        // In this case this specific constructor starts a thread
-        // that periodically updates front-end registrar database with
-        // the data from the local databases
-        xMsgRegService regService = new xMsgRegService(shadowContext, feHost);
+        // create registrar service object
+        xMsgRegService regService = new xMsgRegService(shadowContext,
+                xMsgUtil.localhost(), port);
+
+        // create a new thread that will satisfy registration and discovery requests
+        // using created registrar runnable object
         regServiceThread = xMsgUtil.newThread("registration-service", regService);
-    }
-
-
-    public void start() {
-        regServiceThread.start();
-    }
-
-
-    public void shutdown() {
-        try {
-            context.destroy();
-            regServiceThread.interrupt();
-            regServiceThread.join();
-        } catch (InterruptedException e) {
-            e.printStackTrace();
-        }
     }
 
 
     public static void main(String[] args) {
         try {
-            String localHost = xMsgUtil.localhost();
-            String frontEndHost = localHost;
+            int port = 0;
             if (args.length == 2) {
-                if (args[0].equals("-fe_host")) {
-                    frontEndHost = xMsgUtil.toHostAddress(args[1]);
+                if (args[0].equals("-port")) {
+                    port = Integer.parseInt(args[1]);
                 } else {
-                    System.err.println("Wrong option. Accepts -fe_host option only.");
+                    System.err.println("Wrong option. Accepts -port option only.");
                     System.exit(1);
                 }
-            } else if (args.length != 0) {
-                System.err.println("Wrong arguments. Accepts -fe_host option only.");
-                System.exit(1);
             }
 
-
             final xMsgRegistrar registrar;
-            if (frontEndHost.equals(localHost)) {
+            if (port <= 0) {
                 registrar = new xMsgRegistrar();
             } else {
-                registrar = new xMsgRegistrar(frontEndHost);
+                registrar = new xMsgRegistrar(port);
             }
 
             Runtime.getRuntime().addShutdownHook(new Thread() {
@@ -139,12 +99,33 @@ public class xMsgRegistrar {
                 }
             });
 
+            // start the thread to service the requests
             registrar.start();
 
         } catch (IOException e) {
             System.out.println(e.getMessage());
             System.out.println("exiting...");
             System.exit(1);
+        }
+    }
+
+    /**
+     * Starts the registration and discovery servicing thread
+     */
+    public void start() {
+        regServiceThread.start();
+    }
+
+    /**
+     * Registrar servicing thread shutdown routine
+     */
+    public void shutdown() {
+        try {
+            context.destroy();
+            regServiceThread.interrupt();
+            regServiceThread.join();
+        } catch (InterruptedException e) {
+            e.printStackTrace();
         }
     }
 }

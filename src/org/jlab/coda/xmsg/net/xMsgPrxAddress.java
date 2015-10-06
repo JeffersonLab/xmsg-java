@@ -19,17 +19,24 @@
  * SUPPORT, UPDATES, ENHANCEMENTS, OR MODIFICATIONS.
  */
 
-package org.jlab.coda.xmsg.excp;
+package org.jlab.coda.xmsg.net;
+
+
+import org.jlab.coda.xmsg.core.xMsgConstants;
 
 /**
- * xMsgRegistrationException class.
+ * xMsg proxy address.
  *
  * @author gurjyan
- * @since 1.0
+ * @version 2.x
  */
-public class xMsgRegistrationException extends xMsgException {
+public class xMsgPrxAddress extends xMsgAddress {
 
-    public xMsgRegistrationException(String message) {
-        super(message);
+    public xMsgPrxAddress(String host, int port) {
+        super(host, port);
+    }
+
+    public xMsgPrxAddress(String host) {
+        super(host, xMsgConstants.DEFAULT_PORT.getIntValue());
     }
 }

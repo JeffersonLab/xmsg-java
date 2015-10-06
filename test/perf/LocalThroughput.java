@@ -1,16 +1,10 @@
 package perf;
 
-import java.io.IOException;
-
-import org.jlab.coda.xmsg.core.xMsg;
-import org.jlab.coda.xmsg.core.xMsgCallBack;
-import org.jlab.coda.xmsg.core.xMsgMessage;
-import org.jlab.coda.xmsg.core.xMsgSubscription;
-import org.jlab.coda.xmsg.core.xMsgTopic;
-import org.jlab.coda.xmsg.core.xMsgUtil;
+import org.jlab.coda.xmsg.core.*;
 import org.jlab.coda.xmsg.excp.xMsgException;
-import org.jlab.coda.xmsg.net.xMsgAddress;
 import org.jlab.coda.xmsg.net.xMsgConnection;
+
+import java.io.IOException;
 
 public final class LocalThroughput {
 
@@ -36,15 +30,14 @@ public final class LocalThroughput {
         final Timer timer = new Timer();
 
         try {
-            final xMsg subscriber = new xMsg("throughput_subscriber");
-            final xMsgAddress pubNode = new xMsgAddress(xMsgUtil.toHostAddress(bindTo));
-            final xMsgConnection connection = subscriber.getNewConnection(pubNode);
+            final xMsg subscriber = new xMsg("throughput_subscriber", 1);
+            xMsgConnection con = subscriber.connect();
             final xMsgTopic topic = xMsgTopic.wrap("thr_topic");
 
             xMsgUtil.sleep(100);
 
-            subscriber.setPoolSize(1);
-            xMsgSubscription sub = subscriber.subscribe(connection, topic, new xMsgCallBack() {
+            xMsgSubscription sub = subscriber.subscribe(con,
+                    topic, new xMsgCallBack() {
 
                 @Override
                 public xMsgMessage callback(xMsgMessage msg) {
@@ -85,7 +78,7 @@ public final class LocalThroughput {
             printf("mean throughput: %.3f [Mb/s]%n", megabits);
 
             subscriber.unsubscribe(sub);
-            subscriber.destroy();
+            subscriber.destruct();
 
         } catch (IOException | xMsgException e) {
             e.printStackTrace();

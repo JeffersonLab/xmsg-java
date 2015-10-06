@@ -25,13 +25,13 @@ package org.jlab.coda.xmsg.core;
  * xMsg constants.
  *
  * @author gurjyan
- * @since 1.0
+ * @since 2.x
  */
 public enum xMsgConstants {
 
-    UNDEFINED(0, "undefined"),
-    SUCCESS(1, "success"),
-    ANY(2, "*"),
+    UNDEFINED(20, "undefined"),
+    SUCCESS(21, "success"),
+    ANY(22, "*"),
 
     REGISTRAR(3, "xMsg_Registrar"),
 
@@ -59,8 +59,29 @@ public enum xMsgConstants {
     BIND(17, "bind"),
     CONNECT(18, "connect"),
 
-    DEFAULT_PORT(7771, "defaultPort"),
-    REGISTRAR_PORT(8888, "registrarPort");
+    DEFAULT_PORT(7771, "proxyPort"),
+    REGISTRAR_PORT(8888, "registrarPort"),
+
+    DEFAULT_POOL_SIZE(2, "defaultPoolSize"),
+
+    SINT32(0, "binary/sint32"),
+    SINT64(0, "binary/sint64"),
+    SFIXED32(0, "binary/sfixed32"),
+    SFIXED64(0, "binary/sfixed64"),
+    FLOAT(0, "binary/float"),
+    DOUBLE(0, "binary/double"),
+    STRING(0, "text/string"),
+    BYTES(0, "binary/bytes"),
+
+    ARRAY_SINT32(0, "binary/array-sint32"),
+    ARRAY_SINT64(0, "binary/array-sint64"),
+    ARRAY_SFIXED32(0, "binary/array-sfixed32"),
+    ARRAY_SFIXED64(0, "binary/array-sfixed32"),
+    ARRAY_FLOAT(0, "binary/array-float"),
+    ARRAY_DOUBLE(0, "binary/array-double"),
+    ARRAY_STRING(0, "binary/array-string"),
+    ARRAY_BYTES(0, "binary/array-string");
+
 
     private final int intValue;
     private final String stringValue;
@@ -70,12 +91,11 @@ public enum xMsgConstants {
         this.stringValue = stringValue;
     }
 
-    public int toInteger() {
+    public int getIntValue() {
         return intValue;
     }
 
-    @Override
-    public String toString() {
+    public String getStringValue() {
         return stringValue;
     }
 }

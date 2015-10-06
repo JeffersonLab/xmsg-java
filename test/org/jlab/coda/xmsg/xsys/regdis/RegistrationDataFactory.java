@@ -21,18 +21,14 @@
 
 package org.jlab.coda.xmsg.xsys.regdis;
 
-import java.util.Random;
-
 import org.jlab.coda.xmsg.core.xMsgConstants;
 import org.jlab.coda.xmsg.core.xMsgTopic;
 import org.jlab.coda.xmsg.data.xMsgR.xMsgRegistration;
 import org.jlab.coda.xmsg.data.xMsgR.xMsgRegistration.Builder;
 
+import java.util.Random;
+
 public final class RegistrationDataFactory {
-
-    private RegistrationDataFactory() { }
-
-    private static Random rnd = new Random();
 
     public static String[] testTopics = {
         "writer",
@@ -52,14 +48,12 @@ public final class RegistrationDataFactory {
         "actor:drama:movies",
         "actor:drama:series",
     };
-
     public static String[] testNames = { "A", "B", "C", "D", "E",
                                          "F", "G", "H", "I", "J",
                                          "K", "L", "M", "N", "O",
                                          "P", "Q", "R", "S", "T",
                                          "U", "V", "W", "X", "Y",
                                          "Z" };
-
     public static String[] testHosts = {
         "10.2.9.50",  "10.2.9.60",
         "10.2.9.51",  "10.2.9.61",
@@ -72,7 +66,10 @@ public final class RegistrationDataFactory {
         "10.2.9.58",  "10.2.9.68",
         "10.2.9.59",  "10.2.9.69",
     };
+    private static Random rnd = new Random();
 
+    private RegistrationDataFactory() {
+    }
 
     public static Builder newRegistration(String name,
                                           String host,
@@ -85,7 +82,7 @@ public final class RegistrationDataFactory {
         xMsgTopic xtopic = xMsgTopic.wrap(topic);
         data.setName(name);
         data.setHost(host);
-        data.setPort(xMsgConstants.DEFAULT_PORT.toInteger());
+        data.setPort(xMsgConstants.DEFAULT_PORT.getIntValue());
         data.setDomain(xtopic.domain());
         data.setSubject(xtopic.subject());
         data.setType(xtopic.type());

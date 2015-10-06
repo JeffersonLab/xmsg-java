@@ -31,10 +31,7 @@ import org.zeromq.ZContext;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.is;
-import static org.mockito.Mockito.eq;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
+import static org.mockito.Mockito.*;
 
 public class xMsgTest {
 
@@ -46,8 +43,8 @@ public class xMsgTest {
     public void setup() throws Exception {
         driver = mock(xMsgRegDriver.class);
         when(driver.getContext()).thenReturn(mock(ZContext.class));
-        when(driver.getLocalAddress()).thenReturn(xMsgUtil.localhost());
-        core = new xMsg(name, driver);
+        when(driver.getAddress()).thenReturn(xMsgUtil.localhost());
+        core = new xMsg(name);
     }
 
 
@@ -55,92 +52,44 @@ public class xMsgTest {
     public void registerPublisher() throws Exception {
         xMsgTopic topic = xMsgTopic.wrap("writer:scifi:book");
 
-        core.registerPublisher(topic, "test pub");
+        core.registerAsPublisher(topic, "test pub");
 
         RegValidator validator = new RegValidator(topic, true);
         validator.desc = "test pub";
         validator.assertDriverCall("register");
     }
-
-
-    @Test
-    public void registerLocalPublisher() throws Exception {
-        xMsgTopic topic = xMsgTopic.wrap("writer:scifi:book");
-
-        core.registerLocalPublisher(topic, "test pub");
-
-        RegValidator validator = new RegValidator(topic, true);
-        validator.desc = "test pub";
-        validator.assertDriverCall("registerLocal");
-    }
-
 
     @Test
     public void registerSubscriber() throws Exception {
         xMsgTopic topic = xMsgTopic.wrap("writer:scifi:book");
 
-        core.registerSubscriber(topic, "test sub");
+        core.registerAsSubscriber(topic, "test sub");
 
         RegValidator validator = new RegValidator(topic, false);
         validator.desc = "test sub";
         validator.assertDriverCall("register");
     }
 
-
-    @Test
-    public void registerLocalSubscriber() throws Exception {
-        xMsgTopic topic = xMsgTopic.wrap("writer:scifi:book");
-
-        core.registerLocalSubscriber(topic, "test sub");
-
-        RegValidator validator = new RegValidator(topic, false);
-        validator.desc = "test sub";
-        validator.assertDriverCall("registerLocal");
-    }
-
-
     @Test
     public void removePublisher() throws Exception {
         xMsgTopic topic = xMsgTopic.wrap("writer:scifi:book");
 
-        core.removePublisher(topic);
+        core.removePublisherRegistration(topic);
 
         RegValidator validator = new RegValidator(topic, true);
         validator.assertDriverCall("remove");
     }
-
-
-    @Test
-    public void removeLocalPublisher() throws Exception {
-        xMsgTopic topic = xMsgTopic.wrap("writer:scifi:book");
-
-        core.removeLocalPublisher(topic);
-
-        RegValidator validator = new RegValidator(topic, true);
-        validator.assertDriverCall("removeLocal");
-    }
-
 
     @Test
     public void removeSubscriber() throws Exception {
         xMsgTopic topic = xMsgTopic.wrap("writer:scifi:book");
 
-        core.removeSubscriber(topic);
+        core.removeSubscriberRegistration(topic);
 
         RegValidator validator = new RegValidator(topic, false);
         validator.assertDriverCall("remove");
     }
 
-
-    @Test
-    public void removeLocalSubscriber() throws Exception {
-        xMsgTopic topic = xMsgTopic.wrap("writer:scifi:book");
-
-        core.removeLocalSubscriber(topic);
-
-        RegValidator validator = new RegValidator(topic, false);
-        validator.assertDriverCall("removeLocal");
-    }
 
 
     @Test
@@ -155,17 +104,6 @@ public class xMsgTest {
 
 
     @Test
-    public void findLocalPublishers() throws Exception {
-        xMsgTopic topic = xMsgTopic.wrap("writer:scifi:book");
-
-        core.findLocalPublishers(topic);
-
-        RegValidator validator = new RegValidator(topic, true);
-        validator.assertDriverCall("findLocal");
-    }
-
-
-    @Test
     public void findSubscribers() throws Exception {
         xMsgTopic topic = xMsgTopic.wrap("writer:scifi");
         core.findSubscribers(topic);
@@ -174,15 +112,6 @@ public class xMsgTest {
         validator.assertDriverCall("find");
     }
 
-
-    @Test
-    public void findLocalSubscribers() throws Exception {
-        xMsgTopic topic = xMsgTopic.wrap("writer:scifi:book");
-        core.findLocalSubscribers(topic);
-
-        RegValidator validator = new RegValidator(topic, false);
-        validator.assertDriverCall("findLocal");
-    }
 
 
     private class RegValidator {
@@ -198,7 +127,7 @@ public class xMsgTest {
         public RegValidator(xMsgTopic topic, boolean isPublisher)
                 throws Exception {
             this.host = xMsgUtil.toHostAddress("localhost");
-            this.port = xMsgConstants.DEFAULT_PORT.toInteger();
+            this.port = xMsgConstants.DEFAULT_PORT.getIntValue();
             this.topic = topic;
             this.desc = "";
 
@@ -215,22 +144,13 @@ public class xMsgTest {
             xMsgRegDriver v = verify(driver);
             switch (method) {
                 case "register":
-                    v.registerFrontEnd(eq(name), dataArg.capture(), eq(isPublisher));
-                    break;
-                case "registerLocal":
-                    v.registerLocal(eq(name), dataArg.capture(), eq(isPublisher));
+                    v.register(dataArg.capture(), eq(isPublisher));
                     break;
                 case "remove":
-                    v.removeRegistrationFrontEnd(eq(name), dataArg.capture(), eq(isPublisher));
-                    break;
-                case "removeLocal":
-                    v.removeRegistrationLocal(eq(name), dataArg.capture(), eq(isPublisher));
+                    v.removeRegistration(dataArg.capture(), eq(isPublisher));
                     break;
                 case "find":
-                    v.findGlobal(eq(name), dataArg.capture(), eq(isPublisher));
-                    break;
-                case "findLocal":
-                    v.findLocal(eq(name), dataArg.capture(), eq(isPublisher));
+                    v.findRegistration(dataArg.capture(), eq(isPublisher));
                     break;
                 default:
                     throw new IllegalArgumentException("Illegal method " + method);

@@ -19,17 +19,33 @@
  * SUPPORT, UPDATES, ENHANCEMENTS, OR MODIFICATIONS.
  */
 
-package org.jlab.coda.xmsg.excp;
+package org.jlab.coda.xmsg.core;
+
+import org.zeromq.ZContext;
+
 
 /**
- * xMsgDiscoverException class.
+ * Singleton class that provides unique 0MQ context
+ * {@link org.zeromq.ZContext} for entire JVM process.
  *
  * @author gurjyan
- * @since 1.0
+ * @since 2.x
  */
-public class xMsgDiscoverException extends xMsgException {
+public class xMsgContext {
+    private static xMsgContext ourInstance = new xMsgContext();
 
-    public xMsgDiscoverException(String message) {
-        super(message);
+    private ZContext context;
+
+    private xMsgContext() {
+        context = new ZContext();
     }
+
+    private static xMsgContext getInstance() {
+        return ourInstance;
+    }
+
+    public static ZContext getContext() {
+        return getInstance().context;
+    }
+
 }

@@ -31,19 +31,8 @@ import java.net.InetAddress;
 import java.net.NetworkInterface;
 import java.net.SocketException;
 import java.text.DateFormat;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.Enumeration;
-import java.util.List;
-import java.util.Objects;
-import java.util.concurrent.BlockingQueue;
-import java.util.concurrent.CancellationException;
-import java.util.concurrent.ExecutionException;
-import java.util.concurrent.Future;
-import java.util.concurrent.LinkedBlockingQueue;
-import java.util.concurrent.ThreadFactory;
-import java.util.concurrent.ThreadPoolExecutor;
-import java.util.concurrent.TimeUnit;
+import java.util.*;
+import java.util.concurrent.*;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -52,7 +41,7 @@ import java.util.regex.Pattern;
  * xMsg utility methods.
  *
  * @author gurjyan
- * @since 1.0
+ * @since 2.0
  */
 
 public final class xMsgUtil {
@@ -290,10 +279,10 @@ public final class xMsgUtil {
     }
 
     /**
-     * Deserializes a protobuf {@link ByteString} into an Object.
+     * De-serializes a protobuf {@link ByteString} into an Object.
      *
      * @param bytes the serialization of the object
-     * @return the deserialized Object or null in case of error
+     * @return the de-serialized Object or null in case of error
      */
     public static Object deserialize(ByteString bytes) {
         byte[] bb = bytes.toByteArray();
@@ -301,10 +290,10 @@ public final class xMsgUtil {
     }
 
     /**
-     * Deserializes a byte array into an Object.
+     * De-serializes a byte array into an Object.
      *
      * @param bytes the serialization of the object
-     * @return the deserialized Object or null in case of error
+     * @return the de-serialized Object or null in case of error
      */
     public static Object deserialize(byte[] bytes) {
         try (ByteArrayInputStream bs = new ByteArrayInputStream(bytes);
@@ -315,7 +304,6 @@ public final class xMsgUtil {
             return null;
         }
     }
-
 
     /**
      * Creates a new Thread that reports uncaught exceptions.
@@ -340,7 +328,7 @@ public final class xMsgUtil {
 
 
     /**
-     * Creates a new {@link FixedExecutor}.
+     * Creates a new {@link org.jlab.coda.xmsg.core.xMsgUtil.FixedExecutor}.
      */
     public static ThreadPoolExecutor newFixedThreadPool(int nThreads, String namePrefix) {
         return newFixedThreadPool(nThreads,
@@ -348,9 +336,8 @@ public final class xMsgUtil {
                                   new LinkedBlockingQueue<Runnable>());
     }
 
-
     /**
-     * Creates a new {@link FixedExecutor} with a user controlled queue.
+     * Creates a new {@link org.jlab.coda.xmsg.core.xMsgUtil.FixedExecutor} with a user controlled queue.
      */
     public static ThreadPoolExecutor newFixedThreadPool(int nThreads,
                                                         String namePrefix,
@@ -362,9 +349,8 @@ public final class xMsgUtil {
                                       threadFactory);
     }
 
-
     /**
-     * A thread pool executor that prints the stacktrace of uncaught exceptions.
+     * A thread pool executor that prints the stackTrace of uncaught exceptions.
      */
     public static class FixedExecutor extends ThreadPoolExecutor {
 
@@ -396,7 +382,6 @@ public final class xMsgUtil {
             }
         }
     }
-
 
     /**
      * A thread pool factory with custom thread names.

@@ -21,16 +21,15 @@
 
 package org.jlab.coda.xmsg.xsys.regdis;
 
-import java.util.HashSet;
-import java.util.Set;
-
+import com.google.protobuf.InvalidProtocolBufferException;
 import org.jlab.coda.xmsg.core.xMsgConstants;
 import org.jlab.coda.xmsg.data.xMsgR.xMsgRegistration;
-import org.jlab.coda.xmsg.excp.xMsgRegistrationException;
+import org.jlab.coda.xmsg.excp.xMsgException;
 import org.zeromq.ZFrame;
 import org.zeromq.ZMsg;
 
-import com.google.protobuf.InvalidProtocolBufferException;
+import java.util.HashSet;
+import java.util.Set;
 
 /**
  * A wrapper for a response to a registration or discovery request.
@@ -39,6 +38,9 @@ import com.google.protobuf.InvalidProtocolBufferException;
  * string indicating that the request was successful, a set of registration data
  * in case a discovery request was received, or an error description indicating
  * that something wrong happened with the request.
+ *
+ * @author gurjyan
+ * @since 2.x
  */
 public class xMsgRegResponse {
 
@@ -59,8 +61,8 @@ public class xMsgRegResponse {
     public xMsgRegResponse(String topic, String sender) {
         this.topic = topic;
         this.sender = sender;
-        this.status = xMsgConstants.SUCCESS.toString();
-        this.data = new HashSet<xMsgRegistration>();
+        this.status = xMsgConstants.SUCCESS.getStringValue();
+        this.data = new HashSet<>();
     }
 
 
@@ -77,7 +79,7 @@ public class xMsgRegResponse {
     public xMsgRegResponse(String topic, String sender, Set<xMsgRegistration> data) {
         this.topic = topic;
         this.sender = sender;
-        this.status = xMsgConstants.SUCCESS.toString();
+        this.status = xMsgConstants.SUCCESS.getStringValue();
         this.data = data;
     }
 
@@ -98,18 +100,18 @@ public class xMsgRegResponse {
 
 
     /**
-     * Deserializes the response from the given message.
+     * De-serializes the response from the given message.
      *
      * @param msg the message with the response
-     * @throws xMsgRegistrationException
+     * @throws xMsgException
      *         when the message is malformed or the data is corrupted,
      *         or when the response is an error
      *         (and the exception message is set to the error description)
      */
-    public xMsgRegResponse(ZMsg msg) throws xMsgRegistrationException {
+    public xMsgRegResponse(ZMsg msg) throws xMsgException {
 
         if (msg.size() < 3) {
-            throw new xMsgRegistrationException("xMsg message format violation");
+            throw new xMsgException("xMsg-Error: registration message format violation");
         }
 
         ZFrame topicFrame = msg.pop();
@@ -120,8 +122,8 @@ public class xMsgRegResponse {
             topic = new String(topicFrame.getData());
             sender = new String(senderFrame.getData());
             status = new String(statusFrame.getData());
-            if (!status.equals(xMsgConstants.SUCCESS.toString())) {
-                throw new xMsgRegistrationException(status);
+            if (!status.equals(xMsgConstants.SUCCESS.getStringValue())) {
+                throw new xMsgException("xMsg-Error: unsuccessful registration. status = " + status);
             }
 
             data = new HashSet<>();
@@ -130,9 +132,8 @@ public class xMsgRegResponse {
                 try {
                     data.add(xMsgRegistration.parseFrom(dataFrame.getData()));
                 } catch (InvalidProtocolBufferException e) {
-                    throw new xMsgRegistrationException("Could not deserialize data");
-                } finally {
-                    dataFrame.destroy();
+                    throw new xMsgException("xMsg-Error: Could not deserialize protoBuf data. message = " +
+                            e.getMessage(), e.getCause());
                 }
             }
         } finally {

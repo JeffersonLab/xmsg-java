@@ -21,6 +21,9 @@
 
 package org.jlab.coda.xmsg.xsys.regdis;
 
+import org.jlab.coda.xmsg.core.xMsgTopic;
+import org.jlab.coda.xmsg.data.xMsgR.xMsgRegistration;
+
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.Map.Entry;
@@ -28,14 +31,13 @@ import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
 
-import org.jlab.coda.xmsg.core.xMsgTopic;
-import org.jlab.coda.xmsg.data.xMsgR.xMsgRegistration;
-
 /**
- * A registration database of xMsg actors.
- * <p>
- * Actors are grouped by topic, i.e., actors registered with the same topic will
- * be in the same group.
+ *    A registration database of xMsg actors.
+ *    Actors are grouped by topic, i.e., actors registered with the same topic will
+ *    be in the same group.
+ *
+ * @author smancill
+ * @version 2.x
  */
 public class xMsgRegDatabase {
 

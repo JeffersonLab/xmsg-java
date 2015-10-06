@@ -21,31 +21,23 @@
 
 package org.jlab.coda.xmsg.net;
 
-import org.zeromq.ZMQ.Socket;
+
+import org.jlab.coda.xmsg.core.xMsgConstants;
 
 /**
- * Advanced setup of an {@link xMsgConnection}.
+ * xMsg Registrar address.
+ *
+ * @author gurjyan
+ * @version 2.x
  */
-public interface xMsgConnectionSetup {
+public class xMsgRegAddress extends xMsgAddress {
 
-    /**
-     * Configures the socket before it is connected.
-     * This method will be called for both pub/sub sockets.
-     * It should be used to set options on the socket.
-     * <p>
-     * Leave empty if no configuration is required.
-     *
-     * @see <a href="http://api.zeromq.org/3-2:zmq-setsockopt">ZMQ_LINGER</a>
-     */
-    void preConnection(Socket socket);
+    public xMsgRegAddress(String host, int port) {
+        super(host, port);
+    }
 
-    /**
-     * Runs after the two sockets have been connected.
-     * This method can be used to run some action after calling connect().
-     * For example, sleep a while to give time to the sockets to be actually
-     * connected internally.
-     * <p>
-     * Leave empty if no action is required.
-     */
-    void postConnection();
+    public xMsgRegAddress(String host) {
+        super(host, xMsgConstants.REGISTRAR_PORT.getIntValue());
+    }
+
 }
