@@ -153,7 +153,6 @@ public class xMsgRegDriver {
      * registration response object {@link
      * org.jlab.coda.xmsg.xsys.regdis.xMsgRegResponse}.
      *
-     * @param socket 0MQ socket to the registrar service
      * @param request xMsg request object
      *                {@link org.jlab.coda.xmsg.xsys.regdis.xMsgRegRequest}
      *
@@ -164,11 +163,11 @@ public class xMsgRegDriver {
      *
      * @throws xMsgException
      */
-    protected xMsgRegResponse request(Socket socket, xMsgRegRequest request, int timeout)
+    protected xMsgRegResponse request(xMsgRegRequest request, int timeout)
             throws xMsgException {
         ZMsg requestMsg = request.msg();
         try {
-            requestMsg.send(socket);
+            requestMsg.send(_connectionSocket);
         } catch (ZMQException e) {
             throw new xMsgException("xMsg-Error: sending registration message. " +
                     e.getMessage(), e.getCause());
@@ -176,10 +175,10 @@ public class xMsgRegDriver {
             requestMsg.destroy();
         }
 
-        ZMQ.PollItem[] items = {new ZMQ.PollItem(socket, ZMQ.Poller.POLLIN)};
+        ZMQ.PollItem[] items = {new ZMQ.PollItem(_connectionSocket, ZMQ.Poller.POLLIN)};
         int rc = ZMQ.poll(items, timeout);
         if (rc != -1 && items[0].isReadable()) {
-            ZMsg responseMsg = ZMsg.recvMsg(socket);
+            ZMsg responseMsg = ZMsg.recvMsg(_connectionSocket);
             try {
                 xMsgRegResponse response = new xMsgRegResponse(responseMsg);
                 String status = response.status();
@@ -230,7 +229,7 @@ public class xMsgRegDriver {
         int timeout = xMsgConstants.REGISTER_REQUEST_TIMEOUT.getIntValue();
 
         xMsgRegRequest request = new xMsgRegRequest(topic, data.getName(), data);
-        request(_connectionSocket, request, timeout);
+        request(request, timeout);
     }
 
     /**
@@ -255,7 +254,7 @@ public class xMsgRegDriver {
         int timeout = xMsgConstants.REMOVE_REQUEST_TIMEOUT.getIntValue();
 
         xMsgRegRequest request = new xMsgRegRequest(topic, data.getName(), data);
-        request(_connectionSocket, request, timeout);
+        request(request, timeout);
     }
 
     /**
@@ -274,7 +273,7 @@ public class xMsgRegDriver {
         int timeout = xMsgConstants.REMOVE_REQUEST_TIMEOUT.getIntValue();
 
         xMsgRegRequest request = new xMsgRegRequest(topic, "anonymous", _registrarIp);
-        request(_connectionSocket, request, timeout);
+        request(request, timeout);
     }
 
     /**
@@ -301,7 +300,7 @@ public class xMsgRegDriver {
         int timeout = xMsgConstants.FIND_REQUEST_TIMEOUT.getIntValue();
 
         xMsgRegRequest request = new xMsgRegRequest(topic, data.getName(), data);
-        xMsgRegResponse response = request(_connectionSocket, request, timeout);
+        xMsgRegResponse response = request(request, timeout);
         return response.data();
     }
 }

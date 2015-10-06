@@ -27,8 +27,6 @@ import org.jlab.coda.xmsg.data.xMsgR.xMsgRegistration.Builder;
 import org.junit.Before;
 import org.junit.Test;
 import org.zeromq.ZContext;
-import org.zeromq.ZMQ;
-import org.zeromq.ZMQ.Socket;
 
 import java.util.Arrays;
 import java.util.HashSet;
@@ -41,15 +39,10 @@ import static org.mockito.Mockito.anyInt;
 import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.spy;
 import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
 
 public class xMsgRegDriverTest {
 
     private xMsgRegDriver driver;
-
-    private ZContext context;
-    private Socket localCon;
-    private Socket feCon;
 
     private Builder subscriber;
     private Builder publisher;
@@ -83,106 +76,46 @@ public class xMsgRegDriverTest {
 
     @Before
     public void setup() throws Exception {
-        context = spy(new ZContext());
-        localCon = context.createSocket(ZMQ.REQ);
-        feCon = context.createSocket(ZMQ.REQ);
-        when(context.createSocket(anyInt())).thenReturn(feCon, localCon);
-
-        driver = spy(new xMsgRegDriver(context, "10.2.9.1"));
+        driver = spy(new xMsgRegDriver(new ZContext(), "10.2.9.1"));
         setResponse(new xMsgRegResponse("", ""));
     }
 
 
     @Test
-    public void sendLocalPublisherRegistration() throws Exception {
+    public void sendPublisherRegistration() throws Exception {
         driver.register(publisher.build(), true);
         assertRequest("bradbury_pub",
                 publisher.build(),
-                localCon,
                 xMsgConstants.REGISTER_PUBLISHER,
                 xMsgConstants.REGISTER_REQUEST_TIMEOUT);
     }
 
 
     @Test
-    public void sendLocalSubscriberRegistration() throws Exception {
+    public void sendSubscriberRegistration() throws Exception {
         driver.register(subscriber.build(), false);
-        assertRequest("bradbury_sub",
-                      subscriber.build(),
-                      localCon,
-                      xMsgConstants.REGISTER_SUBSCRIBER,
-                      xMsgConstants.REGISTER_REQUEST_TIMEOUT);
-    }
-
-
-    @Test
-    public void sendFrontEndPublisherRegistration() throws Exception {
-
-        driver.register(publisher.build(), true);
-
-        assertRequest("bradbury_pub",
-                publisher.build(),
-                feCon,
-                xMsgConstants.REGISTER_PUBLISHER,
-                xMsgConstants.REGISTER_REQUEST_TIMEOUT);
-    }
-
-
-    @Test
-    public void sendFrontEndSubscriberRegistration() throws Exception {
-
-        driver.register(subscriber.build(), false);
-
         assertRequest("bradbury_sub",
                 subscriber.build(),
-                feCon,
                 xMsgConstants.REGISTER_SUBSCRIBER,
                 xMsgConstants.REGISTER_REQUEST_TIMEOUT);
     }
 
 
-
     @Test
-    public void sendLocalPublisherRemoval() throws Exception {
+    public void sendPublisherRemoval() throws Exception {
         driver.removeRegistration(publisher.build(), true);
         assertRequest("bradbury_pub",
                 publisher.build(),
-                localCon,
                 xMsgConstants.REMOVE_PUBLISHER,
                 xMsgConstants.REMOVE_REQUEST_TIMEOUT);
     }
 
 
     @Test
-    public void sendLocalSubscriberRemoval() throws Exception {
+    public void sendSubscriberRemoval() throws Exception {
         driver.removeRegistration(subscriber.build(), false);
         assertRequest("bradbury_sub",
                 subscriber.build(),
-                localCon,
-                xMsgConstants.REMOVE_SUBSCRIBER,
-                xMsgConstants.REMOVE_REQUEST_TIMEOUT);
-    }
-
-
-    @Test
-    public void sendFrontEndPublisherRemoval() throws Exception {
-        driver.removeRegistration(publisher.build(), true);
-        assertRequest("bradbury_pub",
-                publisher.build(),
-                feCon,
-                xMsgConstants.REMOVE_PUBLISHER,
-                xMsgConstants.REMOVE_REQUEST_TIMEOUT);
-    }
-
-
-    @Test
-    public void sendFrontEndSubscriberRemoval() throws Exception {
-
-        driver.removeRegistration(subscriber.build(), false);
-
-        assertRequest("bradbury_sub",
-                subscriber.build(),
-                feCon,
                 xMsgConstants.REMOVE_SUBSCRIBER,
                 xMsgConstants.REMOVE_REQUEST_TIMEOUT);
     }
@@ -194,96 +127,59 @@ public class xMsgRegDriverTest {
 
         assertRequest("10.2.9.1_node",
                 "10.2.9.1",
-                feCon,
                 xMsgConstants.REMOVE_ALL_REGISTRATION,
                 xMsgConstants.REMOVE_REQUEST_TIMEOUT);
     }
 
 
-
     @Test
-    public void sendLocalPublisherFind() throws Exception {
-        driver.findRegistration(publisher.build(), true);
+    public void sendPublisherFind() throws Exception {
+        driver.findRegistration(publisher.build(), false);
 
         assertRequest("10.2.9.1_node",
                 publisher.build(),
-                localCon,
                 xMsgConstants.FIND_PUBLISHER,
                 xMsgConstants.FIND_REQUEST_TIMEOUT);
     }
 
 
     @Test
-    public void sendLocalSubscriberFind() throws Exception {
+    public void sendSubscriberFind() throws Exception {
         driver.findRegistration(subscriber.build(), false);
 
         assertRequest("10.2.9.1_node",
                 subscriber.build(),
-                localCon,
                 xMsgConstants.FIND_SUBSCRIBER,
                 xMsgConstants.FIND_REQUEST_TIMEOUT);
     }
 
 
     @Test
-    public void sendFrontEndPublisherFind() throws Exception {
-        driver.findRegistration(publisher.build(), true);
-
-        assertRequest("10.2.9.1_node",
-                publisher.build(),
-                feCon,
-                xMsgConstants.FIND_PUBLISHER,
-                xMsgConstants.FIND_REQUEST_TIMEOUT);
-    }
-
-
-    @Test
-    public void sendFrontEndSubscriberFind() throws Exception {
-        driver.findRegistration(subscriber.build(), false);
-
-        assertRequest("10.2.9.1_node",
-                subscriber.build(),
-                feCon,
-                xMsgConstants.FIND_SUBSCRIBER,
-                xMsgConstants.FIND_REQUEST_TIMEOUT);
-    }
-
-
-    @Test
-    public void getRegistrationFromLocalFind() throws Exception {
+    public void getRegistration() throws Exception {
         setResponse(new xMsgRegResponse("", "", registration));
         Set<xMsgRegistration> res = driver.findRegistration(subscriber.build(), false);
         assertThat(res, is(registration));
     }
 
 
-    @Test
-    public void getRegistrationFromGlobalFind() throws Exception {
-        setResponse(new xMsgRegResponse("", "", registration));
-        Set<xMsgRegistration> res = driver.findRegistration(subscriber.build(), false);
-        assertThat(res, is(registration));
-    }
 
-
-    private void assertRequest(String name, xMsgRegistration data, Socket socket,
+    private void assertRequest(String name, xMsgRegistration data,
                                xMsgConstants topic, xMsgConstants timeout)
             throws Exception {
         xMsgRegRequest request = new xMsgRegRequest(topic.getStringValue(), name, data);
-        verify(driver).request(socket, request, timeout.getIntValue());
+        verify(driver).request(request, timeout.getIntValue());
     }
 
 
-    private void assertRequest(String name, String data, Socket socket,
+    private void assertRequest(String name, String data,
                                xMsgConstants topic, xMsgConstants timeout)
             throws Exception {
         xMsgRegRequest request = new xMsgRegRequest(topic.getStringValue(), name, data);
-        verify(driver).request(socket, request, timeout.getIntValue());
+        verify(driver).request(request, timeout.getIntValue());
     }
 
 
     private void setResponse(xMsgRegResponse response) throws Exception {
-        doReturn(response).when(driver).request(any(Socket.class),
-                                                    any(xMsgRegRequest.class),
-                                                    anyInt());
+        doReturn(response).when(driver).request(any(xMsgRegRequest.class), anyInt());
     }
 }
