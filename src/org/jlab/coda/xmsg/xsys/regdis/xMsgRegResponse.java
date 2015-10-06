@@ -123,7 +123,7 @@ public class xMsgRegResponse {
             sender = new String(senderFrame.getData());
             status = new String(statusFrame.getData());
             if (!status.equals(xMsgConstants.SUCCESS.getStringValue())) {
-                throw new xMsgException("xMsg-Error: unsuccessful registration. status = " + status);
+                throw new xMsgException("xMsg-Error: unsuccessful registration: " + status);
             }
 
             data = new HashSet<>();
@@ -132,8 +132,8 @@ public class xMsgRegResponse {
                 try {
                     data.add(xMsgRegistration.parseFrom(dataFrame.getData()));
                 } catch (InvalidProtocolBufferException e) {
-                    throw new xMsgException("xMsg-Error: Could not deserialize protoBuf data. message = " +
-                            e.getMessage(), e.getCause());
+                    throw new xMsgException("xMsg-Error: Could not deserialize protobuf data.",
+                                            e.getCause());
                 }
             }
         } finally {

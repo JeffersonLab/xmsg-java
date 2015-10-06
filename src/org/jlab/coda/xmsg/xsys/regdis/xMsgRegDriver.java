@@ -101,7 +101,7 @@ public class xMsgRegDriver {
      * @return true if connection socket to the registrar address is made
      */
     public boolean isConnected() {
-        return _connectionSocket!=null;
+        return _connectionSocket != null;
     }
 
     /**
@@ -184,7 +184,7 @@ public class xMsgRegDriver {
                 xMsgRegResponse response = new xMsgRegResponse(responseMsg);
                 String status = response.status();
                 if (!status.equals(xMsgConstants.SUCCESS.getStringValue())) {
-                    throw new xMsgException("xMsg-Error: unsuccessful registration. status = " + status);
+                    throw new xMsgException("xMsg-Error: unsuccessful registration: " + status);
                 }
                 return response;
             } finally {

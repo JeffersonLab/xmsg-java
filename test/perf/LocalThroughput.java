@@ -42,27 +42,25 @@ public final class LocalThroughput {
 
             xMsgUtil.sleep(100);
 
-            xMsgSubscription sub = subscriber.subscribe(con,
-                    topic, new xMsgCallBack() {
-
-                @Override
-                public xMsgMessage callback(xMsgMessage msg) {
-                    int size = msg.getDataSize();
-                    if (size != messageSize) {
-                        printf("message of incorrect size received " + size);
-                        System.exit(1);
-                    }
-                    int nr = ++timer.nr;
-                    if (nr == 1) {
-                        timer.watch = startClock();
-                    } else if (nr == messageCount) {
-                        timer.elapsed = stopClock(timer.watch);
-                        synchronized (lock) {
-                            lock.notify();
+            xMsgSubscription sub = subscriber.subscribe(con, topic, new xMsgCallBack() {
+                    @Override
+                    public xMsgMessage callback(xMsgMessage msg) {
+                        int size = msg.getDataSize();
+                        if (size != messageSize) {
+                            printf("message of incorrect size received " + size);
+                            System.exit(1);
                         }
+                        int nr = ++timer.nr;
+                        if (nr == 1) {
+                            timer.watch = startClock();
+                        } else if (nr == messageCount) {
+                            timer.elapsed = stopClock(timer.watch);
+                            synchronized (lock) {
+                                lock.notify();
+                            }
+                        }
+                        return msg;
                     }
-                    return msg;
-                }
             });
 
             synchronized (lock) {

@@ -86,7 +86,7 @@ public enum xMsgConstants {
     private final int intValue;
     private final String stringValue;
 
-    private xMsgConstants(int intValue, String stringValue) {
+    xMsgConstants(int intValue, String stringValue) {
         this.intValue = intValue;
         this.stringValue = stringValue;
     }

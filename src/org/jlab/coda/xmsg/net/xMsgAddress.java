@@ -67,13 +67,21 @@ public class xMsgAddress {
 
     @Override
     public boolean equals(Object o) {
-        if (this == o) return true;
-        if (!(o instanceof xMsgAddress)) return false;
+        if (this == o) {
+            return true;
+        }
+        if (!(o instanceof xMsgAddress)) {
+            return false;
+        }
 
         xMsgAddress that = (xMsgAddress) o;
 
-        if (!host.equals(that.host)) return false;
-        if (port != that.port) return false;
+        if (!host.equals(that.host)) {
+            return false;
+        }
+        if (port != that.port) {
+            return false;
+        }
 
         return true;
     }

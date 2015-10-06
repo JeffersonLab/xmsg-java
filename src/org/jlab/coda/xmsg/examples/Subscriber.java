@@ -118,8 +118,9 @@ public class Subscriber extends xMsg {
         public xMsgMessage callback(xMsgMessage msg) throws IOException {
             if (msg.getMetaData().getReplyTo().equals(xMsgConstants.UNDEFINED.getStringValue())) {
 
-                // we get the data, but will not do anything with itt for communication benchmarking purposes.
-                List<Integer> data = parseData(msg);
+                // we get the data, but will not do anything with it for
+                // communication benchmarking purposes.
+                /* List<Integer> data = */ parseData(msg);
 
                 if (nr == 0) {
                     t1 = System.currentTimeMillis();

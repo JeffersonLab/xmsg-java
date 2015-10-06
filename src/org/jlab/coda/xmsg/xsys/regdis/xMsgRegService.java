@@ -79,7 +79,8 @@ public class xMsgRegService implements Runnable {
      * @param registrarPort the port of the registrar
      * @throws IOException
      */
-    public xMsgRegService(ZContext context, String registrarHost, int registrarPort) throws IOException {
+    public xMsgRegService(ZContext context, String registrarHost, int registrarPort)
+            throws IOException {
         this.context = context;
         this.registrarPort = registrarPort;
         this.registrarHost = registrarHost;
@@ -87,8 +88,7 @@ public class xMsgRegService implements Runnable {
 
     @Override
     public void run() {
-        log(xMsgUtil.currentTime(4) + " xMsg-Info: registration and discovery server is started at address = " +
-                "tcp://" + registrarHost + ":" + registrarPort);
+        printStartup();
 
         ZMQ.Socket regSocket = context.createSocket(ZMQ.REP);
         regSocket.bind("tcp://" + registrarHost + ":" + registrarPort);
@@ -188,6 +188,12 @@ public class xMsgRegService implements Runnable {
         return reply.msg();
     }
 
+    private void printStartup() {
+        String regAddr = "tcp://" + registrarHost + ":" + registrarPort;
+        String logMsg = " xMsg-Info: registration and discovery server is started at address = ";
+        log(xMsgUtil.currentTime(4) + logMsg + regAddr);
+    }
+
     /**
      * Prints on a stdio with an appropriate time stamp.
      */
@@ -200,7 +206,7 @@ public class xMsgRegService implements Runnable {
      */
     private void log(Exception e) {
         System.err.print(xMsgUtil.currentTime(4) +
-                " message = " + e.getMessage() + " cause = " + e.getCause()+" ");
+                " message = " + e.getMessage() + " cause = " + e.getCause() + " ");
         e.printStackTrace();
     }
 }

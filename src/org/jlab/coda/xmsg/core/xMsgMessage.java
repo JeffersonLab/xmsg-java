@@ -99,7 +99,8 @@ public class xMsgMessage {
      * @throws xMsgException
      * @throws IOException
      */
-    public xMsgMessage(xMsgTopic topic, String mimeType, Object data) throws xMsgException, IOException {
+    public xMsgMessage(xMsgTopic topic, String mimeType, Object data)
+            throws xMsgException, IOException {
         xMsgMeta.Builder md = xMsgMeta.newBuilder();
         md.setDataType(mimeType);
         _construct(topic, md, data);
@@ -230,7 +231,8 @@ public class xMsgMessage {
      * @param data the data object
      * @throws IOException
      */
-    private void _construct(xMsgTopic topic, xMsgMeta.Builder metaData, Object data) throws IOException {
+    private void _construct(xMsgTopic topic, xMsgMeta.Builder metaData, Object data)
+            throws IOException {
         this.topic = topic;
         byte[] ba = null;
 

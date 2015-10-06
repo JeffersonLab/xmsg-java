@@ -31,7 +31,7 @@ import org.zeromq.ZContext;
  * @author gurjyan
  * @since 2.x
  */
-public class xMsgContext {
+public final class xMsgContext {
     private static xMsgContext ourInstance = new xMsgContext();
 
     private ZContext context;
