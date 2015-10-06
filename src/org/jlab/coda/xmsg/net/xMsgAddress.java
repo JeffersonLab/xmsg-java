@@ -64,30 +64,24 @@ public class xMsgAddress {
         return this.host + ":" + this.port;
     }
 
+
     @Override
-    public int hashCode() {
-        final int prime = 31;
-        int result = 1;
-        result = prime * result + host.hashCode();
-        result = prime * result + port;
-        return result;
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (!(o instanceof xMsgAddress)) return false;
+
+        xMsgAddress that = (xMsgAddress) o;
+
+        if (port != that.port) return false;
+        if (host != null ? !host.equals(that.host) : that.host != null) return false;
+
+        return true;
     }
 
     @Override
-    public boolean equals(Object obj) {
-        if (this == obj) {
-            return true;
-        }
-        if (obj == null) {
-            return false;
-        }
-        if (getClass() != obj.getClass()) {
-            return false;
-        }
-        xMsgPrxAddress other = (xMsgPrxAddress) obj;
-        if (!host.equals(other.getHost())) {
-            return false;
-        }
-        return port == other.getPort();
+    public int hashCode() {
+        int result = host != null ? host.hashCode() : 0;
+        result = 31 * result + port;
+        return result;
     }
 }

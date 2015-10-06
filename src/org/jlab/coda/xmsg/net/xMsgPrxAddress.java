@@ -39,5 +39,4 @@ public class xMsgPrxAddress extends xMsgAddress {
     public xMsgPrxAddress(String host) {
         super(host, xMsgConstants.DEFAULT_PORT.getIntValue());
     }
-
 }
