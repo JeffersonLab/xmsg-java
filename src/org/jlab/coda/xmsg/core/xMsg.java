@@ -244,15 +244,6 @@ public class xMsg {
     }
 
     /**
-     * Returns connection (current and future) options
-     *
-     * @param defaultConnectionOption {@link org.jlab.coda.xmsg.net.xMsgConnectionOption} object
-     */
-    public void setDefaultConnectionOption(xMsgConnectionOption defaultConnectionOption) {
-        this.defaultConnectionOption = defaultConnectionOption;
-    }
-
-    /**
      * Makes a connection to a required proxy.
      * This will use the default connection options defined at the constructor.
      * Note that it is reasonable to use this method for connecting to a remote proxy.
