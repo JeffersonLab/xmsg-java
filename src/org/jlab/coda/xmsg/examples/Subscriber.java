@@ -105,7 +105,7 @@ public class Subscriber extends xMsg {
     }
 
     /**
-     * Private callback class
+     * Private callback class.
      */
     private class MyCallBack implements xMsgCallBack {
 

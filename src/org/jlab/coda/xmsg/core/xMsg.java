@@ -182,9 +182,9 @@ public class xMsg {
     }
 
     /**
-     * Creates and xMsg object
+     * Creates an xMsg actor.
      *
-     * @param name the name of an actor
+     * @param name the name of the actor
      * @param defaultProxyHost the proxy host name
      * @param defaultProxyPort the proxy port
      * @param defaultRegistrarHost the registrar host name
@@ -226,7 +226,7 @@ public class xMsg {
     }
 
     /**
-     * Returns the name of this actor
+     * Returns the name of this actor.
      *
      * @return the name of an actor
      */
@@ -243,9 +243,9 @@ public class xMsg {
     }
 
     /**
-     * Returns the size of the callback thread pool
+     * Returns the size of the callback thread pool.
      *
-     * @return he size of the callback thread pool
+     * @return the size of the callback thread pool
      */
     public int getPoolSize() {
         return defaultPoolSize;
@@ -354,7 +354,7 @@ public class xMsg {
     }
 
     /**
-     * Registers an actor as a publisher
+     * Registers this actor as a publisher.
      *
      * @param address the address of the registrar:
      *                object of {@link org.jlab.coda.xmsg.net.xMsgRegAddress}
@@ -388,7 +388,7 @@ public class xMsg {
     }
 
     /**
-     * Registers an actor as a subscriber
+     * Registers this actor as a subscriber.
      *
      * @param address the address of the registrar:
      *                object of {@link org.jlab.coda.xmsg.net.xMsgRegAddress}
@@ -546,7 +546,7 @@ public class xMsg {
     }
 
     /**
-     * Publishes a message through the specified proxy connection
+     * Publishes a message through the specified proxy connection.
      *
      * @param con a proxy connection:
      *            object of {@link org.jlab.coda.xmsg.net.xMsgConnection}
@@ -632,7 +632,7 @@ public class xMsg {
     }
 
     /**
-     * Stops the existing subscription
+     * Stops the existing subscription.
      *
      * @param handle SubscribeHandler object reference:
      *               object of {@link org.jlab.coda.xmsg.core.xMsgSubscription}

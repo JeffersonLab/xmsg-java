@@ -42,8 +42,8 @@ public class xMsgRegistrar {
     private final ZContext context = xMsgContext.getContext();
 
     /**
-     * This constructor assumes registrar port =
-     * {@link org.jlab.coda.xmsg.core.xMsgConstants#REGISTRAR_PORT}
+     * Constructs a registrar that uses the default
+     * {@link org.jlab.coda.xmsg.core.xMsgConstants#REGISTRAR_PORT port}.
      *
      * @throws IOException
      *
@@ -53,8 +53,7 @@ public class xMsgRegistrar {
     }
 
     /**
-     * Creates {@link org.jlab.coda.xmsg.xsys.regdis.xMsgRegService} object
-     * with a specified port number.
+     * Constructs a registrar that uses the specified port number.
      *
      * @param port registrar port number
      * @throws IOException
@@ -109,14 +108,14 @@ public class xMsgRegistrar {
     }
 
     /**
-     * Starts the registration and discovery servicing thread
+     * Starts the registration and discovery servicing thread.
      */
     public void start() {
         regServiceThread.start();
     }
 
     /**
-     * Registrar servicing thread shutdown routine
+     * Stops the registration and discovery service.
      */
     public void shutdown() {
         try {

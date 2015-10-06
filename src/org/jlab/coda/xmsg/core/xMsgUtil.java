@@ -348,7 +348,7 @@ public final class xMsgUtil {
     }
 
     /**
-     * Creates a new {@link org.jlab.coda.xmsg.core.xMsgUtil.FixedExecutor} with a user controlled queue.
+     * Creates a new ThreadPoolExecutor with a user controlled queue.
      */
     public static ThreadPoolExecutor newFixedThreadPool(int nThreads,
                                                         String namePrefix,

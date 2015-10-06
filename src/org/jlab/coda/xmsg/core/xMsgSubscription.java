@@ -60,7 +60,7 @@ public abstract class xMsgSubscription {
 
 
     /**
-     * xMsg subscription constructor
+     * xMsg subscription constructor.
      *
      * @param name       the name of the subscription
      * @param connection the {@link org.jlab.coda.xmsg.net.xMsgConnection} object
@@ -81,7 +81,7 @@ public abstract class xMsgSubscription {
 
 
     /**
-     * An abstract method to be implemented by the user's subscription callback
+     * An abstract method to be implemented by the user's subscription callback.
      *
      * @param msg {@link org.zeromq.ZMsg} object of the wire
      * @throws xMsgException
@@ -92,7 +92,7 @@ public abstract class xMsgSubscription {
 
 
     /**
-     * Starts the subscription thread
+     * Starts the subscription thread.
      */
     void start() {
         thread.start();
@@ -114,7 +114,8 @@ public abstract class xMsgSubscription {
     }
 
     /**
-     * Returns this subscription name
+     * Returns this subscription name.
+     *
      * @return the name of the subscription
      */
     public String getName() {
@@ -122,7 +123,7 @@ public abstract class xMsgSubscription {
     }
 
     /**
-     * Indicates if the subscription thread is running
+     * Indicates if the subscription thread is running.
      * @return true/false
      */
     public boolean isAlive() {

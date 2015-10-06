@@ -42,12 +42,11 @@ class xMsgRegRequest {
     private final byte[] data;
 
     /**
-     * Constructs registration request using xMsgRegistration data object
+     * Constructs a data request.
      *
      * @param topic the request being responded
      * @param sender the sender of the response
-     * @param data the registration data of the request:
-     *             object of {@link org.jlab.coda.xmsg.data.xMsgR.xMsgRegistration}
+     * @param data the registration data of the request
      */
     public xMsgRegRequest(String topic, String sender, xMsgRegistration data) {
         this.topic = topic;
@@ -56,7 +55,7 @@ class xMsgRegRequest {
     }
 
     /**
-     * Constructs registration request using String representation of the request
+     * Constructs a text request.
      *
      * @param topic the request being responded
      * @param sender the sender of the response
@@ -131,7 +130,7 @@ class xMsgRegRequest {
     }
 
     /**
-     * Returns the text of the registration request.
+     * Returns the text of the request.
      */
     public String text() {
         return new String(data);

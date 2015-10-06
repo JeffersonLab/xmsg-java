@@ -34,10 +34,10 @@ import org.zeromq.ZMsg;
 import java.util.Set;
 
 /**
- *     xMsg registration driver. Provides methods for registration and
- *     discovery of xMsg actors, i.e. publishers and subscribers.
- *     Creates 0MQ socket connection to the xMsg registrar service
- *     {@link org.jlab.coda.xmsg.xsys.regdis.xMsgRegService}
+ * xMsg registration driver.
+ * Provides methods for registration and discovery of xMsg actors, i.e.
+ * publishers and subscribers. Creates 0MQ socket connection to the
+ * {@link org.jlab.coda.xmsg.xsys.regdis.xMsgRegService xMsg registrar service}
  *
  * @author gurjyan
  * @since 2.x
@@ -61,7 +61,7 @@ public class xMsgRegDriver {
 
 
     /**
-     * Constructor
+     * Constructor.
      *
      * @param context 0MQ context
      * @param ip registrar service IP address
@@ -79,8 +79,8 @@ public class xMsgRegDriver {
     }
 
     /**
-     * Constructor. Uses xMsg registrar service default port
-     * {@link org.jlab.coda.xmsg.core.xMsgConstants#REGISTRAR_PORT}
+     * Constructor. Uses xMsg registrar service
+     * {@link org.jlab.coda.xmsg.core.xMsgConstants#REGISTRAR_PORT default port}.
      *
      * @param context 0MQ context
      * @param ip      registrar service IP address
@@ -96,8 +96,7 @@ public class xMsgRegDriver {
     }
 
     /**
-     * Defines if the 0MQ socket has been
-     * created to the registrar services.
+     * Defines if the 0MQ socket has been created to the registrar service.
      *
      * @return true if connection socket to the registrar address is made
      */
@@ -106,8 +105,7 @@ public class xMsgRegDriver {
     }
 
     /**
-     *     Disconnects from the registrar
-     *     and closes 0MQ socket.
+     * Disconnects from the registrar and closes 0MQ socket.
      */
     public void disconnect() {
         _connectionSocket.disconnect(_address);
@@ -115,8 +113,7 @@ public class xMsgRegDriver {
     }
 
     /**
-     *     Utility method that returns 0MQ context that
-     *     was used to create this xMsg registration driver.
+     *  Returns the 0MQ context.
      *
      * @return 0MQ context {@link org.zeromq.ZContext}
      */
@@ -125,9 +122,7 @@ public class xMsgRegDriver {
     }
 
     /**
-     *     Utility method that returns IP address of the
-     *     registrar service that was used to create this
-     *     xMsg registration driver.
+     * Returns the IP address of the connected registrar service.
      *
      * @return IP address of the registrar service
      */
@@ -136,9 +131,7 @@ public class xMsgRegDriver {
     }
 
     /**
-     * Utility method that returns port of the
-     * registrar service that was used to create this
-     * xMsg registration driver.
+     * Returns the port of the connected registrar service.
      *
      * @return port of the registrar service
      */
@@ -147,9 +140,7 @@ public class xMsgRegDriver {
     }
 
     /**
-     * Utility method that returns server address of the
-     * registrar service that was used to create this
-     * xMsg registration driver.
+     * Returns server address of the connected registrar service.
      *
      * @return server address the registrar service
      */
@@ -158,9 +149,9 @@ public class xMsgRegDriver {
     }
 
     /**
-     *     Sends sync request to the registrar service and
-     *     receives the xMsg registration response object
-     *     {@link org.jlab.coda.xmsg.xsys.regdis.xMsgRegResponse}
+     * Sends sync request to the registrar service and receives the xMsg
+     * registration response object {@link
+     * org.jlab.coda.xmsg.xsys.regdis.xMsgRegResponse}.
      *
      * @param socket 0MQ socket to the registrar service
      * @param request xMsg request object
@@ -205,7 +196,7 @@ public class xMsgRegDriver {
     }
 
     /**
-     *     Checks the validity of the registration data
+     * Checks the validity of the registration data.
      *
      * @param data registration data
      *             {@link org.jlab.coda.xmsg.data.xMsgR.xMsgRegistration}
@@ -218,9 +209,9 @@ public class xMsgRegDriver {
     }
 
     /**
-     *     Sends a registration request to the registrar service,
-     *     defined at the constructor. Request is constructed using xMsg
-     *     message construct, that has 3 part: topic, sender, and data.
+     * Sends a registration request to the registrar service,
+     * defined at the constructor. Request is constructed using xMsg
+     * message construct, that has 3 part: topic, sender, and data.
      *
      * @param data the registration data object
      *             {@link org.jlab.coda.xmsg.data.xMsgR.xMsgRegistration}
@@ -243,9 +234,9 @@ public class xMsgRegDriver {
     }
 
     /**
-     *     Sends a remove registration request to the registrar service,
-     *     defined at the constructor. Request is constructed using xMsg
-     *     message construct, that have 3 part: topic, sender, and data.
+     * Sends a remove registration request to the registrar service,
+     * defined at the constructor. Request is constructed using xMsg
+     * message construct, that have 3 part: topic, sender, and data.
      *
      * @param data the registration data object
      *             {@link org.jlab.coda.xmsg.data.xMsgR.xMsgRegistration}
@@ -268,11 +259,11 @@ public class xMsgRegDriver {
     }
 
     /**
-     *     Removes registration of all xMsg actors of the registrar service,
-     *     defined at the constructor. This will remove all publishers and
-     *     subscribers from the registrar service registration database.
-     *     This method is usually called by the xMsgNode registrar when
-     *     it shuts down or gets interrupted.
+     * Removes registration of all xMsg actors of the registrar service,
+     * defined at the constructor. This will remove all publishers and
+     * subscribers from the registrar service registration database.
+     * This method is usually called by the xMsgNode registrar when
+     * it shuts down or gets interrupted.
      *
      * @throws xMsgException
      */
@@ -287,11 +278,11 @@ public class xMsgRegDriver {
     }
 
     /**
-     *     Searched the registration database of the registrar service,
-     *     defined by the constructor. This will search the database for
-     *     publishers sor subscribers to a specific topic. The topic of
-     *     an interest is defined within the xMsgRegistration data object
-     *     {@link org.jlab.coda.xmsg.data.xMsgR.xMsgRegistration}
+     * Searched the registration database of the registrar service,
+     * defined by the constructor. This will search the database for
+     * publishers sor subscribers to a specific topic. The topic of
+     * an interest is defined within the xMsgRegistration data object
+     * {@link org.jlab.coda.xmsg.data.xMsgR.xMsgRegistration}
      *
      * @param data the registration data object
      * @param isPublisher if true then this is a request to find publishers,

@@ -152,7 +152,6 @@ public class xMsgMessage {
     /**
      * Serializes this message into a 0MQ message,
      * ready to send it over the wire.
-     * </p>
      *
      * @return the {@link org.zeromq.ZMsg} raw multi-part message
      */
@@ -174,7 +173,7 @@ public class xMsgMessage {
     }
 
     /**
-     * Returns the topic of the message
+     * Returns the topic of the message.
      *
      * @return the object of {@link org.jlab.coda.xmsg.core.xMsgTopic}
      */

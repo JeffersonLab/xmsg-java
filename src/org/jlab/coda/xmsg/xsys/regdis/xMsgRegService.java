@@ -190,16 +190,13 @@ public class xMsgRegService implements Runnable {
 
     /**
      * Prints on a stdio with an appropriate time stamp.
-     *
-     * @param msg
      */
     private void log(String msg) {
         System.out.println(xMsgUtil.currentTime(4) + " " + msg);
     }
 
     /**
-     * Prints exception stackTrace with an appropriate time stamp.
-     * @param e
+     * Prints exception stacktrace with an appropriate time stamp.
      */
     private void log(Exception e) {
         System.err.print(xMsgUtil.currentTime(4) +
