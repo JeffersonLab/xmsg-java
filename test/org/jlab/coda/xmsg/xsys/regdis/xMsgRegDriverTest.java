@@ -125,10 +125,12 @@ public class xMsgRegDriverTest {
 
     @Test
     public void sendPublisherFind() throws Exception {
-        driver.findRegistration(publisher.build(), false);
+        xMsgRegistration.Builder data = createRegData("10.2.9.1_node", "bradbury:scifi:books");
+
+        driver.findRegistration(data.build(), true);
 
         assertRequest("10.2.9.1_node",
-                publisher.build(),
+                data.build(),
                 xMsgConstants.FIND_PUBLISHER,
                 xMsgConstants.FIND_REQUEST_TIMEOUT);
     }
@@ -136,10 +138,12 @@ public class xMsgRegDriverTest {
 
     @Test
     public void sendSubscriberFind() throws Exception {
-        driver.findRegistration(subscriber.build(), false);
+        xMsgRegistration.Builder data = createRegData("10.2.9.1_node", "bradbury:scifi:books");
+
+        driver.findRegistration(data.build(), false);
 
         assertRequest("10.2.9.1_node",
-                subscriber.build(),
+                data.build(),
                 xMsgConstants.FIND_SUBSCRIBER,
                 xMsgConstants.FIND_REQUEST_TIMEOUT);
     }
@@ -147,8 +151,11 @@ public class xMsgRegDriverTest {
 
     @Test
     public void getRegistration() throws Exception {
+        xMsgRegistration.Builder data = createRegData("10.2.9.1_node", "bradbury:scifi:books");
         setResponse(new xMsgRegResponse("", "", registration));
-        Set<xMsgRegistration> res = driver.findRegistration(subscriber.build(), false);
+
+        Set<xMsgRegistration> res = driver.findRegistration(data.build(), false);
+
         assertThat(res, is(registration));
     }
 
