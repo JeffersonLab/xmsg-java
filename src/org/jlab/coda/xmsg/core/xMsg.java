@@ -26,7 +26,7 @@ import org.jlab.coda.xmsg.data.xMsgR.xMsgRegistration.Builder;
 import org.jlab.coda.xmsg.excp.xMsgException;
 import org.jlab.coda.xmsg.net.xMsgConnection;
 import org.jlab.coda.xmsg.net.xMsgConnectionOption;
-import org.jlab.coda.xmsg.net.xMsgPrxAddress;
+import org.jlab.coda.xmsg.net.xMsgProxyAddress;
 import org.jlab.coda.xmsg.net.xMsgRegAddress;
 import org.jlab.coda.xmsg.xsys.regdis.xMsgRegDriver;
 import org.zeromq.ZContext;
@@ -259,10 +259,10 @@ public class xMsg {
      * For local/default proxy connections we suggest using {@link #connect()}
      * or {@link #connect(int port)}
      *
-     * @param address {@link org.jlab.coda.xmsg.net.xMsgPrxAddress} object
+     * @param address {@link org.jlab.coda.xmsg.net.xMsgProxyAddress} object
      * @return {@link org.jlab.coda.xmsg.net.xMsgConnection} object
      */
-    public xMsgConnection connect(xMsgPrxAddress address) {
+    public xMsgConnection connect(xMsgProxyAddress address) {
         return createConnection(address, defaultConnectionOption);
     }
 
@@ -273,11 +273,11 @@ public class xMsg {
      * For local/default proxy connections we suggest using {@link #connect()}
      * or {@link #connect(int port)}
      *
-     * @param address {@link org.jlab.coda.xmsg.net.xMsgPrxAddress} object
+     * @param address {@link org.jlab.coda.xmsg.net.xMsgProxyAddress} object
      * @param setUp {@link org.jlab.coda.xmsg.net.xMsgConnectionOption} object
      * @return {@link org.jlab.coda.xmsg.net.xMsgConnection} object
      */
-    public xMsgConnection connect(xMsgPrxAddress address, xMsgConnectionOption setUp) {
+    public xMsgConnection connect(xMsgProxyAddress address, xMsgConnectionOption setUp) {
         return createConnection(address, setUp);
     }
 
@@ -291,7 +291,7 @@ public class xMsg {
      * @return {@link org.jlab.coda.xmsg.net.xMsgConnection} object
      */
     public xMsgConnection connect(String proxyHost) {
-        xMsgPrxAddress address = new xMsgPrxAddress(proxyHost);
+        xMsgProxyAddress address = new xMsgProxyAddress(proxyHost);
         return createConnection(address, defaultConnectionOption);
     }
 
@@ -302,7 +302,7 @@ public class xMsg {
      * @return {@link org.jlab.coda.xmsg.net.xMsgConnection} object
      */
     public xMsgConnection connect() {
-        xMsgPrxAddress address = new xMsgPrxAddress(defaultProxyHost, defaultProxyPort);
+        xMsgProxyAddress address = new xMsgProxyAddress(defaultProxyHost, defaultProxyPort);
         return createConnection(address, defaultConnectionOption);
     }
 
@@ -314,7 +314,7 @@ public class xMsg {
      * @return {@link org.jlab.coda.xmsg.net.xMsgConnection} object
      */
     public xMsgConnection connect(int port) {
-        xMsgPrxAddress address = new xMsgPrxAddress(defaultProxyHost, port);
+        xMsgProxyAddress address = new xMsgProxyAddress(defaultProxyHost, port);
         return createConnection(address, defaultConnectionOption);
     }
 
@@ -769,11 +769,11 @@ public class xMsg {
      * Creates two 0MQ tcp socket connections to a proxy defined by the xMsgPrAddress.
      *
      * @param address the proxy address:
-     *                object of {@link org.jlab.coda.xmsg.net.xMsgPrxAddress}
+     *                object of {@link org.jlab.coda.xmsg.net.xMsgProxyAddress}
      * @param setup {@link org.jlab.coda.xmsg.net.xMsgConnectionOption} object
      * @return {@link org.jlab.coda.xmsg.net.xMsgConnection} object
      */
-    private xMsgConnection createConnection(xMsgPrxAddress address, xMsgConnectionOption setup) {
+    private xMsgConnection createConnection(xMsgProxyAddress address, xMsgConnectionOption setup) {
         Socket pubSock = context.createSocket(ZMQ.PUB);
         Socket subSock = context.createSocket(ZMQ.SUB);
         setup.preConnection(pubSock);

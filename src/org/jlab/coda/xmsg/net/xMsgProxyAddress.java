@@ -30,13 +30,13 @@ import org.jlab.coda.xmsg.core.xMsgConstants;
  * @author gurjyan
  * @version 2.x
  */
-public class xMsgPrxAddress extends xMsgAddress {
+public class xMsgProxyAddress extends xMsgAddress {
 
-    public xMsgPrxAddress(String host, int port) {
+    public xMsgProxyAddress(String host, int port) {
         super(host, port);
     }
 
-    public xMsgPrxAddress(String host) {
+    public xMsgProxyAddress(String host) {
         super(host, xMsgConstants.DEFAULT_PORT.getIntValue());
     }
 }
