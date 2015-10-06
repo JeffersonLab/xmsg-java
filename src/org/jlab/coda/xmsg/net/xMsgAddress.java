@@ -72,15 +72,15 @@ public class xMsgAddress {
 
         xMsgAddress that = (xMsgAddress) o;
 
+        if (!host.equals(that.host)) return false;
         if (port != that.port) return false;
-        if (host != null ? !host.equals(that.host) : that.host != null) return false;
 
         return true;
     }
 
     @Override
     public int hashCode() {
-        int result = host != null ? host.hashCode() : 0;
+        int result = host.hashCode();
         result = 31 * result + port;
         return result;
     }
