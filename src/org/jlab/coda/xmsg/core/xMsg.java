@@ -324,7 +324,7 @@ public class xMsg {
      *
      * @param connection {@link org.jlab.coda.xmsg.net.xMsgConnection} object
      */
-    public void disconnect(xMsgConnection connection) {
+    public void release(xMsgConnection connection) {
         context.destroySocket(connection.getPubSock());
         context.destroySocket(connection.getSubSock());
     }
