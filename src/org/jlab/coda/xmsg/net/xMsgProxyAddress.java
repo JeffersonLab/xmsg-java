@@ -21,7 +21,6 @@
 
 package org.jlab.coda.xmsg.net;
 
-
 import org.jlab.coda.xmsg.core.xMsgConstants;
 
 /**
@@ -32,11 +31,15 @@ import org.jlab.coda.xmsg.core.xMsgConstants;
  */
 public class xMsgProxyAddress extends xMsgAddress {
 
-    public xMsgProxyAddress(String host, int port) {
-        super(host, port);
+    public xMsgProxyAddress() {
+        super("localhost", xMsgConstants.DEFAULT_PORT.getIntValue());
     }
 
     public xMsgProxyAddress(String host) {
         super(host, xMsgConstants.DEFAULT_PORT.getIntValue());
+    }
+
+    public xMsgProxyAddress(String host, int port) {
+        super(host, port);
     }
 }

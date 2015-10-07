@@ -368,7 +368,7 @@ public class xMsg {
                                     xMsgTopic topic,
                                     String description)
             throws xMsgException, IOException {
-        register(address.getHost(), address.getPort(), topic, description, true);
+        register(address.host(), address.port(), topic, description, true);
     }
 
     /**
@@ -402,7 +402,7 @@ public class xMsg {
                                      xMsgTopic topic,
                                      String description)
             throws xMsgException, IOException {
-        register(address.getHost(), address.getPort(), topic, description, false);
+        register(address.host(), address.port(), topic, description, false);
     }
 
     /**
@@ -434,7 +434,7 @@ public class xMsg {
     public void removePublisherRegistration(xMsgRegAddress address,
                                             xMsgTopic topic)
             throws xMsgException, IOException {
-        _removeRegistration(address.getHost(), address.getPort(), topic, "", true);
+        _removeRegistration(address.host(), address.port(), topic, "", true);
     }
 
     /**
@@ -464,7 +464,7 @@ public class xMsg {
     public void removeSubscriberRegistration(xMsgRegAddress address,
                                              xMsgTopic topic)
             throws xMsgException, IOException {
-        _removeRegistration(address.getHost(), address.getPort(), topic, "", false);
+        _removeRegistration(address.host(), address.port(), topic, "", false);
     }
 
     /**
@@ -495,7 +495,7 @@ public class xMsg {
                                                 xMsgTopic topic)
             throws xMsgException {
 
-        return findRegistration(address.getHost(), address.getPort(), topic, true);
+        return findRegistration(address.host(), address.port(), topic, true);
     }
 
     /**
@@ -527,7 +527,7 @@ public class xMsg {
                                                  xMsgTopic topic)
             throws xMsgException {
 
-        return findRegistration(address.getHost(), address.getPort(), topic, false);
+        return findRegistration(address.host(), address.port(), topic, false);
     }
 
     /**
@@ -782,10 +782,10 @@ public class xMsg {
         setup.preConnection(pubSock);
         setup.preConnection(subSock);
 
-        int pubPort = address.getPort();
+        int pubPort = address.port();
         int subPort = pubPort + 1;
-        pubSock.connect("tcp://" + address.getHost() + ":" + pubPort);
-        subSock.connect("tcp://" + address.getHost() + ":" + subPort);
+        pubSock.connect("tcp://" + address.host() + ":" + pubPort);
+        subSock.connect("tcp://" + address.host() + ":" + subPort);
         setup.postConnection();
 
         xMsgConnection connection = new xMsgConnection();

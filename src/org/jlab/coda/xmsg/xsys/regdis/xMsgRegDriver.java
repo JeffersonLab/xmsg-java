@@ -65,7 +65,7 @@ public class xMsgRegDriver {
     public xMsgRegDriver(ZContext context, xMsgRegAddress address) {
         _context = context;
         _address = address;
-        String addr = "tcp://" + address.getHost() + ":" + address.getPort();
+        String addr = "tcp://" + address.host() + ":" + address.port();
         _connectionSocket = _context.createSocket(ZMQ.REQ);
         _connectionSocket.setHWM(0);
         _connectionSocket.connect(addr);

@@ -21,7 +21,10 @@
 
 package org.jlab.coda.xmsg.net;
 
+import java.io.IOException;
+
 import org.jlab.coda.xmsg.core.xMsgUtil;
+import org.jlab.coda.xmsg.excp.xMsgAddressException;
 
 /**
  *  xMsg address.
@@ -29,39 +32,50 @@ import org.jlab.coda.xmsg.core.xMsgUtil;
  * @author gurjyan
  * @version 2.x
  */
-public class xMsgAddress {
+public abstract class xMsgAddress {
 
     private final String host;
     private final int port;
 
     /**
-     * Creates an address using provided IP and port.
+     * Creates an address using provided host and port.
      *
-     * @param hostAddress the host IP address
+     * @param host the host address
      * @param port the port number
+     * @throws xMsgAddressException if the IP address of the host could not be resolved
      */
-    public xMsgAddress(String hostAddress, int port) {
-        this.host = xMsgUtil.validateIP(hostAddress);
-        this.port = port;
+    public xMsgAddress(String host, int port) {
+        try {
+            if (host == null) {
+                throw new IllegalArgumentException("Null IP address");
+            }
+            if (port <= 1023) {
+                throw new IllegalArgumentException("Null IP address");
+            }
+            this.host = xMsgUtil.toHostAddress(host);
+            this.port = port;
+        } catch (IOException e) {
+            throw new xMsgAddressException(e);
+        }
     }
 
     /**
      * Returns the host name.
      */
-    public String getHost() {
+    public String host() {
         return host;
     }
 
     /**
      * Returns the port number.
      */
-    public int getPort() {
+    public int port() {
         return port;
     }
 
     @Override
     public String toString() {
-        return this.host + ":" + this.port;
+        return host + ":" + port;
     }
 
 
