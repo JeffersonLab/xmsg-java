@@ -75,22 +75,21 @@ public class xMsgRegistrar {
 
     public static void main(String[] args) {
         try {
-            int port = 0;
+            int port = xMsgConstants.REGISTRAR_PORT.getIntValue();
             if (args.length == 2) {
                 if (args[0].equals("-port")) {
                     port = Integer.parseInt(args[1]);
+                    if (port <= 0) {
+                        System.err.println("Invalid port: " + port);
+                        System.exit(1);
+                    }
                 } else {
                     System.err.println("Wrong option. Accepts -port option only.");
                     System.exit(1);
                 }
             }
 
-            final xMsgRegistrar registrar;
-            if (port <= 0) {
-                registrar = new xMsgRegistrar();
-            } else {
-                registrar = new xMsgRegistrar(port);
-            }
+            final xMsgRegistrar registrar = new xMsgRegistrar(port);
 
             Runtime.getRuntime().addShutdownHook(new Thread() {
                 @Override
