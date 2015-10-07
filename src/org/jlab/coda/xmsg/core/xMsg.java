@@ -29,8 +29,6 @@ import org.jlab.coda.xmsg.net.xMsgConnectionOption;
 import org.jlab.coda.xmsg.net.xMsgProxyAddress;
 import org.jlab.coda.xmsg.net.xMsgRegAddress;
 import org.jlab.coda.xmsg.xsys.regdis.xMsgRegDriver;
-import org.zeromq.ZContext;
-import org.zeromq.ZMQ;
 import org.zeromq.ZMQ.Socket;
 import org.zeromq.ZMQException;
 import org.zeromq.ZMsg;
@@ -69,11 +67,8 @@ public class xMsg {
     // default registrar address where registrar and
     private xMsgRegAddress defaultRegistrarAddr;
 
-    // 0MQ context object
-    private ZContext context = xMsgContext.getContext();
-
-    // default connection option
-    private xMsgConnectionOption defaultConnectionOption;
+    // map of active subscriptions
+    private ConnectionManager connectionManager;
 
     // map of active subscriptions
     private Map<String, xMsgSubscription> mySubscriptions = new HashMap<>();
@@ -183,21 +178,8 @@ public class xMsg {
         // create fixed size thread pool
         this.threadPool = xMsgUtil.newFixedThreadPool(defaultPoolSize, name);
 
-        // default pub/sub socket options
-        defaultConnectionOption = new xMsgConnectionOption() {
-
-            @Override
-            public void preConnection(Socket socket) {
-                socket.setRcvHWM(0);
-                socket.setSndHWM(0);
-            }
-
-            @Override
-            public void postConnection() { }
-        };
-
-        // fix default linger
-        this.context.setLinger(-1);
+        // create the connection pool
+        this.connectionManager = new ConnectionManager(xMsgContext.getContext());
     }
 
     /**
@@ -238,7 +220,7 @@ public class xMsg {
      * @return {@link org.jlab.coda.xmsg.net.xMsgConnection} object
      */
     public xMsgConnection connect(xMsgProxyAddress address) {
-        return createConnection(address, defaultConnectionOption);
+        return connectionManager.getProxyConnection(address);
     }
 
     /**
@@ -253,7 +235,7 @@ public class xMsg {
      * @return {@link org.jlab.coda.xmsg.net.xMsgConnection} object
      */
     public xMsgConnection connect(xMsgProxyAddress address, xMsgConnectionOption setUp) {
-        return createConnection(address, setUp);
+        return connectionManager.getProxyConnection(address, setUp);
     }
 
     /**
@@ -268,7 +250,7 @@ public class xMsg {
      */
     public xMsgConnection connect(String proxyHost) {
         xMsgProxyAddress address = new xMsgProxyAddress(proxyHost);
-        return createConnection(address, defaultConnectionOption);
+        return connectionManager.getProxyConnection(address);
     }
 
     /**
@@ -278,7 +260,7 @@ public class xMsg {
      * @return {@link org.jlab.coda.xmsg.net.xMsgConnection} object
      */
     public xMsgConnection connect() {
-        return createConnection(defaultProxyAddr, defaultConnectionOption);
+        return connectionManager.getProxyConnection(defaultProxyAddr);
     }
 
     /**
@@ -290,7 +272,7 @@ public class xMsg {
      */
     public xMsgConnection connect(int port) {
         xMsgProxyAddress address = new xMsgProxyAddress(defaultProxyAddr.host(), port);
-        return createConnection(address, defaultConnectionOption);
+        return connectionManager.getProxyConnection(address);
     }
 
     /**
@@ -299,8 +281,7 @@ public class xMsg {
      * @param connection {@link org.jlab.coda.xmsg.net.xMsgConnection} object
      */
     public void release(xMsgConnection connection) {
-        context.destroySocket(connection.getPubSock());
-        context.destroySocket(connection.getSubSock());
+        connectionManager.releaseProxyConnection(connection);
     }
 
     /**
@@ -313,7 +294,7 @@ public class xMsg {
         for (xMsgSubscription sh : mySubscriptions.values()) {
             unsubscribe(sh);
         }
-        context.destroy();
+        connectionManager.destroy();
         threadPool.shutdown();
     }
 
@@ -324,7 +305,7 @@ public class xMsg {
      * @throws xMsgException
      */
     public void destroy(int linger) throws xMsgException {
-        context.setLinger(linger);
+        connectionManager.setLinger(linger);
         destroy();
     }
 
@@ -653,7 +634,7 @@ public class xMsg {
                           String description,
                           boolean isPublisher)
             throws xMsgException {
-        xMsgRegDriver regDriver = new xMsgRegDriver(context, regAddress);
+        xMsgRegDriver regDriver = connectionManager.getRegistrarConnection(regAddress);
 
         xMsgRegistration.Builder regb = createRegistration(topic, description);
         if (isPublisher) {
@@ -684,9 +665,7 @@ public class xMsg {
                                      boolean isPublisher)
             throws xMsgException {
 
-        // create the registration driver object
-        xMsgRegDriver regDriver = new xMsgRegDriver(context, regAddress);
-
+        xMsgRegDriver regDriver = connectionManager.getRegistrarConnection(regAddress);
         xMsgRegistration.Builder regb = createRegistration(topic, description);
         if (isPublisher) {
             regb.setOwnerType(xMsgRegistration.OwnerType.PUBLISHER);
@@ -714,9 +693,7 @@ public class xMsg {
                                                    boolean isPublisher)
             throws xMsgException {
 
-        // create the registration driver object
-        xMsgRegDriver regDriver = new xMsgRegDriver(context, regAddress);
-
+        xMsgRegDriver regDriver = connectionManager.getRegistrarConnection(regAddress);
         xMsgRegistration.Builder regb = createRegistration(topic, "");
         if (isPublisher) {
             regb.setOwnerType(xMsgRegistration.OwnerType.PUBLISHER);
@@ -725,34 +702,6 @@ public class xMsg {
         }
         xMsgRegistration regData = regb.build();
         return regDriver.findRegistration(regData, isPublisher);
-    }
-
-    /**
-     * Creates two 0MQ tcp socket connections to a proxy defined by the xMsgPrAddress.
-     *
-     * @param address the proxy address:
-     *                object of {@link org.jlab.coda.xmsg.net.xMsgProxyAddress}
-     * @param setup {@link org.jlab.coda.xmsg.net.xMsgConnectionOption} object
-     * @return {@link org.jlab.coda.xmsg.net.xMsgConnection} object
-     */
-    private xMsgConnection createConnection(xMsgProxyAddress address, xMsgConnectionOption setup) {
-        Socket pubSock = context.createSocket(ZMQ.PUB);
-        Socket subSock = context.createSocket(ZMQ.SUB);
-        setup.preConnection(pubSock);
-        setup.preConnection(subSock);
-
-        int pubPort = address.port();
-        int subPort = pubPort + 1;
-        pubSock.connect("tcp://" + address.host() + ":" + pubPort);
-        subSock.connect("tcp://" + address.host() + ":" + subPort);
-        setup.postConnection();
-
-        xMsgConnection connection = new xMsgConnection();
-        connection.setAddress(address);
-        connection.setPubSock(pubSock);
-        connection.setSubSock(subSock);
-
-        return connection;
     }
 
     /**
