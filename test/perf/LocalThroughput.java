@@ -10,8 +10,6 @@ import org.jlab.coda.xmsg.core.xMsgUtil;
 import org.jlab.coda.xmsg.excp.xMsgException;
 import org.jlab.coda.xmsg.net.xMsgConnection;
 
-import java.io.IOException;
-
 public final class LocalThroughput {
 
     private LocalThroughput() { }
@@ -84,7 +82,7 @@ public final class LocalThroughput {
             subscriber.unsubscribe(sub);
             subscriber.destroy();
 
-        } catch (IOException | xMsgException e) {
+        } catch (xMsgException e) {
             e.printStackTrace();
             System.exit(1);
         } catch (InterruptedException e) {

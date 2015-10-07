@@ -101,7 +101,7 @@ public class SubscriptionsTest {
                         xMsgUtil.sleep(100);
                     }
                     actor.unsubscribe(sub);
-                } catch (IOException | xMsgException e) {
+                } catch (xMsgException e) {
                     e.printStackTrace();
                 }
             }

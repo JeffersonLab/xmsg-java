@@ -90,9 +90,9 @@ public class xMsg {
      *
      * @param name the name of an actor
      * @param poolSize the size of the callback thread pool
-     * @throws IOException
+     * @throws xMsgAddressException if the IP address of the host could not be resolved
      */
-    public xMsg(String name, int poolSize) throws IOException {
+    public xMsg(String name, int poolSize) {
         this(name,
              new xMsgProxyAddress(),
              new xMsgRegAddress(),
@@ -110,9 +110,9 @@ public class xMsg {
      * is used to create the xMSg object.
      *
      * @param name the name of an actor
-     * @throws IOException
+     * @throws xMsgAddressException if the IP address of the host could not be resolved
      */
-    public xMsg(String name) throws IOException {
+    public xMsg(String name) {
         this(name,
              new xMsgProxyAddress(),
              new xMsgRegAddress(),
@@ -130,9 +130,9 @@ public class xMsg {
      * @param name the name of an actor
      * @param registrarHost the registrar host
      * @param poolSize the size of the callback thread pool
-     * @throws IOException
+     * @throws xMsgAddressException if the IP address of the host could not be resolved
      */
-    public xMsg(String name, String registrarHost, int poolSize) throws IOException {
+    public xMsg(String name, String registrarHost, int poolSize) {
         this(name,
              new xMsgProxyAddress(),
              new xMsgRegAddress(registrarHost),
@@ -151,9 +151,9 @@ public class xMsg {
      *
      * @param name the name of an actor
      * @param registrarHost the registrar host
-     * @throws IOException
+     * @throws xMsgAddressException if the IP address of the host could not be resolved
      */
-    public xMsg(String name, String registrarHost) throws IOException {
+    public xMsg(String name, String registrarHost) {
         this(name,
              new xMsgProxyAddress(),
              new xMsgRegAddress(registrarHost),
@@ -167,12 +167,12 @@ public class xMsg {
      * @param defaultProxyAddr the proxy address
      * @param defaultRegAddr the registrar address
      * @param poolSize the size of the callback thread pool
-     * @throws IOException
+     * @throws xMsgAddressException if the IP address of the host could not be resolved
      */
     public xMsg(String name,
                 xMsgProxyAddress defaultProxyAddr,
                 xMsgRegAddress defaultRegAddr,
-                int poolSize) throws IOException {
+                int poolSize) {
 
         // We need to have a name for an actor
         this.myName = name;
@@ -265,6 +265,7 @@ public class xMsg {
      *
      * @param proxyHost proxy host name
      * @return {@link org.jlab.coda.xmsg.net.xMsgConnection} object
+     * @throws xMsgAddressException if the IP address of the host could not be resolved
      */
     public xMsgConnection connect(String proxyHost) {
         xMsgProxyAddress address = new xMsgProxyAddress(proxyHost);
@@ -337,12 +338,11 @@ public class xMsg {
      *              object of {@link org.jlab.coda.xmsg.core.xMsgTopic}
      * @param description textual description of the published message
      * @throws xMsgException {@link org.jlab.coda.xmsg.excp.xMsgException}
-     * @throws IOException
      */
     public void registerAsPublisher(xMsgRegAddress address,
                                     xMsgTopic topic,
                                     String description)
-            throws xMsgException, IOException {
+            throws xMsgException {
         register(address, topic, description, true);
     }
 
@@ -354,11 +354,10 @@ public class xMsg {
      *              object of {@link org.jlab.coda.xmsg.core.xMsgTopic}
      * @param description textual description of the published message
      * @throws xMsgException {@link org.jlab.coda.xmsg.excp.xMsgException}
-     * @throws IOException
      */
     public void registerAsPublisher(xMsgTopic topic,
                                     String description)
-            throws xMsgException, IOException {
+            throws xMsgException {
         register(defaultRegistrarAddr, topic, description, true);
     }
 
@@ -371,12 +370,11 @@ public class xMsg {
      *              object of {@link org.jlab.coda.xmsg.core.xMsgTopic}
      * @param description textual description of the subscription
      * @throws xMsgException {@link org.jlab.coda.xmsg.excp.xMsgException}
-     * @throws IOException
      */
     public void registerAsSubscriber(xMsgRegAddress address,
                                      xMsgTopic topic,
                                      String description)
-            throws xMsgException, IOException {
+            throws xMsgException {
         register(address, topic, description, false);
     }
 
@@ -388,11 +386,10 @@ public class xMsg {
      *              object of {@link org.jlab.coda.xmsg.core.xMsgTopic}
      * @param description textual description of the subscription
      * @throws xMsgException {@link org.jlab.coda.xmsg.excp.xMsgException}
-     * @throws IOException
      */
     public void registerAsSubscriber(xMsgTopic topic,
                                      String description)
-            throws xMsgException, IOException {
+            throws xMsgException {
         register(defaultRegistrarAddr, topic, description, false);
     }
 
@@ -404,11 +401,10 @@ public class xMsg {
      * @param topic the subscription topic:
      *              object of {@link org.jlab.coda.xmsg.core.xMsgTopic}
      * @throws xMsgException
-     * @throws IOException
      */
     public void removePublisherRegistration(xMsgRegAddress address,
                                             xMsgTopic topic)
-            throws xMsgException, IOException {
+            throws xMsgException {
         _removeRegistration(address, topic, "", true);
     }
 
@@ -419,10 +415,9 @@ public class xMsg {
      * @param topic the subscription topic:
      *              object of {@link org.jlab.coda.xmsg.core.xMsgTopic}
      * @throws xMsgException
-     * @throws IOException
      */
     public void removePublisherRegistration(xMsgTopic topic)
-            throws xMsgException, IOException {
+            throws xMsgException {
         _removeRegistration(defaultRegistrarAddr, topic, "", true);
     }
 
@@ -434,11 +429,10 @@ public class xMsg {
      * @param topic the subscription topic:
      *              object of {@link org.jlab.coda.xmsg.core.xMsgTopic}
      * @throws xMsgException
-     * @throws IOException
      */
     public void removeSubscriberRegistration(xMsgRegAddress address,
                                              xMsgTopic topic)
-            throws xMsgException, IOException {
+            throws xMsgException {
         _removeRegistration(address, topic, "", false);
     }
 
@@ -449,10 +443,9 @@ public class xMsg {
      * @param topic the subscription topic:
      *              object of {@link org.jlab.coda.xmsg.core.xMsgTopic}
      * @throws xMsgException
-     * @throws IOException
      */
     public void removeSubscriberRegistration(xMsgTopic topic)
-            throws xMsgException, IOException {
+            throws xMsgException {
         _removeRegistration(defaultRegistrarAddr, topic, "", false);
     }
 

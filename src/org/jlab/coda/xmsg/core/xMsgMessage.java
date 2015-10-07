@@ -74,7 +74,7 @@ public class xMsgMessage {
      * @throws IOException
      */
     public xMsgMessage(xMsgTopic topic, xMsgMeta.Builder metaData, byte[] data)
-            throws xMsgException, IOException {
+            throws xMsgException {
         if (metaData.hasByteOrder()) {
             this.topic = topic;
             this.metaData = metaData;
