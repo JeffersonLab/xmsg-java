@@ -89,13 +89,14 @@ public class xMsgRegResponseTest {
     }
 
 
+    @Test
     public void failWithMalformedMessage() throws Exception {
         ZMsg msg = new ZMsg();
         msg.addString("foo:bar");
         msg.addString("foo_service");
 
         expectedEx.expect(xMsgException.class);
-        expectedEx.expectMessage("xMsg message format violation");
+        expectedEx.expectMessage("message format violation");
         new xMsgRegResponse(msg);
     }
 
@@ -111,7 +112,7 @@ public class xMsgRegResponseTest {
         msg.add(Arrays.copyOf(bb, bb.length - 10));
 
         expectedEx.expect(xMsgException.class);
-        expectedEx.expectMessage("Could not deserialize data");
+        expectedEx.expectMessage("Could not deserialize protobuf data");
         new xMsgRegResponse(msg);
     }
 }
