@@ -258,21 +258,23 @@ public class xMsgRegDriver {
     }
 
     /**
-     * Removes registration of all xMsg actors of the registrar service,
-     * defined at the constructor. This will remove all publishers and
-     * subscribers from the registrar service registration database.
+     * Removes registration of all xMsg actors of the specified host.
+     * This will remove all publishers and subscribers running
+     * on the given xMsg node from the registrar service connected
+     * by this driver.
+     * <p>
      * This method is usually called by the xMsgNode registrar when
      * it shuts down or gets interrupted.
      *
      * @throws xMsgException
      */
-    public void removeAll()
+    public void removeAllRegistration(String sender, String host)
             throws xMsgException {
 
         String topic = xMsgConstants.REMOVE_ALL_REGISTRATION.getStringValue();
         int timeout = xMsgConstants.REMOVE_REQUEST_TIMEOUT.getIntValue();
 
-        xMsgRegRequest request = new xMsgRegRequest(topic, "anonymous", _registrarIp);
+        xMsgRegRequest request = new xMsgRegRequest(topic, sender, host);
         request(request, timeout);
     }
 

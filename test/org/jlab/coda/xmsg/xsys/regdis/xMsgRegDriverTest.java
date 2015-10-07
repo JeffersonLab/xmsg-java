@@ -114,7 +114,7 @@ public class xMsgRegDriverTest {
 
     @Test
     public void sendHostRemoval() throws Exception {
-        driver.removeAll();
+        driver.removeAllRegistration("10.2.9.1_node", "10.2.9.1");
 
         assertRequest("10.2.9.1_node",
                 "10.2.9.1",

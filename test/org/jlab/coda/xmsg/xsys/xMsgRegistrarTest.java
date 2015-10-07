@@ -135,13 +135,13 @@ public class xMsgRegistrarTest {
                 it.remove();
             }
         }
-        driver.removeAll();
+        driver.removeAllRegistration("test", host);
     }
 
 
     public void removeAll() throws xMsgException {
         for (String host : RegistrationDataFactory.testHosts) {
-            driver.removeAll();
+            driver.removeAllRegistration("test", host);
         }
         registration.clear();
     }
