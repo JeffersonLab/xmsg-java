@@ -64,18 +64,11 @@ public class xMsg {
     // default thread pool size
     private int defaultPoolSize;
 
-    // default proxy host
-    private String defaultProxyHost;
+    // default proxy address
+    private xMsgProxyAddress defaultProxyAddr;
 
-    // default proxy port
-    private int defaultProxyPort;
-
-    // default host where registrar and
-    // it's in memory database is running
-    private String defaultRegistrarHost;
-
-    // default registrar port
-    private int defaultRegistrarPort;
+    // default registrar address where registrar and
+    private xMsgRegAddress defaultRegistrarAddr;
 
     // 0MQ context object
     private ZContext context = xMsgContext.getContext();
@@ -100,13 +93,10 @@ public class xMsg {
      * @throws IOException
      */
     public xMsg(String name, int poolSize) throws IOException {
-        this(name, xMsgUtil.localhost(), xMsgConstants.DEFAULT_PORT.getIntValue(),
-                xMsgUtil.localhost(), xMsgConstants.REGISTRAR_PORT.getIntValue(), poolSize);
-        defaultPoolSize = poolSize;
-        defaultProxyHost = xMsgUtil.localhost();
-        defaultProxyPort = xMsgConstants.DEFAULT_PORT.getIntValue();
-        defaultRegistrarHost = xMsgUtil.localhost();
-        defaultRegistrarPort = xMsgConstants.REGISTRAR_PORT.getIntValue();
+        this(name,
+             new xMsgProxyAddress(),
+             new xMsgRegAddress(),
+             poolSize);
     }
 
     /**
@@ -123,14 +113,10 @@ public class xMsg {
      * @throws IOException
      */
     public xMsg(String name) throws IOException {
-        this(name, xMsgUtil.localhost(), xMsgConstants.DEFAULT_PORT.getIntValue(),
-                xMsgUtil.localhost(), xMsgConstants.REGISTRAR_PORT.getIntValue(),
-                xMsgConstants.DEFAULT_POOL_SIZE.getIntValue());
-        defaultPoolSize = xMsgConstants.DEFAULT_POOL_SIZE.getIntValue();
-        defaultProxyHost = xMsgUtil.localhost();
-        defaultProxyPort = xMsgConstants.DEFAULT_PORT.getIntValue();
-        defaultRegistrarHost = xMsgUtil.localhost();
-        defaultRegistrarPort = xMsgConstants.REGISTRAR_PORT.getIntValue();
+        this(name,
+             new xMsgProxyAddress(),
+             new xMsgRegAddress(),
+             xMsgConstants.DEFAULT_POOL_SIZE.getIntValue());
     }
 
     /**
@@ -147,13 +133,10 @@ public class xMsg {
      * @throws IOException
      */
     public xMsg(String name, String registrarHost, int poolSize) throws IOException {
-        this(name, xMsgUtil.localhost(), xMsgConstants.DEFAULT_PORT.getIntValue(),
-                registrarHost, xMsgConstants.REGISTRAR_PORT.getIntValue(), poolSize);
-        defaultPoolSize = poolSize;
-        defaultProxyHost = xMsgUtil.localhost();
-        defaultProxyPort = xMsgConstants.DEFAULT_PORT.getIntValue();
-        defaultRegistrarHost = registrarHost;
-        defaultRegistrarPort = xMsgConstants.REGISTRAR_PORT.getIntValue();
+        this(name,
+             new xMsgProxyAddress(),
+             new xMsgRegAddress(registrarHost),
+             poolSize);
     }
 
     /**
@@ -171,39 +154,32 @@ public class xMsg {
      * @throws IOException
      */
     public xMsg(String name, String registrarHost) throws IOException {
-        this(name, xMsgUtil.localhost(), xMsgConstants.DEFAULT_PORT.getIntValue(),
-                registrarHost, xMsgConstants.REGISTRAR_PORT.getIntValue(),
-                xMsgConstants.DEFAULT_POOL_SIZE.getIntValue());
-        defaultPoolSize = xMsgConstants.DEFAULT_POOL_SIZE.getIntValue();
-        defaultProxyHost = xMsgUtil.localhost();
-        defaultProxyPort = xMsgConstants.DEFAULT_PORT.getIntValue();
-        defaultRegistrarHost = registrarHost;
-        defaultRegistrarPort = xMsgConstants.REGISTRAR_PORT.getIntValue();
+        this(name,
+             new xMsgProxyAddress(),
+             new xMsgRegAddress(registrarHost),
+             xMsgConstants.DEFAULT_POOL_SIZE.getIntValue());
     }
 
     /**
      * Creates an xMsg actor.
      *
      * @param name the name of the actor
-     * @param defaultProxyHost the proxy host name
-     * @param defaultProxyPort the proxy port
-     * @param defaultRegistrarHost the registrar host name
-     * @param defaultRegistrarPort the registrar port
+     * @param defaultProxyAddr the proxy address
+     * @param defaultRegAddr the registrar address
      * @param poolSize the size of the callback thread pool
      * @throws IOException
      */
-    public xMsg(String name, String defaultProxyHost, int defaultProxyPort,
-                String defaultRegistrarHost, int defaultRegistrarPort,
+    public xMsg(String name,
+                xMsgProxyAddress defaultProxyAddr,
+                xMsgRegAddress defaultRegAddr,
                 int poolSize) throws IOException {
 
         // We need to have a name for an actor
         this.myName = name;
 
         this.defaultPoolSize = poolSize;
-        this.defaultRegistrarHost = defaultRegistrarHost;
-        this.defaultRegistrarPort = defaultRegistrarPort;
-        this.defaultProxyHost = defaultProxyHost;
-        this.defaultProxyPort = defaultProxyPort;
+        this.defaultProxyAddr = defaultProxyAddr;
+        this.defaultRegistrarAddr = defaultRegAddr;
 
         // create fixed size thread pool
         this.threadPool = xMsgUtil.newFixedThreadPool(defaultPoolSize, name);
@@ -302,8 +278,7 @@ public class xMsg {
      * @return {@link org.jlab.coda.xmsg.net.xMsgConnection} object
      */
     public xMsgConnection connect() {
-        xMsgProxyAddress address = new xMsgProxyAddress(defaultProxyHost, defaultProxyPort);
-        return createConnection(address, defaultConnectionOption);
+        return createConnection(defaultProxyAddr, defaultConnectionOption);
     }
 
     /**
@@ -314,7 +289,7 @@ public class xMsg {
      * @return {@link org.jlab.coda.xmsg.net.xMsgConnection} object
      */
     public xMsgConnection connect(int port) {
-        xMsgProxyAddress address = new xMsgProxyAddress(defaultProxyHost, port);
+        xMsgProxyAddress address = new xMsgProxyAddress(defaultProxyAddr.host(), port);
         return createConnection(address, defaultConnectionOption);
     }
 
@@ -368,7 +343,7 @@ public class xMsg {
                                     xMsgTopic topic,
                                     String description)
             throws xMsgException, IOException {
-        register(address.host(), address.port(), topic, description, true);
+        register(address, topic, description, true);
     }
 
     /**
@@ -384,7 +359,7 @@ public class xMsg {
     public void registerAsPublisher(xMsgTopic topic,
                                     String description)
             throws xMsgException, IOException {
-        register(defaultRegistrarHost, defaultRegistrarPort, topic, description, true);
+        register(defaultRegistrarAddr, topic, description, true);
     }
 
     /**
@@ -402,7 +377,7 @@ public class xMsg {
                                      xMsgTopic topic,
                                      String description)
             throws xMsgException, IOException {
-        register(address.host(), address.port(), topic, description, false);
+        register(address, topic, description, false);
     }
 
     /**
@@ -418,7 +393,7 @@ public class xMsg {
     public void registerAsSubscriber(xMsgTopic topic,
                                      String description)
             throws xMsgException, IOException {
-        register(defaultRegistrarHost, defaultRegistrarPort, topic, description, false);
+        register(defaultRegistrarAddr, topic, description, false);
     }
 
     /**
@@ -434,7 +409,7 @@ public class xMsg {
     public void removePublisherRegistration(xMsgRegAddress address,
                                             xMsgTopic topic)
             throws xMsgException, IOException {
-        _removeRegistration(address.host(), address.port(), topic, "", true);
+        _removeRegistration(address, topic, "", true);
     }
 
     /**
@@ -448,7 +423,7 @@ public class xMsg {
      */
     public void removePublisherRegistration(xMsgTopic topic)
             throws xMsgException, IOException {
-        _removeRegistration(defaultRegistrarHost, defaultRegistrarPort, topic, "", true);
+        _removeRegistration(defaultRegistrarAddr, topic, "", true);
     }
 
     /**
@@ -464,7 +439,7 @@ public class xMsg {
     public void removeSubscriberRegistration(xMsgRegAddress address,
                                              xMsgTopic topic)
             throws xMsgException, IOException {
-        _removeRegistration(address.host(), address.port(), topic, "", false);
+        _removeRegistration(address, topic, "", false);
     }
 
     /**
@@ -478,7 +453,7 @@ public class xMsg {
      */
     public void removeSubscriberRegistration(xMsgTopic topic)
             throws xMsgException, IOException {
-        _removeRegistration(defaultRegistrarHost, defaultRegistrarPort, topic, "", false);
+        _removeRegistration(defaultRegistrarAddr, topic, "", false);
     }
 
     /**
@@ -495,7 +470,7 @@ public class xMsg {
                                                 xMsgTopic topic)
             throws xMsgException {
 
-        return findRegistration(address.host(), address.port(), topic, true);
+        return findRegistration(address, topic, true);
     }
 
     /**
@@ -510,7 +485,7 @@ public class xMsg {
     public Set<xMsgRegistration> findPublishers(xMsgTopic topic)
             throws xMsgException {
 
-        return findRegistration(defaultRegistrarHost, defaultRegistrarPort, topic, true);
+        return findRegistration(defaultRegistrarAddr, topic, true);
     }
 
     /**
@@ -527,7 +502,7 @@ public class xMsg {
                                                  xMsgTopic topic)
             throws xMsgException {
 
-        return findRegistration(address.host(), address.port(), topic, false);
+        return findRegistration(address, topic, false);
     }
 
     /**
@@ -542,7 +517,7 @@ public class xMsg {
     public Set<xMsgRegistration> findSubscribers(xMsgTopic topic)
             throws xMsgException {
 
-        return findRegistration(defaultRegistrarHost, defaultRegistrarPort, topic, false);
+        return findRegistration(defaultRegistrarAddr, topic, false);
     }
 
     /**
@@ -660,8 +635,8 @@ public class xMsg {
     private Builder createRegistration(xMsgTopic topic, String description) {
         xMsgRegistration.Builder regb = xMsgRegistration.newBuilder();
         regb.setName(myName);
-        regb.setHost(defaultProxyHost);
-        regb.setPort(defaultProxyPort);
+        regb.setHost(defaultProxyAddr.host());
+        regb.setPort(defaultProxyAddr.port());
         regb.setDomain(topic.domain());
         regb.setSubject(topic.subject());
         regb.setType(topic.type());
@@ -681,16 +656,12 @@ public class xMsg {
      *                    true = publisher, false = subscriber
      * @throws xMsgException
      */
-    private void register(String regServerIp,
-                          int regServPort,
+    private void register(xMsgRegAddress regAddress,
                           xMsgTopic topic,
                           String description,
                           boolean isPublisher)
             throws xMsgException {
-
-        // create the registration driver object
-        xMsgRegAddress regAddr = new xMsgRegAddress(regServerIp, regServPort);
-        xMsgRegDriver regDriver = new xMsgRegDriver(context, regAddr);
+        xMsgRegDriver regDriver = new xMsgRegDriver(context, regAddress);
 
         xMsgRegistration.Builder regb = createRegistration(topic, description);
         if (isPublisher) {
@@ -715,16 +686,14 @@ public class xMsg {
      *                    true = publisher, false = subscriber
      * @throws xMsgException
      */
-    private void _removeRegistration(String regServerIp,
-                                     int regServPort,
+    private void _removeRegistration(xMsgRegAddress regAddress,
                                      xMsgTopic topic,
                                      String description,
                                      boolean isPublisher)
             throws xMsgException {
 
         // create the registration driver object
-        xMsgRegAddress regAddr = new xMsgRegAddress(regServerIp, regServPort);
-        xMsgRegDriver regDriver = new xMsgRegDriver(context, regAddr);
+        xMsgRegDriver regDriver = new xMsgRegDriver(context, regAddress);
 
         xMsgRegistration.Builder regb = createRegistration(topic, description);
         if (isPublisher) {
@@ -748,15 +717,13 @@ public class xMsg {
      *                    true = publisher, false = subscriber
      * @throws xMsgException
      */
-    private Set<xMsgRegistration> findRegistration(String regServerIp,
-                                                   int regServPort,
+    private Set<xMsgRegistration> findRegistration(xMsgRegAddress regAddress,
                                                    xMsgTopic topic,
                                                    boolean isPublisher)
             throws xMsgException {
 
         // create the registration driver object
-        xMsgRegAddress regAddr = new xMsgRegAddress(regServerIp, regServPort);
-        xMsgRegDriver regDriver = new xMsgRegDriver(context, regAddr);
+        xMsgRegDriver regDriver = new xMsgRegDriver(context, regAddress);
 
         xMsgRegistration.Builder regb = createRegistration(topic, "");
         if (isPublisher) {
