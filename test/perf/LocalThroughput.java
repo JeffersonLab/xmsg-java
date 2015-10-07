@@ -38,7 +38,7 @@ public final class LocalThroughput {
         try {
             final xMsg subscriber = new xMsg("throughput_subscriber");
             final xMsgAddress pubNode = new xMsgAddress(xMsgUtil.toHostAddress(bindTo));
-            final xMsgConnection connection = subscriber.getNewConnection(pubNode);
+            final xMsgConnection connection = subscriber.connect(pubNode);
             final xMsgTopic topic = xMsgTopic.wrap("thr_topic");
 
             xMsgUtil.sleep(100);

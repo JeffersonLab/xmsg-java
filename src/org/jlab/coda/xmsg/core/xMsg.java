@@ -29,15 +29,12 @@ import org.jlab.coda.xmsg.net.xMsgAddress;
 import org.jlab.coda.xmsg.net.xMsgConnection;
 import org.jlab.coda.xmsg.net.xMsgConnectionSetup;
 import org.jlab.coda.xmsg.xsys.regdis.xMsgRegDriver;
-import org.zeromq.ZContext;
 import org.zeromq.ZMQ;
 import org.zeromq.ZMQ.Socket;
 import org.zeromq.ZMQException;
 import org.zeromq.ZMsg;
 
 import java.io.IOException;
-import java.util.HashMap;
-import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.ThreadPoolExecutor;
 import java.util.concurrent.TimeoutException;
@@ -63,14 +60,8 @@ public class xMsg {
     /** The generated unique ID of this actor. */
     protected final String myId;
 
-    /** 0MQ context object. */
-    private final ZContext context;
-
     /** Private database of stored connections. */
-    private final Map<xMsgAddress, xMsgConnection> connections = new HashMap<>();
-
-    /** Default socket options. */
-    private xMsgConnectionSetup defaultSetup;
+    private ConnectionManager connectionManager;
 
     /** Fixed size thread pool. */
     private final ThreadPoolExecutor threadPool;
@@ -131,27 +122,13 @@ public class xMsg {
     xMsg(String name, xMsgRegDriver driver) {
         this.myName = name;
         this.myId = xMsgUtil.encodeIdentity(driver.getLocalAddress(), name);
-        this.context = driver.getContext();
         this.driver = driver;
 
         // create fixed size thread pool
         this.threadPool = xMsgUtil.newFixedThreadPool(DEFAULT_POOL_SIZE, name);
 
-        // default pub/sub socket options
-        defaultSetup = new xMsgConnectionSetup() {
-
-            @Override
-            public void preConnection(Socket socket) {
-                socket.setRcvHWM(0);
-                socket.setSndHWM(0);
-            }
-
-            @Override
-            public void postConnection() { }
-        };
-
-        // fix default linger
-        this.context.setLinger(-1);
+        // create the connection pool
+        this.connectionManager = new ConnectionManager(driver.getContext());
     }
 
     /**
@@ -159,7 +136,7 @@ public class xMsg {
      * managed sockets.
      */
     public void destroy() {
-        context.destroy();
+        connectionManager.destroy();
         threadPool.shutdown();
     }
 
@@ -171,7 +148,7 @@ public class xMsg {
      * @see <a href="http://api.zeromq.org/3-2:zmq-setsockopt">ZMQ_LINGER</a>
      */
     public void destroy(int linger) {
-        context.setLinger(linger);
+        connectionManager.setLinger(linger);
         destroy();
     }
 
@@ -182,7 +159,7 @@ public class xMsg {
      * @param setup the new default setup
      */
     public void setConnectionSetup(xMsgConnectionSetup setup) {
-        defaultSetup = setup;
+        connectionManager.setDefaultConnectionSetup(setup);
     }
 
     /**
@@ -224,7 +201,7 @@ public class xMsg {
      * @return the {@link xMsgConnection} object to the proxy
      */
     public xMsgConnection connect(xMsgAddress address) {
-        return connect(address, defaultSetup);
+        return connectionManager.getProxyConnection(address);
     }
 
     /**
@@ -240,22 +217,7 @@ public class xMsg {
      * @return the {@link xMsgConnection} object to the proxy
      */
     public xMsgConnection connect(xMsgAddress address, xMsgConnectionSetup setup) {
-        /*
-         * First check to see if we have already established connection
-         * to this address
-         */
-        if (connections.containsKey(address)) {
-            return connections.get(address);
-        } else {
-            /*
-             * Otherwise create sockets to the requested address, and store the
-             * created connection object for the future use. Return the
-             * reference to the connection object
-             */
-            xMsgConnection connection = createConnection(address, setup);
-            connections.put(address, connection);
-            return connection;
-        }
+        return connectionManager.getProxyConnection(address, setup);
     }
 
     /**
@@ -264,9 +226,7 @@ public class xMsg {
      * @param connection the connection to be destroyed
      */
     public void destroyConnection(xMsgConnection connection) {
-        context.destroySocket(connection.getPubSock());
-        context.destroySocket(connection.getSubSock());
-        connections.remove(connection.getAddress());
+        connectionManager.releaseProxyConnection(connection);
     }
 
     /**
@@ -278,8 +238,9 @@ public class xMsg {
      * @param address the xMsg address of the host where the xMsg proxy is running
      * @return the {@link xMsgConnection} object to the proxy
      */
+    @Deprecated
     public xMsgConnection getNewConnection(xMsgAddress address) {
-        return createConnection(address, defaultSetup);
+        return connectionManager.getProxyConnection(address);
     }
 
     /**
@@ -293,33 +254,9 @@ public class xMsg {
      * @param setup the setup of the new connection
      * @return the {@link xMsgConnection} object to the proxy
      */
+    @Deprecated
     public xMsgConnection getNewConnection(xMsgAddress address, xMsgConnectionSetup setup) {
-        return createConnection(address, setup);
-    }
-
-    /**
-     * Creates a new connection to the specified proxy.
-     * @param address the address of the proxy to be connected
-     * @return the created connection
-     */
-    private xMsgConnection createConnection(xMsgAddress address, xMsgConnectionSetup setup) {
-        Socket pubSock = context.createSocket(ZMQ.PUB);
-        Socket subSock = context.createSocket(ZMQ.SUB);
-        setup.preConnection(pubSock);
-        setup.preConnection(subSock);
-
-        int pubPort = address.getPort();
-        int subPort = pubPort + 1;
-        pubSock.connect("tcp://" + address.getHost() + ":" + pubPort);
-        subSock.connect("tcp://" + address.getHost() + ":" + subPort);
-        setup.postConnection();
-
-        xMsgConnection connection = new xMsgConnection();
-        connection.setAddress(address);
-        connection.setPubSock(pubSock);
-        connection.setSubSock(subSock);
-
-        return connection;
+        return connectionManager.getProxyConnection(address, setup);
     }
 
     /**
