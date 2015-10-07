@@ -21,14 +21,12 @@
 
 package org.jlab.coda.xmsg.xsys;
 
-import org.jlab.coda.xmsg.core.xMsgConstants;
 import org.jlab.coda.xmsg.core.xMsgContext;
 import org.jlab.coda.xmsg.core.xMsgUtil;
 import org.jlab.coda.xmsg.excp.xMsgException;
+import org.jlab.coda.xmsg.net.xMsgProxyAddress;
 import org.zeromq.ZContext;
 import org.zeromq.ZMQ;
-
-import java.io.IOException;
 
 /**
  * xMsg pub-sub proxy executable.
@@ -45,14 +43,15 @@ public class xMsgProxy {
 
     public static void main(String[] args) {
         try {
-            int port = xMsgConstants.DEFAULT_PORT.getIntValue();
+            xMsgProxyAddress address = new xMsgProxyAddress();
             if (args.length == 2) {
                 if (args[0].equals("-port")) {
-                    port = Integer.parseInt(args[1]);
+                    int port = Integer.parseInt(args[1]);
                     if (port <= 0) {
                         System.err.println("Invalid port: " + port);
                         System.exit(1);
                     }
+                    address = new xMsgProxyAddress("localhost", port);
                 } else {
                     System.err.println("Wrong option. Accepts -port option only.");
                     System.exit(1);
@@ -60,9 +59,9 @@ public class xMsgProxy {
             }
 
             xMsgProxy proxy = new xMsgProxy();
-            proxy.startProxy(xMsgContext.getContext(), port);
+            proxy.startProxy(xMsgContext.getContext(), address);
 
-        } catch (xMsgException | NumberFormatException | IOException e) {
+        } catch (xMsgException | NumberFormatException e) {
             e.printStackTrace();
             System.exit(1);
         }
@@ -74,24 +73,24 @@ public class xMsgProxy {
      * @param context zmq context object
      * @throws xMsgException
      */
-    private void startProxy(ZContext context, int proxyPort) throws xMsgException, IOException {
+    public void startProxy(ZContext context, xMsgProxyAddress address) throws xMsgException {
 
         System.out.println(xMsgUtil.currentTime(4) +
                 " xMsg-Info: Running xMsg proxy on the host = " +
-                xMsgUtil.localhost() + " port = " + proxyPort + "\n");
+                address.host() + " port = " + address.port() + "\n");
 
         // setting up the xMsg proxy
         // socket where clients publish their data/messages
         ZMQ.Socket in = context.createSocket(ZMQ.XSUB);
         in.setRcvHWM(0);
         in.setSndHWM(0);
-        in.bind("tcp://*:" + proxyPort);
+        in.bind("tcp://*:" + address.port());
 
         // socket where clients subscribe data/messages
         ZMQ.Socket out = context.createSocket(ZMQ.XPUB);
         out.setRcvHWM(0);
         out.setSndHWM(0);
-        out.bind("tcp://*:" + (proxyPort + 1));
+        out.bind("tcp://*:" + (address.port() + 1));
 
         // start poxy. this will block for ever
         ZMQ.proxy(in, out, null);
