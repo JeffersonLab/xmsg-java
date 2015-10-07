@@ -74,7 +74,12 @@ public class SubscriptionsTest {
         Thread proxyThread = xMsgUtil.newThread("proxy-thread", new Runnable() {
             @Override
             public void run() {
+                try {
                     xMsgProxy proxy = new xMsgProxy();
+                    proxy.startProxy(context);
+                } catch (xMsgException e) {
+                    e.printStackTrace();
+                }
             }
         });
         proxyThread.start();
@@ -156,7 +161,12 @@ public class SubscriptionsTest {
         Thread proxyThread = xMsgUtil.newThread("proxy-thread", new Runnable() {
             @Override
             public void run() {
+                try {
                     xMsgProxy proxy = new xMsgProxy();
+                    proxy.startProxy(context);
+                } catch (xMsgException e) {
+                    e.printStackTrace();
+                }
             }
         });
         proxyThread.start();
@@ -221,7 +231,12 @@ public class SubscriptionsTest {
         Thread proxyThread = xMsgUtil.newThread("proxy-thread", new Runnable() {
             @Override
             public void run() {
+                try {
                     xMsgProxy proxy = new xMsgProxy();
+                    proxy.startProxy(context);
+                } catch (xMsgException e) {
+                    e.printStackTrace();
+                }
             }
         });
         proxyThread.start();
