@@ -183,6 +183,25 @@ public class xMsg {
     }
 
     /**
+     * Constructor for testing purposes.
+     */
+    xMsg(String name, int poolSize, ConnectionManager connectionManager) {
+
+        // We need to have a name for an actor
+        this.myName = name;
+
+        this.defaultPoolSize = poolSize;
+        this.defaultProxyAddr = new xMsgProxyAddress();
+        this.defaultRegistrarAddr = new xMsgRegAddress();
+
+        // create fixed size thread pool
+        this.threadPool = xMsgUtil.newFixedThreadPool(defaultPoolSize, name);
+
+        // create the connection pool
+        this.connectionManager = connectionManager;
+    }
+
+    /**
      * Returns the name of this actor.
      *
      * @return the name of an actor

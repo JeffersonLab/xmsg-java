@@ -23,6 +23,7 @@ package org.jlab.coda.xmsg.core;
 
 import org.jlab.coda.xmsg.data.xMsgR.xMsgRegistration;
 import org.jlab.coda.xmsg.data.xMsgR.xMsgRegistration.Builder;
+import org.jlab.coda.xmsg.net.xMsgRegAddress;
 import org.jlab.coda.xmsg.xsys.regdis.xMsgRegDriver;
 import org.junit.Before;
 import org.junit.Test;
@@ -30,12 +31,15 @@ import org.mockito.ArgumentCaptor;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.is;
+import static org.mockito.Mockito.any;
+import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.eq;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
 
 public class xMsgTest {
 
+    private ConnectionManager manager;
     private xMsgRegDriver driver;
     private xMsg core;
     private String name = "asimov";
@@ -43,7 +47,9 @@ public class xMsgTest {
     @Before
     public void setup() throws Exception {
         driver = mock(xMsgRegDriver.class);
-        core = new xMsg(name);
+        manager = mock(ConnectionManager.class);
+        doReturn(driver).when(manager).getRegistrarConnection(any(xMsgRegAddress.class));
+        core = new xMsg(name, 1, manager);
     }
 
 
