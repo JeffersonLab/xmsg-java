@@ -200,6 +200,24 @@ public class xMsgMessage {
         return data;
     }
 
+
+    public xMsgMessage response() throws xMsgException, IOException {
+        xMsgTopic resTopic = xMsgTopic.wrap(metaData.getReplyTo());
+        xMsgMessage res = new xMsgMessage(resTopic, data);
+        res.getMetaData().mergeFrom(metaData.build());
+        res.getMetaData().clearReplyTo();
+        return res;
+    }
+
+
+    public xMsgMessage response(Object data) throws xMsgException, IOException {
+        xMsgTopic resTopic = xMsgTopic.wrap(metaData.getReplyTo());
+        xMsgMessage res = new xMsgMessage(resTopic, data);
+        res.getMetaData().mergeFrom(metaData.build());
+        res.getMetaData().clearReplyTo();
+        return res;
+    }
+
     /**
      * Replaces the data with the new object. This method will
      * do it's best to figure out the type of the object, updating accordingly the
