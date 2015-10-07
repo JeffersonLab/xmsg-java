@@ -21,9 +21,9 @@
 
 package org.jlab.coda.xmsg.xsys;
 
-import org.jlab.coda.xmsg.core.xMsgConstants;
 import org.jlab.coda.xmsg.core.xMsgContext;
 import org.jlab.coda.xmsg.core.xMsgUtil;
+import org.jlab.coda.xmsg.net.xMsgRegAddress;
 import org.jlab.coda.xmsg.xsys.regdis.xMsgRegService;
 import org.zeromq.ZContext;
 
@@ -49,7 +49,7 @@ public class xMsgRegistrar {
      *
      */
     public xMsgRegistrar() throws IOException {
-        this(xMsgConstants.REGISTRAR_PORT.getIntValue());
+        this(new xMsgRegAddress());
     }
 
     /**
@@ -58,13 +58,12 @@ public class xMsgRegistrar {
      * @param port registrar port number
      * @throws IOException
      */
-    public xMsgRegistrar(int port) throws IOException {
+    public xMsgRegistrar(xMsgRegAddress address) throws IOException {
 
         ZContext shadowContext = ZContext.shadow(context);
 
         // create registrar service object
-        xMsgRegService regService = new xMsgRegService(shadowContext,
-                xMsgUtil.localhost(), port);
+        xMsgRegService regService = new xMsgRegService(shadowContext, address);
 
         // create a new thread that will satisfy registration and discovery requests
         // using created registrar runnable object
@@ -74,21 +73,22 @@ public class xMsgRegistrar {
 
     public static void main(String[] args) {
         try {
-            int port = xMsgConstants.REGISTRAR_PORT.getIntValue();
+            xMsgRegAddress address = new xMsgRegAddress();
             if (args.length == 2) {
                 if (args[0].equals("-port")) {
-                    port = Integer.parseInt(args[1]);
+                    int port = Integer.parseInt(args[1]);
                     if (port <= 0) {
                         System.err.println("Invalid port: " + port);
                         System.exit(1);
                     }
+                    address = new xMsgRegAddress("localhost", port);
                 } else {
                     System.err.println("Wrong option. Accepts -port option only.");
                     System.exit(1);
                 }
             }
 
-            final xMsgRegistrar registrar = new xMsgRegistrar(port);
+            final xMsgRegistrar registrar = new xMsgRegistrar(address);
 
             Runtime.getRuntime().addShutdownHook(new Thread() {
                 @Override

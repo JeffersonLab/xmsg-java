@@ -26,6 +26,7 @@ import org.jlab.coda.xmsg.core.xMsgConstants;
 import org.jlab.coda.xmsg.core.xMsgUtil;
 import org.jlab.coda.xmsg.data.xMsgR.xMsgRegistration;
 import org.jlab.coda.xmsg.excp.xMsgException;
+import org.jlab.coda.xmsg.net.xMsgRegAddress;
 import org.zeromq.ZContext;
 import org.zeromq.ZMQ;
 import org.zeromq.ZMQException;
@@ -65,10 +66,8 @@ public class xMsgRegService implements Runnable {
     // database to store subscribers
     private final xMsgRegDatabase subscribers = new xMsgRegDatabase();
 
-    private final String registrarHost;
-
-    // Default port of the registrar
-    private int registrarPort = xMsgConstants.REGISTRAR_PORT.getIntValue();
+    // Address of the registrar
+    private final xMsgRegAddress regAddress;
 
 
     /**
@@ -79,11 +78,10 @@ public class xMsgRegService implements Runnable {
      * @param registrarPort the port of the registrar
      * @throws IOException
      */
-    public xMsgRegService(ZContext context, String registrarHost, int registrarPort)
+    public xMsgRegService(ZContext context, xMsgRegAddress regAddress)
             throws IOException {
         this.context = context;
-        this.registrarPort = registrarPort;
-        this.registrarHost = registrarHost;
+        this.regAddress = regAddress;
     }
 
     @Override
@@ -91,7 +89,7 @@ public class xMsgRegService implements Runnable {
         printStartup();
 
         ZMQ.Socket regSocket = context.createSocket(ZMQ.REP);
-        regSocket.bind("tcp://" + registrarHost + ":" + registrarPort);
+        regSocket.bind("tcp://" + regAddress.host() + ":" + regAddress.port());
 
         while (!Thread.currentThread().isInterrupted()) {
             try {
@@ -130,7 +128,7 @@ public class xMsgRegService implements Runnable {
         // the fact that registration is done using client-server type communication,
         // and are always synchronous.
         String topic = xMsgConstants.UNDEFINED.getStringValue();
-        String sender = registrarHost + ":" + xMsgConstants.REGISTRAR.getStringValue();
+        String sender = regAddress.host() + ":" + xMsgConstants.REGISTRAR.getStringValue();
 
         // response message
         xMsgRegResponse reply;
@@ -189,7 +187,7 @@ public class xMsgRegService implements Runnable {
     }
 
     private void printStartup() {
-        String regAddr = "tcp://" + registrarHost + ":" + registrarPort;
+        String regAddr = "tcp://" + regAddress.host() + ":" + regAddress.port();
         String logMsg = " xMsg-Info: registration and discovery server is started at address = ";
         log(xMsgUtil.currentTime(4) + logMsg + regAddr);
     }
