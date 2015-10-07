@@ -176,14 +176,20 @@ public class SubscriptionsTest {
             @Override
             public void run() {
                 try {
-                    xMsg subActor = new xMsg("test_publisher");
-                    xMsgConnection scon = subActor.connect();
+                    final xMsg subActor = new xMsg("test_publisher");
+                    final xMsgConnection scon = subActor.connect();
 
                     xMsgUtil.sleep(100);
                     xMsgTopic subTopic = xMsgTopic.wrap("test_topic");
                     xMsgSubscription sub = subActor.subscribe(scon, subTopic, new xMsgCallBack() {
                         @Override
                         public xMsgMessage callback(xMsgMessage msg) {
+                            try {
+                                xMsgMessage response = msg.response();
+                                subActor.publish(scon, response);
+                            } catch (xMsgException | IOException e) {
+                                e.printStackTrace();
+                            }
                             return msg;
                         }
                     });
@@ -194,7 +200,7 @@ public class SubscriptionsTest {
                     xMsgTopic pubTopic = xMsgTopic.wrap("test_topic");
                     for (int i = 0; i < Check.N; i++) {
                         xMsgMessage msg = createMessage(pubTopic, i);
-                        xMsgMessage resMsg = pubActor.syncPublish(pcon, msg, 1);
+                        xMsgMessage resMsg = pubActor.syncPublish(pcon, msg, 1000);
                         int data = parseData(resMsg);
                         check.sum += data;
                         check.counter++;
@@ -266,7 +272,7 @@ public class SubscriptionsTest {
                     xMsgTopic pubTopic = xMsgTopic.wrap("test_topic");
                     xMsgMessage msg = createMessage(pubTopic, 1);
                     try {
-                        pubActor.syncPublish(pcon, msg, 1);
+                        pubActor.syncPublish(pcon, msg, 1000);
                     } catch (TimeoutException e) {
                         check.timeout = true;
                     }
