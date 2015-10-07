@@ -234,6 +234,14 @@ public class xMsg {
         return myName;
     }
 
+
+    /**
+     * Change the size of the internal thread pool for subscription callbacks.
+     */
+    public void setPoolSize(int poolSize) {
+        threadPool.setCorePoolSize(poolSize);
+    }
+
     /**
      * Returns the size of the callback thread pool
      *
