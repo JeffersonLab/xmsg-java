@@ -73,6 +73,16 @@ public class xMsgProxy {
      * @param context zmq context object
      * @throws xMsgException
      */
+    public void startProxy(ZContext context) throws xMsgException {
+        startProxy(context, new xMsgProxyAddress());
+    }
+
+    /**
+     * Starts the proxy on a local host, with specified port.
+     *
+     * @param context zmq context object
+     * @throws xMsgException
+     */
     public void startProxy(ZContext context, xMsgProxyAddress address) throws xMsgException {
 
         System.out.println(xMsgUtil.currentTime(4) +
