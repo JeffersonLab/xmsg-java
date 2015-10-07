@@ -43,12 +43,11 @@ import java.util.concurrent.ThreadPoolExecutor;
 import java.util.concurrent.TimeoutException;
 
 /**
- *    xMsg base class that provides methods
- *    for organizing pub/sub communications.
+ * xMsg base class that provides methods
+ * for organizing pub/sub communications.
  *
- *    This class also provides a thread pool for
- *    running subscription callbacks in a separate
- *    thread.
+ * This class also provides a thread pool for running subscription
+ * callbacks in a separate thread.
  *
  * @author gurjyan
  * @since 2.x
