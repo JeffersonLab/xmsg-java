@@ -96,20 +96,11 @@ public class xMsgRegDriver {
     }
 
     /**
-     * Defines if the 0MQ socket has been created to the registrar service.
-     *
-     * @return true if connection socket to the registrar address is made
+     * Closes the connection to the registrar.
+     * This driver should not be used after calling this method.
      */
-    public boolean isConnected() {
-        return _connectionSocket != null;
-    }
-
-    /**
-     * Disconnects from the registrar and closes 0MQ socket.
-     */
-    public void disconnect() {
-        _connectionSocket.disconnect(_address);
-        _connectionSocket.close();
+    public void destroy() {
+        _context.destroySocket(_connectionSocket);
     }
 
     /**
