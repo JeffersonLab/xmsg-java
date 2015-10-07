@@ -35,9 +35,11 @@ import java.util.Set;
 
 /**
  * xMsg registration driver.
- * Provides methods for registration and discovery of xMsg actors, i.e.
- * publishers and subscribers. Creates 0MQ socket connection to the
- * {@link org.jlab.coda.xmsg.xsys.regdis.xMsgRegService xMsg registrar service}
+ *
+ * Provides methods for registration and discovery of xMsg actors (i.e.
+ * publishers and subscribers) on the specified
+ * {@link org.jlab.coda.xmsg.xsys.regdis.xMsgRegService xMsg registrar service},
+ * using a 0MQ REQ socket.
  *
  * @author gurjyan
  * @since 2.x
@@ -85,19 +87,12 @@ public class xMsgRegDriver {
     }
 
     /**
-     * Sends sync request to the registrar service and receives the xMsg
-     * registration response object {@link
-     * org.jlab.coda.xmsg.xsys.regdis.xMsgRegResponse}.
+     * Sends a request to the registrar server and waits the response.
      *
-     * @param request xMsg request object
-     *                {@link org.jlab.coda.xmsg.xsys.regdis.xMsgRegRequest}
-     *
+     * @param request the registration request
      * @param timeout timeout in milli seconds
      *
-     * @return xMsg response object
-     *         {@link org.jlab.coda.xmsg.xsys.regdis.xMsgRegResponse}
-     *
-     * @throws xMsgException
+     * @return the registrar response
      */
     protected xMsgRegResponse request(xMsgRegRequest request, int timeout)
             throws xMsgException {
@@ -131,11 +126,7 @@ public class xMsgRegDriver {
     }
 
     /**
-     * Checks the validity of the registration data.
-     *
-     * @param data registration data
-     *             {@link org.jlab.coda.xmsg.data.xMsgR.xMsgRegistration}
-     * @throws xMsgException
+     * Checks if the registration data is initialized.
      */
     private void _validateData(xMsgRegistration data) throws xMsgException {
         if (!data.isInitialized()) {
@@ -144,12 +135,9 @@ public class xMsgRegDriver {
     }
 
     /**
-     * Sends a registration request to the registrar service,
-     * defined at the constructor. Request is constructed using xMsg
-     * message construct, that has 3 part: topic, sender, and data.
+     * Sends a registration request to the registrar service.
      *
-     * @param data the registration data object
-     *             {@link org.jlab.coda.xmsg.data.xMsgR.xMsgRegistration}
+     * @param data the registration data
      * @param isPublisher if true then this is a request to register a publisher,
      *                     otherwise this is a request to register a subscriber
      * @throws xMsgException
@@ -169,12 +157,9 @@ public class xMsgRegDriver {
     }
 
     /**
-     * Sends a remove registration request to the registrar service,
-     * defined at the constructor. Request is constructed using xMsg
-     * message construct, that have 3 part: topic, sender, and data.
+     * Sends a remove registration request to the registrar service.
      *
-     * @param data the registration data object
-     *             {@link org.jlab.coda.xmsg.data.xMsgR.xMsgRegistration}
+     * @param data the registration data
      * @param isPublisher if true then this is a request to register a publisher,
      *                     otherwise this is a request to register a subscriber
      * @throws xMsgException
@@ -194,9 +179,9 @@ public class xMsgRegDriver {
     }
 
     /**
-     * Removes registration of all xMsg actors of the specified host.
+     * Removes registration of all xMsg actors of the specified node.
      * This will remove all publishers and subscribers running
-     * on the given xMsg node from the registrar service connected
+     * on the given host from the registrar service connected
      * by this driver.
      * <p>
      * This method is usually called by the xMsgNode registrar when
@@ -215,11 +200,10 @@ public class xMsgRegDriver {
     }
 
     /**
-     * Searched the registration database of the registrar service,
+     * Searches the connected registrar database for the given topic.
      * defined by the constructor. This will search the database for
-     * publishers sor subscribers to a specific topic. The topic of
-     * an interest is defined within the xMsgRegistration data object
-     * {@link org.jlab.coda.xmsg.data.xMsgR.xMsgRegistration}
+     * publishers or subscribers to a specific topic. The topic of
+     * interest is defined within the given registration data.
      *
      * @param data the registration data object
      * @param isPublisher if true then this is a request to find publishers,
