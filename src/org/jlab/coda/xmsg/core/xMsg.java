@@ -385,7 +385,7 @@ public class xMsg {
     public void removePublisherRegistration(xMsgRegAddress address,
                                             xMsgTopic topic)
             throws xMsgException {
-        _removeRegistration(address, topic, "", true);
+        _removeRegistration(address, topic, true);
     }
 
     /**
@@ -398,7 +398,7 @@ public class xMsg {
      */
     public void removePublisherRegistration(xMsgTopic topic)
             throws xMsgException {
-        _removeRegistration(defaultRegistrarAddr, topic, "", true);
+        _removeRegistration(defaultRegistrarAddr, topic, true);
     }
 
     /**
@@ -413,7 +413,7 @@ public class xMsg {
     public void removeSubscriberRegistration(xMsgRegAddress address,
                                              xMsgTopic topic)
             throws xMsgException {
-        _removeRegistration(address, topic, "", false);
+        _removeRegistration(address, topic, false);
     }
 
     /**
@@ -426,7 +426,7 @@ public class xMsg {
      */
     public void removeSubscriberRegistration(xMsgTopic topic)
             throws xMsgException {
-        _removeRegistration(defaultRegistrarAddr, topic, "", false);
+        _removeRegistration(defaultRegistrarAddr, topic, false);
     }
 
     /**
@@ -605,7 +605,7 @@ public class xMsg {
      * @param description textual description of the actor
      * @return {@link org.jlab.coda.xmsg.data.xMsgR.xMsgRegistration.Builder} Object
      */
-    private Builder createRegistration(xMsgTopic topic, String description) {
+    private Builder createRegistration(xMsgTopic topic) {
         xMsgRegistration.Builder regb = xMsgRegistration.newBuilder();
         regb.setName(myName);
         regb.setHost(defaultProxyAddr.host());
@@ -613,7 +613,6 @@ public class xMsg {
         regb.setDomain(topic.domain());
         regb.setSubject(topic.subject());
         regb.setType(topic.type());
-        regb.setDescription(description);
         return regb;
     }
 
@@ -636,12 +635,13 @@ public class xMsg {
             throws xMsgException {
         xMsgRegDriver regDriver = connectionManager.getRegistrarConnection(regAddress);
 
-        xMsgRegistration.Builder regb = createRegistration(topic, description);
+        xMsgRegistration.Builder regb = createRegistration(topic);
         if (isPublisher) {
             regb.setOwnerType(xMsgRegistration.OwnerType.PUBLISHER);
         } else {
             regb.setOwnerType(xMsgRegistration.OwnerType.SUBSCRIBER);
         }
+        regb.setDescription(description);
         xMsgRegistration regData = regb.build();
         regDriver.register(regData, isPublisher);
     }
@@ -661,12 +661,11 @@ public class xMsg {
      */
     private void _removeRegistration(xMsgRegAddress regAddress,
                                      xMsgTopic topic,
-                                     String description,
                                      boolean isPublisher)
             throws xMsgException {
 
         xMsgRegDriver regDriver = connectionManager.getRegistrarConnection(regAddress);
-        xMsgRegistration.Builder regb = createRegistration(topic, description);
+        xMsgRegistration.Builder regb = createRegistration(topic);
         if (isPublisher) {
             regb.setOwnerType(xMsgRegistration.OwnerType.PUBLISHER);
         } else {
@@ -694,7 +693,7 @@ public class xMsg {
             throws xMsgException {
 
         xMsgRegDriver regDriver = connectionManager.getRegistrarConnection(regAddress);
-        xMsgRegistration.Builder regb = createRegistration(topic, "");
+        xMsgRegistration.Builder regb = createRegistration(topic);
         if (isPublisher) {
             regb.setOwnerType(xMsgRegistration.OwnerType.PUBLISHER);
         } else {
