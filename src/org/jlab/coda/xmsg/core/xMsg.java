@@ -860,44 +860,6 @@ public class xMsg {
     }
 
     /**
-     * Publishes a message through a defined proxy connection. In this case
-     * {@link org.jlab.coda.xmsg.net.xMsgConnection} object is used. The timeout
-     * parameter defines if the publishing is going to sync or async. This method
-     * is not using a predefined xMsgMessage object, but rather builds a message
-     * using a topic, data mimeType and a data object itself.
-     *
-     * @param con proxy connection {@link org.jlab.coda.xmsg.net.xMsgConnection} object
-     * @param topic topic to which the message will be published:
-     *              object of {@link org.jlab.coda.xmsg.core.xMsgTopic}
-     * @param mimeType String the defines a mimeType of the data being published.
-     *                 Note: recommended to use predefined types in
-     *                 {@link org.jlab.coda.xmsg.core.xMsgConstants}
-     * @param data data object
-     * @param timeout timeout > 0 defines publishing process as a sync process
-     * @return in case of the sync operation we expect an object of
-     * {@link org.jlab.coda.xmsg.core.xMsgMessage} from a receiver.
-     * @throws xMsgException
-     * @throws IOException
-     * @throws TimeoutException
-     */
-    private xMsgMessage _publish(xMsgConnection con,
-                                 xMsgTopic topic,
-                                 String mimeType, Object data, int timeout)
-            throws xMsgException, IOException, TimeoutException {
-
-        // create a message
-        xMsgMessage msg;
-        if (mimeType != null) {
-            msg = new xMsgMessage(topic, mimeType, data);
-        } else {
-            msg = new xMsgMessage(topic, data);
-        }
-
-        return _publish(con, msg, timeout);
-    }
-
-    /**
-     *
      * Executes a user callback implementing {@link org.jlab.coda.xmsg.core.xMsgCallBack}
      * interface. Note that it is under user responsibility to check metadata "replyTo"
      * to define if this is a sync request and send the result to the topic = replyTo.
