@@ -778,11 +778,15 @@ public class xMsg {
                 t++;
                 xMsgUtil.sleep(1);
             }
-            if (t >= timeout) {
-                throw new TimeoutException("xMsg-Error: no response for time_out = " + t + " milli sec.");
+            try {
+                if (t >= timeout) {
+                    throw new TimeoutException("xMsg-Error: no response for time_out = " + t + " milli sec.");
+                }
+                return cb.recvMsg;
+            } finally {
+                msg.getMetaData().setReplyTo(xMsgConstants.UNDEFINED.getStringValue());
+                unsubscribe(cb.handler);
             }
-            msg.getMetaData().setReplyTo(xMsgConstants.UNDEFINED.getStringValue());
-            return cb.recvMsg;
         }
         return null;
     }
@@ -832,14 +836,6 @@ public class xMsg {
         @Override
         public xMsgMessage callback(xMsgMessage msg) {
             recvMsg = msg;
-            try {
-                if (handler != null) {
-                    unsubscribe(handler);
-                }
-            } catch (xMsgException e) {
-                e.printStackTrace();
-            }
-
             return recvMsg;
         }
     }
