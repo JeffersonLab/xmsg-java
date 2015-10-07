@@ -29,7 +29,6 @@ import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.net.InetAddress;
 import java.net.NetworkInterface;
-import java.net.SocketException;
 import java.text.DateFormat;
 import java.util.ArrayList;
 import java.util.Date;
@@ -157,9 +156,9 @@ public final class xMsgUtil {
      * broadcast (255.255.255.255) addresses.
      *
      * @return list of IP addresses
-     * @throws SocketException if an I/O error occurs.
+     * @throws IOException if an I/O error occurs.
      */
-    public static List<String> getLocalHostIps() throws SocketException {
+    public static List<String> getLocalHostIps() throws IOException {
         if (localHostIps.isEmpty()) {
             updateLocalHostIps();
         }
@@ -173,9 +172,9 @@ public final class xMsgUtil {
      * multicast (224.xxx through 238.xxx) and
      * broadcast (255.255.255.255) addresses.
      *
-     * @throws SocketException if an I/O error occurs.
+     * @throws IOException if an I/O error occurs.
      */
-    public static void updateLocalHostIps() throws SocketException {
+    public static void updateLocalHostIps() throws IOException {
         List<String> out = new ArrayList<>();
         Enumeration<NetworkInterface> e = NetworkInterface.getNetworkInterfaces();
         while (e.hasMoreElements()) {
