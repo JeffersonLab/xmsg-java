@@ -22,7 +22,6 @@
 package org.jlab.coda.xmsg.core;
 
 import org.jlab.coda.xmsg.data.xMsgR.xMsgRegistration;
-import org.jlab.coda.xmsg.data.xMsgR.xMsgRegistration.Builder;
 import org.jlab.coda.xmsg.excp.xMsgException;
 import org.jlab.coda.xmsg.net.xMsgConnection;
 import org.jlab.coda.xmsg.net.xMsgConnectionOption;
@@ -624,7 +623,7 @@ public class xMsg {
      * @param description textual description of the actor
      * @return {@link org.jlab.coda.xmsg.data.xMsgR.xMsgRegistration.Builder} Object
      */
-    private Builder createRegistration(xMsgTopic topic) {
+    private xMsgRegistration.Builder createRegistration(xMsgTopic topic) {
         xMsgRegistration.Builder regb = xMsgRegistration.newBuilder();
         regb.setName(myName);
         regb.setHost(defaultProxyAddr.host());
