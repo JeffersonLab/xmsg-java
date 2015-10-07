@@ -27,6 +27,7 @@ import org.jlab.coda.xmsg.core.xMsgUtil;
 import org.jlab.coda.xmsg.data.xMsgR.xMsgRegistration;
 import org.jlab.coda.xmsg.data.xMsgR.xMsgRegistration.Builder;
 import org.jlab.coda.xmsg.excp.xMsgException;
+import org.jlab.coda.xmsg.net.xMsgRegAddress;
 import org.jlab.coda.xmsg.testing.IntegrationTest;
 import org.jlab.coda.xmsg.xsys.regdis.RegistrationDataFactory;
 import org.jlab.coda.xmsg.xsys.regdis.xMsgRegDriver;
@@ -53,7 +54,7 @@ public class xMsgRegistrarTest {
     public void testRegistrationDataBase() throws Exception {
         try {
             String localHost = xMsgUtil.localhost();
-            driver = new xMsgRegDriver(xMsgContext.getContext(), localHost);
+            driver = new xMsgRegDriver(xMsgContext.getContext(), new xMsgRegAddress(localHost));
             registrar = new xMsgRegistrar();
             registrar.start();
             xMsgUtil.sleep(200);

@@ -689,7 +689,8 @@ public class xMsg {
             throws xMsgException {
 
         // create the registration driver object
-        xMsgRegDriver regDriver = new xMsgRegDriver(context, regServerIp, regServPort);
+        xMsgRegAddress regAddr = new xMsgRegAddress(regServerIp, regServPort);
+        xMsgRegDriver regDriver = new xMsgRegDriver(context, regAddr);
 
         xMsgRegistration.Builder regb = createRegistration(topic, description);
         if (isPublisher) {
@@ -722,7 +723,8 @@ public class xMsg {
             throws xMsgException {
 
         // create the registration driver object
-        xMsgRegDriver regDriver = new xMsgRegDriver(context, regServerIp, regServPort);
+        xMsgRegAddress regAddr = new xMsgRegAddress(regServerIp, regServPort);
+        xMsgRegDriver regDriver = new xMsgRegDriver(context, regAddr);
 
         xMsgRegistration.Builder regb = createRegistration(topic, description);
         if (isPublisher) {
@@ -753,7 +755,8 @@ public class xMsg {
             throws xMsgException {
 
         // create the registration driver object
-        xMsgRegDriver regDriver = new xMsgRegDriver(context, regServerIp, regServPort);
+        xMsgRegAddress regAddr = new xMsgRegAddress(regServerIp, regServPort);
+        xMsgRegDriver regDriver = new xMsgRegDriver(context, regAddr);
 
         xMsgRegistration.Builder regb = createRegistration(topic, "");
         if (isPublisher) {

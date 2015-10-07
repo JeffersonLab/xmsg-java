@@ -26,6 +26,7 @@ import org.jlab.coda.xmsg.core.xMsgTopic;
 import org.jlab.coda.xmsg.core.xMsgUtil;
 import org.jlab.coda.xmsg.data.xMsgR.xMsgRegistration;
 import org.jlab.coda.xmsg.data.xMsgR.xMsgRegistration.Builder;
+import org.jlab.coda.xmsg.net.xMsgRegAddress;
 import org.junit.Before;
 import org.junit.Test;
 import org.zeromq.ZContext;
@@ -67,7 +68,7 @@ public class xMsgRegDriverTest {
 
     @Before
     public void setup() throws Exception {
-        driver = spy(new xMsgRegDriver(new ZContext(), "10.2.9.1"));
+        driver = spy(new xMsgRegDriver(new ZContext(), new xMsgRegAddress("10.2.9.1")));
         setResponse(new xMsgRegResponse("", ""));
     }
 

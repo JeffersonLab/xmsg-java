@@ -22,9 +22,9 @@
 package org.jlab.coda.xmsg.xsys.regdis;
 
 import org.jlab.coda.xmsg.core.xMsgConstants;
-import org.jlab.coda.xmsg.core.xMsgUtil;
 import org.jlab.coda.xmsg.data.xMsgR.xMsgRegistration;
 import org.jlab.coda.xmsg.excp.xMsgException;
+import org.jlab.coda.xmsg.net.xMsgRegAddress;
 import org.zeromq.ZContext;
 import org.zeromq.ZMQ;
 import org.zeromq.ZMQ.Socket;
@@ -47,52 +47,26 @@ public class xMsgRegDriver {
     // 0MQ context.
     private final ZContext _context;
 
-    // Registrar host name
-    private final String _registrarIp;
-
-    // Registrar tcp address
-    private String _address;
-
-    // Registrar server listening port.
-    private int _registrarPort;
+    // Registrar address
+    private final xMsgRegAddress _address;
 
     // Registrar server (req/rep) connection socket.
     private Socket _connectionSocket = null;
 
 
     /**
-     * Constructor.
+     * Creates a driver to the registrar running in the given address.
      *
      * @param context 0MQ context
-     * @param ip registrar service IP address
-     * @param port registrar service listening port
+     * @param address registrar service address
      */
-    public xMsgRegDriver(ZContext context, String ip, int port) {
+    public xMsgRegDriver(ZContext context, xMsgRegAddress address) {
         _context = context;
-        _registrarIp = xMsgUtil.validateIP(ip);
-        _registrarPort = port;
-        _address = "tcp://" + _registrarIp + ":" + _registrarPort;
+        _address = address;
+        String addr = "tcp://" + address.getHost() + ":" + address.getPort();
         _connectionSocket = _context.createSocket(ZMQ.REQ);
         _connectionSocket.setHWM(0);
-        _connectionSocket.connect(_address);
-
-    }
-
-    /**
-     * Constructor. Uses xMsg registrar service
-     * {@link org.jlab.coda.xmsg.core.xMsgConstants#REGISTRAR_PORT default port}.
-     *
-     * @param context 0MQ context
-     * @param ip      registrar service IP address
-     */
-    public xMsgRegDriver(ZContext context, String ip) {
-        _context = context;
-        _registrarIp = xMsgUtil.validateIP(ip);
-        _registrarPort = xMsgConstants.REGISTRAR_PORT.getIntValue();
-        _address = "tcp://" + _registrarIp + ":" + _registrarPort;
-        _connectionSocket = _context.createSocket(ZMQ.REQ);
-        _connectionSocket.setHWM(0);
-        _connectionSocket.connect(_address);
+        _connectionSocket.connect(addr);
     }
 
     /**
@@ -104,38 +78,9 @@ public class xMsgRegDriver {
     }
 
     /**
-     *  Returns the 0MQ context.
-     *
-     * @return 0MQ context {@link org.zeromq.ZContext}
+     * Returns the address of the registrar service.
      */
-    public ZContext getContext() {
-        return _context;
-    }
-
-    /**
-     * Returns the IP address of the connected registrar service.
-     *
-     * @return IP address of the registrar service
-     */
-    public String getHost() {
-        return _registrarIp;
-    }
-
-    /**
-     * Returns the port of the connected registrar service.
-     *
-     * @return port of the registrar service
-     */
-    public int getPort() {
-        return _registrarPort;
-    }
-
-    /**
-     * Returns server address of the connected registrar service.
-     *
-     * @return server address the registrar service
-     */
-    public String getAddress() {
+    public xMsgRegAddress getAddress() {
         return _address;
     }
 
