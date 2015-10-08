@@ -21,7 +21,6 @@
 
 package org.jlab.coda.xmsg.xsys;
 
-import org.jlab.coda.xmsg.core.xMsgContext;
 import org.jlab.coda.xmsg.core.xMsgTopic;
 import org.jlab.coda.xmsg.core.xMsgUtil;
 import org.jlab.coda.xmsg.data.xMsgR.xMsgRegistration;
@@ -33,6 +32,7 @@ import org.jlab.coda.xmsg.xsys.regdis.RegistrationDataFactory;
 import org.jlab.coda.xmsg.xsys.regdis.xMsgRegDriver;
 import org.junit.Test;
 import org.junit.experimental.categories.Category;
+import org.zeromq.ZContext;
 
 import java.util.HashSet;
 import java.util.Iterator;
@@ -53,8 +53,9 @@ public class xMsgRegistrarTest {
     @Test
     public void testRegistrationDataBase() throws Exception {
         try {
-            driver = new xMsgRegDriver(xMsgContext.getContext(), new xMsgRegAddress());
-            registrar = new xMsgRegistrar(xMsgContext.getContext());
+            ZContext context = new ZContext();
+            driver = new xMsgRegDriver(context, new xMsgRegAddress());
+            registrar = new xMsgRegistrar(context);
             registrar.start();
             xMsgUtil.sleep(200);
 
