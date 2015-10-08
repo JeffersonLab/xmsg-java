@@ -42,8 +42,7 @@ public class xMsgRegistrar {
      * Constructs a registrar that uses the default
      * {@link org.jlab.coda.xmsg.core.xMsgConstants#REGISTRAR_PORT port}.
      *
-     * @throws IOException
-     *
+     * @param context the context to run the registrar service
      */
     public xMsgRegistrar(ZContext context) {
         this(context, new xMsgRegAddress());
@@ -52,8 +51,8 @@ public class xMsgRegistrar {
     /**
      * Constructs a registrar that uses the specified port number.
      *
-     * @param port registrar port number
-     * @throws IOException
+     * @param context the context to run the registrar service
+     * @param address the address of the registrar service
      */
     public xMsgRegistrar(ZContext context, xMsgRegAddress address) {
 

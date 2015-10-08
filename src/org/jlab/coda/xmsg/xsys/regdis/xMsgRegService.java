@@ -53,7 +53,6 @@ import java.util.Set;
  * @author gurjyan
  * @since 2.x
  */
-
 public class xMsgRegService implements Runnable {
 
     // 0MQ context.
@@ -70,12 +69,10 @@ public class xMsgRegService implements Runnable {
 
 
     /**
-     * Creates a xMsg registrar object.
+     * Creates an xMsg registrar object.
      *
      * @param shadowContext shadow context
-     * @param registrarHost host of the registrar
-     * @param registrarPort the port of the registrar
-     * @throws IOException
+     * @param regAddress the address of the registrar service
      * @see ZContext#shadow
      */
     public xMsgRegService(ZContext shadowContext, xMsgRegAddress regAddress) {
