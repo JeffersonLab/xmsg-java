@@ -68,22 +68,10 @@ public class SubscriptionsTest {
             AtomicLong sum = new AtomicLong();
         }
 
-        final ZContext context = new ZContext();
         final Check check = new Check();
 
-        Thread proxyThread = xMsgUtil.newThread("proxy-thread", new Runnable() {
-            @Override
-            public void run() {
-                try {
-                    xMsgProxy proxy = new xMsgProxy();
-                    proxy.startProxy(context);
-                } catch (xMsgException e) {
-                    e.printStackTrace();
-                }
-            }
-        });
+        ProxyThread proxyThread = new ProxyThread();
         proxyThread.start();
-        xMsgUtil.sleep(100);
 
         Thread subThread = xMsgUtil.newThread("sub-thread", new Runnable() {
             @Override
@@ -137,9 +125,7 @@ public class SubscriptionsTest {
         subThread.join();
         pubThread.join();
 
-        context.destroy();
-        proxyThread.interrupt();
-        proxyThread.join();
+        proxyThread.stop();
 
         assertThat(check.counter.get(), is(Check.N));
         assertThat(check.sum.get(), is(Check.SUM_N));
@@ -155,22 +141,10 @@ public class SubscriptionsTest {
             long sum = 0;
         }
 
-        final ZContext context = new ZContext();
         final Check check = new Check();
 
-        Thread proxyThread = xMsgUtil.newThread("proxy-thread", new Runnable() {
-            @Override
-            public void run() {
-                try {
-                    xMsgProxy proxy = new xMsgProxy();
-                    proxy.startProxy(context);
-                } catch (xMsgException e) {
-                    e.printStackTrace();
-                }
-            }
-        });
+        ProxyThread proxyThread = new ProxyThread();
         proxyThread.start();
-        xMsgUtil.sleep(100);
 
         Thread pubThread = xMsgUtil.newThread("syncpub-thread", new Runnable() {
             @Override
@@ -214,10 +188,7 @@ public class SubscriptionsTest {
         pubThread.start();
 
         pubThread.join();
-
-        context.destroy();
-        proxyThread.interrupt();
-        proxyThread.join();
+        proxyThread.stop();
 
         assertThat(check.counter, is(Check.N));
         assertThat(check.sum, is(Check.SUM_N));
@@ -231,22 +202,10 @@ public class SubscriptionsTest {
             boolean timeout = false;
         }
 
-        final ZContext context = new ZContext();
         final Check check = new Check();
 
-        Thread proxyThread = xMsgUtil.newThread("proxy-thread", new Runnable() {
-            @Override
-            public void run() {
-                try {
-                    xMsgProxy proxy = new xMsgProxy();
-                    proxy.startProxy(context);
-                } catch (xMsgException e) {
-                    e.printStackTrace();
-                }
-            }
-        });
+        ProxyThread proxyThread = new ProxyThread();
         proxyThread.start();
-        xMsgUtil.sleep(100);
 
         Thread pubThread = xMsgUtil.newThread("syncpub-thread", new Runnable() {
             @Override
@@ -283,15 +242,44 @@ public class SubscriptionsTest {
             }
         });
         pubThread.start();
-
         pubThread.join();
 
-        context.destroy();
-        proxyThread.interrupt();
-        proxyThread.join();
+        proxyThread.stop();
 
         assertTrue("not received", check.received);
         assertTrue("no timeout", check.timeout);
+    }
+
+
+    private class ProxyThread {
+
+        private final ZContext context = new ZContext();
+        private final Thread proxyThread;
+
+        public ProxyThread() {
+            proxyThread = xMsgUtil.newThread("proxy-thread", new Runnable() {
+                    @Override
+                    public void run() {
+                        try {
+                            xMsgProxy proxy = new xMsgProxy();
+                            proxy.startProxy(context);
+                        } catch (xMsgException e) {
+                            e.printStackTrace();
+                        }
+                    }
+            });
+        }
+
+        public void start() {
+            proxyThread.start();
+            xMsgUtil.sleep(100);
+        }
+
+        public void stop() throws InterruptedException {
+            context.destroy();
+            proxyThread.interrupt();
+            proxyThread.join();
+        }
     }
 
 
