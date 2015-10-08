@@ -54,7 +54,7 @@ public class xMsgRegistrarTest {
     public void testRegistrationDataBase() throws Exception {
         try {
             driver = new xMsgRegDriver(xMsgContext.getContext(), new xMsgRegAddress());
-            registrar = new xMsgRegistrar();
+            registrar = new xMsgRegistrar(xMsgContext.getContext());
             registrar.start();
             xMsgUtil.sleep(200);
 

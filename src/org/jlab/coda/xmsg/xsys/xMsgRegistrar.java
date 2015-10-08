@@ -36,7 +36,7 @@ import org.zeromq.ZContext;
 public class xMsgRegistrar {
 
     private final Thread regServiceThread;
-    private final ZContext context = xMsgContext.getContext();
+    private final ZContext context;
 
     /**
      * Constructs a registrar that uses the default
@@ -45,8 +45,8 @@ public class xMsgRegistrar {
      * @throws IOException
      *
      */
-    public xMsgRegistrar() {
-        this(new xMsgRegAddress());
+    public xMsgRegistrar(ZContext context) {
+        this(context, new xMsgRegAddress());
     }
 
     /**
@@ -55,8 +55,9 @@ public class xMsgRegistrar {
      * @param port registrar port number
      * @throws IOException
      */
-    public xMsgRegistrar(xMsgRegAddress address) {
+    public xMsgRegistrar(ZContext context, xMsgRegAddress address) {
 
+        this.context = context;
         ZContext shadowContext = ZContext.shadow(context);
 
         // create registrar service object
@@ -85,7 +86,8 @@ public class xMsgRegistrar {
                 }
             }
 
-            final xMsgRegistrar registrar = new xMsgRegistrar(address);
+            final ZContext context = xMsgContext.getContext();
+            final xMsgRegistrar registrar = new xMsgRegistrar(context, address);
 
             Runtime.getRuntime().addShutdownHook(new Thread() {
                 @Override
