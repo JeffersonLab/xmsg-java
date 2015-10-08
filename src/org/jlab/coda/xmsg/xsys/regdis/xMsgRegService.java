@@ -58,7 +58,7 @@ import java.util.Set;
 public class xMsgRegService implements Runnable {
 
     // 0MQ context.
-    private final ZContext context;
+    private final ZContext shadowContext;
 
     // Database to store publishers
     private final xMsgRegDatabase publishers = new xMsgRegDatabase();
@@ -73,14 +73,15 @@ public class xMsgRegService implements Runnable {
     /**
      * Creates a xMsg registrar object.
      *
-     * @param context 0MQ context
+     * @param shadowContext shadow context
      * @param registrarHost host of the registrar
      * @param registrarPort the port of the registrar
      * @throws IOException
+     * @see ZContext#shadow
      */
-    public xMsgRegService(ZContext context, xMsgRegAddress regAddress)
+    public xMsgRegService(ZContext shadowContext, xMsgRegAddress regAddress)
             throws IOException {
-        this.context = context;
+        this.shadowContext = shadowContext;
         this.regAddress = regAddress;
     }
 
@@ -88,7 +89,7 @@ public class xMsgRegService implements Runnable {
     public void run() {
         printStartup();
 
-        ZMQ.Socket regSocket = context.createSocket(ZMQ.REP);
+        ZMQ.Socket regSocket = shadowContext.createSocket(ZMQ.REP);
         regSocket.bind("tcp://" + regAddress.host() + ":" + regAddress.port());
 
         while (!Thread.currentThread().isInterrupted()) {
@@ -111,7 +112,7 @@ public class xMsgRegService implements Runnable {
                 log(e);
             }
         }
-        context.destroy();
+        shadowContext.destroy();
         log("xMsg-Info: shutting down xMsg registration and discovery server");
     }
 
