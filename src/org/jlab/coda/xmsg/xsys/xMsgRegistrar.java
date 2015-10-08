@@ -27,11 +27,8 @@ import org.jlab.coda.xmsg.net.xMsgRegAddress;
 import org.jlab.coda.xmsg.xsys.regdis.xMsgRegService;
 import org.zeromq.ZContext;
 
-import java.io.IOException;
-
 /**
  * xMsgRegistrar executable. Starts a local registrar service in it's own thread.
- *
  *
  * @author gurjyan
  * @since 2.x
@@ -48,7 +45,7 @@ public class xMsgRegistrar {
      * @throws IOException
      *
      */
-    public xMsgRegistrar() throws IOException {
+    public xMsgRegistrar() {
         this(new xMsgRegAddress());
     }
 
@@ -58,7 +55,7 @@ public class xMsgRegistrar {
      * @param port registrar port number
      * @throws IOException
      */
-    public xMsgRegistrar(xMsgRegAddress address) throws IOException {
+    public xMsgRegistrar(xMsgRegAddress address) {
 
         ZContext shadowContext = ZContext.shadow(context);
 
@@ -100,7 +97,7 @@ public class xMsgRegistrar {
             // start the thread to service the requests
             registrar.start();
 
-        } catch (IOException e) {
+        } catch (Exception e) {
             System.out.println(e.getMessage());
             System.out.println("exiting...");
             System.exit(1);

@@ -32,7 +32,6 @@ import org.zeromq.ZMQ;
 import org.zeromq.ZMQException;
 import org.zeromq.ZMsg;
 
-import java.io.IOException;
 import java.util.HashSet;
 import java.util.Set;
 
@@ -79,8 +78,7 @@ public class xMsgRegService implements Runnable {
      * @throws IOException
      * @see ZContext#shadow
      */
-    public xMsgRegService(ZContext shadowContext, xMsgRegAddress regAddress)
-            throws IOException {
+    public xMsgRegService(ZContext shadowContext, xMsgRegAddress regAddress) {
         this.shadowContext = shadowContext;
         this.regAddress = regAddress;
     }
