@@ -38,7 +38,7 @@ public final class xMsgM {
           internal_static_xMsgMeta_fieldAccessorTable = new
             com.google.protobuf.GeneratedMessage.FieldAccessorTable(
               internal_static_xMsgMeta_descriptor,
-              new java.lang.String[] { "Version", "Description", "Author", "Status", "SeverityId", "Sender", "SenderState", "CommunicationId", "Composition", "ExecutionTime", "Action", "Control", "DataType", "DatTypeDescription", "ReplyTo", "ByteOrder", });
+              new java.lang.String[] { "Version", "Description", "Contact", "Status", "SeverityId", "Sender", "SenderState", "CommunicationId", "Composition", "ExecutionTime", "Action", "Control", "DataType", "DatTypeDescription", "ReplyTo", "ByteOrder", });
           return null;
         }
       };
@@ -123,27 +123,27 @@ public final class xMsgM {
      * <code>optional string author = 3;</code>
      *
      * <pre>
-     * Author of the communicating data
+     * Contact of the communicating data
      * </pre>
      */
-    boolean hasAuthor();
+    boolean hasContact();
     /**
      * <code>optional string author = 3;</code>
      *
      * <pre>
-     * Author of the communicating data
+     * Contact of the communicating data
      * </pre>
      */
-    java.lang.String getAuthor();
+    java.lang.String getContact();
     /**
      * <code>optional string author = 3;</code>
      *
      * <pre>
-     * Author of the communicating data
+     * Contact of the communicating data
      * </pre>
      */
     com.google.protobuf.ByteString
-        getAuthorBytes();
+        getContactBytes();
 
     // optional .xMsgMeta.Status status = 4;
     /**
@@ -895,10 +895,10 @@ public final class xMsgM {
      * <code>optional string author = 3;</code>
      *
      * <pre>
-     * Author of the communicating data
+     * Contact of the communicating data
      * </pre>
      */
-    public boolean hasAuthor() {
+    public boolean hasContact() {
       return ((bitField0_ & 0x00000004) == 0x00000004);
     }
 
@@ -906,10 +906,10 @@ public final class xMsgM {
      * <code>optional string author = 3;</code>
      *
      * <pre>
-     * Author of the communicating data
+     * Contact of the communicating data
      * </pre>
      */
-    public java.lang.String getAuthor() {
+    public java.lang.String getContact() {
       java.lang.Object ref = author_;
       if (ref instanceof java.lang.String) {
         return (java.lang.String) ref;
@@ -928,11 +928,11 @@ public final class xMsgM {
      * <code>optional string author = 3;</code>
      *
      * <pre>
-     * Author of the communicating data
+     * Contact of the communicating data
      * </pre>
      */
     public com.google.protobuf.ByteString
-        getAuthorBytes() {
+        getContactBytes() {
       java.lang.Object ref = author_;
       if (ref instanceof java.lang.String) {
         com.google.protobuf.ByteString b =
@@ -1491,7 +1491,7 @@ public final class xMsgM {
         output.writeBytes(2, getDescriptionBytes());
       }
       if (((bitField0_ & 0x00000004) == 0x00000004)) {
-        output.writeBytes(3, getAuthorBytes());
+        output.writeBytes(3, getContactBytes());
       }
       if (((bitField0_ & 0x00000008) == 0x00000008)) {
         output.writeEnum(4, status_.getNumber());
@@ -1550,7 +1550,7 @@ public final class xMsgM {
       }
       if (((bitField0_ & 0x00000004) == 0x00000004)) {
         size += com.google.protobuf.CodedOutputStream
-          .computeBytesSize(3, getAuthorBytes());
+          .computeBytesSize(3, getContactBytes());
       }
       if (((bitField0_ & 0x00000008) == 0x00000008)) {
         size += com.google.protobuf.CodedOutputStream
@@ -2190,7 +2190,7 @@ public final class xMsgM {
           description_ = other.description_;
           onChanged();
         }
-        if (other.hasAuthor()) {
+        if (other.hasContact()) {
           bitField0_ |= 0x00000004;
           author_ = other.author_;
           onChanged();
@@ -2488,10 +2488,10 @@ public final class xMsgM {
        * <code>optional string author = 3;</code>
        *
        * <pre>
-       * Author of the communicating data
+       * Contact of the communicating data
        * </pre>
        */
-      public boolean hasAuthor() {
+      public boolean hasContact() {
         return ((bitField0_ & 0x00000004) == 0x00000004);
       }
 
@@ -2499,10 +2499,10 @@ public final class xMsgM {
        * <code>optional string author = 3;</code>
        *
        * <pre>
-       * Author of the communicating data
+       * Contact of the communicating data
        * </pre>
        */
-      public java.lang.String getAuthor() {
+      public java.lang.String getContact() {
         java.lang.Object ref = author_;
         if (!(ref instanceof java.lang.String)) {
           java.lang.String s = ((com.google.protobuf.ByteString) ref)
@@ -2518,10 +2518,10 @@ public final class xMsgM {
        * <code>optional string author = 3;</code>
        *
        * <pre>
-       * Author of the communicating data
+       * Contact of the communicating data
        * </pre>
        */
-      public Builder setAuthor(
+      public Builder setContact(
           java.lang.String value) {
         if (value == null) {
     throw new NullPointerException();
@@ -2536,11 +2536,11 @@ public final class xMsgM {
        * <code>optional string author = 3;</code>
        *
        * <pre>
-       * Author of the communicating data
+       * Contact of the communicating data
        * </pre>
        */
       public com.google.protobuf.ByteString
-          getAuthorBytes() {
+          getContactBytes() {
         java.lang.Object ref = author_;
         if (ref instanceof String) {
           com.google.protobuf.ByteString b =
@@ -2557,10 +2557,10 @@ public final class xMsgM {
        * <code>optional string author = 3;</code>
        *
        * <pre>
-       * Author of the communicating data
+       * Contact of the communicating data
        * </pre>
        */
-      public Builder setAuthorBytes(
+      public Builder setContactBytes(
           com.google.protobuf.ByteString value) {
         if (value == null) {
     throw new NullPointerException();
@@ -2575,12 +2575,12 @@ public final class xMsgM {
        * <code>optional string author = 3;</code>
        *
        * <pre>
-       * Author of the communicating data
+       * Contact of the communicating data
        * </pre>
        */
-      public Builder clearAuthor() {
+      public Builder clearContact() {
         bitField0_ = (bitField0_ & ~0x00000004);
-        author_ = getDefaultInstance().getAuthor();
+        author_ = getDefaultInstance().getContact();
         onChanged();
         return this;
       }
