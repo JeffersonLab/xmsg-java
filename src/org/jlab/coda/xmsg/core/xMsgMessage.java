@@ -200,6 +200,17 @@ public class xMsgMessage {
         return data;
     }
 
+    public void setTopic(xMsgTopic topic) {
+        this.topic = topic;
+    }
+
+    public void setMetaData(xMsgMeta.Builder metaData) {
+        this.metaData = metaData;
+    }
+
+    public void setData(byte[] data) {
+        this.data = data;
+    }
 
     public xMsgMessage response() throws xMsgException, IOException {
         xMsgTopic resTopic = xMsgTopic.wrap(metaData.getReplyTo());
