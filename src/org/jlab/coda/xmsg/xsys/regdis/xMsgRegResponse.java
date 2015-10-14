@@ -85,16 +85,19 @@ public class xMsgRegResponse {
 
 
     /**
-     * Constructs an error response. No registration data is returned.
+     * Passes String data response. The actual registration data is null.
+     * The response status is an actual string representation of the data.
+     * In case there is an error response status will indicate the description
+     * of an error.
      *
      * @param topic the request being responded
      * @param sender the sender of the response
-     * @param errorMsg the error description
+     * @param statusOrData the error description or string data.
      */
-    public xMsgRegResponse(String topic, String sender, String errorMsg) {
+    public xMsgRegResponse(String topic, String sender, String statusOrData) {
         this.topic = topic;
         this.sender = sender;
-        this.status = errorMsg;
+        this.status = statusOrData;
         this.data = new HashSet<>();
     }
 

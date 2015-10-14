@@ -166,7 +166,51 @@ public class xMsgRegService implements Runnable {
                 registration = subscribers.find(data.getDomain(),
                                                 data.getSubject(),
                                                 data.getType());
-            } else {
+            } else if (topic.equals(xMsgConstants.RETURN_PUBLISHER_DOMAIN_NAMES.getStringValue())) {
+                reply = new xMsgRegResponse(topic, sender, publishers.findDomainNames());
+                return reply.msg();
+
+            } else if (topic.equals(xMsgConstants.RETURN_SUBSCRIBER_DOMAIN_NAMES.getStringValue())) {
+                reply = new xMsgRegResponse(topic, sender, subscribers.findDomainNames());
+                return reply.msg();
+
+            } else if (topic.equals(xMsgConstants.RETURN_PUBLISHER_SUBJECT_NAMES.getStringValue())) {
+                xMsgRegistration data = request.data();
+                reply = new xMsgRegResponse(topic, sender, publishers.findSubjectNames(data.getDomain()));
+                return reply.msg();
+
+            } else if (topic.equals(xMsgConstants.RETURN_SUBSCRIBER_SUBJECT_NAMES.getStringValue())) {
+                xMsgRegistration data = request.data();
+                reply = new xMsgRegResponse(topic, sender, subscribers.findSubjectNames(data.getDomain()));
+                return reply.msg();
+
+            }  else if (topic.equals(xMsgConstants.RETURN_PUBLISHER_TYPE_NAMES.getStringValue())) {
+                xMsgRegistration data = request.data();
+                reply = new xMsgRegResponse(topic, sender, publishers.findTypeNames(data.getDomain(), data.getSubject()));
+                return reply.msg();
+
+            } else if (topic.equals(xMsgConstants.RETURN_SUBSCRIBER_TYPE_NAMES.getStringValue())) {
+                xMsgRegistration data = request.data();
+                reply = new xMsgRegResponse(topic, sender, subscribers.findTypeNames(data.getDomain(), data.getSubject()));
+                return reply.msg();
+
+            } else if (topic.equals(xMsgConstants.FIND_PUBLISHERS_BY_DOMAIN.getStringValue())) {
+                xMsgRegistration data = request.data();
+                registration = publishers.findSubjects(data.getDomain());
+
+            } else if (topic.equals(xMsgConstants.FIND_SUBSCRIBERS_BY_DOMAIN.getStringValue())) {
+                xMsgRegistration data = request.data();
+                registration = subscribers.findSubjects(data.getDomain());
+
+            } else if (topic.equals(xMsgConstants.FIND_PUBLISHERS_BY_SUBJECT.getStringValue())) {
+                xMsgRegistration data = request.data();
+                registration = publishers.findTypes(data.getDomain(), data.getSubject());
+
+            } else if (topic.equals(xMsgConstants.FIND_SUBSCRIBERS_BY_SUBJECT.getStringValue())) {
+                xMsgRegistration data = request.data();
+                registration = subscribers.findTypes(data.getDomain(), data.getSubject());
+
+            }  else {
                 log("xMsg-Warning: unknown registration request type");
                 reply = new xMsgRegResponse(topic, sender, "unknown registration request");
                 return reply.msg();

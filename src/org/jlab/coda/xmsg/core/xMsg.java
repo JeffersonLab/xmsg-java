@@ -66,7 +66,6 @@ public class xMsg {
     // default registrar address where registrar and
     private xMsgRegAddress defaultRegistrarAddr;
 
-    // map of active subscriptions
     private ConnectionManager connectionManager;
 
     // map of active subscriptions
@@ -83,7 +82,6 @@ public class xMsg {
      *
      * @param name the name of an actor
      * @param poolSize the size of the callback thread pool
-     * @throws xMsgAddressException if the IP address of the host could not be resolved
      */
     public xMsg(String name, int poolSize) {
         this(name,
@@ -103,7 +101,6 @@ public class xMsg {
      * is used to create the xMSg object.
      *
      * @param name the name of an actor
-     * @throws xMsgAddressException if the IP address of the host could not be resolved
      */
     public xMsg(String name) {
         this(name,
@@ -123,7 +120,6 @@ public class xMsg {
      * @param name the name of an actor
      * @param registrarHost the registrar host
      * @param poolSize the size of the callback thread pool
-     * @throws xMsgAddressException if the IP address of the host could not be resolved
      */
     public xMsg(String name, String registrarHost, int poolSize) {
         this(name,
@@ -144,7 +140,6 @@ public class xMsg {
      *
      * @param name the name of an actor
      * @param registrarHost the registrar host
-     * @throws xMsgAddressException if the IP address of the host could not be resolved
      */
     public xMsg(String name, String registrarHost) {
         this(name,
@@ -160,7 +155,6 @@ public class xMsg {
      * @param defaultProxyAddr the proxy address
      * @param defaultRegAddr the registrar address
      * @param poolSize the size of the callback thread pool
-     * @throws xMsgAddressException if the IP address of the host could not be resolved
      */
     public xMsg(String name,
                 xMsgProxyAddress defaultProxyAddr,
@@ -264,7 +258,6 @@ public class xMsg {
      *
      * @param proxyHost proxy host name
      * @return {@link org.jlab.coda.xmsg.net.xMsgConnection} object
-     * @throws xMsgAddressException if the IP address of the host could not be resolved
      */
     public xMsgConnection connect(String proxyHost) {
         xMsgProxyAddress address = new xMsgProxyAddress(proxyHost);
@@ -620,7 +613,6 @@ public class xMsg {
      *
      * @param topic actor's topic of interest:
      *              object of {@link org.jlab.coda.xmsg.core.xMsgTopic}
-     * @param description textual description of the actor
      * @return {@link org.jlab.coda.xmsg.data.xMsgR.xMsgRegistration.Builder} Object
      */
     private xMsgRegistration.Builder createRegistration(xMsgTopic topic) {
@@ -637,8 +629,6 @@ public class xMsg {
     /**
      * Registers an actor with the registrar, running at the specified host and port.
      *
-     * @param regServerIp the host name of the registrar
-     * @param regServPort the port of the registrar
      * @param topic actor's topic of interest:
      *              object of {@link org.jlab.coda.xmsg.core.xMsgTopic}
      * @param description textual description of the actor
@@ -668,11 +658,8 @@ public class xMsg {
      * Removes an actor from the registrar database, assuming that the
      * registrar is running on the specified host and port.
      *
-     * @param regServerIp the host name of the registrar
-     * @param regServPort the port of the registrar
      * @param topic actor's topic of interest:
      *              object of {@link org.jlab.coda.xmsg.core.xMsgTopic}
-     * @param description textual description of the actor
      * @param isPublisher boolean defines the type of the actor:
      *                    true = publisher, false = subscriber
      * @throws xMsgException
@@ -697,8 +684,6 @@ public class xMsg {
      * Finds the registration information of an actor, previously registered
      * with a registrar running on the specified host and port.
      *
-     * @param regServerIp the host name of the registrar
-     * @param regServPort the port of the registrar
      * @param topic actor's topic of interest:
      *              object of {@link org.jlab.coda.xmsg.core.xMsgTopic}
      * @param isPublisher boolean defines the type of the actor:

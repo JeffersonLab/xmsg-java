@@ -21,6 +21,7 @@
 
 package org.jlab.coda.xmsg.xsys.regdis;
 
+import org.jlab.coda.xmsg.core.xMsgConstants;
 import org.jlab.coda.xmsg.core.xMsgTopic;
 import org.jlab.coda.xmsg.data.xMsgR.xMsgRegistration;
 
@@ -157,17 +158,52 @@ public class xMsgRegDatabase {
      *
      * @see #get
      */
-    Set<xMsgTopic> topics() {
+    public Set<xMsgTopic> topics() {
         return db.keySet();
     }
 
+    public String findDomainNames() {
+     StringBuilder result = new StringBuilder();
+        for(xMsgTopic topic:db.keySet()) {
+            result.append(topic.domain()).append(" ");
+        }
+        return result.toString();
+    }
+
+    public String findSubjectNames(String domainName) {
+        StringBuilder result = new StringBuilder();
+        for(xMsgTopic topic:db.keySet()) {
+            if(topic.domain().equals(domainName)) {
+                result.append(topic.subject()).append(" ");
+            }
+        }
+        return result.toString();
+    }
+
+    public String findTypeNames(String domainName, String subjectName) {
+        StringBuilder result = new StringBuilder();
+        for(xMsgTopic topic:db.keySet()) {
+            if(topic.domain().equals(domainName) && topic.subject().equals(subjectName)) {
+                result.append(topic.type()).append(" ");
+            }
+        }
+        return result.toString();
+    }
+
+    public Set<xMsgRegistration> findSubjects(String domainName) {
+         return find(domainName, xMsgConstants.ANY.getStringValue(), xMsgConstants.ANY.getStringValue());
+    }
+
+    public Set<xMsgRegistration> findTypes(String domainName, String subjectName) {
+         return find(domainName, subjectName, xMsgConstants.ANY.getStringValue());
+    }
 
     /**
      * Returns all actors registered with the specific known topic.
      *
      * @see #topics
      */
-    Set<xMsgRegistration> get(String topic) {
+    public Set<xMsgRegistration> get(String topic) {
         return db.get(xMsgTopic.wrap(topic));
     }
 
@@ -177,7 +213,7 @@ public class xMsgRegDatabase {
      *
      * @see #topics
      */
-    Set<xMsgRegistration> get(xMsgTopic topic) {
+    public Set<xMsgRegistration> get(xMsgTopic topic) {
         return db.get(topic);
     }
 }

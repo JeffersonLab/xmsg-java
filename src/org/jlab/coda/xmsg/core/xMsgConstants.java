@@ -46,7 +46,18 @@ public enum xMsgConstants {
 
     FIND_REQUEST_TIMEOUT(3000, "findRequestTimeout"),
     FIND_PUBLISHER(9, "findPublisher"),
-    FIND_SUBSCRIBER(10, "findSubscribers"),
+    FIND_SUBSCRIBER(10, "findSubscriber"),
+    FIND_PUBLISHERS_BY_DOMAIN(10, "findePublishersByDomain"),
+    FIND_PUBLISHERS_BY_SUBJECT(10, "findePublishersBySubject"),
+    FIND_SUBSCRIBERS_BY_DOMAIN(10, "findeSubscribersByDomain"),
+    FIND_SUBSCRIBERS_BY_SUBJECT(10, "findeSubscribersBySubject"),
+    RETURN_PUBLISHER_DOMAIN_NAMES(10,"returnPublisherDomainNames"),
+    RETURN_PUBLISHER_SUBJECT_NAMES(10,"returnPublisherSubjectNames"),
+    RETURN_PUBLISHER_TYPE_NAMES(10,"returnPublisherTypeNames"),
+    RETURN_SUBSCRIBER_DOMAIN_NAMES(10,"returnSubscriberDomainNames"),
+    RETURN_SUBSCRIBER_SUBJECT_NAMES(10,"returnSubscriberSubjectNames"),
+    RETURN_SUBSCRIBER_TYPE_NAMES(10,"returnSubscriberTypeNames"),
+
 
     INFO(11, "INFO"),
     WARNING(12, "WARNING"),
