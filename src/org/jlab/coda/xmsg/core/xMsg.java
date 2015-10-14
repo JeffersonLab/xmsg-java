@@ -469,6 +469,22 @@ public class xMsg {
     }
 
     /**
+     * Sends a request to the registrar to find/return a registered publisher
+     * domain names.
+     *
+     * @param topic the subscription topic:
+     *              object of {@link org.jlab.coda.xmsg.core.xMsgTopic}.
+     *              Topic in this case is ignored.
+     * @return space separated names in a single String
+     * @throws xMsgException
+     */
+    public String findPublisherDomainNames(xMsgTopic topic)
+            throws xMsgException {
+
+        return _findRegisteredDomainNames(defaultRegistrarAddress, topic, true);
+    }
+
+    /**
      * Sends a request to the registrar to find/return a registered subscriber
      * domain names.
      *
@@ -485,6 +501,22 @@ public class xMsg {
             throws xMsgException {
 
         return _findRegisteredDomainNames(address, topic, false);
+    }
+
+    /**
+     * Sends a request to the registrar to find/return a registered subscriber
+     * domain names.
+     *
+     * @param topic the subscription topic:
+     *              object of {@link org.jlab.coda.xmsg.core.xMsgTopic}.
+     *              Topic in this case is ignored.
+     * @return space separated names in a single String
+     * @throws xMsgException
+     */
+    public String findSubscriberDomainNames(xMsgTopic topic)
+            throws xMsgException {
+
+        return _findRegisteredDomainNames(defaultRegistrarAddress, topic, false);
     }
 
     /**
@@ -507,6 +539,22 @@ public class xMsg {
     }
 
     /**
+     * Sends a request to the registrar to find/return a registered publisher
+     * subject names in a specific domain. Domain is specified within the
+     * topic parameter.
+     *
+     * @param topic the subscription topic:
+     *              object of {@link org.jlab.coda.xmsg.core.xMsgTopic}.
+     * @return space separated names in a single String
+     * @throws xMsgException
+     */
+    public String findPublisherSubjectNames(xMsgTopic topic)
+            throws xMsgException {
+
+        return _findRegisteredSubjectNames(defaultRegistrarAddress, topic, true);
+    }
+
+    /**
      * Sends a request to the registrar to find/return a registered subscriber
      * subject names in a specific domain. Domain is specified within the
      * topic parameter.
@@ -523,6 +571,22 @@ public class xMsg {
             throws xMsgException {
 
         return _findRegisteredSubjectNames(address, topic, false);
+    }
+
+    /**
+     * Sends a request to the registrar to find/return a registered subscriber
+     * subject names in a specific domain. Domain is specified within the
+     * topic parameter.
+     *
+     * @param topic the subscription topic:
+     *              object of {@link org.jlab.coda.xmsg.core.xMsgTopic}.
+     * @return space separated names in a single String
+     * @throws xMsgException
+     */
+    public String findSubscriberSubjectNames(xMsgTopic topic)
+            throws xMsgException {
+
+        return _findRegisteredSubjectNames(defaultRegistrarAddress, topic, false);
     }
 
     /**
@@ -545,6 +609,22 @@ public class xMsg {
     }
 
     /**
+     * Sends a request to the registrar to find/return a registered publisher
+     * type names in a specific domain and subject. Domain and subject are specified
+     * within the topic parameter.
+     *
+     * @param topic the subscription topic:
+     *              object of {@link org.jlab.coda.xmsg.core.xMsgTopic}.
+     * @return space separated names in a single String
+     * @throws xMsgException
+     */
+    public String findPublisherTypeNames(xMsgTopic topic)
+            throws xMsgException {
+
+        return _findRegisteredTypeNames(defaultRegistrarAddress, topic, true);
+    }
+
+    /**
      * Sends a request to the registrar to find/return a registered subscriber
      * type names in a specific domain and subject. Domain and subject are specified
      * within the topic parameter.
@@ -561,6 +641,22 @@ public class xMsg {
             throws xMsgException {
 
         return _findRegisteredTypeNames(address, topic, false);
+    }
+
+    /**
+     * Sends a request to the registrar to find/return a registered subscriber
+     * type names in a specific domain and subject. Domain and subject are specified
+     * within the topic parameter.
+     *
+     * @param topic the subscription topic:
+     *              object of {@link org.jlab.coda.xmsg.core.xMsgTopic}.
+     * @return space separated names in a single String
+     * @throws xMsgException
+     */
+    public String findSubscriberTypeNames(xMsgTopic topic)
+            throws xMsgException {
+
+        return _findRegisteredTypeNames(defaultRegistrarAddress, topic, false);
     }
 
     /**
