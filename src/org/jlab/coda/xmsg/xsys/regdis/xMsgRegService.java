@@ -194,22 +194,6 @@ public class xMsgRegService implements Runnable {
                 reply = new xMsgRegResponse(topic, sender, subscribers.findTypeNames(data.getDomain(), data.getSubject()));
                 return reply.msg();
 
-            } else if (topic.equals(xMsgConstants.FIND_PUBLISHERS_BY_DOMAIN.getStringValue())) {
-                xMsgRegistration data = request.data();
-                registration = publishers.findSubjects(data.getDomain());
-
-            } else if (topic.equals(xMsgConstants.FIND_SUBSCRIBERS_BY_DOMAIN.getStringValue())) {
-                xMsgRegistration data = request.data();
-                registration = subscribers.findSubjects(data.getDomain());
-
-            } else if (topic.equals(xMsgConstants.FIND_PUBLISHERS_BY_SUBJECT.getStringValue())) {
-                xMsgRegistration data = request.data();
-                registration = publishers.findTypes(data.getDomain(), data.getSubject());
-
-            } else if (topic.equals(xMsgConstants.FIND_SUBSCRIBERS_BY_SUBJECT.getStringValue())) {
-                xMsgRegistration data = request.data();
-                registration = subscribers.findTypes(data.getDomain(), data.getSubject());
-
             }  else {
                 log("xMsg-Warning: unknown registration request type");
                 reply = new xMsgRegResponse(topic, sender, "unknown registration request");

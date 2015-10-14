@@ -334,7 +334,7 @@ public class xMsg {
                                     xMsgTopic topic,
                                     String description)
             throws xMsgException {
-        register(address, topic, description, true);
+        _register(address, topic, description, true);
     }
 
     /**
@@ -349,7 +349,7 @@ public class xMsg {
     public void registerAsPublisher(xMsgTopic topic,
                                     String description)
             throws xMsgException {
-        register(defaultRegistrarAddr, topic, description, true);
+        _register(defaultRegistrarAddr, topic, description, true);
     }
 
     /**
@@ -366,7 +366,7 @@ public class xMsg {
                                      xMsgTopic topic,
                                      String description)
             throws xMsgException {
-        register(address, topic, description, false);
+        _register(address, topic, description, false);
     }
 
     /**
@@ -381,7 +381,7 @@ public class xMsg {
     public void registerAsSubscriber(xMsgTopic topic,
                                      String description)
             throws xMsgException {
-        register(defaultRegistrarAddr, topic, description, false);
+        _register(defaultRegistrarAddr, topic, description, false);
     }
 
     /**
@@ -440,6 +440,121 @@ public class xMsg {
         _removeRegistration(defaultRegistrarAddr, topic, false);
     }
 
+
+    /**
+     * Sends a request to the registrar to find/return a registered publisher
+     * domain names.
+     *
+     * @param address the address of the registrar:
+     *                object of {@link org.jlab.coda.xmsg.net.xMsgRegAddress}
+     * @param topic the subscription topic:
+     *              object of {@link org.jlab.coda.xmsg.core.xMsgTopic}.
+     *              Topic in this case is ignored.
+     * @return space separated names in a single String
+     * @throws xMsgException
+     */
+    public String findPublisherDomainNames(xMsgRegAddress address,
+                                                xMsgTopic topic)
+            throws xMsgException {
+
+        return _findRegisteredDomainNames(address, topic, true);
+    }
+
+    /**
+     * Sends a request to the registrar to find/return a registered subscriber
+     * domain names.
+     *
+     * @param address the address of the registrar:
+     *                object of {@link org.jlab.coda.xmsg.net.xMsgRegAddress}
+     * @param topic the subscription topic:
+     *              object of {@link org.jlab.coda.xmsg.core.xMsgTopic}.
+     *              Topic in this case is ignored.
+     * @return space separated names in a single String
+     * @throws xMsgException
+     */
+    public String findSubscriberDomainNames(xMsgRegAddress address,
+                                                xMsgTopic topic)
+            throws xMsgException {
+
+        return _findRegisteredDomainNames(address, topic, false);
+    }
+
+    /**
+     * Sends a request to the registrar to find/return a registered publisher
+     * subject names in a specific domain. Domain is specified within the
+     * topic parameter.
+     *
+     * @param address the address of the registrar:
+     *                object of {@link org.jlab.coda.xmsg.net.xMsgRegAddress}
+     * @param topic the subscription topic:
+     *              object of {@link org.jlab.coda.xmsg.core.xMsgTopic}.
+     * @return space separated names in a single String
+     * @throws xMsgException
+     */
+    public String findPublisherSubjectNames(xMsgRegAddress address,
+                                           xMsgTopic topic)
+            throws xMsgException {
+
+        return _findRegisteredSubjectNames(address, topic, true);
+    }
+
+    /**
+     * Sends a request to the registrar to find/return a registered subscriber
+     * subject names in a specific domain. Domain is specified within the
+     * topic parameter.
+     *
+     * @param address the address of the registrar:
+     *                object of {@link org.jlab.coda.xmsg.net.xMsgRegAddress}
+     * @param topic the subscription topic:
+     *              object of {@link org.jlab.coda.xmsg.core.xMsgTopic}.
+     * @return space separated names in a single String
+     * @throws xMsgException
+     */
+    public String findSubscriberSubjectNames(xMsgRegAddress address,
+                                           xMsgTopic topic)
+            throws xMsgException {
+
+        return _findRegisteredSubjectNames(address, topic, false);
+    }
+
+    /**
+     * Sends a request to the registrar to find/return a registered publisher
+     * type names in a specific domain and subject. Domain and subject are specified
+     * within the topic parameter.
+     *
+     * @param address the address of the registrar:
+     *                object of {@link org.jlab.coda.xmsg.net.xMsgRegAddress}
+     * @param topic the subscription topic:
+     *              object of {@link org.jlab.coda.xmsg.core.xMsgTopic}.
+     * @return space separated names in a single String
+     * @throws xMsgException
+     */
+    public String findPublisherTypeNames(xMsgRegAddress address,
+                                            xMsgTopic topic)
+            throws xMsgException {
+
+        return _findRegisteredTypeNames(address, topic, true);
+    }
+
+    /**
+     * Sends a request to the registrar to find/return a registered subscriber
+     * type names in a specific domain and subject. Domain and subject are specified
+     * within the topic parameter.
+     *
+     * @param address the address of the registrar:
+     *                object of {@link org.jlab.coda.xmsg.net.xMsgRegAddress}
+     * @param topic the subscription topic:
+     *              object of {@link org.jlab.coda.xmsg.core.xMsgTopic}.
+     * @return space separated names in a single String
+     * @throws xMsgException
+     */
+    public String findSubscriberTypeNames(xMsgRegAddress address,
+                                            xMsgTopic topic)
+            throws xMsgException {
+
+        return _findRegisteredTypeNames(address, topic, false);
+    }
+
     /**
      * Sends a request to the registrar to find/return a publisher registration.
      *
@@ -454,7 +569,7 @@ public class xMsg {
                                                 xMsgTopic topic)
             throws xMsgException {
 
-        return findRegistration(address, topic, true);
+        return _findRegistration(address, topic, true);
     }
 
     /**
@@ -469,7 +584,7 @@ public class xMsg {
     public Set<xMsgRegistration> findPublishers(xMsgTopic topic)
             throws xMsgException {
 
-        return findRegistration(defaultRegistrarAddr, topic, true);
+        return _findRegistration(defaultRegistrarAddr, topic, true);
     }
 
     /**
@@ -486,7 +601,7 @@ public class xMsg {
                                                  xMsgTopic topic)
             throws xMsgException {
 
-        return findRegistration(address, topic, false);
+        return _findRegistration(address, topic, false);
     }
 
     /**
@@ -501,7 +616,7 @@ public class xMsg {
     public Set<xMsgRegistration> findSubscribers(xMsgTopic topic)
             throws xMsgException {
 
-        return findRegistration(defaultRegistrarAddr, topic, false);
+        return _findRegistration(defaultRegistrarAddr, topic, false);
     }
 
     /**
@@ -578,7 +693,7 @@ public class xMsg {
             @Override
             public void handle(ZMsg inputMsg) throws xMsgException, IOException {
                 final xMsgMessage callbackMsg = new xMsgMessage(inputMsg);
-                callUserCallBack(cb, callbackMsg);
+                _callUserCallBack(cb, callbackMsg);
             }
         };
 
@@ -615,7 +730,7 @@ public class xMsg {
      *              object of {@link org.jlab.coda.xmsg.core.xMsgTopic}
      * @return {@link org.jlab.coda.xmsg.data.xMsgR.xMsgRegistration.Builder} Object
      */
-    private xMsgRegistration.Builder createRegistration(xMsgTopic topic) {
+    private xMsgRegistration.Builder _createRegistration(xMsgTopic topic) {
         xMsgRegistration.Builder regb = xMsgRegistration.newBuilder();
         regb.setName(myName);
         regb.setHost(defaultProxyAddr.host());
@@ -636,14 +751,14 @@ public class xMsg {
      *                    true = publisher, false = subscriber
      * @throws xMsgException
      */
-    private void register(xMsgRegAddress regAddress,
-                          xMsgTopic topic,
-                          String description,
-                          boolean isPublisher)
+    private void _register(xMsgRegAddress regAddress,
+                           xMsgTopic topic,
+                           String description,
+                           boolean isPublisher)
             throws xMsgException {
         xMsgRegDriver regDriver = connectionManager.getRegistrarConnection(regAddress);
 
-        xMsgRegistration.Builder regb = createRegistration(topic);
+        xMsgRegistration.Builder regb = _createRegistration(topic);
         if (isPublisher) {
             regb.setOwnerType(xMsgRegistration.OwnerType.PUBLISHER);
         } else {
@@ -670,7 +785,7 @@ public class xMsg {
             throws xMsgException {
 
         xMsgRegDriver regDriver = connectionManager.getRegistrarConnection(regAddress);
-        xMsgRegistration.Builder regb = createRegistration(topic);
+        xMsgRegistration.Builder regb = _createRegistration(topic);
         if (isPublisher) {
             regb.setOwnerType(xMsgRegistration.OwnerType.PUBLISHER);
         } else {
@@ -690,13 +805,13 @@ public class xMsg {
      *                    true = publisher, false = subscriber
      * @throws xMsgException
      */
-    private Set<xMsgRegistration> findRegistration(xMsgRegAddress regAddress,
-                                                   xMsgTopic topic,
-                                                   boolean isPublisher)
+    private Set<xMsgRegistration> _findRegistration(xMsgRegAddress regAddress,
+                                                    xMsgTopic topic,
+                                                    boolean isPublisher)
             throws xMsgException {
 
         xMsgRegDriver regDriver = connectionManager.getRegistrarConnection(regAddress);
-        xMsgRegistration.Builder regb = createRegistration(topic);
+        xMsgRegistration.Builder regb = _createRegistration(topic);
         if (isPublisher) {
             regb.setOwnerType(xMsgRegistration.OwnerType.PUBLISHER);
         } else {
@@ -704,6 +819,85 @@ public class xMsg {
         }
         xMsgRegistration regData = regb.build();
         return regDriver.findRegistration(regData, isPublisher);
+    }
+
+    /**
+     * Sends a request to search the database for registered
+     * domain names.
+     *
+     * @param topic actor's topic of interest:
+     *              object of {@link org.jlab.coda.xmsg.core.xMsgTopic}
+     * @param isPublisher boolean defines the type of the actor:
+     *                    true = publisher, false = subscriber
+     * @throws xMsgException
+     */
+    private String _findRegisteredDomainNames(xMsgRegAddress regAddress,
+                                                    xMsgTopic topic,
+                                                    boolean isPublisher)
+            throws xMsgException {
+
+        xMsgRegDriver regDriver = connectionManager.getRegistrarConnection(regAddress);
+        xMsgRegistration.Builder regb = _createRegistration(topic);
+        if (isPublisher) {
+            regb.setOwnerType(xMsgRegistration.OwnerType.PUBLISHER);
+        } else {
+            regb.setOwnerType(xMsgRegistration.OwnerType.SUBSCRIBER);
+        }
+        xMsgRegistration regData = regb.build();
+        return regDriver.findRegisteredDomainNames(regData, isPublisher);
+    }
+
+    /**
+     * Sends a request to search the database for registered
+     * subject names for a defined (as part of the topic parameter) domain.
+     *
+     * @param topic actor's topic of interest:
+     *              object of {@link org.jlab.coda.xmsg.core.xMsgTopic}
+     * @param isPublisher boolean defines the type of the actor:
+     *                    true = publisher, false = subscriber
+     * @throws xMsgException
+     */
+    private String _findRegisteredSubjectNames(xMsgRegAddress regAddress,
+                                                    xMsgTopic topic,
+                                                    boolean isPublisher)
+            throws xMsgException {
+
+        xMsgRegDriver regDriver = connectionManager.getRegistrarConnection(regAddress);
+        xMsgRegistration.Builder regb = _createRegistration(topic);
+        if (isPublisher) {
+            regb.setOwnerType(xMsgRegistration.OwnerType.PUBLISHER);
+        } else {
+            regb.setOwnerType(xMsgRegistration.OwnerType.SUBSCRIBER);
+        }
+        xMsgRegistration regData = regb.build();
+        return regDriver.findRegisteredSubjectNames(regData, isPublisher);
+    }
+
+    /**
+     * Sends a request to search the database for registered
+     * subject names for a defined (as part of the topic parameter)
+     * domain and subject.
+     *
+     * @param topic actor's topic of interest:
+     *              object of {@link org.jlab.coda.xmsg.core.xMsgTopic}
+     * @param isPublisher boolean defines the type of the actor:
+     *                    true = publisher, false = subscriber
+     * @throws xMsgException
+     */
+    private String _findRegisteredTypeNames(xMsgRegAddress regAddress,
+                                                    xMsgTopic topic,
+                                                    boolean isPublisher)
+            throws xMsgException {
+
+        xMsgRegDriver regDriver = connectionManager.getRegistrarConnection(regAddress);
+        xMsgRegistration.Builder regb = _createRegistration(topic);
+        if (isPublisher) {
+            regb.setOwnerType(xMsgRegistration.OwnerType.PUBLISHER);
+        } else {
+            regb.setOwnerType(xMsgRegistration.OwnerType.SUBSCRIBER);
+        }
+        xMsgRegistration regData = regb.build();
+        return regDriver.findRegisteredTypeNames(regData, isPublisher);
     }
 
     /**
@@ -787,8 +981,8 @@ public class xMsg {
      * @throws xMsgException
      * @throws IOException
      */
-    private void callUserCallBack(final xMsgCallBack callback,
-                                  final xMsgMessage callbackMsg)
+    private void _callUserCallBack(final xMsgCallBack callback,
+                                   final xMsgMessage callbackMsg)
             throws xMsgException, IOException {
 
         // async request

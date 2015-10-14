@@ -200,11 +200,10 @@ public class xMsgRegDriver {
     }
 
     /**
-     * Searches the connected registrar database for the given topic.
-     * defined by the constructor. This will search the database for
-     * publishers or subscribers to a specific topic. The topic of
-     * interest is defined within the given registration data.
-     *
+     * Sends a request to search the database for publishers or subscribers
+     * to a specific topic to the registrar server and waits the response.
+     * The topic of interest is defined within the given registration data.
+     * <v>
      * @param data the registration data object
      * @param isPublisher if true then this is a request to find publishers,
      *                     otherwise this is a request to find subscribers
@@ -225,4 +224,83 @@ public class xMsgRegDriver {
         xMsgRegResponse response = request(request, timeout);
         return response.data();
     }
+
+    /**
+     * Sends a request to search the database for publishers or subscribers
+     * domain names.
+     * <v>
+     * @param data the registration data object
+     * @param isPublisher if true then this is a request to find publishers,
+     *                     otherwise this is a request to find subscribers
+     * @return space separated names as a single String
+     * @throws xMsgException
+     */
+    public String findRegisteredDomainNames(xMsgRegistration data,
+                                                  boolean isPublisher)
+            throws xMsgException {
+
+        _validateData(data);
+
+        String topic = isPublisher ? xMsgConstants.RETURN_PUBLISHER_DOMAIN_NAMES.getStringValue() :
+                                     xMsgConstants.RETURN_SUBSCRIBER_DOMAIN_NAMES.getStringValue();
+        int timeout = xMsgConstants.FIND_REQUEST_TIMEOUT.getIntValue();
+
+        xMsgRegRequest request = new xMsgRegRequest(topic, data.getName(), data);
+        xMsgRegResponse response = request(request, timeout);
+        return response.status();
+    }
+
+    /**
+     * Sends a request to search the database for publishers or subscribers
+     * subject names for a defined domain. Note that domain name is passed
+     * within the xMsgRegistration data object.
+     * <v>
+     * @param data the registration data object
+     * @param isPublisher if true then this is a request to find publishers,
+     *                     otherwise this is a request to find subscribers
+     * @return space separated names as a single String
+     * @throws xMsgException
+     */
+    public String findRegisteredSubjectNames(xMsgRegistration data,
+                                                  boolean isPublisher)
+            throws xMsgException {
+
+        _validateData(data);
+
+        String topic = isPublisher ? xMsgConstants.RETURN_PUBLISHER_SUBJECT_NAMES.getStringValue() :
+                                     xMsgConstants.RETURN_SUBSCRIBER_SUBJECT_NAMES.getStringValue();
+        int timeout = xMsgConstants.FIND_REQUEST_TIMEOUT.getIntValue();
+
+        xMsgRegRequest request = new xMsgRegRequest(topic, data.getName(), data);
+        xMsgRegResponse response = request(request, timeout);
+        return response.status();
+    }
+
+    /**
+     * Sends a request to search the database for publishers or subscribers
+     * subject names for a defined domain and subject. Note that domain name
+     * as well as subject name is passed within the xMsgRegistration data object.
+     * <v>
+     * @param data the registration data object
+     * @param isPublisher if true then this is a request to find publishers,
+     *                     otherwise this is a request to find subscribers
+     * @return space separated names as a single String
+     * @throws xMsgException
+     */
+    public String findRegisteredTypeNames(xMsgRegistration data,
+                                                  boolean isPublisher)
+            throws xMsgException {
+
+        _validateData(data);
+
+        String topic = isPublisher ? xMsgConstants.RETURN_PUBLISHER_TYPE_NAMES.getStringValue() :
+                                     xMsgConstants.RETURN_SUBSCRIBER_TYPE_NAMES.getStringValue();
+        int timeout = xMsgConstants.FIND_REQUEST_TIMEOUT.getIntValue();
+
+        xMsgRegRequest request = new xMsgRegRequest(topic, data.getName(), data);
+        xMsgRegResponse response = request(request, timeout);
+        return response.status();
+    }
+
+
 }

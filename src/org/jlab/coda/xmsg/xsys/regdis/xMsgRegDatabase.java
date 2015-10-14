@@ -190,14 +190,6 @@ public class xMsgRegDatabase {
         return result.toString();
     }
 
-    public Set<xMsgRegistration> findSubjects(String domainName) {
-         return find(domainName, xMsgConstants.ANY.getStringValue(), xMsgConstants.ANY.getStringValue());
-    }
-
-    public Set<xMsgRegistration> findTypes(String domainName, String subjectName) {
-         return find(domainName, subjectName, xMsgConstants.ANY.getStringValue());
-    }
-
     /**
      * Returns all actors registered with the specific known topic.
      *
