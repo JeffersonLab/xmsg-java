@@ -34,6 +34,7 @@ public final class xMsgConstants {
     public static final String ANY = "*";
 
     public static final String TOPIC_SEP = ":";
+    public static final String DATA_SEP = "?";
 
     public static final String REGISTRAR = "xMsg_Registrar";
 
