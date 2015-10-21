@@ -35,6 +35,8 @@ public final class xMsgConstants {
 
     public static final String TOPIC_SEP = ":";
     public static final String DATA_SEP = "?";
+    public static final String LANG_SEP = "_";
+    public static final String PRXHOSTPORT_SEP = "%";
 
     public static final String REGISTRAR = "xMsg_Registrar";
 
