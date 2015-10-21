@@ -61,7 +61,7 @@ public class xMsgRegResponse {
     public xMsgRegResponse(String topic, String sender) {
         this.topic = topic;
         this.sender = sender;
-        this.status = xMsgConstants.SUCCESS.getStringValue();
+        this.status = xMsgConstants.SUCCESS;
         this.data = new HashSet<>();
     }
 
@@ -79,7 +79,7 @@ public class xMsgRegResponse {
     public xMsgRegResponse(String topic, String sender, Set<xMsgRegistration> data) {
         this.topic = topic;
         this.sender = sender;
-        this.status = xMsgConstants.SUCCESS.getStringValue();
+        this.status = xMsgConstants.SUCCESS;
         this.data = data;
     }
 
@@ -125,7 +125,7 @@ public class xMsgRegResponse {
             topic = new String(topicFrame.getData());
             sender = new String(senderFrame.getData());
             status = new String(statusFrame.getData());
-            if (!status.equals(xMsgConstants.SUCCESS.getStringValue())) {
+            if (!status.equals(xMsgConstants.SUCCESS)) {
                 throw new xMsgException("xMsg-Error: unsuccessful registration: " + status);
             }
 

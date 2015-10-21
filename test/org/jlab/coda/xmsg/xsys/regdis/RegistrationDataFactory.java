@@ -82,7 +82,7 @@ public final class RegistrationDataFactory {
         xMsgTopic xtopic = xMsgTopic.wrap(topic);
         data.setName(name);
         data.setHost(host);
-        data.setPort(xMsgConstants.DEFAULT_PORT.getIntValue());
+        data.setPort(xMsgConstants.DEFAULT_PORT);
         data.setDomain(xtopic.domain());
         data.setSubject(xtopic.subject());
         data.setType(xtopic.type());

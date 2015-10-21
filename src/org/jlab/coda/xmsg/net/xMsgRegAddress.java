@@ -32,11 +32,11 @@ import org.jlab.coda.xmsg.core.xMsgConstants;
 public class xMsgRegAddress extends xMsgAddress {
 
     public xMsgRegAddress() {
-        super("localhost", xMsgConstants.REGISTRAR_PORT.getIntValue());
+        super("localhost", xMsgConstants.REGISTRAR_PORT);
     }
 
     public xMsgRegAddress(String host) {
-        super(host, xMsgConstants.REGISTRAR_PORT.getIntValue());
+        super(host, xMsgConstants.REGISTRAR_PORT);
     }
 
     public xMsgRegAddress(String host, int port) {

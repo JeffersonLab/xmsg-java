@@ -116,7 +116,7 @@ public class Subscriber extends xMsg {
 
         @Override
         public xMsgMessage callback(xMsgMessage msg) throws IOException {
-            if (msg.getMetaData().getReplyTo().equals(xMsgConstants.UNDEFINED.getStringValue())) {
+            if (msg.getMetaData().getReplyTo().equals(xMsgConstants.UNDEFINED)) {
 
                 // we get the data, but will not do anything with it for
                 // communication benchmarking purposes.
@@ -138,7 +138,7 @@ public class Subscriber extends xMsg {
             } else {
                 // sync request, updates the received xMsgMessage and sends it to the sender
                 // reset relyTo metadata field
-                msg.getMetaData().setReplyTo(xMsgConstants.UNDEFINED.getStringValue());
+                msg.getMetaData().setReplyTo(xMsgConstants.UNDEFINED);
 
                 // sends back "Done" string
                 msg.updateData("Done");
@@ -157,7 +157,7 @@ public class Subscriber extends xMsg {
         private List<Integer> parseData(xMsgMessage msg) {
             try {
                 xMsgM.xMsgMeta.Builder metadata = msg.getMetaData();
-                if (metadata.getDataType().equals(xMsgConstants.ARRAY_SFIXED32.getStringValue())) {
+                if (metadata.getDataType().equals(xMsgConstants.ARRAY_SFIXED32)) {
                     xMsgData data = xMsgData.parseFrom(msg.getData());
                     return data.getFLSINT32AList();
                 }

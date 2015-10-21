@@ -60,7 +60,7 @@ public class xMsgRegResponseTest {
 
         assertThat(recvResponse.topic(), is("foo:bar"));
         assertThat(recvResponse.sender(), is("registration_fe"));
-        assertThat(recvResponse.status(), is(xMsgConstants.SUCCESS.getStringValue()));
+        assertThat(recvResponse.status(), is(xMsgConstants.SUCCESS));
         assertThat(recvResponse.data(), is(empty()));
     }
 
@@ -84,7 +84,7 @@ public class xMsgRegResponseTest {
 
         assertThat(recvResponse.topic(), is("foo:bar"));
         assertThat(recvResponse.sender(), is("registration_fe"));
-        assertThat(recvResponse.status(), is(xMsgConstants.SUCCESS.getStringValue()));
+        assertThat(recvResponse.status(), is(xMsgConstants.SUCCESS));
         assertThat(recvResponse.data(), is(data));
     }
 
@@ -107,7 +107,7 @@ public class xMsgRegResponseTest {
         ZMsg msg = new ZMsg();
         msg.addString("foo:bar");
         msg.addString("foo_service");
-        msg.addString(xMsgConstants.SUCCESS.getStringValue());
+        msg.addString(xMsgConstants.SUCCESS);
         msg.add(data2.build().toByteArray());
         msg.add(Arrays.copyOf(bb, bb.length - 10));
 
