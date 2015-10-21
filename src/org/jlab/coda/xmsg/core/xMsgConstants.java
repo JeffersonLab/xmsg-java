@@ -27,86 +27,72 @@ package org.jlab.coda.xmsg.core;
  * @author gurjyan
  * @since 2.x
  */
-public enum xMsgConstants {
+public final class xMsgConstants {
 
-    UNDEFINED(20, "undefined"),
-    SUCCESS(21, "success"),
-    ANY(22, "*"),
+    public static final String UNDEFINED = "undefined";
+    public static final String SUCCESS = "success";
+    public static final String ANY = "*";
 
-    REGISTRAR(3, "xMsg_Registrar"),
+    public static final String REGISTRAR = "xMsg_Registrar";
 
-    REGISTER_PUBLISHER(4, "registerPublisher"),
-    REGISTER_SUBSCRIBER(5, "registerSubscriber"),
-    REGISTER_REQUEST_TIMEOUT(3000, "registerRequestTimeout"),
+    public static final String REGISTER_PUBLISHER = "registerPublisher";
+    public static final String REGISTER_SUBSCRIBER = "registerSubscriber";
+    public static final int REGISTER_REQUEST_TIMEOUT = 3000;
 
-    REMOVE_PUBLISHER(6, "removePublisherRegistration"),
-    REMOVE_SUBSCRIBER(7, "removeSubscriberRegistration"),
-    REMOVE_ALL_REGISTRATION(8, "removeAllRegistration"),
-    REMOVE_REQUEST_TIMEOUT(3000, "removeRequestTimeout"),
+    public static final String REMOVE_PUBLISHER = "removePublisherRegistration";
+    public static final String REMOVE_SUBSCRIBER = "removeSubscriberRegistration";
+    public static final String REMOVE_ALL_REGISTRATION = "removeAllRegistration";
+    public static final int REMOVE_REQUEST_TIMEOUT = 3000;
 
-    FIND_REQUEST_TIMEOUT(3000, "findRequestTimeout"),
-    FIND_PUBLISHER(9, "findPublisher"),
-    FIND_SUBSCRIBER(10, "findSubscriber"),
-    FIND_PUBLISHERS_BY_DOMAIN(10, "findePublishersByDomain"),
-    FIND_PUBLISHERS_BY_SUBJECT(10, "findePublishersBySubject"),
-    FIND_SUBSCRIBERS_BY_DOMAIN(10, "findeSubscribersByDomain"),
-    FIND_SUBSCRIBERS_BY_SUBJECT(10, "findeSubscribersBySubject"),
-    RETURN_PUBLISHER_DOMAIN_NAMES(10,"returnPublisherDomainNames"),
-    RETURN_PUBLISHER_SUBJECT_NAMES(10,"returnPublisherSubjectNames"),
-    RETURN_PUBLISHER_TYPE_NAMES(10,"returnPublisherTypeNames"),
-    RETURN_SUBSCRIBER_DOMAIN_NAMES(10,"returnSubscriberDomainNames"),
-    RETURN_SUBSCRIBER_SUBJECT_NAMES(10,"returnSubscriberSubjectNames"),
-    RETURN_SUBSCRIBER_TYPE_NAMES(10,"returnSubscriberTypeNames"),
-
-
-    INFO(11, "INFO"),
-    WARNING(12, "WARNING"),
-    ERROR(13, "ERROR"),
-    DONE(14, "done"),
-    DATA(15, "data"),
-
-    NO_RESULT(16, "none"),
-
-    BIND(17, "bind"),
-    CONNECT(18, "connect"),
-
-    DEFAULT_PORT(7771, "proxyPort"),
-    REGISTRAR_PORT(8888, "registrarPort"),
-
-    DEFAULT_POOL_SIZE(2, "defaultPoolSize"),
-
-    SINT32(0, "binary/sint32"),
-    SINT64(0, "binary/sint64"),
-    SFIXED32(0, "binary/sfixed32"),
-    SFIXED64(0, "binary/sfixed64"),
-    FLOAT(0, "binary/float"),
-    DOUBLE(0, "binary/double"),
-    STRING(0, "text/string"),
-    BYTES(0, "binary/bytes"),
-
-    ARRAY_SINT32(0, "binary/array-sint32"),
-    ARRAY_SINT64(0, "binary/array-sint64"),
-    ARRAY_SFIXED32(0, "binary/array-sfixed32"),
-    ARRAY_SFIXED64(0, "binary/array-sfixed32"),
-    ARRAY_FLOAT(0, "binary/array-float"),
-    ARRAY_DOUBLE(0, "binary/array-double"),
-    ARRAY_STRING(0, "binary/array-string"),
-    ARRAY_BYTES(0, "binary/array-string");
+    public static final int FIND_REQUEST_TIMEOUT = 3000;
+    public static final String FIND_PUBLISHER = "findPublisher";
+    public static final String FIND_SUBSCRIBER = "findSubscriber";
+    public static final String FIND_PUBLISHERS_BY_DOMAIN = "findePublishersByDomain";
+    public static final String FIND_PUBLISHERS_BY_SUBJECT = "findePublishersBySubject";
+    public static final String FIND_SUBSCRIBERS_BY_DOMAIN = "findeSubscribersByDomain";
+    public static final String FIND_SUBSCRIBERS_BY_SUBJECT = "findeSubscribersBySubject";
+    public static final String RETURN_PUBLISHER_DOMAIN_NAMES = "returnPublisherDomainNames";
+    public static final String RETURN_PUBLISHER_SUBJECT_NAMES = "returnPublisherSubjectNames";
+    public static final String RETURN_PUBLISHER_TYPE_NAMES = "returnPublisherTypeNames";
+    public static final String RETURN_SUBSCRIBER_DOMAIN_NAMES = "returnSubscriberDomainNames";
+    public static final String RETURN_SUBSCRIBER_SUBJECT_NAMES = "returnSubscriberSubjectNames";
+    public static final String RETURN_SUBSCRIBER_TYPE_NAMES = "returnSubscriberTypeNames";
 
 
-    private final int intValue;
-    private final String stringValue;
+    public static final String INFO = "INFO";
+    public static final String WARNING = "WARNING";
+    public static final String ERROR = "ERROR";
+    public static final String DONE = "done";
+    public static final String DATA = "data";
 
-    xMsgConstants(int intValue, String stringValue) {
-        this.intValue = intValue;
-        this.stringValue = stringValue;
-    }
+    public static final String NO_RESULT = "none";
 
-    public int getIntValue() {
-        return intValue;
-    }
+    public static final String BIND = "bind";
+    public static final String CONNECT = "connect";
 
-    public String getStringValue() {
-        return stringValue;
-    }
+    public static final int DEFAULT_PORT = 7771;
+    public static final int REGISTRAR_PORT = 8888;
+
+    public static final int DEFAULT_POOL_SIZE = 2;
+
+    public static final String SINT32 = "binary/sint32";
+    public static final String SINT64 = "binary/sint64";
+    public static final String SFIXED32 = "binary/sfixed32";
+    public static final String SFIXED64 = "binary/sfixed64";
+    public static final String FLOAT = "binary/float";
+    public static final String DOUBLE = "binary/double";
+    public static final String STRING = "text/string";
+    public static final String BYTES = "binary/bytes";
+
+    public static final String ARRAY_SINT32 = "binary/array-sint32";
+    public static final String ARRAY_SINT64 = "binary/array-sint64";
+    public static final String ARRAY_SFIXED32 = "binary/array-sfixed32";
+    public static final String ARRAY_SFIXED64 = "binary/array-sfixed32";
+    public static final String ARRAY_FLOAT = "binary/array-float";
+    public static final String ARRAY_DOUBLE = "binary/array-double";
+    public static final String ARRAY_STRING = "binary/array-string";
+    public static final String ARRAY_BYTES = "binary/array-string";
+
+
+    private xMsgConstants() { }
 }

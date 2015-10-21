@@ -162,19 +162,17 @@ public class xMsgRegDriverTest {
 
 
 
-    private void assertRequest(String name, xMsgRegistration data,
-                               xMsgConstants topic, xMsgConstants timeout)
+    private void assertRequest(String name, xMsgRegistration data, String topic, int timeout)
             throws Exception {
-        xMsgRegRequest request = new xMsgRegRequest(topic.getStringValue(), name, data);
-        verify(driver).request(request, timeout.getIntValue());
+        xMsgRegRequest request = new xMsgRegRequest(topic, name, data);
+        verify(driver).request(request, timeout);
     }
 
 
-    private void assertRequest(String name, String data,
-                               xMsgConstants topic, xMsgConstants timeout)
+    private void assertRequest(String name, String data, String topic, int timeout)
             throws Exception {
-        xMsgRegRequest request = new xMsgRegRequest(topic.getStringValue(), name, data);
-        verify(driver).request(request, timeout.getIntValue());
+        xMsgRegRequest request = new xMsgRegRequest(topic, name, data);
+        verify(driver).request(request, timeout);
     }
 
 
@@ -189,7 +187,7 @@ public class xMsgRegDriverTest {
             xMsgRegistration.Builder data = xMsgRegistration.newBuilder();
             data.setName(name);
             data.setHost(xMsgUtil.localhost());
-            data.setPort(xMsgConstants.DEFAULT_PORT.getIntValue());
+            data.setPort(xMsgConstants.DEFAULT_PORT);
             data.setDomain(xtopic.domain());
             data.setSubject(xtopic.subject());
             data.setType(xtopic.type());

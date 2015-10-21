@@ -72,7 +72,7 @@ import java.util.StringTokenizer;
  */
 public final class xMsgTopic {
 
-    public static final String ANY = xMsgConstants.ANY.getStringValue();
+    public static final String ANY = xMsgConstants.ANY;
     public static final String SEPARATOR = ":";
     private final String topic;
 

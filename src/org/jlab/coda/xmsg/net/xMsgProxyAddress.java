@@ -32,11 +32,11 @@ import org.jlab.coda.xmsg.core.xMsgConstants;
 public class xMsgProxyAddress extends xMsgAddress {
 
     public xMsgProxyAddress() {
-        super("localhost", xMsgConstants.DEFAULT_PORT.getIntValue());
+        super("localhost", xMsgConstants.DEFAULT_PORT);
     }
 
     public xMsgProxyAddress(String host) {
-        super(host, xMsgConstants.DEFAULT_PORT.getIntValue());
+        super(host, xMsgConstants.DEFAULT_PORT);
     }
 
     public xMsgProxyAddress(String host, int port) {

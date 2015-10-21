@@ -106,7 +106,7 @@ public class xMsg {
         this(name,
              new xMsgProxyAddress(),
              new xMsgRegAddress(),
-             xMsgConstants.DEFAULT_POOL_SIZE.getIntValue());
+             xMsgConstants.DEFAULT_POOL_SIZE);
     }
 
     /**
@@ -145,7 +145,7 @@ public class xMsg {
         this(name,
              new xMsgProxyAddress(),
              new xMsgRegAddress(registrarHost),
-             xMsgConstants.DEFAULT_POOL_SIZE.getIntValue());
+             xMsgConstants.DEFAULT_POOL_SIZE);
     }
 
     /**
@@ -1039,7 +1039,7 @@ public class xMsg {
 
             // just make sure that receiver knows that this is not a sync request.
             // need this in case we reuse messages.
-            msg.getMetaData().setReplyTo(xMsgConstants.UNDEFINED.getStringValue());
+            msg.getMetaData().setReplyTo(xMsgConstants.UNDEFINED);
         }
 
         // send topic, sender, followed by the metadata and data
@@ -1066,7 +1066,7 @@ public class xMsg {
                 }
                 return cb.recvMsg;
             } finally {
-                msg.getMetaData().setReplyTo(xMsgConstants.UNDEFINED.getStringValue());
+                msg.getMetaData().setReplyTo(xMsgConstants.UNDEFINED);
                 unsubscribe(cb.handler);
             }
         }

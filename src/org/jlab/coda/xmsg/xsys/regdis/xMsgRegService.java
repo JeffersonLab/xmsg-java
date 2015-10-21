@@ -123,8 +123,8 @@ public class xMsgRegService implements Runnable {
         // Note these fields do not play any critical role what so ever, due to
         // the fact that registration is done using client-server type communication,
         // and are always synchronous.
-        String topic = xMsgConstants.UNDEFINED.getStringValue();
-        String sender = regAddress.host() + ":" + xMsgConstants.REGISTRAR.getStringValue();
+        String topic = xMsgConstants.UNDEFINED;
+        String sender = regAddress.host() + ":" + xMsgConstants.REGISTRAR;
 
         // response message
         xMsgRegResponse reply;
@@ -139,57 +139,57 @@ public class xMsgRegService implements Runnable {
             // retrieve the topic
             topic = request.topic();
 
-            if (topic.equals(xMsgConstants.REGISTER_PUBLISHER.getStringValue())) {
+            if (topic.equals(xMsgConstants.REGISTER_PUBLISHER)) {
                 publishers.register(request.data());
 
-            } else if (topic.equals(xMsgConstants.REGISTER_SUBSCRIBER.getStringValue())) {
+            } else if (topic.equals(xMsgConstants.REGISTER_SUBSCRIBER)) {
                 subscribers.register(request.data());
 
-            } else if (topic.equals(xMsgConstants.REMOVE_PUBLISHER.getStringValue())) {
+            } else if (topic.equals(xMsgConstants.REMOVE_PUBLISHER)) {
                 publishers.remove(request.data());
 
-            } else if (topic.equals(xMsgConstants.REMOVE_SUBSCRIBER.getStringValue())) {
+            } else if (topic.equals(xMsgConstants.REMOVE_SUBSCRIBER)) {
                 subscribers.remove(request.data());
 
-            } else if (topic.equals(xMsgConstants.REMOVE_ALL_REGISTRATION.getStringValue())) {
+            } else if (topic.equals(xMsgConstants.REMOVE_ALL_REGISTRATION)) {
                 publishers.remove(request.text());
                 subscribers.remove(request.text());
 
-            } else if (topic.equals(xMsgConstants.FIND_PUBLISHER.getStringValue())) {
+            } else if (topic.equals(xMsgConstants.FIND_PUBLISHER)) {
                 xMsgRegistration data = request.data();
                 registration = publishers.find(data.getDomain(),
                                                data.getSubject(),
                                                data.getType());
 
-            } else if (topic.equals(xMsgConstants.FIND_SUBSCRIBER.getStringValue())) {
+            } else if (topic.equals(xMsgConstants.FIND_SUBSCRIBER)) {
                 xMsgRegistration data = request.data();
                 registration = subscribers.find(data.getDomain(),
                                                 data.getSubject(),
                                                 data.getType());
-            } else if (topic.equals(xMsgConstants.RETURN_PUBLISHER_DOMAIN_NAMES.getStringValue())) {
+            } else if (topic.equals(xMsgConstants.RETURN_PUBLISHER_DOMAIN_NAMES)) {
                 reply = new xMsgRegResponse(topic, sender, publishers.findDomainNames());
                 return reply.msg();
 
-            } else if (topic.equals(xMsgConstants.RETURN_SUBSCRIBER_DOMAIN_NAMES.getStringValue())) {
+            } else if (topic.equals(xMsgConstants.RETURN_SUBSCRIBER_DOMAIN_NAMES)) {
                 reply = new xMsgRegResponse(topic, sender, subscribers.findDomainNames());
                 return reply.msg();
 
-            } else if (topic.equals(xMsgConstants.RETURN_PUBLISHER_SUBJECT_NAMES.getStringValue())) {
+            } else if (topic.equals(xMsgConstants.RETURN_PUBLISHER_SUBJECT_NAMES)) {
                 xMsgRegistration data = request.data();
                 reply = new xMsgRegResponse(topic, sender, publishers.findSubjectNames(data.getDomain()));
                 return reply.msg();
 
-            } else if (topic.equals(xMsgConstants.RETURN_SUBSCRIBER_SUBJECT_NAMES.getStringValue())) {
+            } else if (topic.equals(xMsgConstants.RETURN_SUBSCRIBER_SUBJECT_NAMES)) {
                 xMsgRegistration data = request.data();
                 reply = new xMsgRegResponse(topic, sender, subscribers.findSubjectNames(data.getDomain()));
                 return reply.msg();
 
-            }  else if (topic.equals(xMsgConstants.RETURN_PUBLISHER_TYPE_NAMES.getStringValue())) {
+            }  else if (topic.equals(xMsgConstants.RETURN_PUBLISHER_TYPE_NAMES)) {
                 xMsgRegistration data = request.data();
                 reply = new xMsgRegResponse(topic, sender, publishers.findTypeNames(data.getDomain(), data.getSubject()));
                 return reply.msg();
 
-            } else if (topic.equals(xMsgConstants.RETURN_SUBSCRIBER_TYPE_NAMES.getStringValue())) {
+            } else if (topic.equals(xMsgConstants.RETURN_SUBSCRIBER_TYPE_NAMES)) {
                 xMsgRegistration data = request.data();
                 reply = new xMsgRegResponse(topic, sender, subscribers.findTypeNames(data.getDomain(), data.getSubject()));
                 return reply.msg();
