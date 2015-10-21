@@ -33,6 +33,8 @@ public final class xMsgConstants {
     public static final String SUCCESS = "success";
     public static final String ANY = "*";
 
+    public static final String TOPIC_SEP = ":";
+
     public static final String REGISTRAR = "xMsg_Registrar";
 
     public static final String REGISTER_PUBLISHER = "registerPublisher";
