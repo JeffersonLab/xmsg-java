@@ -21,7 +21,6 @@
 
 package org.jlab.coda.xmsg.xsys.regdis;
 
-import org.jlab.coda.xmsg.core.xMsgConstants;
 import org.jlab.coda.xmsg.core.xMsgTopic;
 import org.jlab.coda.xmsg.data.xMsgR.xMsgRegistration;
 
@@ -163,8 +162,8 @@ public class xMsgRegDatabase {
     }
 
     public String findDomainNames() {
-     StringBuilder result = new StringBuilder();
-        for(xMsgTopic topic:db.keySet()) {
+        StringBuilder result = new StringBuilder();
+        for (xMsgTopic topic : db.keySet()) {
             result.append(topic.domain()).append(" ");
         }
         return result.toString();
@@ -172,8 +171,8 @@ public class xMsgRegDatabase {
 
     public String findSubjectNames(String domainName) {
         StringBuilder result = new StringBuilder();
-        for(xMsgTopic topic:db.keySet()) {
-            if(topic.domain().equals(domainName)) {
+        for (xMsgTopic topic : db.keySet()) {
+            if (topic.domain().equals(domainName)) {
                 result.append(topic.subject()).append(" ");
             }
         }
@@ -182,8 +181,8 @@ public class xMsgRegDatabase {
 
     public String findTypeNames(String domainName, String subjectName) {
         StringBuilder result = new StringBuilder();
-        for(xMsgTopic topic:db.keySet()) {
-            if(topic.domain().equals(domainName) && topic.subject().equals(subjectName)) {
+        for (xMsgTopic topic : db.keySet()) {
+            if (topic.domain().equals(domainName) && topic.subject().equals(subjectName)) {
                 result.append(topic.type()).append(" ");
             }
         }

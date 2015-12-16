@@ -176,22 +176,26 @@ public class xMsgRegService implements Runnable {
 
             } else if (topic.equals(xMsgConstants.RETURN_PUBLISHER_SUBJECT_NAMES)) {
                 xMsgRegistration data = request.data();
-                reply = new xMsgRegResponse(topic, sender, publishers.findSubjectNames(data.getDomain()));
+                reply = new xMsgRegResponse(topic, sender,
+                        publishers.findSubjectNames(data.getDomain()));
                 return reply.msg();
 
             } else if (topic.equals(xMsgConstants.RETURN_SUBSCRIBER_SUBJECT_NAMES)) {
                 xMsgRegistration data = request.data();
-                reply = new xMsgRegResponse(topic, sender, subscribers.findSubjectNames(data.getDomain()));
+                reply = new xMsgRegResponse(topic, sender,
+                        subscribers.findSubjectNames(data.getDomain()));
                 return reply.msg();
 
             }  else if (topic.equals(xMsgConstants.RETURN_PUBLISHER_TYPE_NAMES)) {
                 xMsgRegistration data = request.data();
-                reply = new xMsgRegResponse(topic, sender, publishers.findTypeNames(data.getDomain(), data.getSubject()));
+                reply = new xMsgRegResponse(topic, sender,
+                        publishers.findTypeNames(data.getDomain(), data.getSubject()));
                 return reply.msg();
 
             } else if (topic.equals(xMsgConstants.RETURN_SUBSCRIBER_TYPE_NAMES)) {
                 xMsgRegistration data = request.data();
-                reply = new xMsgRegResponse(topic, sender, subscribers.findTypeNames(data.getDomain(), data.getSubject()));
+                reply = new xMsgRegResponse(topic, sender,
+                        subscribers.findTypeNames(data.getDomain(), data.getSubject()));
                 return reply.msg();
 
             }  else {
