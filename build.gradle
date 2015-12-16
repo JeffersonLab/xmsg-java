@@ -129,13 +129,19 @@ task deploy(type: Copy, overwrite: true, dependsOn: install) {
 
 
 
-task(startFE, dependsOn: 'classes', type: JavaExec) {
+task(startRegistrar, dependsOn: 'classes', type: JavaExec) {
     main = 'org.jlab.coda.xmsg.xsys.xMsgRegistrar'
+    if (project.hasProperty("regArgs")) {
+        args Eval.me(regArgs)
+    }
     classpath = sourceSets.main.runtimeClasspath
 }
 
-task(startNode, dependsOn: 'classes', type: JavaExec) {
+task(startProxy, dependsOn: 'classes', type: JavaExec) {
     main = 'org.jlab.coda.xmsg.xsys.xMsgProxy'
+    if (project.hasProperty("proxyArgs")) {
+        args Eval.me(proxyArgs)
+    }
     classpath = sourceSets.main.runtimeClasspath
 }
 
