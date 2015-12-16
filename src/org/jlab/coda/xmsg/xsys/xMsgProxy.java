@@ -21,6 +21,12 @@
 
 package org.jlab.coda.xmsg.xsys;
 
+import static java.util.Arrays.asList;
+
+import java.io.IOException;
+import java.io.PrintStream;
+
+import org.jlab.coda.xmsg.core.xMsgConstants;
 import org.jlab.coda.xmsg.core.xMsgContext;
 import org.jlab.coda.xmsg.core.xMsgUtil;
 import org.jlab.coda.xmsg.excp.xMsgException;
@@ -32,6 +38,11 @@ import org.zeromq.ZMQ.Socket;
 import org.zeromq.ZMsg;
 import org.zeromq.ZThread;
 import org.zeromq.ZThread.IAttachedRunnable;
+
+import joptsimple.OptionException;
+import joptsimple.OptionParser;
+import joptsimple.OptionSet;
+import joptsimple.OptionSpec;
 
 /**
  * xMsg pub-sub proxy executable.
@@ -55,28 +66,47 @@ public class xMsgProxy {
 
     public static void main(String[] args) {
         try {
-            xMsgProxyAddress address = new xMsgProxyAddress();
-            if (args.length == 2) {
-                if (args[0].equals("-port")) {
-                    int port = Integer.parseInt(args[1]);
-                    if (port <= 0) {
-                        System.err.println("Invalid port: " + port);
-                        System.exit(1);
-                    }
-                    address = new xMsgProxyAddress("localhost", port);
-                } else {
-                    System.err.println("Wrong option. Accepts -port option only.");
-                    System.exit(1);
-                }
+            OptionParser parser = new OptionParser();
+            OptionSpec<String> hostSpec = parser.accepts("host")
+                    .withRequiredArg()
+                    .defaultsTo(xMsgUtil.localhost());
+            OptionSpec<Integer> portSpec = parser.accepts("port")
+                    .withRequiredArg()
+                    .ofType(Integer.class)
+                    .defaultsTo(xMsgConstants.DEFAULT_PORT);
+            parser.accepts("verbose");
+            parser.acceptsAll(asList("h", "help")).forHelp();
+            OptionSet options = parser.parse(args);
+
+            if (options.has("help")) {
+                usage(System.out);
+                System.exit(0);
             }
 
+            String host = options.valueOf(hostSpec);
+            int port = options.valueOf(portSpec);
+            xMsgProxyAddress address = new xMsgProxyAddress(host, port);
+
             xMsgProxy proxy = new xMsgProxy(xMsgContext.getContext(), address);
+            if (options.has("verbose")) {
+                proxy.verbose();
+            }
             proxy.start();
 
-        } catch (xMsgException | NumberFormatException e) {
+        } catch (OptionException e) {
+            System.err.println(e.getMessage());
+            System.exit(1);
+        } catch (IOException | xMsgException e) {
             e.printStackTrace();
             System.exit(1);
         }
+    }
+
+    private static void usage(PrintStream out) {
+        out.printf("usage: jx_proxy [options]%n%n  Options:%n");
+        out.printf("  %-22s  %s%n", "-host <hostname>", "use the given hostname");
+        out.printf("  %-22s  %s%n", "-port <port>", "use the given port");
+        out.printf("  %-22s  %s%n", "-verbose", "print debug information");
     }
 
     /**
