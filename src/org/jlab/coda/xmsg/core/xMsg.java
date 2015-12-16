@@ -24,7 +24,7 @@ package org.jlab.coda.xmsg.core;
 import org.jlab.coda.xmsg.data.xMsgR.xMsgRegistration;
 import org.jlab.coda.xmsg.excp.xMsgException;
 import org.jlab.coda.xmsg.net.xMsgConnection;
-import org.jlab.coda.xmsg.net.xMsgConnectionOption;
+import org.jlab.coda.xmsg.net.xMsgConnectionSetup;
 import org.jlab.coda.xmsg.net.xMsgProxyAddress;
 import org.jlab.coda.xmsg.net.xMsgRegAddress;
 import org.jlab.coda.xmsg.xsys.regdis.xMsgRegDriver;
@@ -251,11 +251,11 @@ public class xMsg {
      * or {@link #connect(int port)}
      *
      * @param address {@link org.jlab.coda.xmsg.net.xMsgProxyAddress} object
-     * @param setUp {@link org.jlab.coda.xmsg.net.xMsgConnectionOption} object
+     * @param setup {@link org.jlab.coda.xmsg.net.xMsgConnectionSetup} object
      * @return {@link org.jlab.coda.xmsg.net.xMsgConnection} object
      */
-    public xMsgConnection connect(xMsgProxyAddress address, xMsgConnectionOption setUp) {
-        return connectionManager.getProxyConnection(address, setUp);
+    public xMsgConnection connect(xMsgProxyAddress address, xMsgConnectionSetup setup) {
+        return connectionManager.getProxyConnection(address, setup);
     }
 
     /**

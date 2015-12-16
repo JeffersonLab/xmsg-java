@@ -22,7 +22,7 @@
 package org.jlab.coda.xmsg.core;
 
 import org.jlab.coda.xmsg.net.xMsgConnection;
-import org.jlab.coda.xmsg.net.xMsgConnectionOption;
+import org.jlab.coda.xmsg.net.xMsgConnectionSetup;
 import org.jlab.coda.xmsg.net.xMsgProxyAddress;
 import org.jlab.coda.xmsg.net.xMsgRegAddress;
 import org.jlab.coda.xmsg.xsys.regdis.xMsgRegDriver;
@@ -36,13 +36,13 @@ class ConnectionManager {
     private final ZContext context;
 
     // default connection option
-    private xMsgConnectionOption defaultConnectionOption;
+    private xMsgConnectionSetup defaultConnectionOption;
 
     ConnectionManager(ZContext context) {
         this.context = context;
 
         // default pub/sub socket options
-        defaultConnectionOption = new xMsgConnectionOption() {
+        defaultConnectionOption = new xMsgConnectionSetup() {
 
             @Override
             public void preConnection(Socket socket) {
@@ -63,7 +63,7 @@ class ConnectionManager {
     }
 
     xMsgConnection getProxyConnection(xMsgProxyAddress address,
-                                      xMsgConnectionOption setup) {
+                                      xMsgConnectionSetup setup) {
         Socket pubSock = context.createSocket(ZMQ.PUB);
         Socket subSock = context.createSocket(ZMQ.SUB);
         setup.preConnection(pubSock);

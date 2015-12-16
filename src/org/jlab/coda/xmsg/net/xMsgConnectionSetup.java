@@ -24,13 +24,9 @@ package org.jlab.coda.xmsg.net;
 import org.zeromq.ZMQ.Socket;
 
 /**
- *    Advanced setup of an {@link xMsgConnection}.
- *
- * @author smancill
- * @version 2.x
- *
+ * Advanced setup of an {@link xMsgConnection}.
  */
-public interface xMsgConnectionOption {
+public interface xMsgConnectionSetup {
 
     /**
      * Configures the socket before it is connected.
