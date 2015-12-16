@@ -50,7 +50,7 @@ public abstract class xMsgAddress {
                 throw new IllegalArgumentException("Null IP address");
             }
             if (port <= 1023) {
-                throw new IllegalArgumentException("Null IP address");
+                throw new IllegalArgumentException("Illegal port: " + port);
             }
             this.host = xMsgUtil.toHostAddress(host);
             this.port = port;
