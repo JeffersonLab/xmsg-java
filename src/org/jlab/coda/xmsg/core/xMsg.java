@@ -229,6 +229,16 @@ public class xMsg {
     }
 
     /**
+     * Overwrites the default setup for every connection.
+     * This setup will be applied every time a new connection is created.
+     *
+     * @param setup the new default setup
+     */
+    public void setConnectionSetup(xMsgConnectionSetup setup) {
+        connectionManager.setDefaultConnectionSetup(setup);
+    }
+
+    /**
      * Makes a connection to a required proxy.
      * This will use the default connection options defined at the constructor.
      * Note that it is reasonable to use this method for connecting to a remote proxy.

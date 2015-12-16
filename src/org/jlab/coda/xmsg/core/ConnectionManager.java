@@ -96,6 +96,10 @@ class ConnectionManager {
         connection.destroy();
     }
 
+    void setDefaultConnectionSetup(xMsgConnectionSetup setup) {
+        defaultConnectionOption = setup;
+    }
+
     void setLinger(int linger) {
         context.setLinger(linger);
     }
