@@ -33,11 +33,11 @@ import java.util.Arrays;
 
 /**
  * Defines a message to be passed through 0MQ.
- *
- * Uses {@link org.jlab.coda.xmsg.data.xMsgD.xMsgData} class generated
- * as a result of the proto-buffer description to pass Java primitive
- * types and arrays of primitive types. xMsgData is also used to pass
- * byte[]: the result of a user specific object serialization.
+ * <p>
+ * Uses {@link xMsgData} class generated as a result of the proto-buffer
+ * description to pass Java primitive types and arrays of primitive types.
+ * xMsgData is also used to pass byte[]: the result of a user specific object
+ * serialization.
  * <p>
  * This class will also contain complete metadata of the message data,
  * describing details of the data. In case a message is constructed
@@ -98,8 +98,7 @@ public class xMsgMessage {
      * So, serializable java objects will be serialized and metadata dataType will be assigned
      * to the mimeType input parameter.
      *
-     * @param topic the topic of the message:
-     *              object of {@link org.jlab.coda.xmsg.core.xMsgTopic}
+     * @param topic the topic of the message
      * @param mimeType user textual definition of the data type
      * @param data data object
      * @throws xMsgException
@@ -118,10 +117,9 @@ public class xMsgMessage {
      * updating accordingly the data mimeType. It will also serialize the object and store
      * it as a byte[]. Note that this will fail in case the passed object is not serializable.
      * So, serializable java objects will be serialized and metadata dataType will be assigned
-     * to the mimeType = "binary/bytes".
+     * to the mimeType = "binary/java".
      *
-     * @param topic the topic of the message:
-     *              object of {@link org.jlab.coda.xmsg.core.xMsgTopic}
+     * @param topic the topic of the message
      * @param data data object
      * @throws xMsgException
      * @throws IOException
@@ -130,12 +128,11 @@ public class xMsgMessage {
         this(topic, "binary/bytes", data);
     }
 
-
     /**
      *  Create xMsgMessage from the 0MQ message received off the wire, i.e.
      *  de-serializes the received 0MQ message
      *
-     * @param msg the received {@link org.zeromq.ZMsg} message
+     * @param msg the received message
      */
     xMsgMessage(ZMsg msg) throws xMsgException {
         ZFrame topicFrame = msg.pop();
@@ -160,7 +157,7 @@ public class xMsgMessage {
      * Serializes this message into a 0MQ message,
      * ready to send it over the wire.
      *
-     * @return the {@link org.zeromq.ZMsg} raw multi-part message
+     * @return the raw multi-part message
      */
     ZMsg serialize() {
         ZMsg msg = new ZMsg();
@@ -171,18 +168,7 @@ public class xMsgMessage {
     }
 
     /**
-     * Returns the message data (i.e. serialized byte[] ) size.
-     *
-     * @return size of the serialized data byte[] size.
-     */
-    public int getDataSize() {
-        return data != null ? data.length : 0;
-    }
-
-    /**
      * Returns the topic of the message.
-     *
-     * @return the object of {@link org.jlab.coda.xmsg.core.xMsgTopic}
      */
     public xMsgTopic getTopic() {
         return topic;
@@ -190,17 +176,20 @@ public class xMsgMessage {
 
     /**
      * Returns the metadata of the message.
-     *
-     * @return the object of {@link org.jlab.coda.xmsg.data.xMsgM.xMsgMeta.Builder}
      */
     public xMsgMeta.Builder getMetaData() {
         return metaData;
     }
 
     /**
+     * Returns the size of the message data (i.e. serialized byte[] ).
+     */
+    public int getDataSize() {
+        return data != null ? data.length : 0;
+    }
+
+    /**
      * Returns the data of the message.
-     *
-     * @return data as a byte[]
      */
     public byte[] getData() {
         return data;
@@ -241,7 +230,7 @@ public class xMsgMessage {
      * data mimeType. It will also serialize the object and store it as a byte[].
      * Note that this will fail in case the passed object is not serializable.
      * So, serializable java objects will be serialized and metadata dataType will
-     * be assigned to the mimeType = "binary/bytes".
+     * be assigned to the mimeType = "binary/java".
      *
      * @param data
      * @throws IOException
@@ -256,13 +245,10 @@ public class xMsgMessage {
      * data mimeType. It will also serialize the object and store it as a byte[].
      * Note that this will fail in case the passed object is not serializable.
      * So, serializable java objects will be serialized and metadata dataType will
-     * be assigned to the mimeType = "binary/bytes".
+     * be assigned to the mimeType = "binary/java".
      *
-     * @param topic the topic of the message:
-     *              object of {@link org.jlab.coda.xmsg.core.xMsgTopic}
-     * @param metaData the metadata of the message, describing the data of the
-     *                 message: {@link org.jlab.coda.xmsg.data.xMsgM.xMsgMeta.Builder}
-     *                 object
+     * @param topic the topic of the message
+     * @param metaData the metadata of the message, describing the data
      * @param data the data object
      * @throws IOException
      */
@@ -331,5 +317,4 @@ public class xMsgMessage {
             this.data = xd.build().toByteArray();
         }
     }
-
 }
