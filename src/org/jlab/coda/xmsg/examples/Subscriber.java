@@ -96,10 +96,10 @@ public class Subscriber extends xMsg {
      *
      * @param msg {@link org.jlab.coda.xmsg.core.xMsgMessage} object
      */
-    public void respondBack(xMsgMessage msg) {
+    public void respondBack(xMsgMessage msg, Object data) {
         try {
-            publish(con, msg);
-        } catch (xMsgException e) {
+            publish(con, msg.response(data));
+        } catch (xMsgException | IOException e) {
             e.printStackTrace();
         }
     }
@@ -136,13 +136,8 @@ public class Subscriber extends xMsg {
                     nr = 0;
                 }
             } else {
-                // sync request, updates the received xMsgMessage and sends it to the sender
-                // reset relyTo metadata field
-                msg.getMetaData().setReplyTo(xMsgConstants.UNDEFINED);
-
                 // sends back "Done" string
-                msg.updateData("Done");
-                respondBack(msg);
+                respondBack(msg, "Done");
             }
             return msg;
         }
