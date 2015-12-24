@@ -157,7 +157,7 @@ public class Subscriber extends xMsg {
         private List<Integer> parseData(xMsgMessage msg) {
             try {
                 xMsgM.xMsgMeta.Builder metadata = msg.getMetaData();
-                if (metadata.getDataType().equals(xMsgConstants.ARRAY_SFIXED32)) {
+                if (metadata.getDataType().equals(xMsgConstants.MimeType.ARRAY_SFIXED32)) {
                     xMsgData data = xMsgData.parseFrom(msg.getData());
                     return data.getFLSINT32AList();
                 }

@@ -271,48 +271,49 @@ public class xMsgMessage {
 
         // define the data mime-type
         if (data instanceof Integer) {
-            mimeType = xMsgConstants.SFIXED32;
+            mimeType = xMsgConstants.MimeType.SFIXED32;
             xd.setFLSINT32((Integer) data);
 
         } else if (data instanceof Long) {
-            mimeType = xMsgConstants.SFIXED64;
+            mimeType = xMsgConstants.MimeType.SFIXED64;
             xd.setFLSINT64((Long) data);
 
         } else if (data instanceof Float) {
-            mimeType = xMsgConstants.FLOAT;
+            mimeType = xMsgConstants.MimeType.FLOAT;
             xd.setFLOAT((Float) data);
 
         } else if (data instanceof Double) {
-            mimeType = xMsgConstants.DOUBLE;
+            mimeType = xMsgConstants.MimeType.DOUBLE;
             xd.setDOUBLE((Double) data);
 
         } else if (data instanceof String) {
-            mimeType = xMsgConstants.STRING;
+            mimeType = xMsgConstants.MimeType.STRING;
             xd.setSTRING((String) data);
 
         } else if (data instanceof Integer[]) {
-            mimeType = xMsgConstants.ARRAY_SFIXED32;
+            mimeType = xMsgConstants.MimeType.ARRAY_SFIXED32;
             xd.addAllFLSINT32A(Arrays.asList((Integer[]) data));
 
         } else if (data instanceof Long[]) {
-            mimeType = xMsgConstants.ARRAY_SFIXED64;
+            mimeType = xMsgConstants.MimeType.ARRAY_SFIXED64;
             xd.addAllFLSINT64A(Arrays.asList((Long[]) data));
 
         } else if (data instanceof Float[]) {
-            mimeType = xMsgConstants.ARRAY_FLOAT;
+            mimeType = xMsgConstants.MimeType.ARRAY_FLOAT;
             xd.addAllFLOATA(Arrays.asList((Float[]) data));
 
         } else if (data instanceof Double[]) {
-            mimeType = xMsgConstants.ARRAY_DOUBLE;
+            mimeType = xMsgConstants.MimeType.ARRAY_DOUBLE;
             xd.addAllDOUBLEA(Arrays.asList((Double[]) data));
 
         } else if (data instanceof String[]) {
-            mimeType = xMsgConstants.ARRAY_STRING;
+            mimeType = xMsgConstants.MimeType.ARRAY_STRING;
             xd.addAllSTRINGA(Arrays.asList((String[]) data));
 
         } else if (data instanceof byte[]) {
             ba = (byte[]) data;
         } else {
+            mimeType = xMsgConstants.MimeType.JOBJECT;
             ba = xMsgUtil.serializeToBytes(data);
         }
 
