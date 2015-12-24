@@ -64,24 +64,14 @@ public class xMsgMessage {
      * user serialization. Thus, user also provides a metadata describing the
      * type of the data among other things.
      *
-     * @param topic    the topic of the message:
-     *                 object of {@link org.jlab.coda.xmsg.core.xMsgTopic}
-     * @param metaData the metadata of the message, describing the data of the
-     *                 message: {@link org.jlab.coda.xmsg.data.xMsgM.xMsgMeta.Builder}
-     *                 object
+     * @param topic    the topic of the message
+     * @param metaData the metadata of the message, describing the data
      * @param data     serialized data
-     * @throws xMsgException
-     * @throws IOException
      */
-    public xMsgMessage(xMsgTopic topic, xMsgMeta.Builder metaData, byte[] data)
-            throws xMsgException {
-        if (metaData.hasByteOrder()) {
-            this.topic = topic;
-            this.metaData = metaData;
-            this.data = data;
-        } else {
-            throw new xMsgException("xMsg-Error: Unspecified byte order.");
-        }
+    public xMsgMessage(xMsgTopic topic, xMsgMeta.Builder metaData, byte[] data) {
+        this.topic = topic;
+        this.metaData = metaData;
+        this.data = data;
     }
 
     /**
