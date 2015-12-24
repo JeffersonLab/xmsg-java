@@ -7,8 +7,6 @@ import org.jlab.coda.xmsg.core.xMsgUtil;
 import org.jlab.coda.xmsg.excp.xMsgException;
 import org.jlab.coda.xmsg.net.xMsgConnection;
 
-import java.io.IOException;
-
 public final class RemoteThroughput {
 
     private RemoteThroughput() { }
@@ -33,13 +31,13 @@ public final class RemoteThroughput {
 
             byte[] data = new byte[messageSize];
             for (int i = 0; i < messageCount; i++) {
-                xMsgMessage msg = new xMsgMessage(topic, data);
+                xMsgMessage msg = new xMsgMessage(topic, "data/binary", data);
                 publisher.publish(con, msg);
             }
 
             publisher.destroy();
 
-        } catch (IOException | xMsgException e) {
+        } catch (xMsgException e) {
             e.printStackTrace();
             System.exit(1);
         }

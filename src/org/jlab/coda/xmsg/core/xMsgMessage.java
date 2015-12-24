@@ -75,6 +75,22 @@ public class xMsgMessage {
     }
 
     /**
+     * Constructs a message containing a byte[] that is most likely is the result of
+     * user serialization. Thus, user also provides a mime-type describing the
+     * type of the data.
+     *
+     * @param topic the topic of the message
+     * @param mimeType user textual definition of the data type
+     * @param data data object
+     */
+    public xMsgMessage(xMsgTopic topic, String mimeType, byte[] data) {
+        this.topic = topic;
+        this.metaData = xMsgMeta.newBuilder();
+        this.metaData.setDataType(mimeType);
+        this.data = data;
+    }
+
+    /**
      * Constructs a message, data of which is passed as an Object. This constructor will
      * do it's best to figure out the type of the object and create a metadata object,
      * updating accordingly the data mimeType. It will also serialize the object and store
