@@ -28,6 +28,7 @@ import java.util.Arrays;
 import java.util.List;
 
 import org.jlab.coda.xmsg.data.xMsgD.xMsgData;
+import org.jlab.coda.xmsg.data.xMsgM.xMsgMeta;
 import org.junit.Test;
 
 public class xMsgMessageTest {
@@ -58,5 +59,37 @@ public class xMsgMessageTest {
 
         xMsgMessage msg = xMsgMessage.createFrom(testTopic, orig);
         assertThat(msg.getData(), is(xMsgUtil.serializeToBytes(orig)));
+    }
+
+    @Test
+    public void createSimpleResponse() throws Exception {
+        byte[] data = new byte[] { 0x0, 0x1, 0x2, 0x3, 0xa, 0xb };
+        xMsgMeta.Builder meta = xMsgMeta.newBuilder();
+        meta.setReplyTo("return_123");
+        meta.setDataType("test/binary");
+
+        xMsgMessage msg = new xMsgMessage(testTopic, meta, data);
+        xMsgMessage res = xMsgMessage.createResponse(msg);
+
+        assertThat(res.getTopic().toString(), is("return_123"));
+        assertThat(res.getData(), is(msg.getData()));
+        assertThat(res.getMetaData().getDataType(), is("test/binary"));
+        assertThat(res.getMetaData().getReplyTo(), is(xMsgConstants.UNDEFINED));
+    }
+
+    @Test
+    public void createDataResponse() throws Exception {
+        byte[] data = new byte[] { 0x0, 0x1, 0x2, 0x3, 0xa, 0xb };
+        xMsgMeta.Builder meta = xMsgMeta.newBuilder();
+        meta.setReplyTo("return_123");
+        meta.setDataType("test/binary");
+
+        xMsgMessage msg = new xMsgMessage(testTopic, meta, data);
+        xMsgMessage res = xMsgMessage.createResponse(msg, 1000);
+
+        assertThat(res.getTopic().toString(), is("return_123"));
+        assertThat(xMsgData.parseFrom(res.getData()).getFLSINT32(), is(1000));
+        assertThat(res.getMetaData().getDataType(), is(xMsgConstants.MimeType.SFIXED32));
+        assertThat(res.getMetaData().getReplyTo(), is(xMsgConstants.UNDEFINED));
     }
 }

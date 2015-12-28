@@ -159,9 +159,9 @@ public class SubscriptionsTest {
                         @Override
                         public xMsgMessage callback(xMsgMessage msg) {
                             try {
-                                xMsgMessage response = msg.response();
+                                xMsgMessage response = xMsgMessage.createResponse(msg);
                                 subActor.publish(scon, response);
-                            } catch (xMsgException | IOException e) {
+                            } catch (xMsgException e) {
                                 e.printStackTrace();
                             }
                             return msg;

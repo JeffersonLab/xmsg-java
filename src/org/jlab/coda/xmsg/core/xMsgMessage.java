@@ -169,23 +169,6 @@ public class xMsgMessage {
         this.data = data;
     }
 
-    public xMsgMessage response() throws xMsgException, IOException {
-        xMsgTopic resTopic = xMsgTopic.wrap(metaData.getReplyTo());
-        xMsgMessage res = createFrom(resTopic, data);
-        res.getMetaData().mergeFrom(metaData.build());
-        res.getMetaData().clearReplyTo();
-        return res;
-    }
-
-
-    public xMsgMessage response(Object data) throws xMsgException, IOException {
-        xMsgTopic resTopic = xMsgTopic.wrap(metaData.getReplyTo());
-        xMsgMessage res = createFrom(resTopic, data);
-        res.getMetaData().mergeFrom(metaData.build());
-        res.getMetaData().clearReplyTo();
-        return res;
-    }
-
     /**
      * Constructs a message, data of which is passed as an Object. This method will
      * do it's best to figure out the type of the object, updating accordingly the
@@ -259,5 +242,36 @@ public class xMsgMessage {
         }
 
         return new xMsgMessage(topic, mimeType, ba);
+    }
+
+    /**
+     * Creates a response to the given message, using the same data.
+     * The message must contain the <i>replyTo</i> metadata field.
+     *
+     * @param msg the received message to be responded
+     * @return a response message with the proper topic and the same received data
+     */
+    public static xMsgMessage createResponse(xMsgMessage msg)
+            throws xMsgException {
+        xMsgTopic resTopic = xMsgTopic.wrap(msg.metaData.getReplyTo());
+        xMsgMeta.Builder resMeta = xMsgMeta.newBuilder(msg.metaData.build());
+        resMeta.clearReplyTo();
+        return new xMsgMessage(resTopic, resMeta, msg.data);
+    }
+
+    /**
+     * Creates a response to the given message, serializing the given data.
+     * The message must contain the <i>replyTo</i> metadata field.
+     *
+     * @param msg the received message to be responded
+     * @param data the data to be sent back
+     * @return a response message with the proper topic and the given data
+     * @throws IOException if data could not be serialized
+     */
+    public static xMsgMessage createResponse(xMsgMessage msg, Object data)
+            throws IOException {
+        xMsgTopic resTopic = xMsgTopic.wrap(msg.metaData.getReplyTo());
+        xMsgMessage res = createFrom(resTopic, data);
+        return res;
     }
 }
