@@ -112,7 +112,7 @@ public class SubscriptionsTest {
                     xMsgUtil.sleep(100);
                     xMsgTopic topic = xMsgTopic.wrap("test_topic");
                     for (int i = 0; i < Check.N; i++) {
-                        xMsgMessage msg = createMessage(topic, i);
+                        xMsgMessage msg = xMsgMessage.createFrom(topic, i);
                         actor.publish(con, msg);
                     }
                 } catch (IOException | xMsgException e) {
@@ -173,7 +173,7 @@ public class SubscriptionsTest {
                     xMsgUtil.sleep(100);
                     xMsgTopic pubTopic = xMsgTopic.wrap("test_topic");
                     for (int i = 0; i < Check.N; i++) {
-                        xMsgMessage msg = createMessage(pubTopic, i);
+                        xMsgMessage msg = xMsgMessage.createFrom(pubTopic, i);
                         xMsgMessage resMsg = pubActor.syncPublish(pcon, msg, 1000);
                         int data = parseData(resMsg);
                         check.sum += data;
@@ -229,7 +229,7 @@ public class SubscriptionsTest {
                     xMsgConnection pcon = pubActor.connect();
                     xMsgUtil.sleep(100);
                     xMsgTopic pubTopic = xMsgTopic.wrap("test_topic");
-                    xMsgMessage msg = createMessage(pubTopic, 1);
+                    xMsgMessage msg = xMsgMessage.createFrom(pubTopic, 1);
                     try {
                         pubActor.syncPublish(pcon, msg, 1000);
                     } catch (TimeoutException e) {
@@ -280,11 +280,6 @@ public class SubscriptionsTest {
             proxyThread.interrupt();
             proxyThread.join();
         }
-    }
-
-
-    private xMsgMessage createMessage(xMsgTopic topic, int data) throws xMsgException, IOException {
-        return new xMsgMessage(topic, data);
     }
 
 
