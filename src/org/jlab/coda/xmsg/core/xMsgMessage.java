@@ -30,6 +30,7 @@ import org.zeromq.ZMsg;
 
 import java.io.IOException;
 import java.util.Arrays;
+import java.util.List;
 
 /**
  * Defines a message to be passed through 0MQ.
@@ -242,6 +243,100 @@ public class xMsgMessage {
         }
 
         return new xMsgMessage(topic, mimeType, ba);
+    }
+
+
+    /**
+     * Deserializes simple data from the given message.
+     *
+     * @param message the message that contains the required data
+     * @param dataType the type of the required data
+     * @return the deserialized data of the message
+     * @throws xMsgException if the message data is not of the given type
+     */
+    public static <T> T parseData(xMsgMessage message, Class<T> dataType) {
+        try {
+            byte[] data = message.getData();
+
+            if (dataType.equals(Integer.class)) {
+                xMsgData xd = xMsgData.parseFrom(data);
+                if (xd.hasFLSINT32()) {
+                    return dataType.cast(xd.getFLSINT32());
+                }
+
+            } else if (dataType.equals(Long.class)) {
+                xMsgData xd = xMsgData.parseFrom(data);
+                if (xd.hasFLSINT64()) {
+                    return dataType.cast(xd.getFLSINT64());
+                }
+
+            } else if (dataType.equals(Float.class)) {
+                xMsgData xd = xMsgData.parseFrom(data);
+                if (xd.hasFLOAT()) {
+                    return dataType.cast(xd.getFLOAT());
+                }
+
+            } else if (dataType.equals(Double.class)) {
+                xMsgData xd = xMsgData.parseFrom(data);
+                if (xd.hasDOUBLE()) {
+                    return dataType.cast(xd.getDOUBLE());
+                }
+
+            } else if (dataType.equals(String.class)) {
+                xMsgData xd = xMsgData.parseFrom(data);
+                if (xd.hasSTRING()) {
+                    return dataType.cast(xd.getSTRING());
+                }
+
+            } else if (dataType.equals(Integer[].class)) {
+                xMsgData xd = xMsgData.parseFrom(data);
+                List<Integer> list = xd.getFLSINT32AList();
+                if (!list.isEmpty()) {
+                    Integer[] array = list.toArray(new Integer[list.size()]);
+                    return dataType.cast(array);
+                }
+
+            } else if (dataType.equals(Long[].class)) {
+                xMsgData xd = xMsgData.parseFrom(data);
+                List<Long> list = xd.getFLSINT64AList();
+                if (!list.isEmpty()) {
+                    Long[] array = list.toArray(new Long[list.size()]);
+                    return dataType.cast(array);
+                }
+
+            } else if (dataType.equals(Float[].class)) {
+                xMsgData xd = xMsgData.parseFrom(data);
+                List<Float> list = xd.getFLOATAList();
+                if (!list.isEmpty()) {
+                    Float[] array = list.toArray(new Float[list.size()]);
+                    return dataType.cast(array);
+                }
+
+            } else if (dataType.equals(Double[].class)) {
+                xMsgData xd = xMsgData.parseFrom(data);
+                List<Double> list = xd.getDOUBLEAList();
+                if (!list.isEmpty()) {
+                    Double[] array = list.toArray(new Double[list.size()]);
+                    return dataType.cast(array);
+                }
+
+            } else if (dataType.equals(String[].class)) {
+                xMsgData xd = xMsgData.parseFrom(data);
+                List<String> list = xd.getSTRINGAList();
+                if (!list.isEmpty()) {
+                    String[] array = list.toArray(new String[list.size()]);
+                    return dataType.cast(array);
+                }
+
+            } else if (dataType.equals(Object.class)) {
+                return dataType.cast(xMsgUtil.deserialize(data));
+            }
+
+            throw new IllegalArgumentException("Invalid data type: " + dataType);
+
+        } catch (InvalidProtocolBufferException e) {
+            throw new IllegalArgumentException("Message doesn't contain a valid xMsg data buffer");
+        }
     }
 
     /**

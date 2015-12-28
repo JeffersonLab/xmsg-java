@@ -21,8 +21,6 @@
 
 package org.jlab.coda.xmsg.core;
 
-import com.google.protobuf.InvalidProtocolBufferException;
-import org.jlab.coda.xmsg.data.xMsgD.xMsgData;
 import org.jlab.coda.xmsg.excp.xMsgException;
 import org.jlab.coda.xmsg.net.xMsgConnection;
 import org.jlab.coda.xmsg.testing.IntegrationTest;
@@ -84,7 +82,7 @@ public class SubscriptionsTest {
                     xMsgSubscription sub = actor.subscribe(con, topic, new xMsgCallBack() {
                         @Override
                         public xMsgMessage callback(xMsgMessage msg) {
-                            int i = parseData(msg);
+                            int i = xMsgMessage.parseData(msg, Integer.class);
                             check.counter.incrementAndGet();
                             check.sum.addAndGet(i);
                             return msg;
@@ -175,7 +173,7 @@ public class SubscriptionsTest {
                     for (int i = 0; i < Check.N; i++) {
                         xMsgMessage msg = xMsgMessage.createFrom(pubTopic, i);
                         xMsgMessage resMsg = pubActor.syncPublish(pcon, msg, 1000);
-                        int data = parseData(resMsg);
+                        int data = xMsgMessage.parseData(resMsg, Integer.class);
                         check.sum += data;
                         check.counter++;
                     }
@@ -279,16 +277,6 @@ public class SubscriptionsTest {
             context.destroy();
             proxyThread.interrupt();
             proxyThread.join();
-        }
-    }
-
-
-    private int parseData(xMsgMessage msg) {
-        try {
-            xMsgData data = xMsgData.parseFrom(msg.getData());
-            return data.getFLSINT32();
-        } catch (InvalidProtocolBufferException e) {
-            throw new RuntimeException(e);
         }
     }
 }

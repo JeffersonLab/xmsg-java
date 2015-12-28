@@ -38,19 +38,18 @@ public class xMsgMessageTest {
     @Test
     public void createFromPrimitive() throws Exception {
         xMsgMessage msg;
-        xMsgData data;
 
         msg = xMsgMessage.createFrom(testTopic, 460);
-        data = xMsgData.parseFrom(msg.getData());
-        assertThat(data.getFLSINT32(), is(460));
+        int ivalue = xMsgMessage.parseData(msg, Integer.class);
+        assertThat(ivalue, is(460));
 
         msg = xMsgMessage.createFrom(testTopic, 2000.5);
-        data = xMsgData.parseFrom(msg.getData());
-        assertThat(data.getDOUBLE(), is(2000.5));
+        double dvalue = xMsgMessage.parseData(msg, Double.class);
+        assertThat(dvalue, is(2000.5));
 
         msg = xMsgMessage.createFrom(testTopic, "test_data");
-        data = xMsgData.parseFrom(msg.getData());
-        assertThat(data.getSTRING(), is("test_data"));
+        String svalue = xMsgMessage.parseData(msg, String.class);
+        assertThat(svalue, is("test_data"));
     }
 
     @Test
