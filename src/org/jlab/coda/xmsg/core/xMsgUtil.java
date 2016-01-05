@@ -59,6 +59,9 @@ public final class xMsgUtil {
 
     private static List<String> localHostIps = new ArrayList<>();
 
+    private static AtomicInteger replyToGenerator = new AtomicInteger();
+    private static final int replyToSequenceSize = 1000000;
+
     private xMsgUtil() { }
 
 
@@ -244,6 +247,16 @@ public final class xMsgUtil {
             throw new IllegalArgumentException("Invalid IP address: " + address);
         }
         return address;
+    }
+
+    public static String getUniqueReplyTo(String subject) {
+        int id = replyToGenerator.getAndIncrement() % replyToSequenceSize + replyToSequenceSize;
+        return "ret:" + subject + ":" + id;
+    }
+
+    // for testing
+    static void setUniqueReplyToGenerator(int value) {
+        replyToGenerator.set(value);
     }
 
     /**

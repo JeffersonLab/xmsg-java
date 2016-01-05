@@ -92,6 +92,47 @@ public class xMsgUtilTest {
     }
 
     @Test
+    public void uniqueReplyToGenerator() throws Exception {
+        xMsgUtil.setUniqueReplyToGenerator(0);
+
+        assertThat(xMsgUtil.getUniqueReplyTo("subject"), is("ret:subject:1000000"));
+        assertThat(xMsgUtil.getUniqueReplyTo("subject"), is("ret:subject:1000001"));
+        assertThat(xMsgUtil.getUniqueReplyTo("subject"), is("ret:subject:1000002"));
+
+        Thread t1 = new Thread(new Runnable() {
+            @Override
+            public void run() {
+                for (int i = 3; i < 900000; i++) {
+                    xMsgUtil.getUniqueReplyTo("subject");
+                }
+            }
+        });
+
+        Thread t2 = new Thread(new Runnable() {
+            @Override
+            public void run() {
+                for (int i = 0; i < 90000; i++) {
+                    xMsgUtil.getUniqueReplyTo("subject");
+                }
+            }
+        });
+
+        t1.start();
+        t2.start();
+        t1.join();
+        t2.join();
+
+        assertThat(xMsgUtil.getUniqueReplyTo("subject"), is("ret:subject:1990000"));
+
+        for (int i = 1; i < 10000; i++) {
+            xMsgUtil.getUniqueReplyTo("subject");
+        }
+        assertThat(xMsgUtil.getUniqueReplyTo("subject"), is("ret:subject:1000000"));
+        assertThat(xMsgUtil.getUniqueReplyTo("subject"), is("ret:subject:1000001"));
+        assertThat(xMsgUtil.getUniqueReplyTo("subject"), is("ret:subject:1000002"));
+    }
+
+    @Test
     public void serializeAsBytesAndDeserialize() throws Exception {
         List<String> orig = Arrays.asList("led zeppelin", "pink floyd", "black sabbath");
 

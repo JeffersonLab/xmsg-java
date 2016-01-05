@@ -599,7 +599,7 @@ public class xMsg {
             IOException {
 
         // address/topic where the subscriber should send the result
-        String returnAddress = "return:" + (int) (Math.random() * 100.0);
+        String returnAddress = xMsgUtil.getUniqueReplyTo(driver.getLocalAddress());
 
         // set the return address as replyTo in the xMsgMessage
         msg.getMetaData().setReplyTo(returnAddress);
