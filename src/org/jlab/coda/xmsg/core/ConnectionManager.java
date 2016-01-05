@@ -22,25 +22,28 @@
 package org.jlab.coda.xmsg.core;
 
 import org.jlab.coda.xmsg.net.xMsgConnection;
+import org.jlab.coda.xmsg.net.xMsgConnectionFactory;
 import org.jlab.coda.xmsg.net.xMsgConnectionSetup;
 import org.jlab.coda.xmsg.net.xMsgProxyAddress;
 import org.jlab.coda.xmsg.net.xMsgRegAddress;
 import org.jlab.coda.xmsg.xsys.regdis.xMsgRegDriver;
 import org.zeromq.ZContext;
-import org.zeromq.ZMQ;
 import org.zeromq.ZMQ.Socket;
 
 class ConnectionManager {
 
-    // 0MQ context object
-    private final ZContext context;
+    // Factory
+    private final xMsgConnectionFactory factory;
 
     // default connection option
     private xMsgConnectionSetup defaultConnectionOption;
 
     ConnectionManager(ZContext context) {
-        this.context = context;
+        this(new xMsgConnectionFactory(context));
+    }
 
+    ConnectionManager(xMsgConnectionFactory factory) {
+        this.factory = factory;
         // default pub/sub socket options
         defaultConnectionOption = new xMsgConnectionSetup() {
 
@@ -53,9 +56,6 @@ class ConnectionManager {
             @Override
             public void postConnection() { }
         };
-
-        // fix default linger
-        this.context.setLinger(-1);
     }
 
     xMsgConnection getProxyConnection(xMsgProxyAddress address) {
@@ -64,36 +64,19 @@ class ConnectionManager {
 
     xMsgConnection getProxyConnection(xMsgProxyAddress address,
                                       xMsgConnectionSetup setup) {
-        Socket pubSock = context.createSocket(ZMQ.PUB);
-        Socket subSock = context.createSocket(ZMQ.SUB);
-        setup.preConnection(pubSock);
-        setup.preConnection(subSock);
-
-        int pubPort = address.port();
-        int subPort = pubPort + 1;
-        pubSock.connect("tcp://" + address.host() + ":" + pubPort);
-        subSock.connect("tcp://" + address.host() + ":" + subPort);
-        setup.postConnection();
-
-        xMsgConnection connection = new xMsgConnection();
-        connection.setAddress(address);
-        connection.setPubSock(pubSock);
-        connection.setSubSock(subSock);
-
-        return connection;
+        return factory.createProxyConnection(address, setup);
     }
 
     void releaseProxyConnection(xMsgConnection connection) {
-        context.destroySocket(connection.getPubSock());
-        context.destroySocket(connection.getSubSock());
+        factory.destroyProxyConnection(connection);
     }
 
     xMsgRegDriver getRegistrarConnection(xMsgRegAddress address) {
-        return new xMsgRegDriver(context, address);
+        return factory.createRegistrarConnection(address);
     }
 
     void releaseRegistrarConnection(xMsgRegDriver connection) {
-        connection.destroy();
+        factory.destroyRegistrarConnection(connection);
     }
 
     void setDefaultConnectionSetup(xMsgConnectionSetup setup) {
@@ -101,10 +84,10 @@ class ConnectionManager {
     }
 
     void setLinger(int linger) {
-        context.setLinger(linger);
+        factory.setLinger(linger);
     }
 
     void destroy() {
-        context.destroy();
+        factory.destroy();
     }
 }
