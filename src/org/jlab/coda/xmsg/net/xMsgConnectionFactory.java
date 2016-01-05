@@ -38,7 +38,10 @@ public class xMsgConnectionFactory {
     }
 
     public xMsgRegDriver createRegistrarConnection(xMsgRegAddress address) {
-        return new xMsgRegDriver(context, address);
+        Socket socket = context.createSocket(ZMQ.REQ);
+        socket.setHWM(0);
+        socket.connect("tcp://" + address.host() + ":" + address.port());
+        return new xMsgRegDriver(address, socket);
     }
 
     public void destroyProxyConnection(xMsgConnection connection) {
@@ -47,7 +50,7 @@ public class xMsgConnectionFactory {
     }
 
     public void destroyRegistrarConnection(xMsgRegDriver connection) {
-        connection.destroy();
+        context.destroySocket(connection.getSocket());
     }
 
     public void setLinger(int linger) {

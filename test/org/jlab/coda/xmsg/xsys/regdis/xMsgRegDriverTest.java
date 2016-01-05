@@ -29,7 +29,7 @@ import org.jlab.coda.xmsg.data.xMsgR.xMsgRegistration.Builder;
 import org.jlab.coda.xmsg.net.xMsgRegAddress;
 import org.junit.Before;
 import org.junit.Test;
-import org.zeromq.ZContext;
+import org.zeromq.ZMQ.Socket;
 
 import java.io.IOException;
 import java.util.Arrays;
@@ -41,6 +41,7 @@ import static org.hamcrest.Matchers.is;
 import static org.mockito.Mockito.any;
 import static org.mockito.Mockito.anyInt;
 import static org.mockito.Mockito.doReturn;
+import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.spy;
 import static org.mockito.Mockito.verify;
 
@@ -68,7 +69,7 @@ public class xMsgRegDriverTest {
 
     @Before
     public void setup() throws Exception {
-        driver = spy(new xMsgRegDriver(new ZContext(), new xMsgRegAddress("10.2.9.1")));
+        driver = spy(new xMsgRegDriver(new xMsgRegAddress("10.2.9.1"), mock(Socket.class)));
         setResponse(new xMsgRegResponse("", ""));
     }
 
