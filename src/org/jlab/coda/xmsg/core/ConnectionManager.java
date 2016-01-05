@@ -21,6 +21,12 @@
 
 package org.jlab.coda.xmsg.core;
 
+import java.util.Map;
+import java.util.Queue;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.ConcurrentLinkedQueue;
+import java.util.function.Consumer;
+
 import org.jlab.coda.xmsg.net.xMsgConnection;
 import org.jlab.coda.xmsg.net.xMsgConnectionFactory;
 import org.jlab.coda.xmsg.net.xMsgConnectionSetup;
@@ -35,6 +41,12 @@ class ConnectionManager {
     // Factory
     private final xMsgConnectionFactory factory;
 
+    // pool of proxy connections
+    private final ConnectionPool<xMsgProxyAddress, xMsgConnection> proxyConnections;
+
+    // pool of registrar connections
+    private final ConnectionPool<xMsgRegAddress, xMsgRegDriver> registrarConnections;
+
     // default connection option
     private xMsgConnectionSetup defaultConnectionOption;
 
@@ -44,6 +56,9 @@ class ConnectionManager {
 
     ConnectionManager(xMsgConnectionFactory factory) {
         this.factory = factory;
+        this.proxyConnections = new ConnectionPool<>();
+        this.registrarConnections = new ConnectionPool<>();
+
         // default pub/sub socket options
         defaultConnectionOption = new xMsgConnectionSetup() {
 
@@ -64,19 +79,27 @@ class ConnectionManager {
 
     xMsgConnection getProxyConnection(xMsgProxyAddress address,
                                       xMsgConnectionSetup setup) {
+        xMsgConnection cachedConnection = proxyConnections.getConnection(address);
+        if (cachedConnection != null) {
+            return cachedConnection;
+        }
         return factory.createProxyConnection(address, setup);
     }
 
     void releaseProxyConnection(xMsgConnection connection) {
-        factory.destroyProxyConnection(connection);
+        proxyConnections.setConnection(connection.getAddress(), connection);
     }
 
     xMsgRegDriver getRegistrarConnection(xMsgRegAddress address) {
+        xMsgRegDriver cachedConnection = registrarConnections.getConnection(address);
+        if (cachedConnection != null) {
+            return cachedConnection;
+        }
         return factory.createRegistrarConnection(address);
     }
 
     void releaseRegistrarConnection(xMsgRegDriver connection) {
-        factory.destroyRegistrarConnection(connection);
+        registrarConnections.setConnection(connection.getAddress(), connection);
     }
 
     void setDefaultConnectionSetup(xMsgConnectionSetup setup) {
@@ -88,6 +111,40 @@ class ConnectionManager {
     }
 
     void destroy() {
-        factory.destroy();
+        proxyConnections.destroyAll(c -> factory.destroyProxyConnection(c));
+        registrarConnections.destroyAll(c -> factory.destroyRegistrarConnection(c));
+    }
+
+
+    static class ConnectionPool<A, C> {
+        private Map<A, Queue<C>> connections = new ConcurrentHashMap<>();
+
+        public C getConnection(A address) {
+            Queue<C> cache = connections.get(address);
+            if (cache != null) {
+                return cache.poll();
+            }
+            return null;
+        }
+
+        public void setConnection(A address, C connection) {
+            Queue<C> cache = connections.get(address);
+            if (cache == null) {
+                cache = new ConcurrentLinkedQueue<>();
+                Queue<C> tempCache = connections.putIfAbsent(address, cache);
+                if (tempCache != null) {
+                    cache = tempCache;
+                }
+            }
+            cache.add(connection);
+        }
+
+        public void destroyAll(Consumer<C> destroy) {
+            for (Map.Entry<A, Queue<C>> cache : connections.entrySet()) {
+                for (C connection : cache.getValue()) {
+                    destroy.accept(connection);
+                }
+            }
+        }
     }
 }
