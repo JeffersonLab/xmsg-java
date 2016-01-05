@@ -255,8 +255,31 @@ gradle.taskGraph.whenReady { taskGraph ->
 
 
 
+def buildDirName = buildDir.name
+def generatedProtoDir = "${buildDirName}/generated/source/proto/main/java"
+
 eclipse {
     classpath {
+        file.whenMerged {
+            cp -> cp.entries.add(new org.gradle.plugins.ide.eclipse.model.SourceFolder(generatedProtoDir, null) )
+        }
         defaultOutputDir = file("${buildDir}/eclipse-classes")
     }
 }
+
+idea {
+    module {
+        sourceDirs += file(generatedProtoDir)
+        excludeDirs -= buildDir
+        buildDir.listFiles({d,f->f != 'generated'} as FilenameFilter).each {excludeDirs += it}
+    }
+}
+
+task checkOutputProtoDir << {
+    def gsd = file(generatedProtoDir)
+    if (!gsd.exists()) {
+        gsd.mkdirs()
+    }
+}
+
+tasks.idea.dependsOn(checkOutputProtoDir)
