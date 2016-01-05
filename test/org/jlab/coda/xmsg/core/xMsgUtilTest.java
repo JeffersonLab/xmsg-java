@@ -133,6 +133,23 @@ public class xMsgUtilTest {
     }
 
     @Test
+    public void overflowReplyToGenerator() throws Exception {
+        xMsgUtil.setUniqueReplyToGenerator(Integer.MAX_VALUE);
+
+        assertThat(xMsgUtil.getUniqueReplyTo("subject"), is("ret:subject:1483647"));
+        assertThat(xMsgUtil.getUniqueReplyTo("subject"), is("ret:subject:1483648"));
+        assertThat(xMsgUtil.getUniqueReplyTo("subject"), is("ret:subject:1483649"));
+
+        for (int i = 0; i < 1000000 - 483650; i++) {
+            xMsgUtil.getUniqueReplyTo("subject");
+        }
+
+        assertThat(xMsgUtil.getUniqueReplyTo("subject"), is("ret:subject:1000000"));
+        assertThat(xMsgUtil.getUniqueReplyTo("subject"), is("ret:subject:1000001"));
+        assertThat(xMsgUtil.getUniqueReplyTo("subject"), is("ret:subject:1000002"));
+    }
+
+    @Test
     public void serializeAsBytesAndDeserialize() throws Exception {
         List<String> orig = Arrays.asList("led zeppelin", "pink floyd", "black sabbath");
 
