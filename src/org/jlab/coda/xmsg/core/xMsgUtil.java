@@ -51,7 +51,7 @@ import java.util.regex.Pattern;
  * xMsg utility methods.
  *
  * @author gurjyan
- * @since 2.0
+ * @since 2.x
  */
 
 public final class xMsgUtil {
@@ -141,7 +141,7 @@ public final class xMsgUtil {
     /**
      * Returns the localhost IP.
      *
-     * @throws SocketException if an I/O error occurs.
+     * @throws IOException if an I/O error occurs.
      */
     public static String localhost() throws IOException {
         return toHostAddress("localhost");
