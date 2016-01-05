@@ -22,6 +22,8 @@
 option optimize_for = SPEED;
 option java_outer_classname = "xMsgD";
 
+package org.jlab.coda.xmsg.data;
+
 // ... Data class ...
 message xMsgData {
 

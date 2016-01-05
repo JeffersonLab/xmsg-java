@@ -1,5 +1,6 @@
 apply plugin: 'java'
 apply plugin: 'maven'
+apply plugin: 'com.google.protobuf'
 
 apply plugin: 'checkstyle'
 apply plugin: "findbugs"
@@ -20,8 +21,27 @@ compileJava {
 }
 
 
+buildscript {
+    repositories {
+        mavenCentral()
+    }
+    dependencies {
+        classpath 'com.google.protobuf:protobuf-gradle-plugin:0.7.3'
+    }
+}
+
+protobuf {
+  protoc {
+    artifact = 'com.google.protobuf:protoc:2.6.1'
+  }
+}
+
+
 sourceSets {
     main {
+        proto {
+            srcDir 'src/org/jlab/coda/xmsg/data'
+        }
         java {
             srcDir 'src'
         }
