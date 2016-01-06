@@ -25,7 +25,6 @@ import org.jlab.coda.xmsg.core.xMsgConstants;
 import org.jlab.coda.xmsg.data.xMsgR.xMsgRegistration;
 import org.jlab.coda.xmsg.excp.xMsgException;
 import org.jlab.coda.xmsg.net.xMsgRegAddress;
-import org.zeromq.ZContext;
 import org.zeromq.ZMQ;
 import org.zeromq.ZMQ.Socket;
 import org.zeromq.ZMQException;
@@ -46,37 +45,22 @@ import java.util.Set;
  */
 public class xMsgRegDriver {
 
-    // 0MQ context.
-    private final ZContext _context;
-
     // Registrar address
     private final xMsgRegAddress _address;
 
     // Registrar server (req/rep) connection socket.
-    private Socket _connectionSocket = null;
+    private final Socket _connectionSocket;
 
 
     /**
      * Creates a driver to the registrar running in the given address.
      *
-     * @param context 0MQ context
      * @param address registrar service address
+     * @param socket registrar connection socket
      */
-    public xMsgRegDriver(ZContext context, xMsgRegAddress address) {
-        _context = context;
+    public xMsgRegDriver(xMsgRegAddress address, Socket socket) {
         _address = address;
-        String addr = "tcp://" + address.host() + ":" + address.port();
-        _connectionSocket = _context.createSocket(ZMQ.REQ);
-        _connectionSocket.setHWM(0);
-        _connectionSocket.connect(addr);
-    }
-
-    /**
-     * Closes the connection to the registrar.
-     * This driver should not be used after calling this method.
-     */
-    public void destroy() {
-        _context.destroySocket(_connectionSocket);
+        _connectionSocket = socket;
     }
 
     /**
@@ -302,5 +286,7 @@ public class xMsgRegDriver {
         return response.status();
     }
 
-
+    public Socket getSocket() {
+        return _connectionSocket;
+    }
 }

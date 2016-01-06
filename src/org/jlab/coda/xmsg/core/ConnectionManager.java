@@ -21,25 +21,43 @@
 
 package org.jlab.coda.xmsg.core;
 
+import java.util.Map;
+import java.util.Queue;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.ConcurrentLinkedQueue;
+import java.util.function.Consumer;
+
 import org.jlab.coda.xmsg.net.xMsgConnection;
+import org.jlab.coda.xmsg.net.xMsgConnectionFactory;
 import org.jlab.coda.xmsg.net.xMsgConnectionSetup;
 import org.jlab.coda.xmsg.net.xMsgProxyAddress;
 import org.jlab.coda.xmsg.net.xMsgRegAddress;
 import org.jlab.coda.xmsg.xsys.regdis.xMsgRegDriver;
 import org.zeromq.ZContext;
-import org.zeromq.ZMQ;
 import org.zeromq.ZMQ.Socket;
 
 class ConnectionManager {
 
-    // 0MQ context object
-    private final ZContext context;
+    // Factory
+    private final xMsgConnectionFactory factory;
+
+    // pool of proxy connections
+    private final ConnectionPool<xMsgProxyAddress, xMsgConnection> proxyConnections;
+
+    // pool of registrar connections
+    private final ConnectionPool<xMsgRegAddress, xMsgRegDriver> registrarConnections;
 
     // default connection option
     private xMsgConnectionSetup defaultConnectionOption;
 
     ConnectionManager(ZContext context) {
-        this.context = context;
+        this(new xMsgConnectionFactory(context));
+    }
+
+    ConnectionManager(xMsgConnectionFactory factory) {
+        this.factory = factory;
+        this.proxyConnections = new ConnectionPool<>();
+        this.registrarConnections = new ConnectionPool<>();
 
         // default pub/sub socket options
         defaultConnectionOption = new xMsgConnectionSetup() {
@@ -53,9 +71,6 @@ class ConnectionManager {
             @Override
             public void postConnection() { }
         };
-
-        // fix default linger
-        this.context.setLinger(-1);
     }
 
     xMsgConnection getProxyConnection(xMsgProxyAddress address) {
@@ -64,36 +79,27 @@ class ConnectionManager {
 
     xMsgConnection getProxyConnection(xMsgProxyAddress address,
                                       xMsgConnectionSetup setup) {
-        Socket pubSock = context.createSocket(ZMQ.PUB);
-        Socket subSock = context.createSocket(ZMQ.SUB);
-        setup.preConnection(pubSock);
-        setup.preConnection(subSock);
-
-        int pubPort = address.port();
-        int subPort = pubPort + 1;
-        pubSock.connect("tcp://" + address.host() + ":" + pubPort);
-        subSock.connect("tcp://" + address.host() + ":" + subPort);
-        setup.postConnection();
-
-        xMsgConnection connection = new xMsgConnection();
-        connection.setAddress(address);
-        connection.setPubSock(pubSock);
-        connection.setSubSock(subSock);
-
-        return connection;
+        xMsgConnection cachedConnection = proxyConnections.getConnection(address);
+        if (cachedConnection != null) {
+            return cachedConnection;
+        }
+        return factory.createProxyConnection(address, setup);
     }
 
     void releaseProxyConnection(xMsgConnection connection) {
-        context.destroySocket(connection.getPubSock());
-        context.destroySocket(connection.getSubSock());
+        proxyConnections.setConnection(connection.getAddress(), connection);
     }
 
     xMsgRegDriver getRegistrarConnection(xMsgRegAddress address) {
-        return new xMsgRegDriver(context, address);
+        xMsgRegDriver cachedConnection = registrarConnections.getConnection(address);
+        if (cachedConnection != null) {
+            return cachedConnection;
+        }
+        return factory.createRegistrarConnection(address);
     }
 
     void releaseRegistrarConnection(xMsgRegDriver connection) {
-        connection.destroy();
+        registrarConnections.setConnection(connection.getAddress(), connection);
     }
 
     void setDefaultConnectionSetup(xMsgConnectionSetup setup) {
@@ -101,10 +107,44 @@ class ConnectionManager {
     }
 
     void setLinger(int linger) {
-        context.setLinger(linger);
+        factory.setLinger(linger);
     }
 
     void destroy() {
-        context.destroy();
+        proxyConnections.destroyAll(c -> factory.destroyProxyConnection(c));
+        registrarConnections.destroyAll(c -> factory.destroyRegistrarConnection(c));
+    }
+
+
+    static class ConnectionPool<A, C> {
+        private Map<A, Queue<C>> connections = new ConcurrentHashMap<>();
+
+        public C getConnection(A address) {
+            Queue<C> cache = connections.get(address);
+            if (cache != null) {
+                return cache.poll();
+            }
+            return null;
+        }
+
+        public void setConnection(A address, C connection) {
+            Queue<C> cache = connections.get(address);
+            if (cache == null) {
+                cache = new ConcurrentLinkedQueue<>();
+                Queue<C> tempCache = connections.putIfAbsent(address, cache);
+                if (tempCache != null) {
+                    cache = tempCache;
+                }
+            }
+            cache.add(connection);
+        }
+
+        public void destroyAll(Consumer<C> destroy) {
+            for (Map.Entry<A, Queue<C>> cache : connections.entrySet()) {
+                for (C connection : cache.getValue()) {
+                    destroy.accept(connection);
+                }
+            }
+        }
     }
 }
