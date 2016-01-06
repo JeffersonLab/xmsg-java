@@ -23,6 +23,9 @@ option optimize_for = SPEED;
 
 option java_outer_classname = "xMsgM";
 
+package org.jlab.coda.xmsg.data;
+
+
 // ... Metta-data class ...
 message xMsgMeta {
 

@@ -23,6 +23,8 @@ option optimize_for = SPEED;
 
 option java_outer_classname = "xMsgR";
 
+package org.jlab.coda.xmsg.data;
+
 message xMsgRegistration {
 
     required string name = 1;
