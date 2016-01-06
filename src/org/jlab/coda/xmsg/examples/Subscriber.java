@@ -98,7 +98,7 @@ public class Subscriber extends xMsg {
      */
     public void respondBack(xMsgMessage msg, Object data) {
         try {
-            publish(con, msg.response(data));
+            publish(con, xMsgMessage.createResponse(msg, data));
         } catch (xMsgException | IOException e) {
             e.printStackTrace();
         }

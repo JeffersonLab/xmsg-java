@@ -30,14 +30,15 @@ import org.zeromq.ZMsg;
 
 import java.io.IOException;
 import java.util.Arrays;
+import java.util.List;
 
 /**
  * Defines a message to be passed through 0MQ.
- *
- * Uses {@link org.jlab.coda.xmsg.data.xMsgD.xMsgData} class generated
- * as a result of the proto-buffer description to pass Java primitive
- * types and arrays of primitive types. xMsgData is also used to pass
- * byte[]: the result of a user specific object serialization.
+ * <p>
+ * Uses {@link xMsgData} class generated as a result of the proto-buffer
+ * description to pass Java primitive types and arrays of primitive types.
+ * xMsgData is also used to pass byte[]: the result of a user specific object
+ * serialization.
  * <p>
  * This class will also contain complete metadata of the message data,
  * describing details of the data. In case a message is constructed
@@ -64,72 +65,37 @@ public class xMsgMessage {
      * user serialization. Thus, user also provides a metadata describing the
      * type of the data among other things.
      *
-     * @param topic    the topic of the message:
-     *                 object of {@link org.jlab.coda.xmsg.core.xMsgTopic}
-     * @param metaData the metadata of the message, describing the data of the
-     *                 message: {@link org.jlab.coda.xmsg.data.xMsgM.xMsgMeta.Builder}
-     *                 object
+     * @param topic    the topic of the message
+     * @param metaData the metadata of the message, describing the data
      * @param data     serialized data
-     * @throws xMsgException
-     * @throws IOException
      */
-    public xMsgMessage(xMsgTopic topic, xMsgMeta.Builder metaData, byte[] data)
-            throws xMsgException {
-        if (metaData.hasByteOrder()) {
-            this.topic = topic;
-            this.metaData = metaData;
-            this.data = data;
-        } else {
-            throw new xMsgException("xMsg-Error: Unspecified byte order.");
-        }
+    public xMsgMessage(xMsgTopic topic, xMsgMeta.Builder metaData, byte[] data) {
+        this.topic = topic;
+        this.metaData = metaData;
+        this.data = data;
     }
 
     /**
-     * Constructs a message, data of which is passed as an Object. This constructor will
-     * do it's best to figure out the type of the object and create a metadata object,
-     * updating accordingly the data mimeType. It will also serialize the object and store
-     * it as a byte[]. Note that this will fail in case the passed object is not serializable.
-     * So, serializable java objects will be serialized and metadata dataType will be assigned
-     * to the mimeType input parameter.
+     * Constructs a message containing a byte[] that is most likely is the result of
+     * user serialization. Thus, user also provides a mime-type describing the
+     * type of the data.
      *
-     * @param topic the topic of the message:
-     *              object of {@link org.jlab.coda.xmsg.core.xMsgTopic}
+     * @param topic the topic of the message
      * @param mimeType user textual definition of the data type
      * @param data data object
-     * @throws xMsgException
-     * @throws IOException
      */
-    public xMsgMessage(xMsgTopic topic, String mimeType, Object data)
-            throws xMsgException, IOException {
-        xMsgMeta.Builder md = xMsgMeta.newBuilder();
-        md.setDataType(mimeType);
-        _construct(topic, md, data);
+    public xMsgMessage(xMsgTopic topic, String mimeType, byte[] data) {
+        this.topic = topic;
+        this.metaData = xMsgMeta.newBuilder();
+        this.metaData.setDataType(mimeType);
+        this.data = data;
     }
-
-    /**
-     * Constructs a message, data of which is passed as an Object. This constructor will
-     * do it's best to figure out the type of the object and create a metadata object,
-     * updating accordingly the data mimeType. It will also serialize the object and store
-     * it as a byte[]. Note that this will fail in case the passed object is not serializable.
-     * So, serializable java objects will be serialized and metadata dataType will be assigned
-     * to the mimeType = "binary/bytes".
-     *
-     * @param topic the topic of the message:
-     *              object of {@link org.jlab.coda.xmsg.core.xMsgTopic}
-     * @param data data object
-     * @throws xMsgException
-     * @throws IOException
-     */
-    public xMsgMessage(xMsgTopic topic, Object data) throws xMsgException, IOException {
-        this(topic, "binary/bytes", data);
-    }
-
 
     /**
      *  Create xMsgMessage from the 0MQ message received off the wire, i.e.
      *  de-serializes the received 0MQ message
      *
-     * @param msg the received {@link org.zeromq.ZMsg} message
+     * @param msg the received message
      */
     xMsgMessage(ZMsg msg) throws xMsgException {
         ZFrame topicFrame = msg.pop();
@@ -154,7 +120,7 @@ public class xMsgMessage {
      * Serializes this message into a 0MQ message,
      * ready to send it over the wire.
      *
-     * @return the {@link org.zeromq.ZMsg} raw multi-part message
+     * @return the raw multi-part message
      */
     ZMsg serialize() {
         ZMsg msg = new ZMsg();
@@ -165,18 +131,7 @@ public class xMsgMessage {
     }
 
     /**
-     * Returns the message data (i.e. serialized byte[] ) size.
-     *
-     * @return size of the serialized data byte[] size.
-     */
-    public int getDataSize() {
-        return data != null ? data.length : 0;
-    }
-
-    /**
      * Returns the topic of the message.
-     *
-     * @return the object of {@link org.jlab.coda.xmsg.core.xMsgTopic}
      */
     public xMsgTopic getTopic() {
         return topic;
@@ -184,17 +139,20 @@ public class xMsgMessage {
 
     /**
      * Returns the metadata of the message.
-     *
-     * @return the object of {@link org.jlab.coda.xmsg.data.xMsgM.xMsgMeta.Builder}
      */
     public xMsgMeta.Builder getMetaData() {
         return metaData;
     }
 
     /**
+     * Returns the size of the message data (i.e. serialized byte[] ).
+     */
+    public int getDataSize() {
+        return data != null ? data.length : 0;
+    }
+
+    /**
      * Returns the data of the message.
-     *
-     * @return data as a byte[]
      */
     public byte[] getData() {
         return data;
@@ -212,64 +170,25 @@ public class xMsgMessage {
         this.data = data;
     }
 
-    public xMsgMessage response() throws xMsgException, IOException {
-        xMsgTopic resTopic = xMsgTopic.wrap(metaData.getReplyTo());
-        xMsgMessage res = new xMsgMessage(resTopic, data);
-        res.getMetaData().mergeFrom(metaData.build());
-        res.getMetaData().clearReplyTo();
-        return res;
-    }
-
-
-    public xMsgMessage response(Object data) throws xMsgException, IOException {
-        xMsgTopic resTopic = xMsgTopic.wrap(metaData.getReplyTo());
-        xMsgMessage res = new xMsgMessage(resTopic, data);
-        res.getMetaData().mergeFrom(metaData.build());
-        res.getMetaData().clearReplyTo();
-        return res;
-    }
-
-    /**
-     * Replaces the data with the new object. This method will
-     * do it's best to figure out the type of the object, updating accordingly the
-     * data mimeType. It will also serialize the object and store it as a byte[].
-     * Note that this will fail in case the passed object is not serializable.
-     * So, serializable java objects will be serialized and metadata dataType will
-     * be assigned to the mimeType = "binary/bytes".
-     *
-     * @param data
-     * @throws IOException
-     */
-    public void updateData(Object data) throws IOException {
-        _construct(topic, metaData, data);
-    }
-
     /**
      * Constructs a message, data of which is passed as an Object. This method will
      * do it's best to figure out the type of the object, updating accordingly the
      * data mimeType. It will also serialize the object and store it as a byte[].
      * Note that this will fail in case the passed object is not serializable.
      * So, serializable java objects will be serialized and metadata dataType will
-     * be assigned to the mimeType = "binary/bytes".
+     * be assigned to the mimeType = "binary/java".
      *
-     * @param topic the topic of the message:
-     *              object of {@link org.jlab.coda.xmsg.core.xMsgTopic}
-     * @param metaData the metadata of the message, describing the data of the
-     *                 message: {@link org.jlab.coda.xmsg.data.xMsgM.xMsgMeta.Builder}
-     *                 object
+     * @param topic the topic of the message
      * @param data the data object
      * @throws IOException
      */
-    private void _construct(xMsgTopic topic, xMsgMeta.Builder metaData, Object data)
+    public static xMsgMessage createFrom(xMsgTopic topic, Object data)
             throws IOException {
-        this.topic = topic;
+
         byte[] ba = null;
-
-        String mimeType = metaData.getDataType();
-
+        String mimeType = null;
         xMsgData.Builder xd = xMsgData.newBuilder();
 
-        // define the data mime-type
         if (data instanceof Integer) {
             mimeType = xMsgConstants.MimeType.SFIXED32;
             xd.setFLSINT32((Integer) data);
@@ -311,19 +230,143 @@ public class xMsgMessage {
             xd.addAllSTRINGA(Arrays.asList((String[]) data));
 
         } else if (data instanceof byte[]) {
+            mimeType = xMsgConstants.MimeType.BYTES;
             ba = (byte[]) data;
+
         } else {
             mimeType = xMsgConstants.MimeType.JOBJECT;
             ba = xMsgUtil.serializeToBytes(data);
         }
 
-        metaData.setDataType(mimeType);
-        this.metaData = metaData;
-        if (ba != null) {
-            this.data = ba;
-        } else {
-            this.data = xd.build().toByteArray();
+        if (ba == null) {
+            ba = xd.build().toByteArray();
+        }
+
+        return new xMsgMessage(topic, mimeType, ba);
+    }
+
+
+    /**
+     * Deserializes simple data from the given message.
+     *
+     * @param message the message that contains the required data
+     * @param dataType the type of the required data
+     * @return the deserialized data of the message
+     * @throws xMsgException if the message data is not of the given type
+     */
+    public static <T> T parseData(xMsgMessage message, Class<T> dataType) {
+        try {
+            byte[] data = message.getData();
+
+            if (dataType.equals(Integer.class)) {
+                xMsgData xd = xMsgData.parseFrom(data);
+                if (xd.hasFLSINT32()) {
+                    return dataType.cast(xd.getFLSINT32());
+                }
+
+            } else if (dataType.equals(Long.class)) {
+                xMsgData xd = xMsgData.parseFrom(data);
+                if (xd.hasFLSINT64()) {
+                    return dataType.cast(xd.getFLSINT64());
+                }
+
+            } else if (dataType.equals(Float.class)) {
+                xMsgData xd = xMsgData.parseFrom(data);
+                if (xd.hasFLOAT()) {
+                    return dataType.cast(xd.getFLOAT());
+                }
+
+            } else if (dataType.equals(Double.class)) {
+                xMsgData xd = xMsgData.parseFrom(data);
+                if (xd.hasDOUBLE()) {
+                    return dataType.cast(xd.getDOUBLE());
+                }
+
+            } else if (dataType.equals(String.class)) {
+                xMsgData xd = xMsgData.parseFrom(data);
+                if (xd.hasSTRING()) {
+                    return dataType.cast(xd.getSTRING());
+                }
+
+            } else if (dataType.equals(Integer[].class)) {
+                xMsgData xd = xMsgData.parseFrom(data);
+                List<Integer> list = xd.getFLSINT32AList();
+                if (!list.isEmpty()) {
+                    Integer[] array = list.toArray(new Integer[list.size()]);
+                    return dataType.cast(array);
+                }
+
+            } else if (dataType.equals(Long[].class)) {
+                xMsgData xd = xMsgData.parseFrom(data);
+                List<Long> list = xd.getFLSINT64AList();
+                if (!list.isEmpty()) {
+                    Long[] array = list.toArray(new Long[list.size()]);
+                    return dataType.cast(array);
+                }
+
+            } else if (dataType.equals(Float[].class)) {
+                xMsgData xd = xMsgData.parseFrom(data);
+                List<Float> list = xd.getFLOATAList();
+                if (!list.isEmpty()) {
+                    Float[] array = list.toArray(new Float[list.size()]);
+                    return dataType.cast(array);
+                }
+
+            } else if (dataType.equals(Double[].class)) {
+                xMsgData xd = xMsgData.parseFrom(data);
+                List<Double> list = xd.getDOUBLEAList();
+                if (!list.isEmpty()) {
+                    Double[] array = list.toArray(new Double[list.size()]);
+                    return dataType.cast(array);
+                }
+
+            } else if (dataType.equals(String[].class)) {
+                xMsgData xd = xMsgData.parseFrom(data);
+                List<String> list = xd.getSTRINGAList();
+                if (!list.isEmpty()) {
+                    String[] array = list.toArray(new String[list.size()]);
+                    return dataType.cast(array);
+                }
+
+            } else if (dataType.equals(Object.class)) {
+                return dataType.cast(xMsgUtil.deserialize(data));
+            }
+
+            throw new IllegalArgumentException("Invalid data type: " + dataType);
+
+        } catch (InvalidProtocolBufferException e) {
+            throw new IllegalArgumentException("Message doesn't contain a valid xMsg data buffer");
         }
     }
 
+    /**
+     * Creates a response to the given message, using the same data.
+     * The message must contain the <i>replyTo</i> metadata field.
+     *
+     * @param msg the received message to be responded
+     * @return a response message with the proper topic and the same received data
+     */
+    public static xMsgMessage createResponse(xMsgMessage msg)
+            throws xMsgException {
+        xMsgTopic resTopic = xMsgTopic.wrap(msg.metaData.getReplyTo());
+        xMsgMeta.Builder resMeta = xMsgMeta.newBuilder(msg.metaData.build());
+        resMeta.clearReplyTo();
+        return new xMsgMessage(resTopic, resMeta, msg.data);
+    }
+
+    /**
+     * Creates a response to the given message, serializing the given data.
+     * The message must contain the <i>replyTo</i> metadata field.
+     *
+     * @param msg the received message to be responded
+     * @param data the data to be sent back
+     * @return a response message with the proper topic and the given data
+     * @throws IOException if data could not be serialized
+     */
+    public static xMsgMessage createResponse(xMsgMessage msg, Object data)
+            throws IOException {
+        xMsgTopic resTopic = xMsgTopic.wrap(msg.metaData.getReplyTo());
+        xMsgMessage res = createFrom(resTopic, data);
+        return res;
+    }
 }

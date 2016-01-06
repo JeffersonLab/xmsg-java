@@ -92,7 +92,7 @@ public class Publisher extends xMsg {
             // based on the type of passed object. In this case since data
             // is of the int[] object, the metadata will be created with
             // data type = xMsgConstants.ARRAY_SFIXED32
-            xMsgMessage msg = new xMsgMessage(publisher.topic, b);
+            xMsgMessage msg = new xMsgMessage(publisher.topic, "data/binary", b);
 
             // Async publish data for ever
             while (true) {
