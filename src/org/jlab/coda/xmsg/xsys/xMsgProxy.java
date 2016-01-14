@@ -29,6 +29,7 @@ import org.jlab.coda.xmsg.excp.xMsgException;
 import org.jlab.coda.xmsg.net.xMsgAddress;
 import org.zeromq.ZContext;
 import org.zeromq.ZMQ;
+import org.zeromq.ZMQ.Socket;
 
 /**
  * Runs xMsg pub-sub proxy.
@@ -68,16 +69,12 @@ public class xMsgProxy {
 
         // setting up the xMsg proxy
         // socket where clients publish their data/messages
-        ZMQ.Socket in = context.createSocket(ZMQ.XSUB);
-        in.setRcvHWM(0);
-        in.setSndHWM(0);
-        in.bind("tcp://*:" + address.getPort());
+        Socket in = createSocket(context, ZMQ.XSUB);
+        bindSocket(in, address.getPort());
 
         // socket where clients subscribe data/messages
-        ZMQ.Socket out = context.createSocket(ZMQ.XPUB);
-        out.setRcvHWM(0);
-        out.setSndHWM(0);
-        out.bind("tcp://*:" + (address.getPort() + 1));
+        Socket out = createSocket(context, ZMQ.XPUB);
+        bindSocket(out, address.getPort() + 1);
 
         // start proxy. this will block for ever
         ZMQ.proxy(in, out, null);
@@ -90,5 +87,23 @@ public class xMsgProxy {
         } catch (IOException e) {
             throw new UncheckedIOException(e);
         }
+    }
+
+
+    private static Socket createSocket(ZContext ctx, int type) {
+        Socket socket = ctx.createSocket(type);
+        socket.setRcvHWM(0);
+        socket.setSndHWM(0);
+        return socket;
+    }
+
+
+    private static void bindSocket(Socket socket, int port) {
+        socket.bind("tcp://*:" + port);
+    }
+
+
+    private static void connectSocket(Socket socket, String host, int port) {
+        socket.connect("tcp://" + host + ":" + port);
     }
 }
