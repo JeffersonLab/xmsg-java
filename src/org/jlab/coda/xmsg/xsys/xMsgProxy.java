@@ -59,8 +59,6 @@ public class xMsgProxy {
 
     private final xMsgProxyAddress addr;
     private final ZContext ctx;
-    private final ZMQ.Socket in;
-    private final ZMQ.Socket out;
 
     private boolean verbose = false;
 
@@ -118,18 +116,6 @@ public class xMsgProxy {
     public xMsgProxy(ZContext context, xMsgProxyAddress address) {
         ctx = context;
         addr = address;
-
-        // socket where clients publish their data/messages
-        in = context.createSocket(ZMQ.XSUB);
-        in.setRcvHWM(0);
-        in.setSndHWM(0);
-        in.bind("tcp://*:" + address.port());
-
-        // socket where clients subscribe data/messages
-        out = context.createSocket(ZMQ.XPUB);
-        out.setRcvHWM(0);
-        out.setSndHWM(0);
-        out.bind("tcp://*:" + (address.port() + 1));
     }
 
     /**
@@ -156,6 +142,14 @@ public class xMsgProxy {
     public void start() throws xMsgException {
 
         try {
+            // socket where clients publish their data/messages
+            ZMQ.Socket in = createSocket(ctx, ZMQ.XSUB);
+            bindSocket(in, addr.port());
+
+            // socket where clients subscribe data/messages
+            ZMQ.Socket out = createSocket(ctx, ZMQ.XPUB);
+            bindSocket(out, addr.port() + 1);
+
             System.out.println(xMsgUtil.currentTime(4) +
                     " xMsg-Info: Running xMsg proxy on the host = " +
                     addr.host() + " port = " + addr.port() + "\n");
@@ -191,5 +185,23 @@ public class xMsgProxy {
                 msg.destroy();
             }
         }
+    }
+
+
+    private static Socket createSocket(ZContext ctx, int type) {
+        Socket socket = ctx.createSocket(type);
+        socket.setRcvHWM(0);
+        socket.setSndHWM(0);
+        return socket;
+    }
+
+
+    private static void bindSocket(Socket socket, int port) {
+        socket.bind("tcp://*:" + port);
+    }
+
+
+    private static void connectSocket(Socket socket, String host, int port) {
+        socket.connect("tcp://" + host + ":" + port);
     }
 }
