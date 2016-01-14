@@ -21,9 +21,12 @@
 
 package org.jlab.coda.xmsg.xsys;
 
-import org.jlab.coda.xmsg.core.xMsgConstants;
+import java.io.IOException;
+import java.io.UncheckedIOException;
+
 import org.jlab.coda.xmsg.core.xMsgUtil;
 import org.jlab.coda.xmsg.excp.xMsgException;
+import org.jlab.coda.xmsg.net.xMsgAddress;
 import org.zeromq.ZContext;
 import org.zeromq.ZMQ;
 
@@ -44,6 +47,7 @@ public class xMsgProxy {
         try {
             xMsgProxy proxy = new xMsgProxy();
             proxy.startProxy(new ZContext());
+
         } catch (xMsgException e) {
             e.printStackTrace();
             System.exit(1);
@@ -57,6 +61,7 @@ public class xMsgProxy {
      * @throws xMsgException
      */
     public void startProxy(ZContext context) throws xMsgException {
+        xMsgAddress address = new xMsgAddress(localhost());
 
         System.out.println(xMsgUtil.currentTime(4) +
                 " Info: Running xMsg proxy server on the localhost..." + "\n");
@@ -66,15 +71,24 @@ public class xMsgProxy {
         ZMQ.Socket in = context.createSocket(ZMQ.XSUB);
         in.setRcvHWM(0);
         in.setSndHWM(0);
-        in.bind("tcp://*:" + xMsgConstants.DEFAULT_PORT.toInteger());
+        in.bind("tcp://*:" + address.getPort());
 
         // socket where clients subscribe data/messages
         ZMQ.Socket out = context.createSocket(ZMQ.XPUB);
         out.setRcvHWM(0);
         out.setSndHWM(0);
-        out.bind("tcp://*:" + (xMsgConstants.DEFAULT_PORT.toInteger() + 1));
+        out.bind("tcp://*:" + (address.getPort() + 1));
 
-        // start poxy. this will block for ever
+        // start proxy. this will block for ever
         ZMQ.proxy(in, out, null);
+    }
+
+
+    private static String localhost() {
+        try {
+            return xMsgUtil.localhost();
+        } catch (IOException e) {
+            throw new UncheckedIOException(e);
+        }
     }
 }
