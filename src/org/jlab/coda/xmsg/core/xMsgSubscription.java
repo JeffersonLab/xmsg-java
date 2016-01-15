@@ -72,10 +72,11 @@ public abstract class xMsgSubscription {
         if (this.socket == null) {
             throw new IllegalArgumentException("xMsg-Error: null subscription socket");
         }
-        this.socket.subscribe(topic.toString().getBytes());
-        xMsgUtil.sleep(100);
 
         this.topic = topic.toString();
+        subscribe(connection.getPubSock(), this.socket, this.topic);
+        xMsgUtil.sleep(10);
+
         this.thread = xMsgUtil.newThread(name, new Handler());
     }
 
@@ -86,10 +87,11 @@ public abstract class xMsgSubscription {
         if (this.socket == null) {
             throw new IllegalArgumentException("xMsg-Error: null subscription socket");
         }
-        this.socket.subscribe(topic.toString().getBytes());
-        xMsgUtil.sleep(100);
 
         this.topic = topic.toString();
+        subscribe(connection.getPubSock(), this.socket, this.topic);
+        xMsgUtil.sleep(10);
+
         this.thread = new Thread();
     }
 
@@ -141,6 +143,40 @@ public abstract class xMsgSubscription {
      */
     public boolean isAlive() {
         return isRunning;
+    }
+
+    private void subscribe(Socket pubSocket, Socket subSocket, String topic) {
+        this.socket.subscribe(topic.toString().getBytes());
+
+        ZMQ.Poller items = new ZMQ.Poller(1);
+        items.register(subSocket, ZMQ.Poller.POLLIN);
+        int retry = 0;
+        while (retry <= 10) {
+            retry++;
+            ZMsg ctrlMsg = new ZMsg();
+            try {
+                ctrlMsg.add(xMsgConstants.CTRL_TOPIC);
+                ctrlMsg.add(xMsgConstants.CTRL_SUBSCRIBE);
+                ctrlMsg.add(topic);
+                ctrlMsg.send(pubSocket);
+
+                items.poll(10);
+                if (items.pollin(0)) {
+                    ZMsg replyMsg = ZMsg.recvMsg(subSocket);
+                    try {
+                        // TODO: check the message
+                        return;
+                    } finally {
+                        replyMsg.destroy();
+                    }
+                }
+            } catch (ZMQException e) {
+                e.printStackTrace();
+            } finally {
+                ctrlMsg.destroy();
+            }
+        }
+        throw new RuntimeException("Could not subscribe to " + topic);
     }
 
 
