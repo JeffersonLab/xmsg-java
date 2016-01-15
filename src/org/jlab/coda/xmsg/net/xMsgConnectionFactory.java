@@ -4,11 +4,14 @@ import java.io.IOException;
 import java.io.UncheckedIOException;
 import java.util.Random;
 
+import org.jlab.coda.xmsg.core.xMsgConstants;
 import org.jlab.coda.xmsg.core.xMsgUtil;
 import org.jlab.coda.xmsg.xsys.regdis.xMsgRegDriver;
 import org.zeromq.ZContext;
 import org.zeromq.ZMQ;
 import org.zeromq.ZMQ.Socket;
+import org.zeromq.ZMQException;
+import org.zeromq.ZMsg;
 
 public class xMsgConnectionFactory {
 
@@ -40,6 +43,13 @@ public class xMsgConnectionFactory {
         pubSock.connect("tcp://" + address.host() + ":" + pubPort);
         subSock.connect("tcp://" + address.host() + ":" + subPort);
         ctrlSock.connect("tcp://" + address.host() + ":" + ctrlPort);
+
+        if (!checkConnection(pubSock, ctrlSock, identity)) {
+            context.destroySocket(pubSock);
+            context.destroySocket(subSock);
+            context.destroySocket(ctrlSock);
+            throw new RuntimeException("Could not connect to " + address.toString());
+        }
         setup.postConnection();
 
         xMsgConnection connection = new xMsgConnection();
@@ -74,6 +84,39 @@ public class xMsgConnectionFactory {
 
     public void destroy() {
         context.destroy();
+    }
+
+
+    private boolean checkConnection(Socket pubSocket, Socket ctrlSocket, String identity) {
+        ZMQ.Poller items = new ZMQ.Poller(1);
+        items.register(ctrlSocket, ZMQ.Poller.POLLIN);
+        int retry = 0;
+        while (retry <= 10) {
+            retry++;
+            ZMsg ctrlMsg = new ZMsg();
+            try {
+                ctrlMsg.add(xMsgConstants.CTRL_TOPIC);
+                ctrlMsg.add(xMsgConstants.CTRL_CONNECT);
+                ctrlMsg.add(identity);
+                ctrlMsg.send(pubSocket);
+
+                items.poll(10);
+                if (items.pollin(0)) {
+                    ZMsg replyMsg = ZMsg.recvMsg(ctrlSocket);
+                    try {
+                        // TODO: check the message
+                        return true;
+                    } finally {
+                        replyMsg.destroy();
+                    }
+                }
+            } catch (ZMQException e) {
+                e.printStackTrace();
+            } finally {
+                ctrlMsg.destroy();
+            }
+        }
+        return false;
     }
 
 

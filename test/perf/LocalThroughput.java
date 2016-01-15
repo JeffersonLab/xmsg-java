@@ -5,7 +5,6 @@ import org.jlab.coda.xmsg.core.xMsgCallBack;
 import org.jlab.coda.xmsg.core.xMsgMessage;
 import org.jlab.coda.xmsg.core.xMsgSubscription;
 import org.jlab.coda.xmsg.core.xMsgTopic;
-import org.jlab.coda.xmsg.core.xMsgUtil;
 
 import org.jlab.coda.xmsg.excp.xMsgException;
 import org.jlab.coda.xmsg.net.xMsgConnection;
@@ -37,8 +36,6 @@ public final class LocalThroughput {
             final xMsg subscriber = new xMsg("throughput_subscriber", 1);
             xMsgConnection con = subscriber.connect(bindTo);
             final xMsgTopic topic = xMsgTopic.wrap("thr_topic");
-
-            xMsgUtil.sleep(100);
 
             xMsgSubscription sub = subscriber.subscribe(con, topic, new xMsgCallBack() {
                     @Override
