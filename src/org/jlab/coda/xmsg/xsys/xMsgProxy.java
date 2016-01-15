@@ -30,6 +30,9 @@ import org.jlab.coda.xmsg.net.xMsgAddress;
 import org.zeromq.ZContext;
 import org.zeromq.ZMQ;
 import org.zeromq.ZMQ.Socket;
+import org.zeromq.ZMsg;
+import org.zeromq.ZThread;
+import org.zeromq.ZThread.IAttachedRunnable;
 
 /**
  * Runs xMsg pub-sub proxy.
@@ -44,9 +47,14 @@ import org.zeromq.ZMQ.Socket;
  */
 public class xMsgProxy {
 
+    private boolean verbose = false;
+
     public static void main(String[] args) {
         try {
             xMsgProxy proxy = new xMsgProxy();
+            if (System.getenv("XMSG_PROXY_DEBUG") != null) {
+                proxy.verbose();
+            }
             proxy.startProxy(new ZContext());
 
         } catch (xMsgException e) {
@@ -77,7 +85,41 @@ public class xMsgProxy {
         bindSocket(out, address.getPort() + 1);
 
         // start proxy. this will block for ever
-        ZMQ.proxy(in, out, null);
+        if (verbose) {
+            Socket listener = ZThread.fork(context, new Listener());
+            ZMQ.proxy(in, out, listener);
+        } else {
+            ZMQ.proxy(in, out, null);
+        }
+    }
+
+
+    /**
+     * Prints every received message.
+     */
+    public void verbose() {
+        this.verbose = true;
+    }
+
+
+    /**
+     * The listener receives all messages flowing through the proxy,
+     * on its pipe.
+     */
+    private static class Listener implements IAttachedRunnable {
+        @Override
+        public void run(Object[] args, ZContext ctx, Socket pipe) {
+            //  Print everything that arrives on pipe
+            while (true) {
+                ZMsg msg = ZMsg.recvMsg(pipe);
+                if (msg == null) {
+                    System.out.println("Interrupted...");
+                    break;
+                }
+                msg.pop().print(null);
+                msg.destroy();
+            }
+        }
     }
 
 
