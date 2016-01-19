@@ -36,6 +36,7 @@ import java.util.Date;
 import java.util.Enumeration;
 import java.util.List;
 import java.util.Objects;
+import java.util.Random;
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.CancellationException;
 import java.util.concurrent.ExecutionException;
@@ -59,8 +60,12 @@ public final class xMsgUtil {
 
     private static List<String> localHostIps = new ArrayList<>();
 
-    private static AtomicInteger replyToGenerator = new AtomicInteger();
+    // CHECKSTYLE.OFF: ConstantName
+    private static final Random randomGenerator = new Random();
     private static final int replyToSequenceSize = 1000000;
+    private static final int replyToSeed = randomGenerator.nextInt(replyToSequenceSize);
+    private static final AtomicInteger replyToGenerator = new AtomicInteger(replyToSeed);
+    // CHECKSTYLE.ON: ConstantName
 
     private xMsgUtil() { }
 
@@ -249,7 +254,7 @@ public final class xMsgUtil {
         return address;
     }
 
-    public static String getUniqueReplyTo(String subject) {
+    static String getUniqueReplyTo(String subject) {
         long next = replyToGenerator.getAndIncrement() & 0xffffffffL;
         int id = (int) (next % replyToSequenceSize + replyToSequenceSize);
         return "ret:" + subject + ":" + id;
@@ -258,6 +263,11 @@ public final class xMsgUtil {
     // for testing
     static void setUniqueReplyToGenerator(int value) {
         replyToGenerator.set(value);
+    }
+
+    static String encodeIdentity(String address, String name) {
+        String id = address + "#" + name + "#" + randomGenerator.nextInt(100);
+        return Integer.toHexString(id.hashCode());
     }
 
     /**
