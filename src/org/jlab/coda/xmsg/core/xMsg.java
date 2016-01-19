@@ -743,11 +743,12 @@ public class xMsg {
      * @throws xMsgException
      */
     public void publish(xMsgConnection con, xMsgMessage msg) throws xMsgException {
-        try {
-            _publish(con, msg, -1);
-        } catch (TimeoutException e) {
-            e.printStackTrace();
-        }
+
+        // just make sure that receiver knows that this is not a sync request.
+        // need this in case we reuse messages.
+        msg.getMetaData().setReplyTo(xMsgConstants.UNDEFINED);
+
+        _publish(con, msg);
     }
 
     /**
@@ -768,7 +769,37 @@ public class xMsg {
     public xMsgMessage syncPublish(xMsgConnection con,
                                    xMsgMessage msg,
                                    int timeout) throws xMsgException, TimeoutException {
-        return _publish(con, msg, timeout);
+
+        // address/topic where the subscriber should send the result
+        String returnAddress = xMsgUtil.getUniqueReplyTo(defaultProxyAddress.host());
+
+        // set the return address as replyTo in the xMsgMessage
+        msg.getMetaData().setReplyTo(returnAddress);
+
+        // subscribe to the returnAddress
+        SyncSendCallBack cb = new SyncSendCallBack();
+        xMsgSubscription sh = subscribe(con, xMsgTopic.wrap(returnAddress), cb);
+        cb.setSubscriptionHandler(sh);
+
+        // it must be the internal _publish, to keep the replyTo field
+        _publish(con, msg);
+
+        // wait for the response
+        int t = 0;
+        assert cb != null : "xMsg-Error: null callback at sync publish";
+        while (cb.recvMsg == null && t < timeout) {
+            t++;
+            xMsgUtil.sleep(1);
+        }
+        try {
+            if (t >= timeout) {
+                throw new TimeoutException("No response for timeout = " + t + " milli sec.");
+            }
+            return cb.recvMsg;
+        } finally {
+            msg.getMetaData().setReplyTo(xMsgConstants.UNDEFINED);
+            unsubscribe(cb.handler);
+        }
     }
 
     /**
@@ -1014,73 +1045,17 @@ public class xMsg {
         return regDriver.findRegisteredTypeNames(regData, isPublisher);
     }
 
-    /**
-     * Publishes a message through a defined proxy connection. In this case
-     * {@link org.jlab.coda.xmsg.net.xMsgConnection} object is used. The timeout
-     * parameter defines if the publishing is going to sync or async.
-     *
-     * @param con proxy connection {@link org.jlab.coda.xmsg.net.xMsgConnection} object
-     * @param msg {@link org.jlab.coda.xmsg.core.xMsgMessage} object
-     * @param timeout timeout > 0 defines publishing process as a sync process
-     * @return in case of the sync operation we expect an object of
-     * {@link org.jlab.coda.xmsg.core.xMsgMessage} from a receiver.
-     * @throws xMsgException
-     * @throws TimeoutException
-     */
-    private xMsgMessage _publish(xMsgConnection con, xMsgMessage msg, int timeout)
-            throws xMsgException, TimeoutException {
-
-        SyncSendCallBack cb = null;
-        // get pub socket
+    private void _publish(xMsgConnection con, xMsgMessage msg) throws xMsgException {
         Socket sock = con.getPubSock();
-
-        if (timeout > 0) {
-            // address/topic where the subscriber should send the result
-            String returnAddress = xMsgUtil.getUniqueReplyTo(defaultProxyAddress.host());
-
-            // set the return address as replyTo in the xMsgMessage
-            msg.getMetaData().setReplyTo(returnAddress);
-
-            // subscribe to the returnAddress
-            cb = new SyncSendCallBack();
-            xMsgSubscription sh = subscribe(con, xMsgTopic.wrap(returnAddress), cb);
-            cb.setSubscriptionHandler(sh);
-        } else {
-
-            // just make sure that receiver knows that this is not a sync request.
-            // need this in case we reuse messages.
-            msg.getMetaData().setReplyTo(xMsgConstants.UNDEFINED);
-        }
-
-        // send topic, sender, followed by the metadata and data
         ZMsg outputMsg = msg.serialize();
         try {
             outputMsg.send(sock);
         } catch (ZMQException e) {
-            throw new xMsgException("xMsg-Error: publishing failed. " + e.getMessage());
+            throw new xMsgException("Publishing failed: " + e.getMessage());
         } finally {
             outputMsg.destroy();
         }
 
-        if (timeout > 0) {
-            // wait for the response
-            int t = 0;
-            assert cb != null : "xMsg-Error: null callback at sync publish";
-            while (cb.recvMsg == null && t < timeout) {
-                t++;
-                xMsgUtil.sleep(1);
-            }
-            try {
-                if (t >= timeout) {
-                    throw new TimeoutException("xMsg-Error: no response for time_out = " + t + " milli sec.");
-                }
-                return cb.recvMsg;
-            } finally {
-                msg.getMetaData().setReplyTo(xMsgConstants.UNDEFINED);
-                unsubscribe(cb.handler);
-            }
-        }
-        return null;
     }
 
     /**
