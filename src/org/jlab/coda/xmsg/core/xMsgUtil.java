@@ -251,7 +251,7 @@ public final class xMsgUtil {
         return address;
     }
 
-    public static String getUniqueReplyTo(String subject) {
+    static String getUniqueReplyTo(String subject) {
         long next = replyToGenerator.getAndIncrement() & 0xffffffffL;
         int id = (int) (next % replyToSequenceSize + replyToSequenceSize);
         return "ret:" + subject + ":" + id;
