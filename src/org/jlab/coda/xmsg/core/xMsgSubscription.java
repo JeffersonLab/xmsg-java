@@ -60,6 +60,19 @@ public abstract class xMsgSubscription {
     }
 
 
+    xMsgSubscription(xMsgConnection connection, xMsgTopic topic) {
+        this.socket = connection.getSubSock();
+        if (this.socket == null) {
+            throw new IllegalArgumentException("Error: null subscription socket");
+        }
+        this.socket.subscribe(topic.toString().getBytes());
+        xMsgUtil.sleep(100);
+
+        this.topic = topic.toString();
+        this.thread = new Thread();
+    }
+
+
     abstract void handle(ZMsg msg) throws xMsgException, TimeoutException, IOException;
 
 

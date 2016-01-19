@@ -605,23 +605,40 @@ public class xMsg {
         msg.getMetaData().setReplyTo(returnAddress);
 
         // subscribe to the returnAddress
-        SyncSendCallBack cb = new SyncSendCallBack();
-        xMsgSubscription sh = subscribe(connection, xMsgTopic.wrap(returnAddress), cb);
-        cb.setSubscriptionHandler(sh);
+        xMsgSubscription sh = new xMsgSubscription(connection, xMsgTopic.wrap(returnAddress)) {
+            @Override
+            void handle(ZMsg msg) throws xMsgException, TimeoutException, IOException { }
+        };
 
-        publish(connection, msg);
+        try {
+            publish(connection, msg);
 
-        // wait for the response
-        int t = 0;
-        while (cb.recvMsg == null && t < timeout * 1000) {
-            t++;
-            xMsgUtil.sleep(1);
-        }
-        if (t >= timeout * 1000) {
+            // wait for the response
+            int t = 0;
+            ZMQ.Poller items = new ZMQ.Poller(1);
+            items.register(connection.getSubSock(), ZMQ.Poller.POLLIN);
+            while (t <= timeout * 1000) {
+                try {
+                    items.poll(10);
+                    if (items.pollin(0)) {
+                        ZMsg rawMsg = ZMsg.recvMsg(connection.getSubSock());
+                        try {
+                            return new xMsgMessage(rawMsg);
+                        } finally {
+                            rawMsg.destroy();
+                        }
+                    }
+                    t += 10;
+                } catch (ZMQException e) {
+                    e.printStackTrace();
+                }
+            }
             throw new TimeoutException("Error: no response for time_out = " + t);
+        } finally {
+            msg.getMetaData().setReplyTo(xMsgConstants.UNDEFINED.toString());
+            sh.stop();
         }
-        msg.getMetaData().setReplyTo(xMsgConstants.UNDEFINED.toString());
-        return cb.recvMsg;
+
     }
 
     /**
@@ -727,33 +744,5 @@ public class xMsg {
      */
     public String getName() {
         return myName;
-    }
-
-    /**
-     * Private inner class used to organize sync send/publish communications.
-     */
-    private class SyncSendCallBack implements xMsgCallBack {
-
-        public xMsgMessage recvMsg = null;
-
-        private xMsgSubscription handler = null;
-
-        public void setSubscriptionHandler(xMsgSubscription handler) {
-            this.handler = handler;
-        }
-
-        @Override
-        public xMsgMessage callback(xMsgMessage msg) {
-            recvMsg = msg;
-            try {
-                if (handler != null) {
-                    unsubscribe(handler);
-                }
-            } catch (xMsgException e) {
-                e.printStackTrace();
-            }
-
-            return recvMsg;
-        }
     }
 }
