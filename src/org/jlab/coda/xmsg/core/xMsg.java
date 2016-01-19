@@ -28,6 +28,7 @@ import org.jlab.coda.xmsg.net.xMsgConnectionSetup;
 import org.jlab.coda.xmsg.net.xMsgProxyAddress;
 import org.jlab.coda.xmsg.net.xMsgRegAddress;
 import org.jlab.coda.xmsg.xsys.regdis.xMsgRegDriver;
+import org.zeromq.ZMQ;
 import org.zeromq.ZMQ.Socket;
 import org.zeromq.ZMQException;
 import org.zeromq.ZMsg;
@@ -777,28 +778,39 @@ public class xMsg {
         msg.getMetaData().setReplyTo(returnAddress);
 
         // subscribe to the returnAddress
-        SyncSendCallBack cb = new SyncSendCallBack();
-        xMsgSubscription sh = subscribe(con, xMsgTopic.wrap(returnAddress), cb);
-        cb.setSubscriptionHandler(sh);
+        xMsgSubscription sh = new xMsgSubscription(con, xMsgTopic.wrap(returnAddress)) {
+            @Override
+            void handle(ZMsg msg) throws xMsgException, TimeoutException, IOException { }
+        };
 
-        // it must be the internal _publish, to keep the replyTo field
-        _publish(con, msg);
-
-        // wait for the response
-        int t = 0;
-        assert cb != null : "xMsg-Error: null callback at sync publish";
-        while (cb.recvMsg == null && t < timeout) {
-            t++;
-            xMsgUtil.sleep(1);
-        }
         try {
-            if (t >= timeout) {
-                throw new TimeoutException("No response for timeout = " + t + " milli sec.");
+            // it must be the internal _publish, to keep the replyTo field
+            _publish(con, msg);
+
+            // wait for the response
+            int t = 0;
+            ZMQ.Poller items = new ZMQ.Poller(1);
+            items.register(con.getSubSock(), ZMQ.Poller.POLLIN);
+            while (t < timeout) {
+                try {
+                    items.poll(10);
+                    if (items.pollin(0)) {
+                        ZMsg rawMsg = ZMsg.recvMsg(con.getSubSock());
+                        try {
+                            return new xMsgMessage(rawMsg);
+                        } finally {
+                            rawMsg.destroy();
+                        }
+                    }
+                    t += 10;
+                } catch (ZMQException e) {
+                    e.printStackTrace();
+                }
             }
-            return cb.recvMsg;
+            throw new TimeoutException("Error: no response for time_out = " + t);
         } finally {
-            msg.getMetaData().setReplyTo(xMsgConstants.UNDEFINED);
-            unsubscribe(cb.handler);
+            msg.getMetaData().setReplyTo(xMsgConstants.UNDEFINED.toString());
+            sh.stop();
         }
     }
 
@@ -1085,25 +1097,5 @@ public class xMsg {
                 }
             }
         });
-    }
-
-    /**
-     * Private inner class used to organize sync send/publish communications.
-     */
-    private class SyncSendCallBack implements xMsgCallBack {
-
-        public xMsgMessage recvMsg = null;
-
-        private xMsgSubscription handler = null;
-
-        public void setSubscriptionHandler(xMsgSubscription handler) {
-            this.handler = handler;
-        }
-
-        @Override
-        public xMsgMessage callback(xMsgMessage msg) {
-            recvMsg = msg;
-            return recvMsg;
-        }
     }
 }

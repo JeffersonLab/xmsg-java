@@ -80,6 +80,19 @@ public abstract class xMsgSubscription {
     }
 
 
+    xMsgSubscription(xMsgConnection connection, xMsgTopic topic) {
+        this.name = topic.toString();
+        this.socket = connection.getSubSock();
+        if (this.socket == null) {
+            throw new IllegalArgumentException("xMsg-Error: null subscription socket");
+        }
+        this.socket.subscribe(topic.toString().getBytes());
+        xMsgUtil.sleep(100);
+
+        this.topic = topic.toString();
+        this.thread = new Thread();
+    }
+
     /**
      * An abstract method to be implemented by the user's subscription callback.
      *
