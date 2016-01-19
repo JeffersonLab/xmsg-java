@@ -265,6 +265,11 @@ public final class xMsgUtil {
         replyToGenerator.set(value);
     }
 
+    static String encodeIdentity(String address, String name) {
+        String id = address + "#" + name + "#" + randomGenerator.nextInt(100);
+        return Integer.toHexString(id.hashCode());
+    }
+
     /**
      * Serializes an Object into a protobuf {@link ByteString}.
      *

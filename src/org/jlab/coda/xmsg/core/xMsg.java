@@ -57,8 +57,11 @@ import java.util.concurrent.TimeoutException;
  */
 public class xMsg {
 
-    /** The unique identifier of this actor. */
+    /** The identifier of this actor. */
     protected final String myName;
+
+    /** The generated unique ID of this actor. */
+    protected final String myId;
 
     /** 0MQ context object. */
     private final ZContext context;
@@ -127,6 +130,7 @@ public class xMsg {
      */
     xMsg(String name, xMsgRegDriver driver) {
         this.myName = name;
+        this.myId = xMsgUtil.encodeIdentity(driver.getLocalAddress(), name);
         this.context = driver.getContext();
         this.driver = driver;
 
@@ -599,7 +603,7 @@ public class xMsg {
             IOException {
 
         // address/topic where the subscriber should send the result
-        String returnAddress = xMsgUtil.getUniqueReplyTo(driver.getLocalAddress());
+        String returnAddress = xMsgUtil.getUniqueReplyTo(myId);
 
         // set the return address as replyTo in the xMsgMessage
         msg.getMetaData().setReplyTo(returnAddress);
