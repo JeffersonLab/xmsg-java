@@ -52,8 +52,11 @@ import java.util.concurrent.TimeoutException;
  */
 public class xMsg {
 
-    // the name of this actor
+    /** The identifier of this actor. */
     protected final String myName;
+
+    /** The generated unique ID of this actor. */
+    protected final String myId;
 
     // thread pool
     private final ThreadPoolExecutor threadPool;
@@ -164,6 +167,7 @@ public class xMsg {
 
         // We need to have a name for an actor
         this.myName = name;
+        this.myId = xMsgUtil.encodeIdentity(defaultRegAddr.toString(), name);
 
         this.defaultPoolSize = poolSize;
         this.defaultProxyAddress = defaultProxyAddress;
@@ -183,6 +187,7 @@ public class xMsg {
 
         // We need to have a name for an actor
         this.myName = name;
+        this.myId = xMsgUtil.encodeIdentity("localhost", name);
 
         this.defaultPoolSize = poolSize;
         this.defaultProxyAddress = new xMsgProxyAddress();
@@ -772,7 +777,7 @@ public class xMsg {
                                    int timeout) throws xMsgException, TimeoutException {
 
         // address/topic where the subscriber should send the result
-        String returnAddress = xMsgUtil.getUniqueReplyTo(defaultProxyAddress.host());
+        String returnAddress = xMsgUtil.getUniqueReplyTo(myId);
 
         // set the return address as replyTo in the xMsgMessage
         msg.getMetaData().setReplyTo(returnAddress);

@@ -150,6 +150,13 @@ public class xMsgUtilTest {
     }
 
     @Test
+    public void encodeIdentity() throws Exception {
+        String encode = xMsgUtil.encodeIdentity(xMsgUtil.localhost(), "test_actor");
+        assertThat(encode.length(), is(8));
+
+    }
+
+    @Test
     public void serializeAsBytesAndDeserialize() throws Exception {
         List<String> orig = Arrays.asList("led zeppelin", "pink floyd", "black sabbath");
 
