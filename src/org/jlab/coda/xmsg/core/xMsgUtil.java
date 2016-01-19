@@ -59,8 +59,10 @@ public final class xMsgUtil {
 
     private static List<String> localHostIps = new ArrayList<>();
 
-    private static AtomicInteger replyToGenerator = new AtomicInteger();
+    // CHECKSTYLE.OFF: ConstantName
     private static final int replyToSequenceSize = 1000000;
+    private static final AtomicInteger replyToGenerator = new AtomicInteger();
+    // CHECKSTYLE.ON: ConstantName
 
     private xMsgUtil() { }
 
