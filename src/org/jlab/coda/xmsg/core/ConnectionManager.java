@@ -113,6 +113,7 @@ class ConnectionManager {
     void destroy() {
         proxyConnections.destroyAll(c -> factory.destroyProxyConnection(c));
         registrarConnections.destroyAll(c -> factory.destroyRegistrarConnection(c));
+        factory.destroy();
     }
 
 

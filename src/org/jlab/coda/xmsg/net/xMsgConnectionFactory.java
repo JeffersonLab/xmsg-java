@@ -58,8 +58,6 @@ public class xMsgConnectionFactory {
     }
 
     public void destroy() {
-        if (!context.isMain()) {
-            context.destroy();
-        }
+        context.destroy();
     }
 }
