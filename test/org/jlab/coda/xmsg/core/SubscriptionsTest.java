@@ -45,6 +45,8 @@ public class SubscriptionsTest {
 
     @Test
     public void unsuscribeStopsThread() throws Exception {
+        ProxyThread proxyThread = new ProxyThread();
+        proxyThread.start();
 
         xMsg actor = new xMsg("test");
         xMsgConnection con = actor.connect();
@@ -52,6 +54,8 @@ public class SubscriptionsTest {
         xMsgSubscription subscription = actor.subscribe(con, xMsgTopic.wrap("topic"), null);
         xMsgUtil.sleep(1000);
         actor.unsubscribe(subscription);
+
+        proxyThread.stop();
 
         assertFalse(subscription.isAlive());
     }
@@ -77,7 +81,6 @@ public class SubscriptionsTest {
                 try {
                     xMsg actor = new xMsg("test_publisher");
                     xMsgConnection con = actor.connect();
-                    xMsgUtil.sleep(100);
                     xMsgTopic topic = xMsgTopic.wrap("test_topic");
                     xMsgSubscription sub = actor.subscribe(con, topic, new xMsgCallBack() {
                         @Override
@@ -107,7 +110,6 @@ public class SubscriptionsTest {
                     xMsg actor = new xMsg("test_publisher");
                     xMsgConnection con = actor.connect();
 
-                    xMsgUtil.sleep(100);
                     xMsgTopic topic = xMsgTopic.wrap("test_topic");
                     for (int i = 0; i < Check.N; i++) {
                         xMsgMessage msg = xMsgMessage.createFrom(topic, i);
@@ -151,7 +153,6 @@ public class SubscriptionsTest {
                     final xMsg subActor = new xMsg("test_publisher");
                     final xMsgConnection scon = subActor.connect();
 
-                    xMsgUtil.sleep(100);
                     xMsgTopic subTopic = xMsgTopic.wrap("test_topic");
                     xMsgSubscription sub = subActor.subscribe(scon, subTopic, new xMsgCallBack() {
                         @Override
@@ -168,7 +169,6 @@ public class SubscriptionsTest {
                     xMsgUtil.sleep(100);
                     xMsg pubActor = new xMsg("test_publisher");
                     xMsgConnection pcon = subActor.connect();
-                    xMsgUtil.sleep(100);
                     xMsgTopic pubTopic = xMsgTopic.wrap("test_topic");
                     for (int i = 0; i < Check.N; i++) {
                         xMsgMessage msg = xMsgMessage.createFrom(pubTopic, i);
@@ -212,7 +212,6 @@ public class SubscriptionsTest {
                     xMsg subActor = new xMsg("test_publisher");
                     xMsgConnection scon = subActor.connect();
 
-                    xMsgUtil.sleep(100);
                     xMsgTopic subTopic = xMsgTopic.wrap("test_topic");
                     xMsgSubscription sub = subActor.subscribe(scon, subTopic, new xMsgCallBack() {
                         @Override
@@ -225,7 +224,6 @@ public class SubscriptionsTest {
                     xMsgUtil.sleep(100);
                     xMsg pubActor = new xMsg("test_publisher");
                     xMsgConnection pcon = pubActor.connect();
-                    xMsgUtil.sleep(100);
                     xMsgTopic pubTopic = xMsgTopic.wrap("test_topic");
                     xMsgMessage msg = xMsgMessage.createFrom(pubTopic, 1);
                     try {

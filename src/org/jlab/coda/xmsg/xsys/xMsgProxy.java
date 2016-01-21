@@ -32,6 +32,7 @@ import org.jlab.coda.xmsg.core.xMsgUtil;
 import org.jlab.coda.xmsg.excp.xMsgException;
 import org.jlab.coda.xmsg.net.xMsgProxyAddress;
 import org.zeromq.ZContext;
+import org.zeromq.ZFrame;
 import org.zeromq.ZMQ;
 import org.zeromq.ZMQException;
 import org.zeromq.ZMQ.Socket;
@@ -59,8 +60,7 @@ public class xMsgProxy {
 
     private final xMsgProxyAddress addr;
     private final ZContext ctx;
-    private final ZMQ.Socket in;
-    private final ZMQ.Socket out;
+    private final Thread controller;
 
     private boolean verbose = false;
 
@@ -118,18 +118,7 @@ public class xMsgProxy {
     public xMsgProxy(ZContext context, xMsgProxyAddress address) {
         ctx = context;
         addr = address;
-
-        // socket where clients publish their data/messages
-        in = context.createSocket(ZMQ.XSUB);
-        in.setRcvHWM(0);
-        in.setSndHWM(0);
-        in.bind("tcp://*:" + address.port());
-
-        // socket where clients subscribe data/messages
-        out = context.createSocket(ZMQ.XPUB);
-        out.setRcvHWM(0);
-        out.setSndHWM(0);
-        out.bind("tcp://*:" + (address.port() + 1));
+        controller = xMsgUtil.newThread("control", new Controller());
     }
 
     /**
@@ -156,6 +145,17 @@ public class xMsgProxy {
     public void start() throws xMsgException {
 
         try {
+            // socket where clients publish their data/messages
+            ZMQ.Socket in = createSocket(ctx, ZMQ.XSUB);
+            bindSocket(in, addr.port());
+
+            // socket where clients subscribe data/messages
+            ZMQ.Socket out = createSocket(ctx, ZMQ.XPUB);
+            bindSocket(out, addr.port() + 1);
+
+            // start controller
+            controller.start();
+
             System.out.println(xMsgUtil.currentTime(4) +
                     " xMsg-Info: Running xMsg proxy on the host = " +
                     addr.host() + " port = " + addr.port() + "\n");
@@ -169,6 +169,76 @@ public class xMsgProxy {
             }
         } catch (ZMQException e) {
             throw new xMsgException(e.getMessage());
+        }
+    }
+
+
+    /**
+     * The controller receives and replies synchronization control messages from
+     * connections.
+     */
+    private class Controller implements Runnable {
+
+        @Override
+        public void run() {
+            ZContext shadowContext = ZContext.shadow(ctx);
+
+            Socket control = createSocket(shadowContext, ZMQ.SUB);
+            Socket publisher = createSocket(shadowContext, ZMQ.PUB);
+            Socket router = createSocket(shadowContext, ZMQ.ROUTER);
+
+            try {
+                connectSocket(control, addr.host(), addr.port() + 1);
+                connectSocket(publisher, addr.host(), addr.port());
+
+                router.setRouterHandlover(true);
+                bindSocket(router, addr.port() + 2);
+
+                control.subscribe(xMsgConstants.CTRL_TOPIC.getBytes());
+            } catch (ZMQException e) {
+                e.printStackTrace();
+                return;
+            }
+
+            while (!Thread.currentThread().isInterrupted()) {
+                try {
+                    ZMsg msg = ZMsg.recvMsg(control);
+                    ZFrame topicFrame = msg.pop();
+                    ZFrame typeFrame = msg.pop();
+                    ZFrame idFrame = msg.pop();
+                    try {
+                        String type = new String(typeFrame.getData());
+                        String id = new String(idFrame.getData());
+
+                        if (type.equals(xMsgConstants.CTRL_CONNECT.toString())) {
+                            ZMsg ack = new ZMsg();
+                            ack.add(id);
+                            ack.add(type);
+                            ack.send(router);
+                        } else if (type.equals(xMsgConstants.CTRL_SUBSCRIBE.toString())) {
+                            ZMsg ack = new ZMsg();
+                            ack.add(id);
+                            ack.add(type);
+                            ack.send(publisher);
+                        } else if (type.equals(xMsgConstants.CTRL_REPLY.toString())) {
+                            ZMsg ack = new ZMsg();
+                            ack.add(id);
+                            ack.add(type);
+                            ack.send(router);
+                        }
+                    } finally {
+                        topicFrame.destroy();
+                        idFrame.destroy();
+                        typeFrame.destroy();
+                    }
+                } catch (ZMQException e) {
+                    if (e.getErrorCode() == ZMQ.Error.ETERM.getCode()) {
+                        break;
+                    }
+                    e.printStackTrace();
+                }
+            }
+            shadowContext.destroy();
         }
     }
 
@@ -191,5 +261,23 @@ public class xMsgProxy {
                 msg.destroy();
             }
         }
+    }
+
+
+    private static Socket createSocket(ZContext ctx, int type) {
+        Socket socket = ctx.createSocket(type);
+        socket.setRcvHWM(0);
+        socket.setSndHWM(0);
+        return socket;
+    }
+
+
+    private static void bindSocket(Socket socket, int port) {
+        socket.bind("tcp://*:" + port);
+    }
+
+
+    private static void connectSocket(Socket socket, String host, int port) {
+        socket.connect("tcp://" + host + ":" + port);
     }
 }

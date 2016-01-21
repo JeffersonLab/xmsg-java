@@ -36,6 +36,8 @@ public class xMsgConnection {
     private xMsgProxyAddress address;
     private Socket pubSock = null;
     private Socket subSock = null;
+    private Socket ctrlSock = null;
+    private String identity = null;
 
 
     public xMsgProxyAddress getAddress() {
@@ -60,5 +62,21 @@ public class xMsgConnection {
 
     public void setSubSock(Socket subSock) {
         this.subSock = subSock;
+    }
+
+    public Socket getControlSock() {
+        return ctrlSock;
+    }
+
+    public void setControlSock(Socket subSock) {
+        this.ctrlSock = subSock;
+    }
+
+    public String getIdentity() {
+        return identity;
+    }
+
+    public void setIdentity(String id) {
+        this.identity = id;
     }
 }

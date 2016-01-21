@@ -38,6 +38,11 @@ public final class xMsgConstants {
     public static final String LANG_SEP = "_";
     public static final String PRXHOSTPORT_SEP = "%";
 
+    public static final String CTRL_TOPIC = "xmsg:control";
+    public static final String CTRL_CONNECT = "pub";
+    public static final String CTRL_SUBSCRIBE = "sub";
+    public static final String CTRL_REPLY = "rep";
+
     public static final String REGISTRAR = "xMsg_Registrar";
 
     public static final String REGISTER_PUBLISHER = "registerPublisher";

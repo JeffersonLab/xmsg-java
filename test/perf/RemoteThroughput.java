@@ -3,7 +3,6 @@ package perf;
 import org.jlab.coda.xmsg.core.xMsg;
 import org.jlab.coda.xmsg.core.xMsgMessage;
 import org.jlab.coda.xmsg.core.xMsgTopic;
-import org.jlab.coda.xmsg.core.xMsgUtil;
 import org.jlab.coda.xmsg.excp.xMsgException;
 import org.jlab.coda.xmsg.net.xMsgConnection;
 
@@ -25,9 +24,6 @@ public final class RemoteThroughput {
             final xMsg publisher = new xMsg("thr_publisher");
             xMsgConnection con = publisher.connect(bindTo);
             final xMsgTopic topic = xMsgTopic.wrap("thr_topic");
-
-            xMsgUtil.sleep(100);
-
 
             byte[] data = new byte[messageSize];
             for (int i = 0; i < messageCount; i++) {
