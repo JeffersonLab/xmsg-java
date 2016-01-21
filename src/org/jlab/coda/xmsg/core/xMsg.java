@@ -621,7 +621,7 @@ public class xMsg {
             int t = 0;
             ZMQ.Poller items = new ZMQ.Poller(1);
             items.register(connection.getSubSock(), ZMQ.Poller.POLLIN);
-            while (t <= timeout * 1000) {
+            while (t < timeout * 1000) {
                 try {
                     items.poll(10);
                     if (items.pollin(0)) {
@@ -637,7 +637,7 @@ public class xMsg {
                     e.printStackTrace();
                 }
             }
-            throw new TimeoutException("Error: no response for time_out = " + t);
+            throw new TimeoutException("Error: no response for time_out = " + timeout);
         } finally {
             msg.getMetaData().setReplyTo(xMsgConstants.UNDEFINED.toString());
             sh.stop();
