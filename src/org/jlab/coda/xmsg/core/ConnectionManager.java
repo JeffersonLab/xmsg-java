@@ -34,7 +34,6 @@ import org.jlab.coda.xmsg.net.xMsgProxyAddress;
 import org.jlab.coda.xmsg.net.xMsgRegAddress;
 import org.jlab.coda.xmsg.xsys.regdis.xMsgRegDriver;
 import org.zeromq.ZContext;
-import org.zeromq.ZMQ.Socket;
 
 class ConnectionManager {
 
@@ -60,17 +59,7 @@ class ConnectionManager {
         this.registrarConnections = new ConnectionPool<>();
 
         // default pub/sub socket options
-        defaultConnectionOption = new xMsgConnectionSetup() {
-
-            @Override
-            public void preConnection(Socket socket) {
-                socket.setRcvHWM(0);
-                socket.setSndHWM(0);
-            }
-
-            @Override
-            public void postConnection() { }
-        };
+        defaultConnectionOption = new xMsgConnectionSetup() { };
     }
 
     xMsgConnection getProxyConnection(xMsgProxyAddress address) {
