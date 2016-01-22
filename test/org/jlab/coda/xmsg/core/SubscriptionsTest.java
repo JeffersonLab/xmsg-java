@@ -252,7 +252,7 @@ public class SubscriptionsTest {
         private final ZContext context = new ZContext();
         private final Thread proxyThread;
 
-        public ProxyThread() {
+        ProxyThread() {
             proxyThread = xMsgUtil.newThread("proxy-thread", new Runnable() {
                     @Override
                     public void run() {

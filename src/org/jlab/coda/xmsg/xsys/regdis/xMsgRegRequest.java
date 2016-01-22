@@ -48,7 +48,7 @@ class xMsgRegRequest {
      * @param sender the sender of the response
      * @param data the registration data of the request
      */
-    public xMsgRegRequest(String topic, String sender, xMsgRegistration data) {
+    xMsgRegRequest(String topic, String sender, xMsgRegistration data) {
         this.topic = topic;
         this.sender = sender;
         this.data = data.toByteArray();
@@ -61,7 +61,7 @@ class xMsgRegRequest {
      * @param sender the sender of the response
      * @param text the registration text of the request
      */
-    public xMsgRegRequest(String topic, String sender, String text) {
+    xMsgRegRequest(String topic, String sender, String text) {
         this.topic = topic;
         this.sender = sender;
         this.data = text.getBytes();
@@ -73,7 +73,7 @@ class xMsgRegRequest {
      * @param msg the message with the response
      * @throws xMsgException
      */
-    public xMsgRegRequest(ZMsg msg) throws xMsgException {
+    xMsgRegRequest(ZMsg msg) throws xMsgException {
 
         if (msg.size() != 3) {
             throw new xMsgException("xMsg-Error: registration message format violation");

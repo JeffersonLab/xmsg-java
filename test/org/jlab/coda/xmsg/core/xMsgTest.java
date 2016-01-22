@@ -129,8 +129,7 @@ public class xMsgTest {
 
         private ArgumentCaptor<xMsgRegistration> dataArg;
 
-        public RegValidator(xMsgTopic topic, boolean isPublisher)
-                throws Exception {
+        RegValidator(xMsgTopic topic, boolean isPublisher) throws Exception {
             this.host = xMsgUtil.toHostAddress("localhost");
             this.port = xMsgConstants.DEFAULT_PORT;
             this.topic = topic;
