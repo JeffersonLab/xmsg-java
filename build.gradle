@@ -77,7 +77,7 @@ javadoc {
     options.charSet = "utf8"
     options.encoding = "utf8"
     options.docEncoding = "utf8"
-    options.links("http://docs.oracle.com/javase/7/docs/api/")
+    options.links("http://docs.oracle.com/javase/8/docs/api/")
     exclude 'org/jlab/coda/xmsg/examples/**'
     exclude 'org/jlab/coda/xmsg/xsys/regdis/**'
 }
