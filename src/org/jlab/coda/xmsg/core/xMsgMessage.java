@@ -186,7 +186,7 @@ public class xMsgMessage {
             throws IOException {
 
         byte[] ba = null;
-        String mimeType = null;
+        final String mimeType;
         xMsgData.Builder xd = xMsgData.newBuilder();
 
         if (data instanceof Integer) {
