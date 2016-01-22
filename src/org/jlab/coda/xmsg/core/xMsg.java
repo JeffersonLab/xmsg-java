@@ -249,8 +249,7 @@ public class xMsg {
      * This will use the default connection options defined at the constructor.
      * Note that it is reasonable to use this method for connecting to a remote proxy.
      * Yet, this is not a requirement.
-     * For local/default proxy connections we suggest using {@link #connect()}
-     * or {@link #connect(int port)}
+     * For local/default proxy connections we suggest using {@link #connect()}.
      *
      * @param address {@link org.jlab.coda.xmsg.net.xMsgProxyAddress} object
      * @return {@link org.jlab.coda.xmsg.net.xMsgConnection} object
@@ -263,8 +262,7 @@ public class xMsg {
      * Makes a connection to a required proxy.
      * Note that it is reasonable to use this method for connecting to a remote proxy.
      * Yet, this is not a requirement.
-     * For local/default proxy connections we suggest using {@link #connect()}
-     * or {@link #connect(int port)}
+     * For local/default proxy connections we suggest using {@link #connect()}.
      *
      * @param address {@link org.jlab.coda.xmsg.net.xMsgProxyAddress} object
      * @param setup {@link org.jlab.coda.xmsg.net.xMsgConnectionSetup} object
@@ -296,18 +294,6 @@ public class xMsg {
      */
     public xMsgConnection connect() {
         return connectionManager.getProxyConnection(defaultProxyAddress);
-    }
-
-    /**
-     * Makes a connection to the default/local proxy on a specified port.
-     * Note that the default proxy host is defined at the constructor.
-     *
-     * @param port proxy port number
-     * @return {@link org.jlab.coda.xmsg.net.xMsgConnection} object
-     */
-    public xMsgConnection connect(int port) {
-        xMsgProxyAddress address = new xMsgProxyAddress(defaultProxyAddress.host(), port);
-        return connectionManager.getProxyConnection(address);
     }
 
     /**
