@@ -128,7 +128,7 @@ public class xMsgConnectionFactory {
     private static long getCtrlIdPrefix() {
         try {
             final int javaId = 1;
-            final int ipHash = Math.abs(xMsgUtil.localhost().hashCode());
+            final int ipHash = xMsgUtil.localhost().hashCode() & Integer.MAX_VALUE;
             return (ipHash % 1000) * 1000000 + javaId * 100000;
         } catch (IOException e) {
             throw new UncheckedIOException(e);
