@@ -41,14 +41,62 @@ import java.util.concurrent.ThreadPoolExecutor;
 import java.util.concurrent.TimeoutException;
 
 /**
- * xMsg base class that provides methods
- * for organizing pub/sub communications.
+ * The main xMsg pub/sub actor.
+ * <p>
+ * Actors send messages to each other using pub/sub communications
+ * through a cloud of xMsg proxies.
+ * Registrar services provide registration and discoverability of actors.
+ * <p>
+ * An actor has a <em>name</em> for identification, a <em>default proxy</em> intended for
+ * long-term publication/subscription of messages, and a <em>default registrar</em>
+ * where it can register and discover other long-term actors.
+ * Unless otherwise specified, the local node and the standard ports will be
+ * used for both default proxy and registrar.
+ * <p>
+ * Publishers set specific <em>topics</em> for their messages, and subscribers define
+ * topics of interest to filter which messages they want to receive.
+ * A <em>domain-specific callback</em> defined by the subscriber will be executed every
+ * time a message is received. This callback must be thread-safe,
+ * and it can also be used to send responses or new messages.
+ * <p>
+ * In order to publish or subscribe to messages, a <em>connection</em> to a proxy must
+ * be obtained. The actor owns and keeps a <em>pool of available connections</em>,
+ * creating new ones as needed. When no address is specified, the <em>default
+ * proxy</em> will be used. The connections can be returned to the pool of available
+ * connections, to avoid creating too many new connections. All connections will
+ * be closed when the actor is destroyed.
+ * <p>
+ * Multi-threaded publication of messages is fully supported, but every thread
+ * must use its own connection. Subscriptions of messages always run in their
+ * own background thread. It is recommended to always obtain and release the
+ * necessary connections inside the thread that uses them. The <em>connect</em> methods
+ * will ensure that each thread gets a different connection.
+ * <p>
+ * Publishers must be sending messages through the same <em>proxy</em> than the
+ * subscribers for the messages to be received. Normally, this proxy will be
+ * the <em>default proxy</em> of a long-term subscriber with many dynamic publishers, or
+ * the <em>default proxy</em> of a long-term publisher with many dynamic subscribers.
+ * To have many publishers sending messages to many subscribers, they all must
+ * <em>agree</em> in the proxy. It is possible to use several proxies, but multiple
+ * publications and subscriptions will be needed, and it may get complicated.
+ * Applications using xMsg have great flexibility to organize their
+ * communications, but it is better to deploy simple topologies.
+ * <p>
+ * Actors can register as publishers and/or subscribers with <em>registrar services</em>,
+ * so other actors can discover them if they share the topic of interest.
+ * Using the registration and discovery methods is always thread-safe.
+ * The registrar service must be common to the actors, running in a known node.
+ * If no address is specified, the <em>default registrar</em> will be used.
+ * Note that the registration will always set the <em>default proxy</em> as the proxy
+ * through which the actor is publishing/subscribed to messages.
+ * If registration for different proxies is needed, multiple actors should be
+ * used, each one with an appropriate default proxy.
+ * <p>
+ * The proxy and the registrar are provided as stand-alone executables,
+ * but only the Java implementation can be used to run a registrar.
  *
- * This class also provides a thread pool for running subscription
- * callbacks in a separate thread.
- *
- * @author gurjyan
- * @since 2.x
+ * @see xMsgMessage
+ * @see xMsgTopic
  */
 public class xMsg {
 
@@ -77,15 +125,14 @@ public class xMsg {
 
 
     /**
-     * Creates an xMsg object using default settings for proxy and registrar.
-     * The localhost will be used as a default host for both proxy and registrar.
-     * The default proxy port will be set to
-     * {@link org.jlab.coda.xmsg.core.xMsgConstants#REGISTRAR_PORT}
-     * As a  default port for the registrar will be used
-     * {@link org.jlab.coda.xmsg.core.xMsgConstants#REGISTRAR_PORT}
+     * Creates an actor with default settings.
+     * The local node and the standard ports will be used for both
+     * default proxy and registrar.
      *
-     * @param name the name of an actor
-     * @param poolSize the size of the callback thread pool
+     * @param name the name of this actor
+     * @param poolSize the initial size of the callback thread-pool
+     * @see xMsgProxyAddress
+     * @see xMsgRegAddress
      */
     public xMsg(String name, int poolSize) {
         this(name,
@@ -95,16 +142,14 @@ public class xMsg {
     }
 
     /**
-     * Creates an xMsg object using default settings for proxy and registrar.
-     * The localhost will be used as a default host for both proxy and registrar.
-     * The default proxy port will be set to
-     * {@link org.jlab.coda.xmsg.core.xMsgConstants#REGISTRAR_PORT}
-     * As a  default port for the registrar will be used
-     * {@link org.jlab.coda.xmsg.core.xMsgConstants#REGISTRAR_PORT}
-     * The default pool size {@link org.jlab.coda.xmsg.core.xMsgConstants#DEFAULT_POOL_SIZE}
-     * is used to create the xMSg object.
+     * Creates an actor with default settings.
+     * The local node and the standard ports will be used for both
+     * default proxy and registrar, and the callback thread-pool will use the
+     * {@link org.jlab.coda.xmsg.core.xMsgConstants#DEFAULT_POOL_SIZE default pool size}.
      *
-     * @param name the name of an actor
+     * @param name the name of this actor
+     * @see xMsgProxyAddress
+     * @see xMsgRegAddress
      */
     public xMsg(String name) {
         this(name,
@@ -114,16 +159,13 @@ public class xMsg {
     }
 
     /**
-     * Creates an xMsg object using default settings for proxy and default port for the registrar.
-     * The localhost will be used as a default host for proxy.
-     * The default proxy port will be set to
-     * {@link org.jlab.coda.xmsg.core.xMsgConstants#REGISTRAR_PORT}
-     * As a  default port for the registrar will be used
-     * {@link org.jlab.coda.xmsg.core.xMsgConstants#REGISTRAR_PORT}
+     * Creates an actor specifying the default registrar to be used.
+     * The local node and the standard ports will be used for the default proxy.
      *
-     * @param name the name of an actor
-     * @param defaultRegistrar the registrar address
-     * @param poolSize the size of the callback thread pool
+     * @param name the name of this actor
+     * @param defaultRegistrar the address to the default registrar
+     * @param poolSize the initial size of the callback thread-pool
+     * @see xMsgProxyAddress
      */
     public xMsg(String name, xMsgRegAddress defaultRegistrar, int poolSize) {
         this(name,
@@ -133,17 +175,13 @@ public class xMsg {
     }
 
     /**
-     * Creates an xMsg object using default settings for proxy and default port for the registrar.
-     * The localhost will be used as a default host for proxy.
-     * The default proxy port will be set to
-     * {@link org.jlab.coda.xmsg.core.xMsgConstants#REGISTRAR_PORT}
-     * As a  default port for the registrar will be used
-     * {@link org.jlab.coda.xmsg.core.xMsgConstants#REGISTRAR_PORT}
-     * The default pool size {@link org.jlab.coda.xmsg.core.xMsgConstants#DEFAULT_POOL_SIZE}
-     * is used to create the xMSg object.
+     * Creates an actor specifying the default registrar to be used.
+     * The local node and the standard ports will be used for the default proxy,
+     * and the callback thread-pool will use the
+     * {@link org.jlab.coda.xmsg.core.xMsgConstants#DEFAULT_POOL_SIZE default pool size}.
      *
      * @param name the name of an actor
-     * @param defaultRegistrar the registrar address
+     * @param defaultRegistrar the address to the default registrar
      */
     public xMsg(String name, xMsgRegAddress defaultRegistrar) {
         this(name,
@@ -153,11 +191,11 @@ public class xMsg {
     }
 
     /**
-     * Creates an xMsg actor.
+     * Creates an actor specifying the default proxy and registrar to be used.
      *
-     * @param name the name of the actor
-     * @param defaultProxy the proxy address
-     * @param defaultRegistrar the registrar address
+     * @param name the name of this actor
+     * @param defaultProxy the address to the default proxy
+     * @param defaultRegistrar the address to the default registrar
      * @param poolSize the size of the callback thread pool
      */
     public xMsg(String name,
@@ -202,16 +240,13 @@ public class xMsg {
 
     /**
      * Returns the name of this actor.
-     *
-     * @return the name of an actor
      */
     public String getName() {
         return myName;
     }
 
-
     /**
-     * Change the size of the internal thread pool for subscription callbacks.
+     * Changes the size of the callback thread-pool.
      */
     public void setPoolSize(int poolSize) {
         threadPool.setCorePoolSize(poolSize);
@@ -219,23 +254,27 @@ public class xMsg {
 
     /**
      * Returns the size of the callback thread pool.
-     *
-     * @return the size of the callback thread pool
      */
     public int getPoolSize() {
         return defaultPoolSize;
     }
 
+    /**
+     * Returns the address of the default proxy used by this actor.
+     */
     public xMsgProxyAddress getDefaultProxyAddress() {
         return defaultProxyAddress;
     }
 
+    /**
+     * Returns the address of the default registrar used by this actor.
+     */
     public xMsgRegAddress getDefaultRegistrarAddress() {
         return defaultRegistrarAddress;
     }
 
     /**
-     * Overwrites the default setup for every connection.
+     * Overwrites the default setup for all created connection.
      * This setup will be applied every time a new connection is created.
      *
      * @param setup the new default setup
@@ -245,41 +284,23 @@ public class xMsg {
     }
 
     /**
-     * Makes a connection to a required proxy.
-     * This will use the default connection options defined at the constructor.
-     * Note that it is reasonable to use this method for connecting to a remote proxy.
-     * Yet, this is not a requirement.
-     * For local/default proxy connections we suggest using {@link #connect()}.
+     * Obtains a connection to the specified proxy.
+     * If there is no available connection, a new one will be created.
      *
-     * @param address {@link org.jlab.coda.xmsg.net.xMsgProxyAddress} object
-     * @return {@link org.jlab.coda.xmsg.net.xMsgConnection} object
+     * @param address the address of the proxy
+     * @return a connection the proxy
      */
     public xMsgConnection connect(xMsgProxyAddress address) {
         return connectionManager.getProxyConnection(address);
     }
 
     /**
-     * Makes a connection to a required proxy.
-     * Note that it is reasonable to use this method for connecting to a remote proxy.
-     * Yet, this is not a requirement.
-     * For local/default proxy connections we suggest using {@link #connect()}.
+     * Obtains a connection to the specified proxy host and
+     * {@link org.jlab.coda.xmsg.core.xMsgConstants#DEFAULT_PORT default port}.
+     * If there is no available connection, a new one will be created.
      *
-     * @param address {@link org.jlab.coda.xmsg.net.xMsgProxyAddress} object
-     * @param setup {@link org.jlab.coda.xmsg.net.xMsgConnectionSetup} object
-     * @return {@link org.jlab.coda.xmsg.net.xMsgConnection} object
-     */
-    public xMsgConnection connect(xMsgProxyAddress address, xMsgConnectionSetup setup) {
-        return connectionManager.getProxyConnection(address, setup);
-    }
-
-    /**
-     * Makes a connection to the proxy on a specified host.
-     * The default proxy port will be used:
-     * {@link org.jlab.coda.xmsg.core.xMsgConstants#REGISTRAR_PORT}
-     * This will use the default connection options defined at the constructor.
-     *
-     * @param proxyHost proxy host name
-     * @return {@link org.jlab.coda.xmsg.net.xMsgConnection} object
+     * @param proxyHost the host name of the proxy
+     * @return a connection the proxy
      */
     public xMsgConnection connect(String proxyHost) {
         xMsgProxyAddress address = new xMsgProxyAddress(proxyHost);
@@ -287,27 +308,27 @@ public class xMsg {
     }
 
     /**
-     * Makes a connection to the default/local proxy. Note that
-     * default proxy host and port are defined at the constructor.
+     * Obtains a connection to the default proxy.
+     * If there is no available connection, a new one will be created.
      *
-     * @return {@link org.jlab.coda.xmsg.net.xMsgConnection} object
+     * @return a connection the proxy
      */
     public xMsgConnection connect() {
         return connectionManager.getProxyConnection(defaultProxyAddress);
     }
 
     /**
-     * Disconnects and closes pub and sub  sockets to the proxy.
+     * Returns the given connection into the pool of available connections.
      *
-     * @param connection {@link org.jlab.coda.xmsg.net.xMsgConnection} object
+     * @param connection the returned connection
      */
     public void release(xMsgConnection connection) {
         connectionManager.releaseProxyConnection(connection);
     }
 
     /**
-     * Un-subscribes all previous subscriptions, destroys the
-     * 0MQ context and shuts down thread pool.
+     * Unsubscribes all previous subscriptions,
+     * destroys the 0MQ context and shuts down thread pool.
      *
      * @throws xMsgException
      */
@@ -320,7 +341,8 @@ public class xMsg {
     }
 
     /**
-     * Destructor if this xMsg object.
+     * Unsubscribes all previous subscriptions,
+     * destroys the 0MQ context and shuts down thread pool.
      *
      * @param linger linger period for closing the 0MQ context
      * @throws xMsgException
@@ -331,14 +353,15 @@ public class xMsg {
     }
 
     /**
-     * Registers this actor as a publisher.
+     * Registers this actor as a publisher of the specified topic,
+     * on the given registrar service.
      *
-     * @param address the address of the registrar:
-     *                object of {@link org.jlab.coda.xmsg.net.xMsgRegAddress}
-     * @param topic the topic to which messages will be published:
-     *              object of {@link org.jlab.coda.xmsg.core.xMsgTopic}
-     * @param description textual description of the published message
-     * @throws xMsgException {@link org.jlab.coda.xmsg.excp.xMsgException}
+     * The actor will be registered as publishing through the default proxy.
+     *
+     * @param address the address of the registrar service
+     * @param topic the topic to which messages will be published
+     * @param description general description of the published messages
+     * @throws xMsgException if the registration failed
      */
     public void registerAsPublisher(xMsgRegAddress address,
                                     xMsgTopic topic,
@@ -348,13 +371,14 @@ public class xMsg {
     }
 
     /**
-     * Registers an actor as a publisher. This assumes that the
-     * request is addressed to the default registrar.
+     * Registers this actor as a publisher of the specified topic,
+     * on the default registrar service.
      *
-     * @param topic the topic to which messages will be published:
-     *              object of {@link org.jlab.coda.xmsg.core.xMsgTopic}
-     * @param description textual description of the published message
-     * @throws xMsgException {@link org.jlab.coda.xmsg.excp.xMsgException}
+     * The actor will be registered as publishing through the default proxy.
+     *
+     * @param topic the topic to which messages will be published
+     * @param description general description of the published messages
+     * @throws xMsgException if the registration failed
      */
     public void registerAsPublisher(xMsgTopic topic,
                                     String description)
@@ -363,14 +387,15 @@ public class xMsg {
     }
 
     /**
-     * Registers this actor as a subscriber.
+     * Registers this actor as a subscriber of the specified topic,
+     * on the given registrar service.
      *
-     * @param address the address of the registrar:
-     *                object of {@link org.jlab.coda.xmsg.net.xMsgRegAddress}
-     * @param topic the subscription topic:
-     *              object of {@link org.jlab.coda.xmsg.core.xMsgTopic}
-     * @param description textual description of the subscription
-     * @throws xMsgException {@link org.jlab.coda.xmsg.excp.xMsgException}
+     * The actor will be registered as subscribed through the default proxy.
+     *
+     * @param address the address of the registrar service
+     * @param topic the topic of the subscription
+     * @param description general description of the subscription
+     * @throws xMsgException if the registration failed
      */
     public void registerAsSubscriber(xMsgRegAddress address,
                                      xMsgTopic topic,
@@ -380,13 +405,14 @@ public class xMsg {
     }
 
     /**
-     * Registers an actor as a subscriber. This assumes that the
-     * request is addressed to the default registrar.
+     * Registers this actor as a subscriber of the specified topic,
+     * on the default registrar service.
      *
-     * @param topic the subscription topic:
-     *              object of {@link org.jlab.coda.xmsg.core.xMsgTopic}
-     * @param description textual description of the subscription
-     * @throws xMsgException {@link org.jlab.coda.xmsg.excp.xMsgException}
+     * The actor will be registered as subscribed through the default proxy.
+     *
+     * @param topic the topic of the subscription
+     * @param description general description of the subscription
+     * @throws xMsgException if the registration failed
      */
     public void registerAsSubscriber(xMsgTopic topic,
                                      String description)
@@ -395,13 +421,12 @@ public class xMsg {
     }
 
     /**
-     * Sends a request to the registrar to remove a publisher registration.
+     * Removes this actor as a publisher of the specified topic,
+     * from the given registrar service.
      *
-     * @param address the address of the registrar:
-     *                object of {@link org.jlab.coda.xmsg.net.xMsgRegAddress}
-     * @param topic the subscription topic:
-     *              object of {@link org.jlab.coda.xmsg.core.xMsgTopic}
-     * @throws xMsgException
+     * @param address the address of the registrar service
+     * @param topic the topic to which messages are published
+     * @throws xMsgException if the request failed
      */
     public void deregisterAsPublisher(xMsgRegAddress address,
                                       xMsgTopic topic)
@@ -410,12 +435,11 @@ public class xMsg {
     }
 
     /**
-     * Sends a request to the registrar to remove a publisher registration.
-     * This assumes that the request is addressed to the default registrar.
+     * Removes this actor as a publisher of the specified topic,
+     * from the default registrar service.
      *
-     * @param topic the subscription topic:
-     *              object of {@link org.jlab.coda.xmsg.core.xMsgTopic}
-     * @throws xMsgException
+     * @param topic the topic to which messages are published
+     * @throws xMsgException if the request failed
      */
     public void deregisterAsPublisher(xMsgTopic topic)
             throws xMsgException {
@@ -423,13 +447,12 @@ public class xMsg {
     }
 
     /**
-     * Sends a request to the registrar to remove a subscriber registration.
+     * Removes this actor as a subscriber of the specified topic,
+     * from the given registrar service.
      *
-     * @param address the address of the registrar:
-     *                object of {@link org.jlab.coda.xmsg.net.xMsgRegAddress}
-     * @param topic the subscription topic:
-     *              object of {@link org.jlab.coda.xmsg.core.xMsgTopic}
-     * @throws xMsgException
+     * @param address the address of the registrar service
+     * @param topic the topic of the subscription
+     * @throws xMsgException if the request failed
      */
     public void deregisterAsSubscriber(xMsgRegAddress address,
                                        xMsgTopic topic)
@@ -438,12 +461,11 @@ public class xMsg {
     }
 
     /**
-     * Sends a request to the registrar to remove a subscriber registration.
-     * This assumes that the request is addressed to the default registrar.
+     * Removes this actor as a subscriber from the given registrar.
+     * The default registrar is defined at the constructor.
      *
-     * @param topic the subscription topic:
-     *              object of {@link org.jlab.coda.xmsg.core.xMsgTopic}
-     * @throws xMsgException
+     * @param topic the subscription topic
+     * @throws xMsgException if the request failed
      */
     public void deregisterAsSubscriber(xMsgTopic topic)
             throws xMsgException {
@@ -452,14 +474,13 @@ public class xMsg {
 
 
     /**
-     * Sends a request to the registrar to find/return a publisher registration.
+     * Finds all publishers of the specified topic
+     * that are registered on the given registrar service.
      *
-     * @param address the address of the registrar:
-     *                object of {@link org.jlab.coda.xmsg.net.xMsgRegAddress}
-     * @param topic the subscription topic:
-     *              object of {@link org.jlab.coda.xmsg.core.xMsgTopic}
-     * @return Set of {@link org.jlab.coda.xmsg.data.xMsgR.xMsgRegistration} objects
-     * @throws xMsgException
+     * @param address the address to the registrar service
+     * @param topic the topic of interest
+     * @return a set with the registration data of the matching publishers
+     * @throws xMsgException if the request failed
      */
     public Set<xMsgRegistration> findPublishers(xMsgRegAddress address,
                                                 xMsgTopic topic)
@@ -469,13 +490,12 @@ public class xMsg {
     }
 
     /**
-     * Sends a request to the registrar to find/return a publisher registration.
-     * This assumes that the request is addressed to the default registrar.
+     * Finds all publishers of the specified topic
+     * that are registered on the default registrar service.
      *
-     * @param topic the subscription topic:
-     *              object of {@link org.jlab.coda.xmsg.core.xMsgTopic}
-     * @return Set of {@link org.jlab.coda.xmsg.data.xMsgR.xMsgRegistration} objects
-     * @throws xMsgException
+     * @param topic the topic of interest
+     * @return a set with the registration data of the matching publishers
+     * @throws xMsgException if the request failed
      */
     public Set<xMsgRegistration> findPublishers(xMsgTopic topic)
             throws xMsgException {
@@ -484,14 +504,13 @@ public class xMsg {
     }
 
     /**
-     * Sends a request to the registrar to find/return a subscriber registration.
+     * Finds all subscribers to the specified topic
+     * that are registered on the given registrar service.
      *
-     * @param address the address of the registrar:
-     *                object of {@link org.jlab.coda.xmsg.net.xMsgRegAddress}
-     * @param topic the subscription topic:
-     *              object of {@link org.jlab.coda.xmsg.core.xMsgTopic}
-     * @return Set of {@link org.jlab.coda.xmsg.data.xMsgR.xMsgRegistration} objects
-     * @throws xMsgException
+     * @param address the address to the registrar service
+     * @param topic the topic of interest
+     * @return a set with the registration data of the matching subscribers
+     * @throws xMsgException if the request failed
      */
     public Set<xMsgRegistration> findSubscribers(xMsgRegAddress address,
                                                  xMsgTopic topic)
@@ -501,13 +520,12 @@ public class xMsg {
     }
 
     /**
-     * Sends a request to the registrar to find/return a subscriber registration.
-     * This assumes that the request is addressed to the default registrar.
+     * Finds all subscribers to the specified topic
+     * that are registered on the default registrar service.
      *
-     * @param topic the subscription topic:
-     *              object of {@link org.jlab.coda.xmsg.core.xMsgTopic}
-     * @return Set of {@link org.jlab.coda.xmsg.data.xMsgR.xMsgRegistration} objects
-     * @throws xMsgException
+     * @param topic the topic of interest
+     * @return a set with the registration data of the matching subscribers
+     * @throws xMsgException if the request failed
      */
     public Set<xMsgRegistration> findSubscribers(xMsgTopic topic)
             throws xMsgException {
@@ -518,11 +536,9 @@ public class xMsg {
     /**
      * Publishes a message through the specified proxy connection.
      *
-     * @param con a proxy connection:
-     *            object of {@link org.jlab.coda.xmsg.net.xMsgConnection}
-     * @param msg publishing message:
-     *            object of {@link org.jlab.coda.xmsg.core.xMsgMessage}
-     * @throws xMsgException
+     * @param con the connection to the proxy
+     * @param msg the message to be published
+     * @throws xMsgException if the request failed
      */
     public void publish(xMsgConnection con, xMsgMessage msg) throws xMsgException {
 
@@ -534,17 +550,19 @@ public class xMsg {
     }
 
     /**
-     * Publishes a message through the specified proxy connection and blocks waiting
-     * for a response from a subscriber. Note that the subscriber must check "replyTo"
-     * metadata field and publish the response to that address.
+     * Publishes a message through the specified proxy connection and blocks
+     * waiting for a response.
      *
-     * @param con a proxy connection:
-     *            object of {@link org.jlab.coda.xmsg.net.xMsgConnection}
-     * @param msg publishing message:
-     *            object of {@link org.jlab.coda.xmsg.core.xMsgMessage}
-     * @param timeout int that defines how long publisher will wait for
-     *                subscribers response in milli seconds.
-     * @return {@link org.jlab.coda.xmsg.core.xMsgMessage} object
+     * The subscriber must publish the response to the topic given by the
+     * {@code replyto} metadata field, through the same proxy.
+     *
+     * This method will throw if a response is not received before the timeout
+     * expires.
+     *
+     * @param con the connection to the proxy
+     * @param msg the message to be published
+     * @param timeout the length of time to wait a response, in milliseconds
+     * @return the response message
      * @throws xMsgException
      * @throws TimeoutException
      */
@@ -596,16 +614,13 @@ public class xMsg {
     }
 
     /**
-     * Subscribes to a specific topic. New subscription handlers will be stored
-     * in a local map of subscriptions. This method will throw an exception
-     * in case requested subscription already exists in the map of subscriptions.
+     * Subscribes to a topic of interest through the specified proxy
+     * connection.
+     * A background thread will be started to receive the messages.
      *
-     * @param con a proxy connection:
-     *            object of {@link org.jlab.coda.xmsg.net.xMsgConnection}
-     * @param topic subscription topic:
-     *              object of {@link org.jlab.coda.xmsg.core.xMsgTopic}
-     * @param cb {@link org.jlab.coda.xmsg.core.xMsgCallBack} object
-     * @return {@link org.jlab.coda.xmsg.core.xMsgSubscription} object.
+     * @param con the connection to the proxy
+     * @param topic the topic to select messages
+     * @param cb the user action to run when a message is received
      * @throws xMsgException
      */
     public xMsgSubscription subscribe(final xMsgConnection con,
@@ -644,10 +659,9 @@ public class xMsg {
     }
 
     /**
-     * Stops the existing subscription.
+     * Stops the given subscription.
      *
-     * @param handle SubscribeHandler object reference:
-     *               object of {@link org.jlab.coda.xmsg.core.xMsgSubscription}
+     * @param handle an active subscription
      * @throws xMsgException
      */
     public void unsubscribe(xMsgSubscription handle)
@@ -660,14 +674,6 @@ public class xMsg {
     //                        Private section
     // ..............................................................//
 
-    /**
-     * Creates xMsgRegistration builder object. This is a proto-buffer
-     * definition of actor registration data.
-     *
-     * @param topic actor's topic of interest:
-     *              object of {@link org.jlab.coda.xmsg.core.xMsgTopic}
-     * @return {@link org.jlab.coda.xmsg.data.xMsgR.xMsgRegistration.Builder} Object
-     */
     private xMsgRegistration.Builder _createRegistration(xMsgTopic topic) {
         xMsgRegistration.Builder regb = xMsgRegistration.newBuilder();
         regb.setName(myName);
@@ -679,16 +685,6 @@ public class xMsg {
         return regb;
     }
 
-    /**
-     * Registers an actor with the registrar, running at the specified host and port.
-     *
-     * @param topic actor's topic of interest:
-     *              object of {@link org.jlab.coda.xmsg.core.xMsgTopic}
-     * @param description textual description of the actor
-     * @param isPublisher boolean defines the type of the actor:
-     *                    true = publisher, false = subscriber
-     * @throws xMsgException
-     */
     private void _register(xMsgRegAddress regAddress,
                            xMsgTopic topic,
                            String description,
@@ -707,16 +703,6 @@ public class xMsg {
         regDriver.register(regData, isPublisher);
     }
 
-    /**
-     * Removes an actor from the registrar database, assuming that the
-     * registrar is running on the specified host and port.
-     *
-     * @param topic actor's topic of interest:
-     *              object of {@link org.jlab.coda.xmsg.core.xMsgTopic}
-     * @param isPublisher boolean defines the type of the actor:
-     *                    true = publisher, false = subscriber
-     * @throws xMsgException
-     */
     private void _removeRegistration(xMsgRegAddress regAddress,
                                      xMsgTopic topic,
                                      boolean isPublisher)
@@ -733,16 +719,6 @@ public class xMsg {
         regDriver.removeRegistration(regData, isPublisher);
     }
 
-    /**
-     * Finds the registration information of an actor, previously registered
-     * with a registrar running on the specified host and port.
-     *
-     * @param topic actor's topic of interest:
-     *              object of {@link org.jlab.coda.xmsg.core.xMsgTopic}
-     * @param isPublisher boolean defines the type of the actor:
-     *                    true = publisher, false = subscriber
-     * @throws xMsgException
-     */
     private Set<xMsgRegistration> _findRegistration(xMsgRegAddress regAddress,
                                                     xMsgTopic topic,
                                                     boolean isPublisher)
@@ -773,18 +749,6 @@ public class xMsg {
 
     }
 
-    /**
-     * Executes a user callback implementing {@link org.jlab.coda.xmsg.core.xMsgCallBack}
-     * interface. Note that it is under user responsibility to check metadata "replyTo"
-     * to define if this is a sync request and send the result to the topic = replyTo.
-     *
-     * @param callback the actual user callback implementing
-     *                 the interface {@link org.jlab.coda.xmsg.core.xMsgCallBack}
-     * @param callbackMsg the message  {@link org.jlab.coda.xmsg.core.xMsgMessage}
-     *                    passed to the user callback
-     * @throws xMsgException
-     * @throws IOException
-     */
     private void _callUserCallBack(final xMsgCallBack callback,
                                    final xMsgMessage callbackMsg)
             throws xMsgException, IOException {
