@@ -156,22 +156,22 @@ public class xMsg {
      * Creates an xMsg actor.
      *
      * @param name the name of the actor
-     * @param defaultProxyAddress the proxy address
-     * @param defaultRegAddr the registrar address
+     * @param defaultProxy the proxy address
+     * @param defaultRegistrar the registrar address
      * @param poolSize the size of the callback thread pool
      */
     public xMsg(String name,
-                xMsgProxyAddress defaultProxyAddress,
-                xMsgRegAddress defaultRegAddr,
+                xMsgProxyAddress defaultProxy,
+                xMsgRegAddress defaultRegistrar,
                 int poolSize) {
 
         // We need to have a name for an actor
         this.myName = name;
-        this.myId = xMsgUtil.encodeIdentity(defaultRegAddr.toString(), name);
+        this.myId = xMsgUtil.encodeIdentity(defaultRegistrar.toString(), name);
 
         this.defaultPoolSize = poolSize;
-        this.defaultProxyAddress = defaultProxyAddress;
-        this.defaultRegistrarAddress = defaultRegAddr;
+        this.defaultProxyAddress = defaultProxy;
+        this.defaultRegistrarAddress = defaultRegistrar;
 
         // create fixed size thread pool
         this.threadPool = xMsgUtil.newFixedThreadPool(defaultPoolSize, name);
