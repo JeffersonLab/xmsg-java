@@ -1,5 +1,7 @@
 package perf;
 
+import java.util.concurrent.CountDownLatch;
+
 import org.jlab.coda.xmsg.core.xMsg;
 import org.jlab.coda.xmsg.core.xMsgCallBack;
 import org.jlab.coda.xmsg.core.xMsgMessage;
@@ -29,7 +31,7 @@ public final class LocalThroughput {
         final int messageSize = Integer.parseInt(argv[1]);
         final long messageCount = Long.valueOf(argv[2]);
 
-        final Object lock = new Object();
+        final CountDownLatch finished = new CountDownLatch(1);
         final Timer timer = new Timer();
 
         try {
@@ -50,17 +52,14 @@ public final class LocalThroughput {
                             timer.watch = startClock();
                         } else if (nr == messageCount) {
                             timer.elapsed = stopClock(timer.watch);
-                            synchronized (lock) {
-                                lock.notify();
-                            }
+                            finished.countDown();
                         }
                         return msg;
                     }
             });
 
-            synchronized (lock) {
-                lock.wait();
-            }
+            finished.await();
+
             if (timer.elapsed == 0) {
                 timer.elapsed = 1;
             }
