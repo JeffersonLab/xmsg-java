@@ -161,33 +161,6 @@ public class xMsgRegDatabase {
         return db.keySet();
     }
 
-    public String findDomainNames() {
-        StringBuilder result = new StringBuilder();
-        for (xMsgTopic topic : db.keySet()) {
-            result.append(topic.domain()).append(" ");
-        }
-        return result.toString();
-    }
-
-    public String findSubjectNames(String domainName) {
-        StringBuilder result = new StringBuilder();
-        for (xMsgTopic topic : db.keySet()) {
-            if (topic.domain().equals(domainName)) {
-                result.append(topic.subject()).append(" ");
-            }
-        }
-        return result.toString();
-    }
-
-    public String findTypeNames(String domainName, String subjectName) {
-        StringBuilder result = new StringBuilder();
-        for (xMsgTopic topic : db.keySet()) {
-            if (topic.domain().equals(domainName) && topic.subject().equals(subjectName)) {
-                result.append(topic.type()).append(" ");
-            }
-        }
-        return result.toString();
-    }
 
     /**
      * Returns all actors registered with the specific known topic.

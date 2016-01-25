@@ -57,17 +57,6 @@ public final class xMsgConstants {
     public static final int FIND_REQUEST_TIMEOUT = 3000;
     public static final String FIND_PUBLISHER = "findPublisher";
     public static final String FIND_SUBSCRIBER = "findSubscriber";
-    public static final String FIND_PUBLISHERS_BY_DOMAIN = "findePublishersByDomain";
-    public static final String FIND_PUBLISHERS_BY_SUBJECT = "findePublishersBySubject";
-    public static final String FIND_SUBSCRIBERS_BY_DOMAIN = "findeSubscribersByDomain";
-    public static final String FIND_SUBSCRIBERS_BY_SUBJECT = "findeSubscribersBySubject";
-    public static final String RETURN_PUBLISHER_DOMAIN_NAMES = "returnPublisherDomainNames";
-    public static final String RETURN_PUBLISHER_SUBJECT_NAMES = "returnPublisherSubjectNames";
-    public static final String RETURN_PUBLISHER_TYPE_NAMES = "returnPublisherTypeNames";
-    public static final String RETURN_SUBSCRIBER_DOMAIN_NAMES = "returnSubscriberDomainNames";
-    public static final String RETURN_SUBSCRIBER_SUBJECT_NAMES = "returnSubscriberSubjectNames";
-    public static final String RETURN_SUBSCRIBER_TYPE_NAMES = "returnSubscriberTypeNames";
-
 
     public static final String INFO = "INFO";
     public static final String WARNING = "WARNING";
