@@ -23,6 +23,7 @@ package org.jlab.coda.xmsg.core;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.is;
+import static org.junit.Assert.assertFalse;
 
 import java.util.Arrays;
 import java.util.List;
@@ -73,7 +74,7 @@ public class xMsgMessageTest {
         assertThat(res.getTopic().toString(), is("return_123"));
         assertThat(res.getData(), is(msg.getData()));
         assertThat(res.getMetaData().getDataType(), is("test/binary"));
-        assertThat(res.getMetaData().getReplyTo(), is(xMsgConstants.UNDEFINED));
+        assertFalse(res.getMetaData().hasReplyTo());
     }
 
     @Test
@@ -89,6 +90,6 @@ public class xMsgMessageTest {
         assertThat(res.getTopic().toString(), is("return_123"));
         assertThat(xMsgData.parseFrom(res.getData()).getFLSINT32(), is(1000));
         assertThat(res.getMetaData().getDataType(), is(xMsgConstants.MimeType.SFIXED32));
-        assertThat(res.getMetaData().getReplyTo(), is(xMsgConstants.UNDEFINED));
+        assertFalse(res.getMetaData().hasReplyTo());
     }
 }

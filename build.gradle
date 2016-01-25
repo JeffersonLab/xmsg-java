@@ -260,8 +260,17 @@ def generatedProtoDir = "${buildDirName}/generated/source/proto/main/java"
 
 eclipse {
     classpath {
-        file.whenMerged {
-            cp -> cp.entries.add(new org.gradle.plugins.ide.eclipse.model.SourceFolder(generatedProtoDir, null) )
+        file {
+            whenMerged {
+                cp -> cp.entries.add(new org.gradle.plugins.ide.eclipse.model.SourceFolder(generatedProtoDir, null) )
+            }
+            withXml { xml ->
+                xml.asNode().find {
+                    it.@kind == 'src' && it.@path == generatedProtoDir
+                }
+                .appendNode('attributes')
+                .appendNode('attribute', [ name:'ignore_optional_problems', value:"true"])
+            }
         }
         defaultOutputDir = file("${buildDir}/eclipse-classes")
     }
