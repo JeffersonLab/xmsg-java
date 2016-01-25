@@ -122,13 +122,13 @@ public class xMsg {
      * {@link org.jlab.coda.xmsg.core.xMsgConstants#REGISTRAR_PORT}
      *
      * @param name the name of an actor
-     * @param registrarHost the registrar host
+     * @param defaultRegistrar the registrar address
      * @param poolSize the size of the callback thread pool
      */
-    public xMsg(String name, String registrarHost, int poolSize) {
+    public xMsg(String name, xMsgRegAddress defaultRegistrar, int poolSize) {
         this(name,
              new xMsgProxyAddress(),
-             new xMsgRegAddress(registrarHost),
+             defaultRegistrar,
              poolSize);
     }
 
@@ -143,12 +143,12 @@ public class xMsg {
      * is used to create the xMSg object.
      *
      * @param name the name of an actor
-     * @param registrarHost the registrar host
+     * @param defaultRegistrar the registrar address
      */
-    public xMsg(String name, String registrarHost) {
+    public xMsg(String name, xMsgRegAddress defaultRegistrar) {
         this(name,
              new xMsgProxyAddress(),
-             new xMsgRegAddress(registrarHost),
+             defaultRegistrar,
              xMsgConstants.DEFAULT_POOL_SIZE);
     }
 
