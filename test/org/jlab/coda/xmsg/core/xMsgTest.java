@@ -79,7 +79,7 @@ public class xMsgTest {
     public void removePublisher() throws Exception {
         xMsgTopic topic = xMsgTopic.wrap("writer:scifi:book");
 
-        core.removePublisherRegistration(topic);
+        core.deregisterAsPublisher(topic);
 
         RegValidator validator = new RegValidator(topic, true);
         validator.assertDriverCall("remove");
@@ -89,7 +89,7 @@ public class xMsgTest {
     public void removeSubscriber() throws Exception {
         xMsgTopic topic = xMsgTopic.wrap("writer:scifi:book");
 
-        core.removeSubscriberRegistration(topic);
+        core.deregisterAsSubscriber(topic);
 
         RegValidator validator = new RegValidator(topic, false);
         validator.assertDriverCall("remove");

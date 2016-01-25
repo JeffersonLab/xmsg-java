@@ -403,8 +403,8 @@ public class xMsg {
      *              object of {@link org.jlab.coda.xmsg.core.xMsgTopic}
      * @throws xMsgException
      */
-    public void removePublisherRegistration(xMsgRegAddress address,
-                                            xMsgTopic topic)
+    public void deregisterAsPublisher(xMsgRegAddress address,
+                                      xMsgTopic topic)
             throws xMsgException {
         _removeRegistration(address, topic, true);
     }
@@ -417,7 +417,7 @@ public class xMsg {
      *              object of {@link org.jlab.coda.xmsg.core.xMsgTopic}
      * @throws xMsgException
      */
-    public void removePublisherRegistration(xMsgTopic topic)
+    public void deregisterAsPublisher(xMsgTopic topic)
             throws xMsgException {
         _removeRegistration(defaultRegistrarAddress, topic, true);
     }
@@ -431,8 +431,8 @@ public class xMsg {
      *              object of {@link org.jlab.coda.xmsg.core.xMsgTopic}
      * @throws xMsgException
      */
-    public void removeSubscriberRegistration(xMsgRegAddress address,
-                                             xMsgTopic topic)
+    public void deregisterAsSubscriber(xMsgRegAddress address,
+                                       xMsgTopic topic)
             throws xMsgException {
         _removeRegistration(address, topic, false);
     }
@@ -445,7 +445,7 @@ public class xMsg {
      *              object of {@link org.jlab.coda.xmsg.core.xMsgTopic}
      * @throws xMsgException
      */
-    public void removeSubscriberRegistration(xMsgTopic topic)
+    public void deregisterAsSubscriber(xMsgTopic topic)
             throws xMsgException {
         _removeRegistration(defaultRegistrarAddress, topic, false);
     }
