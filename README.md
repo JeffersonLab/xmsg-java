@@ -48,8 +48,8 @@ In a conclusion we present the xMsg entire API
     unsubscribe
     registerAsPublisher
     registerAsSubscriber
-    removePublisherRegistration
-    removeSubscriberRegistration
+    deregisterAsPublisher
+    deregisterAsSubscriber
     findPublishers
     findSubscribers
 
