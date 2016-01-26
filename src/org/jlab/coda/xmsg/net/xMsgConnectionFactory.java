@@ -91,7 +91,7 @@ public class xMsgConnectionFactory {
         ZMQ.Poller items = new ZMQ.Poller(1);
         items.register(ctrlSocket, ZMQ.Poller.POLLIN);
         int retry = 0;
-        while (retry <= 10) {
+        while (retry < 10) {
             retry++;
             ZMsg ctrlMsg = new ZMsg();
             try {
@@ -100,7 +100,7 @@ public class xMsgConnectionFactory {
                 ctrlMsg.add(identity);
                 ctrlMsg.send(pubSocket);
 
-                items.poll(10);
+                items.poll(100);
                 if (items.pollin(0)) {
                     ZMsg replyMsg = ZMsg.recvMsg(ctrlSocket);
                     try {
