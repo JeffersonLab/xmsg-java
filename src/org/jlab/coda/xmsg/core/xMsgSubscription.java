@@ -164,7 +164,7 @@ public abstract class xMsgSubscription {
         ZMQ.Poller items = new ZMQ.Poller(1);
         items.register(subSocket, ZMQ.Poller.POLLIN);
         int retry = 0;
-        while (retry <= 10) {
+        while (retry < 10) {
             retry++;
             ZMsg ctrlMsg = new ZMsg();
             try {
@@ -173,7 +173,7 @@ public abstract class xMsgSubscription {
                 ctrlMsg.add(topic);
                 ctrlMsg.send(pubSocket);
 
-                items.poll(10);
+                items.poll(100);
                 if (items.pollin(0)) {
                     ZMsg replyMsg = ZMsg.recvMsg(subSocket);
                     try {
