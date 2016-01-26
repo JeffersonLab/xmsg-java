@@ -2,8 +2,6 @@ package org.jlab.coda.xmsg.net;
 
 import org.jlab.coda.xmsg.core.xMsgUtil;
 
-import java.io.IOException;
-import java.io.UncheckedIOException;
 import java.util.Random;
 
 final class IdentityGenerator {
@@ -16,13 +14,9 @@ final class IdentityGenerator {
     // CHECKSTYLE.ON: ConstantName
 
     private static long getCtrlIdPrefix() {
-        try {
-            final int javaId = 1;
-            final int ipHash = xMsgUtil.localhost().hashCode() & Integer.MAX_VALUE;
-            return javaId * 100000000 + (ipHash % 1000) * 100000;
-        } catch (IOException e) {
-            throw new UncheckedIOException(e);
-        }
+        final int javaId = 1;
+        final int ipHash = xMsgUtil.localhost().hashCode() & Integer.MAX_VALUE;
+        return javaId * 100000000 + (ipHash % 1000) * 100000;
     }
 
     static String getCtrlId() {

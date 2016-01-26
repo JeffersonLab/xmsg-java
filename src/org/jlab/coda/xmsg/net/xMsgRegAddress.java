@@ -26,7 +26,7 @@ import org.jlab.coda.xmsg.core.xMsgConstants;
 import org.jlab.coda.xmsg.core.xMsgUtil;
 import org.jlab.coda.xmsg.excp.xMsgAddressException;
 
-import java.io.IOException;
+import java.io.UncheckedIOException;
 
 /**
  * xMsg Registrar address.
@@ -74,7 +74,7 @@ public class xMsgRegAddress {
             }
             this.host = xMsgUtil.toHostAddress(host);
             this.port = port;
-        } catch (IOException e) {
+        } catch (UncheckedIOException e) {
             throw new xMsgAddressException(e);
         }
     }

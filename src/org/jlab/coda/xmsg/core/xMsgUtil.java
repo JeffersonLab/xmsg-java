@@ -28,6 +28,7 @@ import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
+import java.io.UncheckedIOException;
 import java.net.InetAddress;
 import java.net.NetworkInterface;
 import java.text.DateFormat;
@@ -150,9 +151,9 @@ public final class xMsgUtil {
     /**
      * Returns the localhost IP.
      *
-     * @throws IOException if an I/O error occurs.
+     * @throws UncheckedIOException if an I/O error occurs.
      */
-    public static String localhost() throws IOException {
+    public static String localhost() {
         return toHostAddress("localhost");
     }
 
@@ -165,9 +166,9 @@ public final class xMsgUtil {
      * broadcast (255.255.255.255) addresses.
      *
      * @return list of IP addresses
-     * @throws IOException if an I/O error occurs.
+     * @throws UncheckedIOException if an I/O error occurs.
      */
-    public static List<String> getLocalHostIps() throws IOException {
+    public static List<String> getLocalHostIps() {
         if (localHostIps.isEmpty()) {
             updateLocalHostIps();
         }
@@ -181,23 +182,27 @@ public final class xMsgUtil {
      * multicast (224.xxx through 238.xxx) and
      * broadcast (255.255.255.255) addresses.
      *
-     * @throws IOException if an I/O error occurs.
+     * @throws UncheckedIOException if an I/O error occurs.
      */
-    public static void updateLocalHostIps() throws IOException {
-        List<String> out = new ArrayList<>();
-        Enumeration<NetworkInterface> e = NetworkInterface.getNetworkInterfaces();
-        while (e.hasMoreElements()) {
-            NetworkInterface n = e.nextElement();
-            Enumeration<InetAddress> ee = n.getInetAddresses();
-            while (ee.hasMoreElements()) {
-                InetAddress i = ee.nextElement();
-                String address = i.getHostAddress();
-                if (!(address.startsWith("127") || address.contains(":"))) {
-                    out.add(address);
+    public static void updateLocalHostIps() {
+        try {
+            List<String> out = new ArrayList<>();
+            Enumeration<NetworkInterface> e = NetworkInterface.getNetworkInterfaces();
+            while (e.hasMoreElements()) {
+                NetworkInterface n = e.nextElement();
+                Enumeration<InetAddress> ee = n.getInetAddresses();
+                while (ee.hasMoreElements()) {
+                    InetAddress i = ee.nextElement();
+                    String address = i.getHostAddress();
+                    if (!(address.startsWith("127") || address.contains(":"))) {
+                        out.add(address);
+                    }
                 }
             }
+            localHostIps = out;
+        } catch (IOException e) {
+            throw new UncheckedIOException(e);
         }
-        localHostIps = out;
     }
 
     /**
@@ -209,9 +214,9 @@ public final class xMsgUtil {
      *
      * @param hostName The name of the host (accepts "localhost")
      * @return dotted notation of the IP address
-     * @throws IOException if the IP could not be obtained
+     * @throws UncheckedIOException if the IP could not be resolved
      */
-    public static String toHostAddress(String hostName) throws IOException  {
+    public static String toHostAddress(String hostName) {
         if (isIP(hostName)) {
             return hostName;
         }
@@ -224,7 +229,11 @@ public final class xMsgUtil {
                 return getLocalHostIps().get(0);
             }
         } else {
-            return InetAddress.getByName(hostName).getHostAddress();
+            try {
+                return InetAddress.getByName(hostName).getHostAddress();
+            } catch (IOException e) {
+                throw new UncheckedIOException(e);
+            }
         }
     }
 

@@ -32,7 +32,6 @@ import org.jlab.coda.xmsg.net.xMsgSocketFactory;
 import org.junit.Before;
 import org.junit.Test;
 
-import java.io.IOException;
 import java.util.Arrays;
 import java.util.HashSet;
 import java.util.Set;
@@ -186,18 +185,14 @@ public class xMsgRegDriverTest {
 
 
     private xMsgRegistration.Builder createRegData(String name, String topic) {
-        try {
-            xMsgTopic xtopic = xMsgTopic.wrap(topic);
-            xMsgRegistration.Builder data = xMsgRegistration.newBuilder();
-            data.setName(name);
-            data.setHost(xMsgUtil.localhost());
-            data.setPort(xMsgConstants.DEFAULT_PORT);
-            data.setDomain(xtopic.domain());
-            data.setSubject(xtopic.subject());
-            data.setType(xtopic.type());
-            return data;
-        } catch (IOException e) {
-            throw new RuntimeException(e);
-        }
+        xMsgTopic xtopic = xMsgTopic.wrap(topic);
+        xMsgRegistration.Builder data = xMsgRegistration.newBuilder();
+        data.setName(name);
+        data.setHost(xMsgUtil.localhost());
+        data.setPort(xMsgConstants.DEFAULT_PORT);
+        data.setDomain(xtopic.domain());
+        data.setSubject(xtopic.subject());
+        data.setType(xtopic.type());
+        return data;
     }
 }

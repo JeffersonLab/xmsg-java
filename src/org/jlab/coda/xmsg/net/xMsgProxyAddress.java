@@ -26,7 +26,7 @@ import org.jlab.coda.xmsg.core.xMsgConstants;
 import org.jlab.coda.xmsg.core.xMsgUtil;
 import org.jlab.coda.xmsg.excp.xMsgAddressException;
 
-import java.io.IOException;
+import java.io.UncheckedIOException;
 
 /**
  * xMsg proxy address.
@@ -77,7 +77,7 @@ public class xMsgProxyAddress {
             this.host = xMsgUtil.toHostAddress(host);
             this.pubPort = port;
             this.subPort = port + 1;
-        } catch (IOException e) {
+        } catch (UncheckedIOException e) {
             throw new xMsgAddressException(e);
         }
     }
