@@ -98,6 +98,11 @@ public class xMsgMessage {
      * @param msg the received message
      */
     xMsgMessage(ZMsg msg) throws xMsgException {
+
+        if (msg.size() != 3) {
+            throw new xMsgException("xMsg-Error: invalid pub/sub message format");
+        }
+
         ZFrame topicFrame = msg.pop();
         ZFrame metaDataFrame = msg.pop();
         ZFrame dataFrame = msg.pop();
