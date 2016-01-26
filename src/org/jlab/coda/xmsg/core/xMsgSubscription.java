@@ -208,6 +208,11 @@ public abstract class xMsgSubscription {
                     if (items.pollin(0)) {
                         ZMsg msg = ZMsg.recvMsg(socket);
                         try {
+                            if (msg.size() == 2) {
+                                // ignore control message
+                                // (which are composed of 2 frames)
+                                continue;
+                            }
                             handle(msg);
                         } catch (xMsgException | TimeoutException | IOException e) {
                             e.printStackTrace();
