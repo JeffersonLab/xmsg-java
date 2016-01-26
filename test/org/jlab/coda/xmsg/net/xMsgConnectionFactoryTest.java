@@ -38,9 +38,9 @@ public class xMsgConnectionFactoryTest {
 
     @Test
     public void ctrlIdentityPrefixHas3Digits() throws Exception {
-        String prefix1 = xMsgConnectionFactory.getCtrlId().substring(0, 3);
-        String prefix2 = xMsgConnectionFactory.getCtrlId().substring(0, 3);
-        String prefix3 = xMsgConnectionFactory.getCtrlId().substring(0, 3);
+        String prefix1 = xMsgConnectionFactory.getCtrlId().substring(1, 4);
+        String prefix2 = xMsgConnectionFactory.getCtrlId().substring(1, 4);
+        String prefix3 = xMsgConnectionFactory.getCtrlId().substring(1, 4);
 
         assertThat(prefix1, is(prefix2));
         assertThat(prefix1, is(prefix3));
@@ -49,9 +49,9 @@ public class xMsgConnectionFactoryTest {
 
     @Test
     public void ctrlIdentityFourthDigitIsJavaIdentifier() throws Exception {
-        assertThat(xMsgConnectionFactory.getCtrlId().charAt(3), is('1'));
-        assertThat(xMsgConnectionFactory.getCtrlId().charAt(3), is('1'));
-        assertThat(xMsgConnectionFactory.getCtrlId().charAt(3), is('1'));
+        assertThat(xMsgConnectionFactory.getCtrlId().charAt(0), is('1'));
+        assertThat(xMsgConnectionFactory.getCtrlId().charAt(0), is('1'));
+        assertThat(xMsgConnectionFactory.getCtrlId().charAt(0), is('1'));
     }
 
     @Test

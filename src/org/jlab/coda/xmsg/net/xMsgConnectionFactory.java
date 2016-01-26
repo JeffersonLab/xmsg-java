@@ -129,7 +129,7 @@ public class xMsgConnectionFactory {
         try {
             final int javaId = 1;
             final int ipHash = xMsgUtil.localhost().hashCode() & Integer.MAX_VALUE;
-            return (ipHash % 1000) * 1000000 + javaId * 100000;
+            return javaId * 100000000 + (ipHash % 1000) * 100000;
         } catch (IOException e) {
             throw new UncheckedIOException(e);
         }
