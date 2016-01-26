@@ -544,7 +544,7 @@ public class xMsg {
 
         // just make sure that receiver knows that this is not a sync request.
         // need this in case we reuse messages.
-        msg.getMetaData().setReplyTo(xMsgConstants.UNDEFINED);
+        msg.getMetaData().clearReplyTo();
 
         _publish(con, msg);
     }
