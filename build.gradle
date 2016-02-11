@@ -108,6 +108,19 @@ artifacts {
 }
 
 
+if (!project.hasProperty("localPublicationRepo")) {
+    ext.localPublicationRepo = "file://localhost/tmp/repo"
+}
+
+uploadArchives {
+    repositories {
+        mavenDeployer {
+            repository(url: localPublicationRepo)
+        }
+    }
+}
+
+
 
 test {
     useJUnit {
