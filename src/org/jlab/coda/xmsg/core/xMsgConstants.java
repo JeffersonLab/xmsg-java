@@ -75,9 +75,6 @@ public final class xMsgConstants {
 
     public static final int DEFAULT_POOL_SIZE = 2;
 
-    private xMsgConstants() {
-    }
-
     public static final class MimeType {
         public static final String SINT32 = "binary/sint32";
         public static final String SINT64 = "binary/sint64";
@@ -102,4 +99,6 @@ public final class xMsgConstants {
         public static final String COBJECT = "binary/cpp";
         public static final String POBJECT = "binary/python";
     }
+
+    private xMsgConstants() { }
 }

@@ -22,23 +22,29 @@
 
 package org.jlab.coda.xmsg.xsys;
 
-import joptsimple.OptionException;
-import joptsimple.OptionParser;
-import joptsimple.OptionSet;
-import joptsimple.OptionSpec;
+import static java.util.Arrays.asList;
+
+import java.io.IOException;
+import java.io.PrintStream;
+
 import org.jlab.coda.xmsg.core.xMsgConstants;
 import org.jlab.coda.xmsg.core.xMsgContext;
 import org.jlab.coda.xmsg.core.xMsgUtil;
 import org.jlab.coda.xmsg.excp.xMsgException;
 import org.jlab.coda.xmsg.net.xMsgProxyAddress;
-import org.zeromq.*;
+import org.zeromq.ZContext;
+import org.zeromq.ZFrame;
+import org.zeromq.ZMQ;
+import org.zeromq.ZMQException;
 import org.zeromq.ZMQ.Socket;
+import org.zeromq.ZMsg;
+import org.zeromq.ZThread;
 import org.zeromq.ZThread.IAttachedRunnable;
 
-import java.io.IOException;
-import java.io.PrintStream;
-
-import static java.util.Arrays.asList;
+import joptsimple.OptionException;
+import joptsimple.OptionParser;
+import joptsimple.OptionSet;
+import joptsimple.OptionSpec;
 
 /**
  * xMsg pub-sub proxy executable.
@@ -58,27 +64,6 @@ public class xMsgProxy {
     private final Thread controller;
 
     private boolean verbose = false;
-
-    /**
-     * Construct the proxy with the given local address.
-     *
-     * @param context zmq context object
-     * @param address the local address
-     */
-    public xMsgProxy(ZContext context, xMsgProxyAddress address) {
-        ctx = context;
-        addr = address;
-        controller = xMsgUtil.newThread("control", new Controller());
-    }
-
-    /**
-     * Construct the proxy on a local host.
-     *
-     * @param context zmq context object
-     */
-    public xMsgProxy(ZContext context) {
-        this(context, new xMsgProxyAddress());
-    }
 
     public static void main(String[] args) {
         try {
@@ -125,19 +110,25 @@ public class xMsgProxy {
         out.printf("  %-22s  %s%n", "-verbose", "print debug information");
     }
 
-    private static Socket createSocket(ZContext ctx, int type) {
-        Socket socket = ctx.createSocket(type);
-        socket.setRcvHWM(0);
-        socket.setSndHWM(0);
-        return socket;
+    /**
+     * Construct the proxy with the given local address.
+     *
+     * @param context zmq context object
+     * @param address the local address
+     */
+    public xMsgProxy(ZContext context, xMsgProxyAddress address) {
+        ctx = context;
+        addr = address;
+        controller = xMsgUtil.newThread("control", new Controller());
     }
 
-    private static void bindSocket(Socket socket, int port) {
-        socket.bind("tcp://*:" + port);
-    }
-
-    private static void connectSocket(Socket socket, String host, int port) {
-        socket.connect("tcp://" + host + ":" + port);
+    /**
+     * Construct the proxy on a local host.
+     *
+     * @param context zmq context object
+     */
+    public xMsgProxy(ZContext context) {
+        this(context, new xMsgProxyAddress());
     }
 
     /**
@@ -182,25 +173,6 @@ public class xMsgProxy {
         }
     }
 
-    /**
-     * The listener receives all messages flowing through the proxy,
-     * on its pipe.
-     */
-    private static class Listener implements IAttachedRunnable {
-        @Override
-        public void run(Object[] args, ZContext ctx, Socket pipe) {
-            //  Print everything that arrives on pipe
-            while (true) {
-                ZMsg msg = ZMsg.recvMsg(pipe);
-                if (msg == null) {
-                    System.out.println("Interrupted...");
-                    break;
-                }
-                msg.pop().print(null);
-                msg.destroy();
-            }
-        }
-    }
 
     /**
      * The controller receives and replies synchronization control messages from
@@ -276,5 +248,44 @@ public class xMsgProxy {
             }
             shadowContext.destroy();
         }
+    }
+
+
+    /**
+     * The listener receives all messages flowing through the proxy,
+     * on its pipe.
+     */
+    private static class Listener implements IAttachedRunnable {
+        @Override
+        public void run(Object[] args, ZContext ctx, Socket pipe) {
+            //  Print everything that arrives on pipe
+            while (true) {
+                ZMsg msg = ZMsg.recvMsg(pipe);
+                if (msg == null) {
+                    System.out.println("Interrupted...");
+                    break;
+                }
+                msg.pop().print(null);
+                msg.destroy();
+            }
+        }
+    }
+
+
+    private static Socket createSocket(ZContext ctx, int type) {
+        Socket socket = ctx.createSocket(type);
+        socket.setRcvHWM(0);
+        socket.setSndHWM(0);
+        return socket;
+    }
+
+
+    private static void bindSocket(Socket socket, int port) {
+        socket.bind("tcp://*:" + port);
+    }
+
+
+    private static void connectSocket(Socket socket, String host, int port) {
+        socket.connect("tcp://" + host + ":" + port);
     }
 }

@@ -22,18 +22,18 @@
 
 package org.jlab.coda.xmsg.xsys.regdis;
 
+import java.util.HashSet;
+import java.util.Set;
+
 import org.jlab.coda.xmsg.core.xMsgTopic;
 import org.jlab.coda.xmsg.data.xMsgR.xMsgRegistration;
 import org.junit.Before;
 import org.junit.Test;
 
-import java.util.HashSet;
-import java.util.Set;
-
+import static org.jlab.coda.xmsg.xsys.regdis.RegistrationDataFactory.newRegistration;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.empty;
 import static org.hamcrest.Matchers.is;
-import static org.jlab.coda.xmsg.xsys.regdis.RegistrationDataFactory.newRegistration;
 
 
 public class xMsgRegDatabaseTest {
@@ -68,31 +68,18 @@ public class xMsgRegDatabaseTest {
         tolkien1 = newRegistration("tolkien", "10.2.9.1", "writer:adventure:tales", true);
     }
 
-    private static Set<xMsgTopic> newTopicSet(String... topics) {
-        Set<xMsgTopic> set = new HashSet<xMsgTopic>();
-        for (String s : topics) {
-            set.add(xMsgTopic.wrap(s));
-        }
-        return set;
-    }
-
-    private static Set<xMsgRegistration> newRegSet(xMsgRegistration... regs) {
-        Set<xMsgRegistration> set = new HashSet<xMsgRegistration>();
-        for (xMsgRegistration r : regs) {
-            set.add(r);
-        }
-        return set;
-    }
 
     @Before
     public void setup() {
         db = new xMsgRegDatabase();
     }
 
+
     @Test
     public void newRegistrationDatabaseIsEmpty() throws Exception {
         assertThat(db.topics(), is(empty()));
     }
+
 
     @Test
     public void addFirstRegistrationOfFirstTopicCreatesTopic() throws Exception {
@@ -102,6 +89,7 @@ public class xMsgRegDatabaseTest {
         assertThat(db.get("writer:scifi:books"), is(newRegSet(asimov1.build())));
     }
 
+
     @Test
     public void addNextRegistrationOfFirstTopic() throws Exception {
         db.register(twain1.build());
@@ -110,6 +98,7 @@ public class xMsgRegDatabaseTest {
         assertThat(db.get("writer:adventure"),
                    is(newRegSet(twain1.build(), twain2.build())));
     }
+
 
     @Test
     public void addFirstRegistrationOfNewTopic() throws Exception {
@@ -133,6 +122,7 @@ public class xMsgRegDatabaseTest {
                    is(newRegSet(tolkien1.build())));
     }
 
+
     @Test
     public void addNextRegistrationOfNewTopic() throws Exception {
         db.register(asimov1.build());
@@ -145,6 +135,7 @@ public class xMsgRegDatabaseTest {
                    is(newRegSet(twain1.build(), twain2.build())));
     }
 
+
     @Test
     public void addDuplicatedRegistrationDoesNothing() throws Exception {
         db.register(asimov1.build());
@@ -155,6 +146,7 @@ public class xMsgRegDatabaseTest {
                    is(newRegSet(asimov1.build(), bradbury1.build())));
     }
 
+
     @Test
     public void removeRegistrationFromOnlyTopicWithOneElement() throws Exception {
         db.register(asimov1.build());
@@ -162,6 +154,7 @@ public class xMsgRegDatabaseTest {
 
         assertThat(db.find("writer", "scifi", "books"), is(empty()));
     }
+
 
     @Test
     public void removeRegistrationFromOnlyTopicWithSeveralElements() throws Exception {
@@ -175,6 +168,7 @@ public class xMsgRegDatabaseTest {
                    is(newRegSet(asimov1.build(), bradbury1.build())));
     }
 
+
     @Test
     public void removeRegistrationFromTopicWithOneElement() throws Exception {
         db.register(asimov1.build());
@@ -187,6 +181,7 @@ public class xMsgRegDatabaseTest {
         assertThat(db.get("writer:adventure"),
                    is(newRegSet(twain1.build(), twain2.build())));
     }
+
 
     @Test
     public void removeRegistrationFromTopicWithSeveralElements() throws Exception {
@@ -204,6 +199,7 @@ public class xMsgRegDatabaseTest {
                    is(newRegSet(twain1.build(), twain2.build())));
     }
 
+
     @Test
     public void removeMissingRegistrationDoesNothing() throws Exception {
         db.register(asimov1.build());
@@ -214,6 +210,7 @@ public class xMsgRegDatabaseTest {
         assertThat(db.get("writer:scifi:books"),
                    is(newRegSet(asimov1.build(), asimov2.build())));
     }
+
 
     @Test
     public void removeRegistrationByHost() throws Exception {
@@ -241,6 +238,7 @@ public class xMsgRegDatabaseTest {
                    is(newRegSet(tolkien1.build())));
     }
 
+
     @Test
     public void removeLastRegistrationByData() throws Exception {
         db.register(asimov1.build());
@@ -250,6 +248,7 @@ public class xMsgRegDatabaseTest {
         assertThat(db.topics(), is(empty()));
     }
 
+
     @Test
     public void removeLastRegistrationByHost() throws Exception {
         db.register(asimov1.build());
@@ -258,6 +257,7 @@ public class xMsgRegDatabaseTest {
 
         assertThat(db.topics(), is(empty()));
     }
+
 
     @Test
     public void findByDomain() throws Exception {
@@ -272,6 +272,7 @@ public class xMsgRegDatabaseTest {
                    is(newRegSet(brando2.build())));
     }
 
+
     @Test
     public void findByDomainAndSubject() throws Exception {
         db.register(asimov1.build());
@@ -284,6 +285,7 @@ public class xMsgRegDatabaseTest {
         assertThat(db.find("writer", "adventure", "*"),
                    is(newRegSet(twain1.build(), twain2.build(), tolkien1.build())));
     }
+
 
     @Test
     public void findByFullTopic() throws Exception {
@@ -299,6 +301,7 @@ public class xMsgRegDatabaseTest {
                    is(empty()));
     }
 
+
     @Test
     public void findUnregisteredTopicReturnsEmpty() throws Exception {
         db.register(asimov1.build());
@@ -307,5 +310,23 @@ public class xMsgRegDatabaseTest {
         db.register(tolkien1.build());
 
         assertThat(db.find("writer", "adventure", "books"), is(empty()));
+    }
+
+
+    private static Set<xMsgTopic> newTopicSet(String... topics) {
+        Set<xMsgTopic> set = new HashSet<xMsgTopic>();
+        for (String s : topics) {
+            set.add(xMsgTopic.wrap(s));
+        }
+        return set;
+    }
+
+
+    private static Set<xMsgRegistration> newRegSet(xMsgRegistration... regs) {
+        Set<xMsgRegistration> set = new HashSet<xMsgRegistration>();
+        for (xMsgRegistration r : regs) {
+            set.add(r);
+        }
+        return set;
     }
 }

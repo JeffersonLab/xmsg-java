@@ -123,6 +123,60 @@ public class xMsgMessage {
     }
 
     /**
+     * Serializes this message into a 0MQ message,
+     * ready to send it over the wire.
+     *
+     * @return the raw multi-part message
+     */
+    ZMsg serialize() {
+        ZMsg msg = new ZMsg();
+        msg.add(topic.toString());
+        msg.add(metaData.build().toByteArray());
+        msg.add(data);
+        return msg;
+    }
+
+    /**
+     * Returns the topic of the message.
+     */
+    public xMsgTopic getTopic() {
+        return topic;
+    }
+
+    /**
+     * Returns the metadata of the message.
+     */
+    public xMsgMeta.Builder getMetaData() {
+        return metaData;
+    }
+
+    /**
+     * Returns the size of the message data (i.e. serialized byte[] ).
+     */
+    public int getDataSize() {
+        return data != null ? data.length : 0;
+    }
+
+    /**
+     * Returns the data of the message.
+     */
+    public byte[] getData() {
+        return data;
+    }
+
+    public void setTopic(xMsgTopic topic) {
+        this.topic = topic;
+    }
+
+    public void setMetaData(xMsgMeta.Builder metaData) {
+        this.metaData = metaData;
+    }
+
+    public void setData(byte[] data) {
+        this.data = data;
+    }
+
+    /**
      * Constructs a message, data of which is passed as an Object. This method will
      * do it's best to figure out the type of the object, updating accordingly the
      * data mimeType. It will also serialize the object and store it as a byte[].
@@ -196,6 +250,7 @@ public class xMsgMessage {
 
         return new xMsgMessage(topic, mimeType, ba);
     }
+
 
     /**
      * Deserializes simple data from the given message.
@@ -319,59 +374,5 @@ public class xMsgMessage {
         xMsgTopic resTopic = xMsgTopic.wrap(msg.metaData.getReplyTo());
         xMsgMessage res = createFrom(resTopic, data);
         return res;
-    }
-
-    /**
-     * Serializes this message into a 0MQ message,
-     * ready to send it over the wire.
-     *
-     * @return the raw multi-part message
-     */
-    ZMsg serialize() {
-        ZMsg msg = new ZMsg();
-        msg.add(topic.toString());
-        msg.add(metaData.build().toByteArray());
-        msg.add(data);
-        return msg;
-    }
-
-    /**
-     * Returns the topic of the message.
-     */
-    public xMsgTopic getTopic() {
-        return topic;
-    }
-
-    public void setTopic(xMsgTopic topic) {
-        this.topic = topic;
-    }
-
-    /**
-     * Returns the metadata of the message.
-     */
-    public xMsgMeta.Builder getMetaData() {
-        return metaData;
-    }
-
-    public void setMetaData(xMsgMeta.Builder metaData) {
-        this.metaData = metaData;
-    }
-
-    /**
-     * Returns the size of the message data (i.e. serialized byte[] ).
-     */
-    public int getDataSize() {
-        return data != null ? data.length : 0;
-    }
-
-    /**
-     * Returns the data of the message.
-     */
-    public byte[] getData() {
-        return data;
-    }
-
-    public void setData(byte[] data) {
-        this.data = data;
     }
 }

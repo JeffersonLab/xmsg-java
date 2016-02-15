@@ -31,8 +31,20 @@ import java.io.ObjectOutputStream;
 import java.net.InetAddress;
 import java.net.NetworkInterface;
 import java.text.DateFormat;
-import java.util.*;
-import java.util.concurrent.*;
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.Enumeration;
+import java.util.List;
+import java.util.Objects;
+import java.util.Random;
+import java.util.concurrent.BlockingQueue;
+import java.util.concurrent.CancellationException;
+import java.util.concurrent.ExecutionException;
+import java.util.concurrent.Future;
+import java.util.concurrent.LinkedBlockingQueue;
+import java.util.concurrent.ThreadFactory;
+import java.util.concurrent.ThreadPoolExecutor;
+import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -46,12 +58,13 @@ import java.util.regex.Pattern;
 
 public final class xMsgUtil {
 
+    private static List<String> localHostIps = new ArrayList<>();
+
     // CHECKSTYLE.OFF: ConstantName
     private static final Random randomGenerator = new Random();
     private static final int replyToSequenceSize = 1000000;
     private static final int replyToSeed = randomGenerator.nextInt(replyToSequenceSize);
     private static final AtomicInteger replyToGenerator = new AtomicInteger(replyToSeed);
-    private static List<String> localHostIps = new ArrayList<>();
     // CHECKSTYLE.ON: ConstantName
 
     private xMsgUtil() { }

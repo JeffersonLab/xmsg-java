@@ -22,10 +22,10 @@
 
 package org.jlab.coda.xmsg.net;
 
+import java.io.IOException;
+
 import org.jlab.coda.xmsg.core.xMsgUtil;
 import org.jlab.coda.xmsg.excp.xMsgAddressException;
-
-import java.io.IOException;
 
 /**
  *  xMsg address.

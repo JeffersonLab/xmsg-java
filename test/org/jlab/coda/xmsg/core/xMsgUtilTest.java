@@ -22,18 +22,19 @@
 
 package org.jlab.coda.xmsg.core;
 
-import com.google.protobuf.ByteString;
+import java.util.Arrays;
+import java.util.List;
+
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ExpectedException;
 
-import java.util.Arrays;
-import java.util.List;
+import com.google.protobuf.ByteString;
 
-import static org.hamcrest.MatcherAssert.assertThat;
-import static org.hamcrest.Matchers.is;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.is;
 
 
 public class xMsgUtilTest {

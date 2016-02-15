@@ -22,16 +22,16 @@
 
 package org.jlab.coda.xmsg.core;
 
-import org.jlab.coda.xmsg.data.xMsgD.xMsgData;
-import org.jlab.coda.xmsg.data.xMsgM.xMsgMeta;
-import org.junit.Test;
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.is;
+import static org.junit.Assert.assertFalse;
 
 import java.util.Arrays;
 import java.util.List;
 
-import static org.hamcrest.MatcherAssert.assertThat;
-import static org.hamcrest.Matchers.is;
-import static org.junit.Assert.assertFalse;
+import org.jlab.coda.xmsg.data.xMsgD.xMsgData;
+import org.jlab.coda.xmsg.data.xMsgM.xMsgMeta;
+import org.junit.Test;
 
 public class xMsgMessageTest {
 

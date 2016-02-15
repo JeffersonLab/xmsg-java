@@ -23,7 +23,12 @@
 package org.jlab.coda.xmsg.examples;
 
 import com.google.protobuf.InvalidProtocolBufferException;
-import org.jlab.coda.xmsg.core.*;
+import org.jlab.coda.xmsg.core.xMsg;
+import org.jlab.coda.xmsg.core.xMsgCallBack;
+import org.jlab.coda.xmsg.core.xMsgConstants;
+import org.jlab.coda.xmsg.core.xMsgMessage;
+import org.jlab.coda.xmsg.core.xMsgTopic;
+import org.jlab.coda.xmsg.core.xMsgUtil;
 import org.jlab.coda.xmsg.data.xMsgD.xMsgData;
 import org.jlab.coda.xmsg.data.xMsgM;
 import org.jlab.coda.xmsg.excp.xMsgException;

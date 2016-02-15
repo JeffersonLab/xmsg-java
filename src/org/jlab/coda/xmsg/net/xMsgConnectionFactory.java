@@ -22,6 +22,10 @@
 
 package org.jlab.coda.xmsg.net;
 
+import java.io.IOException;
+import java.io.UncheckedIOException;
+import java.util.Random;
+
 import org.jlab.coda.xmsg.core.xMsgConstants;
 import org.jlab.coda.xmsg.core.xMsgUtil;
 import org.jlab.coda.xmsg.xsys.regdis.xMsgRegDriver;
@@ -31,15 +35,8 @@ import org.zeromq.ZMQ.Socket;
 import org.zeromq.ZMQException;
 import org.zeromq.ZMsg;
 
-import java.io.IOException;
-import java.io.UncheckedIOException;
-import java.util.Random;
-
 public class xMsgConnectionFactory {
 
-    // CHECKSTYLE.OFF: ConstantName
-    private static final Random randomGenerator = new Random();
-    private static final long ctrlIdPrefix = getCtrlIdPrefix();
     private ZContext context;
 
     public xMsgConnectionFactory(ZContext context) {
@@ -47,20 +44,6 @@ public class xMsgConnectionFactory {
 
         // fix default linger
         this.context.setLinger(-1);
-    }
-
-    private static long getCtrlIdPrefix() {
-        try {
-            final int javaId = 1;
-            final int ipHash = xMsgUtil.localhost().hashCode() & Integer.MAX_VALUE;
-            return javaId * 100000000 + (ipHash % 1000) * 100000;
-        } catch (IOException e) {
-            throw new UncheckedIOException(e);
-        }
-    }
-
-    static String getCtrlId() {
-        return Long.toString(ctrlIdPrefix + randomGenerator.nextInt(100000));
     }
 
     public xMsgConnection createProxyConnection(xMsgProxyAddress address,
@@ -120,11 +103,11 @@ public class xMsgConnectionFactory {
     public void setLinger(int linger) {
         context.setLinger(linger);
     }
-    // CHECKSTYLE.ON: ConstantName
 
     public void destroy() {
         context.destroy();
     }
+
 
     private boolean checkConnection(Socket pubSocket, Socket ctrlSocket, String identity) {
         ZMQ.Poller items = new ZMQ.Poller(1);
@@ -144,8 +127,6 @@ public class xMsgConnectionFactory {
                     ZMsg replyMsg = ZMsg.recvMsg(ctrlSocket);
                     try {
                         // TODO: check the message
-                        replyMsg.destroy();
-                        ctrlMsg.destroy();
                         return true;
                     } finally {
                         replyMsg.destroy();
@@ -158,5 +139,25 @@ public class xMsgConnectionFactory {
             }
         }
         return false;
+    }
+
+
+    // CHECKSTYLE.OFF: ConstantName
+    private static final Random randomGenerator = new Random();
+    private static final long ctrlIdPrefix = getCtrlIdPrefix();
+    // CHECKSTYLE.ON: ConstantName
+
+    private static long getCtrlIdPrefix() {
+        try {
+            final int javaId = 1;
+            final int ipHash = xMsgUtil.localhost().hashCode() & Integer.MAX_VALUE;
+            return javaId * 100000000 + (ipHash % 1000) * 100000;
+        } catch (IOException e) {
+            throw new UncheckedIOException(e);
+        }
+    }
+
+    static String getCtrlId() {
+        return Long.toString(ctrlIdPrefix + randomGenerator.nextInt(100000));
     }
 }

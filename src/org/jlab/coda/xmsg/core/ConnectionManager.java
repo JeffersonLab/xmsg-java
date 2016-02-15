@@ -22,15 +22,19 @@
 
 package org.jlab.coda.xmsg.core;
 
-import org.jlab.coda.xmsg.net.*;
-import org.jlab.coda.xmsg.xsys.regdis.xMsgRegDriver;
-import org.zeromq.ZContext;
-
 import java.util.Map;
 import java.util.Queue;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentLinkedQueue;
 import java.util.function.Consumer;
+
+import org.jlab.coda.xmsg.net.xMsgConnection;
+import org.jlab.coda.xmsg.net.xMsgConnectionFactory;
+import org.jlab.coda.xmsg.net.xMsgConnectionSetup;
+import org.jlab.coda.xmsg.net.xMsgProxyAddress;
+import org.jlab.coda.xmsg.net.xMsgRegAddress;
+import org.jlab.coda.xmsg.xsys.regdis.xMsgRegDriver;
+import org.zeromq.ZContext;
 
 class ConnectionManager {
 
