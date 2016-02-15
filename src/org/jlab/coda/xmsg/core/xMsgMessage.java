@@ -1,22 +1,23 @@
 /*
- * Copyright (C) 2015. Jefferson Lab, xMsg framework (JLAB). All Rights Reserved.
- * Permission to use, copy, modify, and distribute this software and its
- * documentation for educational, research, and not-for-profit purposes,
- * without fee and without a signed licensing agreement.
+ *    Copyright (C) 2016. Jefferson Lab (JLAB). All Rights Reserved.
+ *    Permission to use, copy, modify, and distribute this software and its
+ *    documentation for governmental use, educational, research, and not-for-profit
+ *    purposes, without fee and without a signed licensing agreement.
  *
- * Contact Vardan Gyurjyan
- * Department of Experimental Nuclear Physics, Jefferson Lab.
+ *    IN NO EVENT SHALL JLAB BE LIABLE TO ANY PARTY FOR DIRECT, INDIRECT, SPECIAL,
+ *    INCIDENTAL, OR CONSEQUENTIAL DAMAGES, INCLUDING LOST PROFITS, ARISING OUT OF
+ *    THE USE OF THIS SOFTWARE AND ITS DOCUMENTATION, EVEN IF JLAB HAS BEEN ADVISED
+ *    OF THE POSSIBILITY OF SUCH DAMAGE.
  *
- * IN NO EVENT SHALL JLAB BE LIABLE TO ANY PARTY FOR DIRECT, INDIRECT, SPECIAL,
- * INCIDENTAL, OR CONSEQUENTIAL DAMAGES, INCLUDING LOST PROFITS, ARISING OUT OF
- * THE USE OF THIS SOFTWARE AND ITS DOCUMENTATION, EVEN IF JLAB HAS BEEN ADVISED
- * OF THE POSSIBILITY OF SUCH DAMAGE.
+ *    JLAB SPECIFICALLY DISCLAIMS ANY WARRANTIES, INCLUDING, BUT NOT LIMITED TO,
+ *    THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR
+ *    PURPOSE. THE CLARA SOFTWARE AND ACCOMPANYING DOCUMENTATION, IF ANY, PROVIDED
+ *    HEREUNDER IS PROVIDED "AS IS". JLAB HAS NO OBLIGATION TO PROVIDE MAINTENANCE,
+ *    SUPPORT, UPDATES, ENHANCEMENTS, OR MODIFICATIONS.
  *
- * JLAB SPECIFICALLY DISCLAIMS ANY WARRANTIES, INCLUDING, BUT NOT LIMITED TO,
- * THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR
- * PURPOSE. THE CLARA SOFTWARE AND ACCOMPANYING DOCUMENTATION, IF ANY, PROVIDED
- * HEREUNDER IS PROVIDED "AS IS". JLAB HAS NO OBLIGATION TO PROVIDE MAINTENANCE,
- * SUPPORT, UPDATES, ENHANCEMENTS, OR MODIFICATIONS.
+ *    This software was developed under the United States Government License.
+ *    For more information contact author at gurjyan@jlab.org
+ *    Department of Experimental Nuclear Physics, Jefferson Lab.
  */
 
 package org.jlab.coda.xmsg.core;
@@ -122,60 +123,6 @@ public class xMsgMessage {
     }
 
     /**
-     * Serializes this message into a 0MQ message,
-     * ready to send it over the wire.
-     *
-     * @return the raw multi-part message
-     */
-    ZMsg serialize() {
-        ZMsg msg = new ZMsg();
-        msg.add(topic.toString());
-        msg.add(metaData.build().toByteArray());
-        msg.add(data);
-        return msg;
-    }
-
-    /**
-     * Returns the topic of the message.
-     */
-    public xMsgTopic getTopic() {
-        return topic;
-    }
-
-    /**
-     * Returns the metadata of the message.
-     */
-    public xMsgMeta.Builder getMetaData() {
-        return metaData;
-    }
-
-    /**
-     * Returns the size of the message data (i.e. serialized byte[] ).
-     */
-    public int getDataSize() {
-        return data != null ? data.length : 0;
-    }
-
-    /**
-     * Returns the data of the message.
-     */
-    public byte[] getData() {
-        return data;
-    }
-
-    public void setTopic(xMsgTopic topic) {
-        this.topic = topic;
-    }
-
-    public void setMetaData(xMsgMeta.Builder metaData) {
-        this.metaData = metaData;
-    }
-
-    public void setData(byte[] data) {
-        this.data = data;
-    }
-
-    /**
      * Constructs a message, data of which is passed as an Object. This method will
      * do it's best to figure out the type of the object, updating accordingly the
      * data mimeType. It will also serialize the object and store it as a byte[].
@@ -249,7 +196,6 @@ public class xMsgMessage {
 
         return new xMsgMessage(topic, mimeType, ba);
     }
-
 
     /**
      * Deserializes simple data from the given message.
@@ -373,5 +319,59 @@ public class xMsgMessage {
         xMsgTopic resTopic = xMsgTopic.wrap(msg.metaData.getReplyTo());
         xMsgMessage res = createFrom(resTopic, data);
         return res;
+    }
+
+    /**
+     * Serializes this message into a 0MQ message,
+     * ready to send it over the wire.
+     *
+     * @return the raw multi-part message
+     */
+    ZMsg serialize() {
+        ZMsg msg = new ZMsg();
+        msg.add(topic.toString());
+        msg.add(metaData.build().toByteArray());
+        msg.add(data);
+        return msg;
+    }
+
+    /**
+     * Returns the topic of the message.
+     */
+    public xMsgTopic getTopic() {
+        return topic;
+    }
+
+    public void setTopic(xMsgTopic topic) {
+        this.topic = topic;
+    }
+
+    /**
+     * Returns the metadata of the message.
+     */
+    public xMsgMeta.Builder getMetaData() {
+        return metaData;
+    }
+
+    public void setMetaData(xMsgMeta.Builder metaData) {
+        this.metaData = metaData;
+    }
+
+    /**
+     * Returns the size of the message data (i.e. serialized byte[] ).
+     */
+    public int getDataSize() {
+        return data != null ? data.length : 0;
+    }
+
+    /**
+     * Returns the data of the message.
+     */
+    public byte[] getData() {
+        return data;
+    }
+
+    public void setData(byte[] data) {
+        this.data = data;
     }
 }

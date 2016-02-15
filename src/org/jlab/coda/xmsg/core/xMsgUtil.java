@@ -1,22 +1,23 @@
 /*
- * Copyright (C) 2015. Jefferson Lab, xMsg framework (JLAB). All Rights Reserved.
- * Permission to use, copy, modify, and distribute this software and its
- * documentation for educational, research, and not-for-profit purposes,
- * without fee and without a signed licensing agreement.
+ *    Copyright (C) 2016. Jefferson Lab (JLAB). All Rights Reserved.
+ *    Permission to use, copy, modify, and distribute this software and its
+ *    documentation for governmental use, educational, research, and not-for-profit
+ *    purposes, without fee and without a signed licensing agreement.
  *
- * Contact Vardan Gyurjyan
- * Department of Experimental Nuclear Physics, Jefferson Lab.
+ *    IN NO EVENT SHALL JLAB BE LIABLE TO ANY PARTY FOR DIRECT, INDIRECT, SPECIAL,
+ *    INCIDENTAL, OR CONSEQUENTIAL DAMAGES, INCLUDING LOST PROFITS, ARISING OUT OF
+ *    THE USE OF THIS SOFTWARE AND ITS DOCUMENTATION, EVEN IF JLAB HAS BEEN ADVISED
+ *    OF THE POSSIBILITY OF SUCH DAMAGE.
  *
- * IN NO EVENT SHALL JLAB BE LIABLE TO ANY PARTY FOR DIRECT, INDIRECT, SPECIAL,
- * INCIDENTAL, OR CONSEQUENTIAL DAMAGES, INCLUDING LOST PROFITS, ARISING OUT OF
- * THE USE OF THIS SOFTWARE AND ITS DOCUMENTATION, EVEN IF JLAB HAS BEEN ADVISED
- * OF THE POSSIBILITY OF SUCH DAMAGE.
+ *    JLAB SPECIFICALLY DISCLAIMS ANY WARRANTIES, INCLUDING, BUT NOT LIMITED TO,
+ *    THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR
+ *    PURPOSE. THE CLARA SOFTWARE AND ACCOMPANYING DOCUMENTATION, IF ANY, PROVIDED
+ *    HEREUNDER IS PROVIDED "AS IS". JLAB HAS NO OBLIGATION TO PROVIDE MAINTENANCE,
+ *    SUPPORT, UPDATES, ENHANCEMENTS, OR MODIFICATIONS.
  *
- * JLAB SPECIFICALLY DISCLAIMS ANY WARRANTIES, INCLUDING, BUT NOT LIMITED TO,
- * THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR
- * PURPOSE. THE CLARA SOFTWARE AND ACCOMPANYING DOCUMENTATION, IF ANY, PROVIDED
- * HEREUNDER IS PROVIDED "AS IS". JLAB HAS NO OBLIGATION TO PROVIDE MAINTENANCE,
- * SUPPORT, UPDATES, ENHANCEMENTS, OR MODIFICATIONS.
+ *    This software was developed under the United States Government License.
+ *    For more information contact author at gurjyan@jlab.org
+ *    Department of Experimental Nuclear Physics, Jefferson Lab.
  */
 
 package org.jlab.coda.xmsg.core;
@@ -30,20 +31,8 @@ import java.io.ObjectOutputStream;
 import java.net.InetAddress;
 import java.net.NetworkInterface;
 import java.text.DateFormat;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.Enumeration;
-import java.util.List;
-import java.util.Objects;
-import java.util.Random;
-import java.util.concurrent.BlockingQueue;
-import java.util.concurrent.CancellationException;
-import java.util.concurrent.ExecutionException;
-import java.util.concurrent.Future;
-import java.util.concurrent.LinkedBlockingQueue;
-import java.util.concurrent.ThreadFactory;
-import java.util.concurrent.ThreadPoolExecutor;
-import java.util.concurrent.TimeUnit;
+import java.util.*;
+import java.util.concurrent.*;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -57,13 +46,12 @@ import java.util.regex.Pattern;
 
 public final class xMsgUtil {
 
-    private static List<String> localHostIps = new ArrayList<>();
-
     // CHECKSTYLE.OFF: ConstantName
     private static final Random randomGenerator = new Random();
     private static final int replyToSequenceSize = 1000000;
     private static final int replyToSeed = randomGenerator.nextInt(replyToSequenceSize);
     private static final AtomicInteger replyToGenerator = new AtomicInteger(replyToSeed);
+    private static List<String> localHostIps = new ArrayList<>();
     // CHECKSTYLE.ON: ConstantName
 
     private xMsgUtil() { }
@@ -201,6 +189,10 @@ public final class xMsgUtil {
 
     /**
      * Returns the IP address of the specified host.
+     * Limitation: in case of multiple network cards
+     *             this method will return the first
+     *             IP address of from the list of IP
+     *             addresses of all network cards.
      *
      * @param hostName The name of the host (accepts "localhost")
      * @return dotted notation of the IP address

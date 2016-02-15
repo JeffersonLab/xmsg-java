@@ -1,49 +1,44 @@
 /*
- * Copyright (C) 2015. Jefferson Lab, xMsg framework (JLAB). All Rights Reserved.
- * Permission to use, copy, modify, and distribute this software and its
- * documentation for educational, research, and not-for-profit purposes,
- * without fee and without a signed licensing agreement.
+ *    Copyright (C) 2016. Jefferson Lab (JLAB). All Rights Reserved.
+ *    Permission to use, copy, modify, and distribute this software and its
+ *    documentation for governmental use, educational, research, and not-for-profit
+ *    purposes, without fee and without a signed licensing agreement.
  *
- * Contact Vardan Gyurjyan
- * Department of Experimental Nuclear Physics, Jefferson Lab.
+ *    IN NO EVENT SHALL JLAB BE LIABLE TO ANY PARTY FOR DIRECT, INDIRECT, SPECIAL,
+ *    INCIDENTAL, OR CONSEQUENTIAL DAMAGES, INCLUDING LOST PROFITS, ARISING OUT OF
+ *    THE USE OF THIS SOFTWARE AND ITS DOCUMENTATION, EVEN IF JLAB HAS BEEN ADVISED
+ *    OF THE POSSIBILITY OF SUCH DAMAGE.
  *
- * IN NO EVENT SHALL JLAB BE LIABLE TO ANY PARTY FOR DIRECT, INDIRECT, SPECIAL,
- * INCIDENTAL, OR CONSEQUENTIAL DAMAGES, INCLUDING LOST PROFITS, ARISING OUT OF
- * THE USE OF THIS SOFTWARE AND ITS DOCUMENTATION, EVEN IF JLAB HAS BEEN ADVISED
- * OF THE POSSIBILITY OF SUCH DAMAGE.
+ *    JLAB SPECIFICALLY DISCLAIMS ANY WARRANTIES, INCLUDING, BUT NOT LIMITED TO,
+ *    THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR
+ *    PURPOSE. THE CLARA SOFTWARE AND ACCOMPANYING DOCUMENTATION, IF ANY, PROVIDED
+ *    HEREUNDER IS PROVIDED "AS IS". JLAB HAS NO OBLIGATION TO PROVIDE MAINTENANCE,
+ *    SUPPORT, UPDATES, ENHANCEMENTS, OR MODIFICATIONS.
  *
- * JLAB SPECIFICALLY DISCLAIMS ANY WARRANTIES, INCLUDING, BUT NOT LIMITED TO,
- * THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR
- * PURPOSE. THE CLARA SOFTWARE AND ACCOMPANYING DOCUMENTATION, IF ANY, PROVIDED
- * HEREUNDER IS PROVIDED "AS IS". JLAB HAS NO OBLIGATION TO PROVIDE MAINTENANCE,
- * SUPPORT, UPDATES, ENHANCEMENTS, OR MODIFICATIONS.
+ *    This software was developed under the United States Government License.
+ *    For more information contact author at gurjyan@jlab.org
+ *    Department of Experimental Nuclear Physics, Jefferson Lab.
  */
 
 package org.jlab.coda.xmsg.xsys;
-
-import static java.util.Arrays.asList;
-
-import java.io.IOException;
-import java.io.PrintStream;
-
-import org.jlab.coda.xmsg.core.xMsgConstants;
-import org.jlab.coda.xmsg.core.xMsgContext;
-import org.jlab.coda.xmsg.core.xMsgUtil;
-import org.jlab.coda.xmsg.excp.xMsgException;
-import org.jlab.coda.xmsg.net.xMsgProxyAddress;
-import org.zeromq.ZContext;
-import org.zeromq.ZFrame;
-import org.zeromq.ZMQ;
-import org.zeromq.ZMQException;
-import org.zeromq.ZMQ.Socket;
-import org.zeromq.ZMsg;
-import org.zeromq.ZThread;
-import org.zeromq.ZThread.IAttachedRunnable;
 
 import joptsimple.OptionException;
 import joptsimple.OptionParser;
 import joptsimple.OptionSet;
 import joptsimple.OptionSpec;
+import org.jlab.coda.xmsg.core.xMsgConstants;
+import org.jlab.coda.xmsg.core.xMsgContext;
+import org.jlab.coda.xmsg.core.xMsgUtil;
+import org.jlab.coda.xmsg.excp.xMsgException;
+import org.jlab.coda.xmsg.net.xMsgProxyAddress;
+import org.zeromq.*;
+import org.zeromq.ZMQ.Socket;
+import org.zeromq.ZThread.IAttachedRunnable;
+
+import java.io.IOException;
+import java.io.PrintStream;
+
+import static java.util.Arrays.asList;
 
 /**
  * xMsg pub-sub proxy executable.
@@ -63,6 +58,27 @@ public class xMsgProxy {
     private final Thread controller;
 
     private boolean verbose = false;
+
+    /**
+     * Construct the proxy with the given local address.
+     *
+     * @param context zmq context object
+     * @param address the local address
+     */
+    public xMsgProxy(ZContext context, xMsgProxyAddress address) {
+        ctx = context;
+        addr = address;
+        controller = xMsgUtil.newThread("control", new Controller());
+    }
+
+    /**
+     * Construct the proxy on a local host.
+     *
+     * @param context zmq context object
+     */
+    public xMsgProxy(ZContext context) {
+        this(context, new xMsgProxyAddress());
+    }
 
     public static void main(String[] args) {
         try {
@@ -109,25 +125,19 @@ public class xMsgProxy {
         out.printf("  %-22s  %s%n", "-verbose", "print debug information");
     }
 
-    /**
-     * Construct the proxy with the given local address.
-     *
-     * @param context zmq context object
-     * @param address the local address
-     */
-    public xMsgProxy(ZContext context, xMsgProxyAddress address) {
-        ctx = context;
-        addr = address;
-        controller = xMsgUtil.newThread("control", new Controller());
+    private static Socket createSocket(ZContext ctx, int type) {
+        Socket socket = ctx.createSocket(type);
+        socket.setRcvHWM(0);
+        socket.setSndHWM(0);
+        return socket;
     }
 
-    /**
-     * Construct the proxy on a local host.
-     *
-     * @param context zmq context object
-     */
-    public xMsgProxy(ZContext context) {
-        this(context, new xMsgProxyAddress());
+    private static void bindSocket(Socket socket, int port) {
+        socket.bind("tcp://*:" + port);
+    }
+
+    private static void connectSocket(Socket socket, String host, int port) {
+        socket.connect("tcp://" + host + ":" + port);
     }
 
     /**
@@ -172,6 +182,25 @@ public class xMsgProxy {
         }
     }
 
+    /**
+     * The listener receives all messages flowing through the proxy,
+     * on its pipe.
+     */
+    private static class Listener implements IAttachedRunnable {
+        @Override
+        public void run(Object[] args, ZContext ctx, Socket pipe) {
+            //  Print everything that arrives on pipe
+            while (true) {
+                ZMsg msg = ZMsg.recvMsg(pipe);
+                if (msg == null) {
+                    System.out.println("Interrupted...");
+                    break;
+                }
+                msg.pop().print(null);
+                msg.destroy();
+            }
+        }
+    }
 
     /**
      * The controller receives and replies synchronization control messages from
@@ -210,21 +239,28 @@ public class xMsgProxy {
                         String type = new String(typeFrame.getData());
                         String id = new String(idFrame.getData());
 
-                        if (type.equals(xMsgConstants.CTRL_CONNECT.toString())) {
-                            ZMsg ack = new ZMsg();
-                            ack.add(id);
-                            ack.add(type);
-                            ack.send(router);
-                        } else if (type.equals(xMsgConstants.CTRL_SUBSCRIBE.toString())) {
-                            ZMsg ack = new ZMsg();
-                            ack.add(id);
-                            ack.add(type);
-                            ack.send(publisher);
-                        } else if (type.equals(xMsgConstants.CTRL_REPLY.toString())) {
-                            ZMsg ack = new ZMsg();
-                            ack.add(id);
-                            ack.add(type);
-                            ack.send(router);
+                        switch (type) {
+                            case xMsgConstants.CTRL_CONNECT: {
+                                ZMsg ack = new ZMsg();
+                                ack.add(id);
+                                ack.add(type);
+                                ack.send(router);
+                                break;
+                            }
+                            case xMsgConstants.CTRL_SUBSCRIBE: {
+                                ZMsg ack = new ZMsg();
+                                ack.add(id);
+                                ack.add(type);
+                                ack.send(publisher);
+                                break;
+                            }
+                            case xMsgConstants.CTRL_REPLY: {
+                                ZMsg ack = new ZMsg();
+                                ack.add(id);
+                                ack.add(type);
+                                ack.send(router);
+                                break;
+                            }
                         }
                     } finally {
                         topicFrame.destroy();
@@ -240,44 +276,5 @@ public class xMsgProxy {
             }
             shadowContext.destroy();
         }
-    }
-
-
-    /**
-     * The listener receives all messages flowing through the proxy,
-     * on its pipe.
-     */
-    private static class Listener implements IAttachedRunnable {
-        @Override
-        public void run(Object[] args, ZContext ctx, Socket pipe) {
-            //  Print everything that arrives on pipe
-            while (true) {
-                ZMsg msg = ZMsg.recvMsg(pipe);
-                if (msg == null) {
-                    System.out.println("Interrupted...");
-                    break;
-                }
-                msg.pop().print(null);
-                msg.destroy();
-            }
-        }
-    }
-
-
-    private static Socket createSocket(ZContext ctx, int type) {
-        Socket socket = ctx.createSocket(type);
-        socket.setRcvHWM(0);
-        socket.setSndHWM(0);
-        return socket;
-    }
-
-
-    private static void bindSocket(Socket socket, int port) {
-        socket.bind("tcp://*:" + port);
-    }
-
-
-    private static void connectSocket(Socket socket, String host, int port) {
-        socket.connect("tcp://" + host + ":" + port);
     }
 }
