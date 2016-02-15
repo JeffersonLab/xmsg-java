@@ -233,6 +233,8 @@ public class xMsgProxy {
                                 ack.send(router);
                                 break;
                             }
+                            default:
+                                System.err.println("Unexepected request: " + type);
                         }
                     } finally {
                         topicFrame.destroy();
