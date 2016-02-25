@@ -29,7 +29,6 @@ import org.jlab.coda.xmsg.net.xMsgAddress;
 import org.jlab.coda.xmsg.net.xMsgConnection;
 import org.jlab.coda.xmsg.net.xMsgConnectionSetup;
 import org.jlab.coda.xmsg.xsys.regdis.xMsgRegDriver;
-import org.zeromq.ZMQ;
 import org.zeromq.ZMQ.Socket;
 import org.zeromq.ZMQException;
 import org.zeromq.ZMsg;
@@ -546,28 +545,17 @@ public class xMsg {
         msg.getMetaData().setReplyTo(returnAddress);
 
         // subscribe to the returnAddress
-        xMsgSubscription sh = new xMsgSubscription(connection, xMsgTopic.wrap(returnAddress)) {
-            @Override
-            void handle(ZMsg msg) throws xMsgException, TimeoutException, IOException { }
-        };
+        DataSubscription sub = new DataSubscription(connection, returnAddress);
 
         try {
             publish(connection, msg);
 
             // wait for the response
             int t = 0;
-            ZMQ.Poller items = new ZMQ.Poller(1);
-            items.register(connection.getSubSock(), ZMQ.Poller.POLLIN);
             while (t < timeout * 1000) {
                 try {
-                    items.poll(10);
-                    if (items.pollin(0)) {
-                        ZMsg rawMsg = ZMsg.recvMsg(connection.getSubSock());
-                        try {
-                            return new xMsgMessage(rawMsg);
-                        } finally {
-                            rawMsg.destroy();
-                        }
+                    if (sub.hasMsg(10)) {
+                        return sub.recvMsg();
                     }
                     t += 10;
                 } catch (ZMQException e) {
@@ -577,7 +565,7 @@ public class xMsg {
             throw new TimeoutException("Error: no response for time_out = " + timeout);
         } finally {
             msg.getMetaData().setReplyTo(xMsgConstants.UNDEFINED.toString());
-            sh.stop();
+            sub.stop();
         }
 
     }
