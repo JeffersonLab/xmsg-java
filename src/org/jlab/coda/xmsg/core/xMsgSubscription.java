@@ -24,8 +24,6 @@ package org.jlab.coda.xmsg.core;
 
 import org.jlab.coda.xmsg.excp.xMsgException;
 import org.jlab.coda.xmsg.net.xMsgConnection;
-import org.zeromq.ZMQ;
-import org.zeromq.ZMQ.Socket;
 import org.zeromq.ZMQException;
 import org.zeromq.ZMsg;
 
@@ -51,11 +49,8 @@ import java.io.IOException;
  */
 public abstract class xMsgSubscription {
 
-    // 0MQ sub socket
-    private final Socket socket;
-
-    // string of the topic
-    private final String topic;
+    // 0MQ sub wrapper
+    private final DataSubscription sub;
 
     // thread to wait for the published message and run the handle
     private final Thread thread;
@@ -74,37 +69,10 @@ public abstract class xMsgSubscription {
      */
     xMsgSubscription(String name, xMsgConnection connection, xMsgTopic topic) {
         this.name = name;
-        this.socket = connection.getSubSock();
-        if (this.socket == null) {
-            throw new IllegalArgumentException("xMsg-Error: null subscription socket");
-        }
-
-        this.topic = topic.toString();
-        subscribe(connection.getPubSock(), this.socket, this.topic);
-        xMsgUtil.sleep(10);
-
+        this.sub = new DataSubscription(connection, topic);
         this.thread = xMsgUtil.newThread(name, new Handler());
     }
 
-
-    /**
-     * Used internally for a response subscription.
-     *
-     * @see xMsg#syncPublish
-     */
-    xMsgSubscription(xMsgConnection connection, xMsgTopic topic) {
-        this.name = topic.toString();
-        this.socket = connection.getSubSock();
-        if (this.socket == null) {
-            throw new IllegalArgumentException("xMsg-Error: null subscription socket");
-        }
-
-        this.topic = topic.toString();
-        subscribe(connection.getPubSock(), this.socket, this.topic);
-        xMsgUtil.sleep(10);
-
-        this.thread = new Thread();
-    }
 
     /**
      * Process a received message.
@@ -118,58 +86,16 @@ public abstract class xMsgSubscription {
 
 
     /**
-     * Subscribes the connection and waits for a control message to confirm
-     * the subscription.
-     */
-    private void subscribe(Socket pubSocket, Socket subSocket, String topic) {
-        this.socket.subscribe(topic.toString().getBytes());
-
-        ZMQ.Poller items = new ZMQ.Poller(1);
-        items.register(subSocket, ZMQ.Poller.POLLIN);
-        int retry = 0;
-        while (retry < 10) {
-            retry++;
-            ZMsg ctrlMsg = new ZMsg();
-            try {
-                ctrlMsg.add(xMsgConstants.CTRL_TOPIC);
-                ctrlMsg.add(xMsgConstants.CTRL_SUBSCRIBE);
-                ctrlMsg.add(topic);
-                ctrlMsg.send(pubSocket);
-
-                items.poll(100);
-                if (items.pollin(0)) {
-                    ZMsg replyMsg = ZMsg.recvMsg(subSocket);
-                    try {
-                        // TODO: check the message
-                        return;
-                    } finally {
-                        replyMsg.destroy();
-                    }
-                }
-            } catch (ZMQException e) {
-                e.printStackTrace();
-            } finally {
-                ctrlMsg.destroy();
-            }
-        }
-        throw new RuntimeException("Could not subscribe to " + topic);
-    }
-
-
-    /**
      * Receives messages and runs user's callback.
      */
     private class Handler implements Runnable {
 
         @Override
         public void run() {
-            ZMQ.Poller items = new ZMQ.Poller(1);
-            items.register(socket, ZMQ.Poller.POLLIN);
             while (isRunning) {
                 try {
-                    items.poll(100);
-                    if (items.pollin(0)) {
-                        ZMsg msg = ZMsg.recvMsg(socket);
+                    if (sub.hasMsg(100)) {
+                        ZMsg msg = sub.recvMsg();
                         try {
                             if (msg.size() == 2) {
                                 // ignore control message
@@ -208,7 +134,7 @@ public abstract class xMsgSubscription {
         } catch (InterruptedException e) {
             Thread.currentThread().interrupt();
         }
-        socket.unsubscribe(topic.getBytes());
+        sub.stop();
     }
 
     /**
