@@ -37,13 +37,10 @@ import java.io.IOException;
 public abstract class xMsgSubscription {
 
     private final Thread thread;
-    private final DataSubscription sub;
-
     private volatile boolean isRunning = false;
 
     xMsgSubscription(String name, xMsgConnection connection, xMsgTopic topic) throws xMsgException {
-        this.sub = new DataSubscription(connection, topic);
-        this.thread = xMsgUtil.newThread(name, new Handler());
+        this.thread = xMsgUtil.newThread(name, new Handler(connection, topic));
     }
 
 
@@ -51,6 +48,12 @@ public abstract class xMsgSubscription {
 
 
     private class Handler implements Runnable {
+
+        private final DataSubscription sub;
+
+        Handler(xMsgConnection connection, xMsgTopic topic) throws xMsgException {
+            this.sub = new DataSubscription(connection, topic);
+        }
 
         @Override
         public void run() {
@@ -67,6 +70,7 @@ public abstract class xMsgSubscription {
                     e.printStackTrace();
                 }
             }
+            sub.stop();
         }
     }
 
@@ -84,7 +88,6 @@ public abstract class xMsgSubscription {
         } catch (InterruptedException e) {
             Thread.currentThread().interrupt();
         }
-        sub.stop();
     }
 
 
