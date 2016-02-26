@@ -37,7 +37,6 @@ import java.io.IOException;
 public abstract class xMsgSubscription {
 
     private final Thread thread;
-    private volatile boolean isRunning = false;
 
     xMsgSubscription(String name, xMsgConnection connection, xMsgTopic topic) throws xMsgException {
         this.thread = xMsgUtil.newThread(name, new Handler(connection, topic));
@@ -57,7 +56,7 @@ public abstract class xMsgSubscription {
 
         @Override
         public void run() {
-            while (isRunning) {
+            while (!Thread.currentThread().isInterrupted()) {
                 try {
                     if (sub.hasMsg(100)) {
                         try {
@@ -76,14 +75,13 @@ public abstract class xMsgSubscription {
 
 
     void start() {
-        isRunning = true;
         thread.start();
     }
 
 
     void stop() {
         try {
-            isRunning = false;
+            thread.interrupt();
             thread.join();
         } catch (InterruptedException e) {
             Thread.currentThread().interrupt();
@@ -92,6 +90,6 @@ public abstract class xMsgSubscription {
 
 
     public boolean isAlive() {
-        return isRunning;
+        return thread.isAlive();
     }
 }
