@@ -55,9 +55,6 @@ public abstract class xMsgSubscription {
     // the name for the subscription
     private final String name;
 
-    // handle to stop the subscription
-    private volatile boolean isRunning = false;
-
 
     /**
      * Creates a long-running subscription that process messages on the background.
@@ -95,7 +92,7 @@ public abstract class xMsgSubscription {
 
         @Override
         public void run() {
-            while (isRunning) {
+            while (!Thread.currentThread().isInterrupted()) {
                 try {
                     if (sub.hasMsg(100)) {
                         ZMsg msg = sub.recvMsg();
@@ -124,7 +121,6 @@ public abstract class xMsgSubscription {
      * Starts the subscription thread.
      */
     void start() {
-        isRunning = true;
         thread.start();
     }
 
@@ -133,7 +129,7 @@ public abstract class xMsgSubscription {
      */
     void stop() {
         try {
-            isRunning = false;
+            thread.interrupt();
             thread.join();
         } catch (InterruptedException e) {
             Thread.currentThread().interrupt();
@@ -144,7 +140,7 @@ public abstract class xMsgSubscription {
      * Indicates if the subscription thread is running.
      */
     public boolean isAlive() {
-        return isRunning;
+        return thread.isAlive();
     }
 
     /**
