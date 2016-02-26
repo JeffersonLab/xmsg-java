@@ -29,7 +29,6 @@ import org.zeromq.ZMQException;
 import org.zeromq.ZMsg;
 
 import java.io.IOException;
-import java.util.concurrent.TimeoutException;
 
 /**
  * xMsg subscription handler.
@@ -73,7 +72,7 @@ public abstract class xMsgSubscription {
     }
 
 
-    abstract void handle(ZMsg msg) throws xMsgException, TimeoutException, IOException;
+    abstract void handle(xMsgMessage msg) throws xMsgException, IOException;
 
 
     private class Handler implements Runnable {
@@ -88,8 +87,8 @@ public abstract class xMsgSubscription {
                     if (items.pollin(0)) {
                         ZMsg msg = ZMsg.recvMsg(socket);
                         try {
-                            handle(msg);
-                        } catch (xMsgException | TimeoutException | IOException e) {
+                            handle(new xMsgMessage(msg));
+                        } catch (xMsgException | IOException e) {
                             e.printStackTrace();
                         } finally {
                             msg.destroy();

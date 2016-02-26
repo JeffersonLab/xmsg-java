@@ -603,9 +603,8 @@ public class xMsg {
 
         xMsgSubscription sHandle = new xMsgSubscription(name, connection, topic) {
             @Override
-            public void handle(ZMsg inputMsg) throws xMsgException, IOException {
-                final xMsgMessage callbackMsg = new xMsgMessage(inputMsg);
-                callUserCallBack(connection, callback, callbackMsg);
+            public void handle(xMsgMessage inputMsg) throws xMsgException, IOException {
+                callUserCallBack(connection, callback, inputMsg);
             }
         };
 
