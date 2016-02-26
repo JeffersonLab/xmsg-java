@@ -64,7 +64,7 @@ public abstract class xMsgSubscription {
     private final String name;
 
     // handle to stop the subscription
-    private volatile boolean isRunning = true;
+    private volatile boolean isRunning = false;
 
 
     /**
@@ -194,6 +194,7 @@ public abstract class xMsgSubscription {
      * Starts the subscription thread.
      */
     void start() {
+        isRunning = true;
         thread.start();
     }
 
@@ -201,8 +202,8 @@ public abstract class xMsgSubscription {
      * Stops the background subscription thread and unsubscribes the socket.
      */
     void stop() {
-        isRunning = false;
         try {
+            isRunning = false;
             thread.join();
         } catch (InterruptedException e) {
             Thread.currentThread().interrupt();
