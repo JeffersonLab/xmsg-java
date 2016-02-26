@@ -30,7 +30,6 @@ import org.zeromq.ZMQException;
 import org.zeromq.ZMsg;
 
 import java.io.IOException;
-import java.util.concurrent.TimeoutException;
 
 /**
  * A subscription object uses a {@link xMsgConnection connection} to receive
@@ -115,7 +114,7 @@ public abstract class xMsgSubscription {
      * @throws TimeoutException
      * @throws IOException
      */
-    abstract void handle(ZMsg msg) throws xMsgException, TimeoutException, IOException;
+    abstract void handle(xMsgMessage msg) throws xMsgException, IOException;
 
 
     /**
@@ -177,8 +176,8 @@ public abstract class xMsgSubscription {
                                 // (which are composed of 2 frames)
                                 continue;
                             }
-                            handle(msg);
-                        } catch (xMsgException | TimeoutException | IOException e) {
+                            handle(new xMsgMessage(msg));
+                        } catch (xMsgException | IOException e) {
                             e.printStackTrace();
                         } finally {
                             msg.destroy();

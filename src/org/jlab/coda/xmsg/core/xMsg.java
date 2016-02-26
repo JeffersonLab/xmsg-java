@@ -580,7 +580,7 @@ public class xMsg {
         // subscribe to the returnAddress
         xMsgSubscription sh = new xMsgSubscription(connection, xMsgTopic.wrap(returnAddress)) {
             @Override
-            void handle(ZMsg msg) throws xMsgException, TimeoutException, IOException { }
+            void handle(xMsgMessage msg) throws xMsgException, IOException { }
         };
 
         try {
@@ -645,9 +645,8 @@ public class xMsg {
 
         xMsgSubscription sHandle = new xMsgSubscription(name, connection, topic) {
             @Override
-            public void handle(ZMsg inputMsg) throws xMsgException, IOException {
-                final xMsgMessage callbackMsg = new xMsgMessage(inputMsg);
-                _callUserCallBack(callback, callbackMsg);
+            public void handle(xMsgMessage inputMsg) throws xMsgException, IOException {
+                _callUserCallBack(callback, inputMsg);
             }
         };
 
