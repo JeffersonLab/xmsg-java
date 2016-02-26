@@ -642,7 +642,7 @@ public class xMsg {
         xMsgSubscription sHandle = new xMsgSubscription(name, connection, topic) {
             @Override
             public void handle(xMsgMessage inputMsg) throws xMsgException, IOException {
-                _callUserCallBack(callback, inputMsg);
+                threadPool.submit(() -> callback.callback(inputMsg));
             }
         };
 
@@ -743,22 +743,5 @@ public class xMsg {
             outputMsg.destroy();
         }
 
-    }
-
-    private void _callUserCallBack(final xMsgCallBack callback,
-                                   final xMsgMessage callbackMsg)
-            throws xMsgException, IOException {
-
-        // async request
-        threadPool.submit(new Runnable() {
-            @Override
-            public void run() {
-                try {
-                    callback.callback(callbackMsg);
-                } catch (IOException e) {
-                    e.printStackTrace();
-                }
-            }
-        });
     }
 }
