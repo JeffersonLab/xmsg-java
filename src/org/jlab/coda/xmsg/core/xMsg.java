@@ -592,37 +592,17 @@ public class xMsg {
         xMsgSubscription sHandle = new xMsgSubscription(name, connection, topic) {
             @Override
             public void handle(xMsgMessage inputMsg) throws xMsgException, IOException {
-                callUserCallBack(connection, callback, inputMsg);
+                threadPool.submit(new Runnable() {
+                    @Override
+                    public void run() {
+                        callback.callback(inputMsg);
+                    }
+                });
             }
         };
 
         sHandle.start();
         return sHandle;
-    }
-
-    private void callUserCallBack(final xMsgConnection connection,
-                                  final xMsgCallBack callback,
-                                  final xMsgMessage callbackMsg)
-            throws xMsgException, IOException {
-
-        // Check if it is sync request
-        // sync request
-        String requester = callbackMsg.getMetaData().getReplyTo();
-        if (!requester.equals(xMsgConstants.UNDEFINED.toString())) {
-            xMsgMessage rm = callback.callback(callbackMsg);
-            if (rm != null) {
-                rm.setTopic(xMsgTopic.wrap(requester));
-                publish(connection, rm);
-            }
-        } else {
-            // async request
-            threadPool.submit(new Runnable() {
-                @Override
-                public void run() {
-                    callback.callback(callbackMsg);
-                }
-            });
-        }
     }
 
     /**

@@ -181,11 +181,18 @@ public class SubscriptionsTest {
                 try {
                     xMsg subActor = new xMsg("test_publisher");
                     xMsgConnection subCon = subActor.connect();
+                    xMsgConnection repCon = subActor.connect();
                     xMsgUtil.sleep(100);
                     xMsgTopic subTopic = xMsgTopic.wrap("test_topic");
                     xMsgSubscription sub = subActor.subscribe(subCon, subTopic, new xMsgCallBack() {
                         @Override
                         public xMsgMessage callback(xMsgMessage msg) {
+                            try {
+                                msg.setTopic(xMsgTopic.wrap(msg.getMetaData().getReplyTo()));
+                                subActor.publish(repCon, msg);
+                            } catch (xMsgException | IOException e) {
+                                e.printStackTrace();
+                            }
                             return msg;
                         }
                     });
@@ -250,13 +257,20 @@ public class SubscriptionsTest {
                 try {
                     xMsg subActor = new xMsg("test_publisher");
                     xMsgConnection subCon = subActor.connect();
+                    xMsgConnection repCon = subActor.connect();
                     xMsgUtil.sleep(100);
                     xMsgTopic subTopic = xMsgTopic.wrap("test_topic");
                     xMsgSubscription sub = subActor.subscribe(subCon, subTopic, new xMsgCallBack() {
                         @Override
                         public xMsgMessage callback(xMsgMessage msg) {
-                            check.received = true;
-                            xMsgUtil.sleep(1500);
+                            try {
+                                check.received = true;
+                                xMsgUtil.sleep(1500);
+                                msg.setTopic(xMsgTopic.wrap(msg.getMetaData().getReplyTo()));
+                                subActor.publish(repCon, msg);
+                            } catch (xMsgException | IOException e) {
+                                e.printStackTrace();
+                            }
                             return msg;
                         }
                     });
