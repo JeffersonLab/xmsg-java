@@ -24,6 +24,7 @@ package org.jlab.coda.xmsg.core;
 
 import org.jlab.coda.xmsg.excp.xMsgException;
 import org.jlab.coda.xmsg.net.xMsgConnection;
+import org.zeromq.ZMQ;
 import org.zeromq.ZMQException;
 import org.zeromq.ZMsg;
 
@@ -110,6 +111,9 @@ public abstract class xMsgSubscription {
                         }
                     }
                 } catch (ZMQException e) {
+                    if (e.getErrorCode() == ZMQ.Error.ETERM.getCode()) {
+                        break;
+                    }
                     e.printStackTrace();
                 }
             }
