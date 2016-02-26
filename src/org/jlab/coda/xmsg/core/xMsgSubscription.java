@@ -43,8 +43,7 @@ public abstract class xMsgSubscription {
     private final String topic;
     private final Thread thread;
 
-    private volatile boolean isRunning = true;
-
+    private volatile boolean isRunning = false;
 
     xMsgSubscription(String name, xMsgConnection connection, xMsgTopic topic) {
         this.socket = connection.getSubSock();
@@ -103,13 +102,14 @@ public abstract class xMsgSubscription {
 
 
     void start() {
+        isRunning = true;
         thread.start();
     }
 
 
     void stop() {
-        isRunning = false;
         try {
+            isRunning = false;
             thread.join();
         } catch (InterruptedException e) {
             Thread.currentThread().interrupt();
