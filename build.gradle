@@ -35,9 +35,6 @@ sourceSets {
 
 
 repositories {
-    maven {
-        url 'https://userweb.jlab.org/~smancill/repo/'
-    }
     mavenCentral()
 }
 
