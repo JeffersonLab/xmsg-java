@@ -119,43 +119,6 @@ public abstract class xMsgSubscription {
 
 
     /**
-     * Starts the subscription thread.
-     */
-    void start() {
-        thread.start();
-    }
-
-    /**
-     * Stops the background subscription thread and unsubscribes the socket.
-     */
-    void stop() {
-        isRunning = false;
-        try {
-            thread.join();
-        } catch (InterruptedException e) {
-            Thread.currentThread().interrupt();
-        }
-        socket.unsubscribe(topic.getBytes());
-    }
-
-    /**
-     * Returns this subscription name.
-     *
-     * @return the name of the subscription
-     */
-    public String getName() {
-        return name;
-    }
-
-    /**
-     * Indicates if the subscription thread is running.
-     * @return true/false
-     */
-    public boolean isAlive() {
-        return isRunning;
-    }
-
-    /**
      * Subscribes the connection and waits for a control message to confirm
      * the subscription.
      */
@@ -226,5 +189,39 @@ public abstract class xMsgSubscription {
                 }
             }
         }
+    }
+
+    /**
+     * Starts the subscription thread.
+     */
+    void start() {
+        thread.start();
+    }
+
+    /**
+     * Stops the background subscription thread and unsubscribes the socket.
+     */
+    void stop() {
+        isRunning = false;
+        try {
+            thread.join();
+        } catch (InterruptedException e) {
+            Thread.currentThread().interrupt();
+        }
+        socket.unsubscribe(topic.getBytes());
+    }
+
+    /**
+     * Indicates if the subscription thread is running.
+     */
+    public boolean isAlive() {
+        return isRunning;
+    }
+
+    /**
+     * Returns the name of this subscription.
+     */
+    public String getName() {
+        return name;
     }
 }
