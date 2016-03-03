@@ -537,17 +537,17 @@ public class xMsg {
     /**
      * Publishes a message through the specified proxy connection.
      *
-     * @param con the connection to the proxy
+     * @param connection the connection to the proxy
      * @param msg the message to be published
      * @throws xMsgException if the request failed
      */
-    public void publish(xMsgConnection con, xMsgMessage msg) throws xMsgException {
+    public void publish(xMsgConnection connection, xMsgMessage msg) throws xMsgException {
 
         // just make sure that receiver knows that this is not a sync request.
         // need this in case we reuse messages.
         msg.getMetaData().clearReplyTo();
 
-        _publish(con, msg);
+        _publish(connection, msg);
     }
 
     /**
@@ -560,14 +560,14 @@ public class xMsg {
      * This method will throw if a response is not received before the timeout
      * expires.
      *
-     * @param con the connection to the proxy
+     * @param connection the connection to the proxy
      * @param msg the message to be published
      * @param timeout the length of time to wait a response, in milliseconds
      * @return the response message
      * @throws xMsgException
      * @throws TimeoutException
      */
-    public xMsgMessage syncPublish(xMsgConnection con,
+    public xMsgMessage syncPublish(xMsgConnection connection,
                                    xMsgMessage msg,
                                    int timeout) throws xMsgException, TimeoutException {
 
@@ -578,24 +578,24 @@ public class xMsg {
         msg.getMetaData().setReplyTo(returnAddress);
 
         // subscribe to the returnAddress
-        xMsgSubscription sh = new xMsgSubscription(con, xMsgTopic.wrap(returnAddress)) {
+        xMsgSubscription sh = new xMsgSubscription(connection, xMsgTopic.wrap(returnAddress)) {
             @Override
             void handle(ZMsg msg) throws xMsgException, TimeoutException, IOException { }
         };
 
         try {
             // it must be the internal _publish, to keep the replyTo field
-            _publish(con, msg);
+            _publish(connection, msg);
 
             // wait for the response
             int t = 0;
             ZMQ.Poller items = new ZMQ.Poller(1);
-            items.register(con.getSubSock(), ZMQ.Poller.POLLIN);
+            items.register(connection.getSubSock(), ZMQ.Poller.POLLIN);
             while (t < timeout) {
                 try {
                     items.poll(10);
                     if (items.pollin(0)) {
-                        ZMsg rawMsg = ZMsg.recvMsg(con.getSubSock());
+                        ZMsg rawMsg = ZMsg.recvMsg(connection.getSubSock());
                         try {
                             return new xMsgMessage(rawMsg);
                         } finally {
@@ -619,18 +619,18 @@ public class xMsg {
      * connection.
      * A background thread will be started to receive the messages.
      *
-     * @param con the connection to the proxy
+     * @param connection the connection to the proxy
      * @param topic the topic to select messages
-     * @param cb the user action to run when a message is received
+     * @param callback the user action to run when a message is received
      * @throws xMsgException
      */
-    public xMsgSubscription subscribe(final xMsgConnection con,
+    public xMsgSubscription subscribe(final xMsgConnection connection,
                                       final xMsgTopic topic,
-                                      final xMsgCallBack cb)
+                                      final xMsgCallBack callback)
             throws xMsgException {
 
         // define a unique name for the subscription
-        String name = "sub-" + myName + "-" + con.getAddress() + "-" + topic;
+        String name = "sub-" + myName + "-" + connection.getAddress() + "-" + topic;
 
         // check to see if the subscription already exists
         if (mySubscriptions.containsKey(name)) {
@@ -638,16 +638,16 @@ public class xMsg {
         }
 
         // get sub socket
-        Socket sock = con.getSubSock();
+        Socket sock = connection.getSubSock();
         if (sock == null) {
             throw new xMsgException("xMsg-Error: null sub socket");
         }
 
-        xMsgSubscription sHandle = new xMsgSubscription(name, con, topic) {
+        xMsgSubscription sHandle = new xMsgSubscription(name, connection, topic) {
             @Override
             public void handle(ZMsg inputMsg) throws xMsgException, IOException {
                 final xMsgMessage callbackMsg = new xMsgMessage(inputMsg);
-                _callUserCallBack(cb, callbackMsg);
+                _callUserCallBack(callback, callbackMsg);
             }
         };
 
@@ -737,8 +737,8 @@ public class xMsg {
     }
 
 
-    private void _publish(xMsgConnection con, xMsgMessage msg) throws xMsgException {
-        Socket sock = con.getPubSock();
+    private void _publish(xMsgConnection connection, xMsgMessage msg) throws xMsgException {
+        Socket sock = connection.getPubSock();
         ZMsg outputMsg = msg.serialize();
         try {
             outputMsg.send(sock);
