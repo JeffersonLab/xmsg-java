@@ -194,11 +194,18 @@ public class SubscriptionsTest {
             try {
                 xMsg subActor = new xMsg("test_subscriber");
                 xMsgConnection subCon = subActor.connect();
+                xMsgConnection repCon = subActor.connect();
 
                 xMsgTopic subTopic = xMsgTopic.wrap("test_topic");
                 xMsgSubscription sub = subActor.subscribe(subCon, subTopic, msg -> {
-                    check.received = true;
-                    xMsgUtil.sleep(1500);
+                    try {
+                        check.received = true;
+                        xMsgUtil.sleep(1500);
+                        xMsgMessage response = xMsgMessage.createResponse(msg);
+                        subActor.publish(repCon, response);
+                    } catch (xMsgException e) {
+                        e.printStackTrace();
+                    }
                 });
                 xMsgUtil.sleep(100);
                 xMsg pubActor = new xMsg("test_publisher");
