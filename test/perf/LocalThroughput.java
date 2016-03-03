@@ -72,7 +72,6 @@ public final class LocalThroughput {
                     timer.elapsed = stopClock(timer.watch);
                     finished.countDown();
                 }
-                return msg;
             });
 
             finished.await();

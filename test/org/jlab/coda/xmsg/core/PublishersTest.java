@@ -82,7 +82,6 @@ public class PublishersTest {
                     int i = parseData(msg);
                     check.counter.incrementAndGet();
                     check.sum.addAndGet(i);
-                    return msg;
                 });
                 subReady.countDown();
                 int counter = 0;
@@ -196,7 +195,6 @@ public class PublishersTest {
                     } finally {
                         actor.release(pubConnection);
                     }
-                    return msg;
                 });
                 subReady.countDown();
                 while (check.counter.get() < Check.N) {

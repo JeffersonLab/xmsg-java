@@ -116,7 +116,7 @@ public class Subscriber extends xMsg {
         long t2;
 
         @Override
-        public xMsgMessage callback(xMsgMessage msg) throws IOException {
+        public void callback(xMsgMessage msg) {
             if (msg.getMetaData().getReplyTo().equals(xMsgConstants.UNDEFINED)) {
 
                 // we get the data, but will not do anything with it for
@@ -140,7 +140,6 @@ public class Subscriber extends xMsg {
                 // sends back "Done" string
                 respondBack(msg, "Done");
             }
-            return msg;
         }
 
         /**

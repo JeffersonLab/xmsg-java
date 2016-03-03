@@ -85,7 +85,6 @@ public class SubscriptionsTest {
                     int i = xMsgMessage.parseData(msg, Integer.class);
                     check.counter.incrementAndGet();
                     check.sum.addAndGet(i);
-                    return msg;
                 });
                 while (check.counter.get() < Check.N) {
                     xMsgUtil.sleep(100);
@@ -151,7 +150,6 @@ public class SubscriptionsTest {
                     } catch (xMsgException e) {
                         e.printStackTrace();
                     }
-                    return msg;
                 });
                 xMsgUtil.sleep(100);
                 xMsg pubActor = new xMsg("test_publisher");
@@ -200,7 +198,6 @@ public class SubscriptionsTest {
                 xMsgSubscription sub = subActor.subscribe(scon, subTopic, msg -> {
                     check.received = true;
                     xMsgUtil.sleep(1500);
-                    return msg;
                 });
                 xMsgUtil.sleep(100);
                 xMsg pubActor = new xMsg("test_publisher");
