@@ -78,7 +78,7 @@ public class SubscriptionsTest {
 
         Thread subThread = xMsgUtil.newThread("sub-thread", () -> {
             try {
-                xMsg actor = new xMsg("test_publisher");
+                xMsg actor = new xMsg("test_subscriber");
                 xMsgConnection con = actor.connect();
                 xMsgTopic topic = xMsgTopic.wrap("test_topic");
                 xMsgSubscription sub = actor.subscribe(con, topic, msg -> {
@@ -139,7 +139,7 @@ public class SubscriptionsTest {
 
         Thread pubThread = xMsgUtil.newThread("syncpub-thread", () -> {
             try {
-                final xMsg subActor = new xMsg("test_publisher");
+                final xMsg subActor = new xMsg("test_subscriber");
                 final xMsgConnection scon = subActor.connect();
 
                 xMsgTopic subTopic = xMsgTopic.wrap("test_topic");
@@ -191,7 +191,7 @@ public class SubscriptionsTest {
 
         Thread pubThread = xMsgUtil.newThread("syncpub-thread", () -> {
             try {
-                xMsg subActor = new xMsg("test_publisher");
+                xMsg subActor = new xMsg("test_subscriber");
                 xMsgConnection scon = subActor.connect();
 
                 xMsgTopic subTopic = xMsgTopic.wrap("test_topic");
