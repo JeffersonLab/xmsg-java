@@ -590,6 +590,9 @@ public class xMsg {
                     if (sub.hasMsg(10)) {
                         ZMsg rawMsg = sub.recvMsg();
                         try {
+                            if (rawMsg.size() == 2) {
+                                continue;
+                            }
                             return new xMsgMessage(rawMsg);
                         } finally {
                             rawMsg.destroy();
