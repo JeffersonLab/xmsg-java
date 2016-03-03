@@ -62,7 +62,7 @@ public abstract class xMsgSubscription {
     private final Thread thread;
 
     // the name for the subscription
-    private String name;
+    private final String name;
 
     // handle to stop the subscription
     private volatile boolean isRunning = true;
