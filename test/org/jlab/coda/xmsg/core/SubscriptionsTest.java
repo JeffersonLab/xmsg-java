@@ -141,12 +141,13 @@ public class SubscriptionsTest {
             try {
                 final xMsg subActor = new xMsg("test_subscriber");
                 final xMsgConnection subCon = subActor.connect();
+                final xMsgConnection repCon = subActor.connect();
 
                 xMsgTopic subTopic = xMsgTopic.wrap("test_topic");
                 xMsgSubscription sub = subActor.subscribe(subCon, subTopic, msg -> {
                     try {
                         xMsgMessage response = xMsgMessage.createResponse(msg);
-                        subActor.publish(subCon, response);
+                        subActor.publish(repCon, response);
                     } catch (xMsgException e) {
                         e.printStackTrace();
                     }
