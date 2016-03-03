@@ -2,6 +2,7 @@ package org.jlab.coda.xmsg.core;
 
 import org.jlab.coda.xmsg.excp.xMsgException;
 import org.jlab.coda.xmsg.net.xMsgConnection;
+import org.zeromq.ZFrame;
 import org.zeromq.ZMQ.Poller;
 import org.zeromq.ZMQ.Socket;
 import org.zeromq.ZMQException;
@@ -42,8 +43,20 @@ class DataSubscription {
                 if (items.pollin(0)) {
                     ZMsg replyMsg = ZMsg.recvMsg(subSocket);
                     try {
-                        // TODO: check the message
-                        return;
+                        if (replyMsg.size() == 2) {
+                            ZFrame idFrame = replyMsg.pop();
+                            ZFrame typeFrame = replyMsg.pop();
+                            try {
+                                String id = new String(idFrame.getData());
+                                String type = new String(typeFrame.getData());
+                                if (id.equals(topic) && type.equals(xMsgConstants.CTRL_SUBSCRIBE)) {
+                                    return;
+                                }
+                            } finally {
+                                idFrame.destroy();
+                                typeFrame.destroy();
+                            }
+                        }
                     } finally {
                         replyMsg.destroy();
                     }
