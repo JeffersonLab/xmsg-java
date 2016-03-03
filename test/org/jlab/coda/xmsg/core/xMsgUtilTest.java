@@ -100,21 +100,15 @@ public class xMsgUtilTest {
         assertThat(xMsgUtil.getUniqueReplyTo("subject"), is("ret:subject:1000001"));
         assertThat(xMsgUtil.getUniqueReplyTo("subject"), is("ret:subject:1000002"));
 
-        Thread t1 = new Thread(new Runnable() {
-            @Override
-            public void run() {
-                for (int i = 3; i < 900000; i++) {
-                    xMsgUtil.getUniqueReplyTo("subject");
-                }
+        Thread t1 = new Thread(() -> {
+            for (int i = 3; i < 900000; i++) {
+                xMsgUtil.getUniqueReplyTo("subject");
             }
         });
 
-        Thread t2 = new Thread(new Runnable() {
-            @Override
-            public void run() {
-                for (int i = 0; i < 90000; i++) {
-                    xMsgUtil.getUniqueReplyTo("subject");
-                }
+        Thread t2 = new Thread(() -> {
+            for (int i = 0; i < 90000; i++) {
+                xMsgUtil.getUniqueReplyTo("subject");
             }
         });
 

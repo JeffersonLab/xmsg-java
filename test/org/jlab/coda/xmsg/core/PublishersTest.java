@@ -62,48 +62,39 @@ public class PublishersTest {
         final String rawTopic = "test_topic";
         final CountDownLatch subReady = new CountDownLatch(1);
 
-        Thread proxyThread = xMsgUtil.newThread("proxy-thread", new Runnable() {
-            @Override
-            public void run() {
-                try {
-                    xMsgProxy proxy = new xMsgProxy(context);
-                    proxy.start();
-                } catch (xMsgException e) {
-                    e.printStackTrace();
-                }
+        Thread proxyThread = xMsgUtil.newThread("proxy-thread", () -> {
+            try {
+                xMsgProxy proxy = new xMsgProxy(context);
+                proxy.start();
+            } catch (xMsgException e) {
+                e.printStackTrace();
             }
         });
         proxyThread.start();
 
 
-        Thread subThread = xMsgUtil.newThread("sub-thread", new Runnable() {
-            @Override
-            public void run() {
-                try {
-                    xMsg actor = new xMsg("test_subscriber");
-                    xMsgConnection connection = actor.connect();
-                    xMsgTopic topic = xMsgTopic.wrap(rawTopic);
-                    xMsgSubscription sub = actor.subscribe(connection, topic, new xMsgCallBack() {
-                        @Override
-                        public xMsgMessage callback(xMsgMessage msg) {
-                            int i = parseData(msg);
-                            check.counter.incrementAndGet();
-                            check.sum.addAndGet(i);
-                            return msg;
-                        }
-                    });
-                    subReady.countDown();
-                    int counter = 0;
-                    while (check.counter.get() < Check.N) {
-                        xMsgUtil.sleep(100);
-                        if (++counter * 1000 > Check.N) {
-                            break;
-                        }
+        Thread subThread = xMsgUtil.newThread("sub-thread", () -> {
+            try {
+                xMsg actor = new xMsg("test_subscriber");
+                xMsgConnection connection = actor.connect();
+                xMsgTopic topic = xMsgTopic.wrap(rawTopic);
+                xMsgSubscription sub = actor.subscribe(connection, topic, msg -> {
+                    int i = parseData(msg);
+                    check.counter.incrementAndGet();
+                    check.sum.addAndGet(i);
+                    return msg;
+                });
+                subReady.countDown();
+                int counter = 0;
+                while (check.counter.get() < Check.N) {
+                    xMsgUtil.sleep(100);
+                    if (++counter * 1000 > Check.N) {
+                        break;
                     }
-                    actor.unsubscribe(sub);
-                } catch (xMsgException e) {
-                    e.printStackTrace();
                 }
+                actor.unsubscribe(sub);
+            } catch (xMsgException e) {
+                e.printStackTrace();
             }
         });
         subThread.start();
@@ -179,50 +170,41 @@ public class PublishersTest {
         final String rawTopic = "test_topic";
         final CountDownLatch subReady = new CountDownLatch(1);
 
-        Thread proxyThread = xMsgUtil.newThread("proxy-thread", new Runnable() {
-            @Override
-            public void run() {
-                try {
-                    xMsgProxy proxy = new xMsgProxy(context);
-                    proxy.start();
-                } catch (xMsgException e) {
-                    e.printStackTrace();
-                }
+        Thread proxyThread = xMsgUtil.newThread("proxy-thread", () -> {
+            try {
+                xMsgProxy proxy = new xMsgProxy(context);
+                proxy.start();
+            } catch (xMsgException e) {
+                e.printStackTrace();
             }
         });
         proxyThread.start();
 
 
-        Thread subThread = xMsgUtil.newThread("sub-thread", new Runnable() {
-            @Override
-            public void run() {
-                try {
-                    xMsg actor = new xMsg("test_reply_subscriber");
-                    xMsgConnection connection = actor.connect();
-                    xMsgTopic topic = xMsgTopic.wrap(rawTopic);
-                    xMsgSubscription sub = actor.subscribe(connection, topic, new xMsgCallBack() {
-                        @Override
-                        public xMsgMessage callback(xMsgMessage msg) {
-                            xMsgConnection pubConnection = actor.connect();
-                            try {
-                                xMsgMessage res = xMsgMessage.createResponse(msg);
-                                actor.publish(pubConnection, res);
-                            } catch (xMsgException e) {
-                                e.printStackTrace();
-                            } finally {
-                                actor.release(pubConnection);
-                            }
-                            return msg;
-                        }
-                    });
-                    subReady.countDown();
-                    while (check.counter.get() < Check.N) {
-                        xMsgUtil.sleep(100);
+        Thread subThread = xMsgUtil.newThread("sub-thread", () -> {
+            try {
+                xMsg actor = new xMsg("test_reply_subscriber");
+                xMsgConnection connection = actor.connect();
+                xMsgTopic topic = xMsgTopic.wrap(rawTopic);
+                xMsgSubscription sub = actor.subscribe(connection, topic, msg -> {
+                    xMsgConnection pubConnection = actor.connect();
+                    try {
+                        xMsgMessage res = xMsgMessage.createResponse(msg);
+                        actor.publish(pubConnection, res);
+                    } catch (xMsgException e) {
+                        e.printStackTrace();
+                    } finally {
+                        actor.release(pubConnection);
                     }
-                    actor.unsubscribe(sub);
-                } catch (xMsgException e) {
-                    e.printStackTrace();
+                    return msg;
+                });
+                subReady.countDown();
+                while (check.counter.get() < Check.N) {
+                    xMsgUtil.sleep(100);
                 }
+                actor.unsubscribe(sub);
+            } catch (xMsgException e) {
+                e.printStackTrace();
             }
         });
         subThread.start();

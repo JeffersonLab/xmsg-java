@@ -25,8 +25,6 @@ package perf;
 import java.util.concurrent.CountDownLatch;
 
 import org.jlab.coda.xmsg.core.xMsg;
-import org.jlab.coda.xmsg.core.xMsgCallBack;
-import org.jlab.coda.xmsg.core.xMsgMessage;
 import org.jlab.coda.xmsg.core.xMsgSubscription;
 import org.jlab.coda.xmsg.core.xMsgTopic;
 
@@ -61,23 +59,20 @@ public final class LocalThroughput {
             xMsgConnection con = subscriber.connect(bindTo);
             final xMsgTopic topic = xMsgTopic.wrap("thr_topic");
 
-            xMsgSubscription sub = subscriber.subscribe(con, topic, new xMsgCallBack() {
-                    @Override
-                    public xMsgMessage callback(xMsgMessage msg) {
-                        int size = msg.getDataSize();
-                        if (size != messageSize) {
-                            printf("message of incorrect size received " + size);
-                            System.exit(1);
-                        }
-                        int nr = ++timer.nr;
-                        if (nr == 1) {
-                            timer.watch = startClock();
-                        } else if (nr == messageCount) {
-                            timer.elapsed = stopClock(timer.watch);
-                            finished.countDown();
-                        }
-                        return msg;
-                    }
+            xMsgSubscription sub = subscriber.subscribe(con, topic, msg -> {
+                int size = msg.getDataSize();
+                if (size != messageSize) {
+                    printf("message of incorrect size received " + size);
+                    System.exit(1);
+                }
+                int nr = ++timer.nr;
+                if (nr == 1) {
+                    timer.watch = startClock();
+                } else if (nr == messageCount) {
+                    timer.elapsed = stopClock(timer.watch);
+                    finished.countDown();
+                }
+                return msg;
             });
 
             finished.await();
