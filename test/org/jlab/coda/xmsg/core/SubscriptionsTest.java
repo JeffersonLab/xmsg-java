@@ -140,24 +140,24 @@ public class SubscriptionsTest {
         Thread pubThread = xMsgUtil.newThread("syncpub-thread", () -> {
             try {
                 final xMsg subActor = new xMsg("test_subscriber");
-                final xMsgConnection scon = subActor.connect();
+                final xMsgConnection subCon = subActor.connect();
 
                 xMsgTopic subTopic = xMsgTopic.wrap("test_topic");
-                xMsgSubscription sub = subActor.subscribe(scon, subTopic, msg -> {
+                xMsgSubscription sub = subActor.subscribe(subCon, subTopic, msg -> {
                     try {
                         xMsgMessage response = xMsgMessage.createResponse(msg);
-                        subActor.publish(scon, response);
+                        subActor.publish(subCon, response);
                     } catch (xMsgException e) {
                         e.printStackTrace();
                     }
                 });
                 xMsgUtil.sleep(100);
                 xMsg pubActor = new xMsg("test_publisher");
-                xMsgConnection pcon = subActor.connect();
+                xMsgConnection pubCon = subActor.connect();
                 xMsgTopic pubTopic = xMsgTopic.wrap("test_topic");
                 for (int i = 0; i < Check.N; i++) {
                     xMsgMessage msg = xMsgMessage.createFrom(pubTopic, i);
-                    xMsgMessage resMsg = pubActor.syncPublish(pcon, msg, 1000);
+                    xMsgMessage resMsg = pubActor.syncPublish(pubCon, msg, 1000);
                     int data = xMsgMessage.parseData(resMsg, Integer.class);
                     check.sum += data;
                     check.counter++;
@@ -192,20 +192,20 @@ public class SubscriptionsTest {
         Thread pubThread = xMsgUtil.newThread("syncpub-thread", () -> {
             try {
                 xMsg subActor = new xMsg("test_subscriber");
-                xMsgConnection scon = subActor.connect();
+                xMsgConnection subCon = subActor.connect();
 
                 xMsgTopic subTopic = xMsgTopic.wrap("test_topic");
-                xMsgSubscription sub = subActor.subscribe(scon, subTopic, msg -> {
+                xMsgSubscription sub = subActor.subscribe(subCon, subTopic, msg -> {
                     check.received = true;
                     xMsgUtil.sleep(1500);
                 });
                 xMsgUtil.sleep(100);
                 xMsg pubActor = new xMsg("test_publisher");
-                xMsgConnection pcon = pubActor.connect();
+                xMsgConnection pubCon = pubActor.connect();
                 xMsgTopic pubTopic = xMsgTopic.wrap("test_topic");
                 xMsgMessage msg = xMsgMessage.createFrom(pubTopic, 1);
                 try {
-                    pubActor.syncPublish(pcon, msg, 1000);
+                    pubActor.syncPublish(pubCon, msg, 1000);
                 } catch (TimeoutException e) {
                     check.timeout = true;
                 }
