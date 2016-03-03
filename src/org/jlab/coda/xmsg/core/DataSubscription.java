@@ -1,5 +1,6 @@
 package org.jlab.coda.xmsg.core;
 
+import org.jlab.coda.xmsg.excp.xMsgException;
 import org.jlab.coda.xmsg.net.xMsgConnection;
 import org.zeromq.ZMQ.Poller;
 import org.zeromq.ZMQ.Socket;
@@ -13,7 +14,7 @@ class DataSubscription {
     final String topic;
     final Poller items;
 
-    DataSubscription(xMsgConnection connection, xMsgTopic topic) {
+    DataSubscription(xMsgConnection connection, xMsgTopic topic) throws xMsgException {
         this.pubSocket = connection.getPubSock();
         this.subSocket = connection.getSubSock();
         this.topic = topic.toString();
@@ -23,7 +24,7 @@ class DataSubscription {
         xMsgUtil.sleep(10);
     }
 
-    private void start() {
+    private void start() throws xMsgException {
         this.subSocket.subscribe(topic.getBytes());
         this.items.register(subSocket, Poller.POLLIN);
 
@@ -53,7 +54,7 @@ class DataSubscription {
                 ctrlMsg.destroy();
             }
         }
-        throw new RuntimeException("Could not subscribe to " + topic);
+        throw new xMsgException("Could not subscribe to " + topic);
     }
 
     boolean hasMsg(int timeout) {

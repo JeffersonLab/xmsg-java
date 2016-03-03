@@ -64,10 +64,11 @@ public abstract class xMsgSubscription {
 
     /**
      * Creates a long-running subscription that process messages on the background.
+     * @throws xMsgException
      *
      * @see xMsg#subscribe
      */
-    xMsgSubscription(String name, xMsgConnection connection, xMsgTopic topic) {
+    xMsgSubscription(String name, xMsgConnection connection, xMsgTopic topic) throws xMsgException {
         this.name = name;
         this.sub = new DataSubscription(connection, topic);
         this.thread = xMsgUtil.newThread(name, new Handler());
