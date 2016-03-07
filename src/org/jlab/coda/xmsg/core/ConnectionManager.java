@@ -89,6 +89,10 @@ class ConnectionManager {
         proxyConnections.setConnection(connection.getAddress(), connection);
     }
 
+    void destroyProxyConnection(xMsgConnection connection) {
+        factory.destroyProxyConnection(connection);
+    }
+
     xMsgRegDriver getRegistrarConnection(xMsgRegAddress address) {
         xMsgRegDriver cachedConnection = registrarConnections.getConnection(address);
         if (cachedConnection != null) {

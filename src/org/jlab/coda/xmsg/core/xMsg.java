@@ -358,6 +358,15 @@ public class xMsg {
     }
 
     /**
+     * Destroys the given connection.
+     *
+     * @param connection the connection to be destroyed
+     */
+    public void destroyConnection(xMsgConnection connection) {
+        connectionManager.destroyProxyConnection(connection);
+    }
+
+    /**
      * Unsubscribes all previous subscriptions,
      * destroys the 0MQ context and shuts down thread pool.
      *
