@@ -38,7 +38,7 @@ import org.zeromq.ZMsg;
 
 public class xMsgConnectionFactory {
 
-    private ZContext context;
+    private final ZContext context;
 
     public xMsgConnectionFactory(ZContext context) {
         this.context = context;
