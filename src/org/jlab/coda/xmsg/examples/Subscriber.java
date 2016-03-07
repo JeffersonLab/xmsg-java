@@ -62,7 +62,7 @@ public class Subscriber extends xMsg {
         super("test_subscriber");
 
         // connect to default proxy (local host, default proxy port)
-        con = connect();
+        con = createConnection();
 
         // build the subscribing topic (hard codded)
         final String domain = "test_domain";

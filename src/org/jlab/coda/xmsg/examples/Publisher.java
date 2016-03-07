@@ -58,7 +58,7 @@ public class Publisher extends xMsg {
         super("test_publisher");
 
         // connect to default proxy (local host, default proxy port)
-        con = connect();
+        con = createConnection();
 
         // build the publishing topic (hard codded)
         final String domain = "test_domain";

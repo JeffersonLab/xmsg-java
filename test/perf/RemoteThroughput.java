@@ -44,7 +44,7 @@ public final class RemoteThroughput {
 
         try {
             final xMsg publisher = new xMsg("thr_publisher");
-            xMsgConnection con = publisher.connect(bindTo);
+            xMsgConnection con = publisher.createConnection(bindTo);
             final xMsgTopic topic = xMsgTopic.wrap("thr_topic");
 
             byte[] data = new byte[messageSize];

@@ -50,7 +50,7 @@ public class SubscriptionsTest {
         proxyThread.start();
 
         xMsg actor = new xMsg("test");
-        xMsgConnection con = actor.connect();
+        xMsgConnection con = actor.createConnection();
 
         xMsgSubscription subscription = actor.subscribe(con, xMsgTopic.wrap("topic"), null);
         xMsgUtil.sleep(1000);
@@ -79,7 +79,7 @@ public class SubscriptionsTest {
         Thread subThread = xMsgUtil.newThread("sub-thread", () -> {
             try {
                 xMsg actor = new xMsg("test_subscriber");
-                xMsgConnection con = actor.connect();
+                xMsgConnection con = actor.createConnection();
                 xMsgTopic topic = xMsgTopic.wrap("test_topic");
                 xMsgSubscription sub = actor.subscribe(con, topic, msg -> {
                     int i = xMsgMessage.parseData(msg, Integer.class);
@@ -100,7 +100,7 @@ public class SubscriptionsTest {
         Thread pubThread = xMsgUtil.newThread("pub-thread", () -> {
             try {
                 xMsg actor = new xMsg("test_publisher");
-                xMsgConnection con = actor.connect();
+                xMsgConnection con = actor.createConnection();
 
                 xMsgTopic topic = xMsgTopic.wrap("test_topic");
                 for (int i = 0; i < Check.N; i++) {
@@ -140,7 +140,7 @@ public class SubscriptionsTest {
         Thread pubThread = xMsgUtil.newThread("syncpub-thread", () -> {
             try {
                 final xMsg subActor = new xMsg("test_subscriber");
-                final xMsgConnection subCon = subActor.connect();
+                final xMsgConnection subCon = subActor.createConnection();
                 final xMsgConnection repCon = subActor.connect();
 
                 xMsgTopic subTopic = xMsgTopic.wrap("test_topic");
@@ -154,7 +154,7 @@ public class SubscriptionsTest {
                 });
                 xMsgUtil.sleep(100);
                 xMsg pubActor = new xMsg("test_publisher");
-                xMsgConnection pubCon = subActor.connect();
+                xMsgConnection pubCon = subActor.createConnection();
                 xMsgTopic pubTopic = xMsgTopic.wrap("test_topic");
                 for (int i = 0; i < Check.N; i++) {
                     xMsgMessage msg = xMsgMessage.createFrom(pubTopic, i);
@@ -193,7 +193,7 @@ public class SubscriptionsTest {
         Thread pubThread = xMsgUtil.newThread("syncpub-thread", () -> {
             try {
                 xMsg subActor = new xMsg("test_subscriber");
-                xMsgConnection subCon = subActor.connect();
+                xMsgConnection subCon = subActor.createConnection();
                 xMsgConnection repCon = subActor.connect();
 
                 xMsgTopic subTopic = xMsgTopic.wrap("test_topic");
@@ -209,7 +209,7 @@ public class SubscriptionsTest {
                 });
                 xMsgUtil.sleep(100);
                 xMsg pubActor = new xMsg("test_publisher");
-                xMsgConnection pubCon = pubActor.connect();
+                xMsgConnection pubCon = pubActor.createConnection();
                 xMsgTopic pubTopic = xMsgTopic.wrap("test_topic");
                 xMsgMessage msg = xMsgMessage.createFrom(pubTopic, 1);
                 try {

@@ -76,7 +76,7 @@ public class PublishersTest {
         Thread subThread = xMsgUtil.newThread("sub-thread", () -> {
             try {
                 xMsg actor = new xMsg("test_subscriber");
-                xMsgConnection connection = actor.connect();
+                xMsgConnection connection = actor.createConnection();
                 xMsgTopic topic = xMsgTopic.wrap(rawTopic);
                 xMsgSubscription sub = actor.subscribe(connection, topic, msg -> {
                     int i = parseData(msg);
@@ -115,11 +115,10 @@ public class PublishersTest {
                 try {
                     xMsg actor = new xMsg("test_publisher_" + start);
                     xMsgTopic topic = xMsgTopic.build(rawTopic, Integer.toString(start));
+                    xMsgConnection connection = actor.createConnection();
                     for (int i = start; i < end; i++) {
-                        xMsgConnection connection = actor.connect();
                         xMsgMessage msg = createMessage(topic, i);
                         actor.publish(connection, msg);
-                        actor.release(connection);
                     }
                 } catch (IOException | xMsgException e) {
                     e.printStackTrace();
@@ -183,7 +182,7 @@ public class PublishersTest {
         Thread subThread = xMsgUtil.newThread("sub-thread", () -> {
             try {
                 xMsg actor = new xMsg("test_reply_subscriber");
-                xMsgConnection connection = actor.connect();
+                xMsgConnection connection = actor.createConnection();
                 xMsgTopic topic = xMsgTopic.wrap(rawTopic);
                 xMsgSubscription sub = actor.subscribe(connection, topic, msg -> {
                     xMsgConnection pubConnection = actor.connect();
