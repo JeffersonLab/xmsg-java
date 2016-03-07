@@ -54,15 +54,15 @@ public class xMsgConnectionFactory {
         Socket subSock = context.createSocket(ZMQ.SUB);
         Socket ctrlSock = context.createSocket(ZMQ.DEALER);
 
+        String identity = getCtrlId();
+        ctrlSock.setIdentity(identity.getBytes());
+
         setup.preConnection(pubSock);
         setup.preConnection(subSock);
 
         int pubPort = address.port();
         int subPort = pubPort + 1;
         int ctrlPort = subPort + 1;
-
-        String identity = getCtrlId();
-        ctrlSock.setIdentity(identity.getBytes());
 
         pubSock.connect("tcp://" + address.host() + ":" + pubPort);
         subSock.connect("tcp://" + address.host() + ":" + subPort);
