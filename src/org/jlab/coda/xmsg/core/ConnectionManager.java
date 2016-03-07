@@ -63,6 +63,15 @@ class ConnectionManager {
         defaultConnectionOption = new xMsgConnectionSetup() { };
     }
 
+    xMsgConnection createProxyConnection(xMsgProxyAddress address) {
+        return createProxyConnection(address, defaultConnectionOption);
+    }
+
+    xMsgConnection createProxyConnection(xMsgProxyAddress address,
+                                      xMsgConnectionSetup setup) {
+        return factory.createProxyConnection(address, setup);
+    }
+
     xMsgConnection getProxyConnection(xMsgProxyAddress address) {
         return getProxyConnection(address, defaultConnectionOption);
     }

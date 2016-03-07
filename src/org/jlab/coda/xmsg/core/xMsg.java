@@ -284,6 +284,37 @@ public class xMsg {
     }
 
     /**
+     * Creates a new connection to the specified proxy.
+     *
+     * @param address the address of the proxy
+     * @return a connection to the proxy
+     */
+    public xMsgConnection createConnection(xMsgProxyAddress address) {
+        return connectionManager.createProxyConnection(address);
+    }
+
+    /**
+     * Creates a new connection to the specified proxy host and
+     * {@link org.jlab.coda.xmsg.core.xMsgConstants#DEFAULT_PORT default port}.
+     *
+     * @param proxyHost the host name of the proxy
+     * @return a connection to the proxy
+     */
+    public xMsgConnection createConnection(String proxyHost) {
+        xMsgProxyAddress address = new xMsgProxyAddress(proxyHost);
+        return connectionManager.createProxyConnection(address);
+    }
+
+    /**
+     * Creates a new connection to the default proxy.
+     *
+     * @return a connection to the proxy
+     */
+    public xMsgConnection createConnection() {
+        return connectionManager.createProxyConnection(defaultProxyAddress);
+    }
+
+    /**
      * Obtains a connection to the specified proxy.
      * If there is no available connection, a new one will be created.
      *
