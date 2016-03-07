@@ -30,8 +30,6 @@ import org.jlab.coda.xmsg.net.xMsgRegAddress;
 import org.jlab.coda.xmsg.xsys.regdis.xMsgRegDriver;
 import org.junit.Before;
 import org.junit.Test;
-import org.mockito.invocation.InvocationOnMock;
-import org.mockito.stubbing.Answer;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.is;
@@ -54,22 +52,16 @@ public class ConnectionManagerTest {
         factory = mock(xMsgConnectionFactory.class);
 
         when(factory.createProxyConnection(any(), any()))
-                .thenAnswer(new Answer<xMsgConnection>() {
-                    @Override
-                    public xMsgConnection answer(InvocationOnMock invocation) throws Throwable {
-                        xMsgConnection c = new xMsgConnection();
-                        c.setAddress((xMsgProxyAddress) invocation.getArguments()[0]);
-                        return c;
-                    }
+                .thenAnswer(invocation -> {
+                    xMsgConnection c = new xMsgConnection();
+                    c.setAddress((xMsgProxyAddress) invocation.getArguments()[0]);
+                    return c;
                 });
 
         when(factory.createRegistrarConnection(any()))
-                .thenAnswer(new Answer<xMsgRegDriver>() {
-                    @Override
-                    public xMsgRegDriver answer(InvocationOnMock invocation) throws Throwable {
-                        xMsgRegAddress addr = (xMsgRegAddress) invocation.getArguments()[0];
-                        return new xMsgRegDriver(addr, null);
-                    }
+                .thenAnswer(invocation -> {
+                    xMsgRegAddress addr = (xMsgRegAddress) invocation.getArguments()[0];
+                    return new xMsgRegDriver(addr, null);
                 });
     }
 
