@@ -31,6 +31,7 @@ import org.jlab.coda.xmsg.core.xMsgUtil;
 import org.jlab.coda.xmsg.excp.xMsgException;
 import org.jlab.coda.xmsg.xsys.regdis.xMsgRegDriver;
 import org.zeromq.ZContext;
+import org.zeromq.ZFrame;
 import org.zeromq.ZMQ;
 import org.zeromq.ZMQ.Socket;
 import org.zeromq.ZMQException;
@@ -156,8 +157,17 @@ public class xMsgConnectionFactory {
                 if (items.pollin(0)) {
                     ZMsg replyMsg = ZMsg.recvMsg(ctrlSocket);
                     try {
-                        // TODO: check the message
-                        return true;
+                        if (replyMsg.size() == 1) {
+                            ZFrame typeFrame = replyMsg.pop();
+                            try {
+                                String type = new String(typeFrame.getData());
+                                if (type.equals(xMsgConstants.CTRL_CONNECT)) {
+                                    return true;
+                                }
+                            } finally {
+                                typeFrame.destroy();
+                            }
+                        }
                     } finally {
                         replyMsg.destroy();
                     }
