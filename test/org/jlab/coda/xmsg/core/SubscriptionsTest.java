@@ -144,14 +144,16 @@ public class SubscriptionsTest {
 
                 xMsgTopic subTopic = xMsgTopic.wrap("test_topic");
                 xMsgSubscription sub = subActor.subscribe(subCon, subTopic, msg -> {
-                    xMsgConnection repCon = subActor.getConnection();
                     try {
-                        xMsgMessage response = xMsgMessage.createResponse(msg);
-                        subActor.publish(repCon, response);
+                        xMsgConnection repCon = subActor.getConnection();
+                        try {
+                            xMsgMessage response = xMsgMessage.createResponse(msg);
+                            subActor.publish(repCon, response);
+                        } finally {
+                            subActor.releaseConnection(repCon);
+                        }
                     } catch (xMsgException e) {
                         e.printStackTrace();
-                    } finally {
-                        subActor.releaseConnection(repCon);
                     }
                 });
                 xMsgUtil.sleep(100);
@@ -199,16 +201,18 @@ public class SubscriptionsTest {
 
                 xMsgTopic subTopic = xMsgTopic.wrap("test_topic");
                 xMsgSubscription sub = subActor.subscribe(subCon, subTopic, msg -> {
-                    xMsgConnection repCon = subActor.getConnection();
                     try {
-                        check.received = true;
-                        xMsgUtil.sleep(1500);
-                        xMsgMessage response = xMsgMessage.createResponse(msg);
-                        subActor.publish(repCon, response);
+                        xMsgConnection repCon = subActor.getConnection();
+                        try {
+                            check.received = true;
+                            xMsgUtil.sleep(1500);
+                            xMsgMessage response = xMsgMessage.createResponse(msg);
+                            subActor.publish(repCon, response);
+                        } finally {
+                            subActor.releaseConnection(repCon);
+                        }
                     } catch (xMsgException e) {
                         e.printStackTrace();
-                    } finally {
-                        subActor.releaseConnection(repCon);
                     }
                 });
                 xMsgUtil.sleep(100);

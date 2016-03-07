@@ -185,14 +185,16 @@ public class PublishersTest {
                 xMsgConnection connection = actor.createConnection();
                 xMsgTopic topic = xMsgTopic.wrap(rawTopic);
                 xMsgSubscription sub = actor.subscribe(connection, topic, msg -> {
-                    xMsgConnection pubConnection = actor.getConnection();
                     try {
-                        xMsgMessage res = xMsgMessage.createResponse(msg);
-                        actor.publish(pubConnection, res);
+                        xMsgConnection pubConnection = actor.getConnection();
+                        try {
+                            xMsgMessage res = xMsgMessage.createResponse(msg);
+                            actor.publish(pubConnection, res);
+                        } finally {
+                            actor.releaseConnection(pubConnection);
+                        }
                     } catch (xMsgException e) {
                         e.printStackTrace();
-                    } finally {
-                        actor.releaseConnection(pubConnection);
                     }
                 });
                 subReady.countDown();

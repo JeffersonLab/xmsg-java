@@ -288,8 +288,9 @@ public class xMsg {
      *
      * @param address the address of the proxy
      * @return a connection to the proxy
+     * @throws xMsgException if the connection could not be created
      */
-    public xMsgConnection createConnection(xMsgProxyAddress address) {
+    public xMsgConnection createConnection(xMsgProxyAddress address) throws xMsgException {
         return connectionManager.createProxyConnection(address);
     }
 
@@ -299,8 +300,9 @@ public class xMsg {
      *
      * @param proxyHost the host name of the proxy
      * @return a connection to the proxy
+     * @throws xMsgException if the connection could not be created
      */
-    public xMsgConnection createConnection(String proxyHost) {
+    public xMsgConnection createConnection(String proxyHost) throws xMsgException {
         xMsgProxyAddress address = new xMsgProxyAddress(proxyHost);
         return connectionManager.createProxyConnection(address);
     }
@@ -309,8 +311,9 @@ public class xMsg {
      * Creates a new connection to the default proxy.
      *
      * @return a connection to the proxy
+     * @throws xMsgException if the connection could not be created
      */
-    public xMsgConnection createConnection() {
+    public xMsgConnection createConnection() throws xMsgException {
         return connectionManager.createProxyConnection(defaultProxyAddress);
     }
 
@@ -320,8 +323,9 @@ public class xMsg {
      *
      * @param address the address of the proxy
      * @return a connection to the proxy
+     * @throws xMsgException if a new connection could not be created
      */
-    public xMsgConnection getConnection(xMsgProxyAddress address) {
+    public xMsgConnection getConnection(xMsgProxyAddress address) throws xMsgException {
         return connectionManager.getProxyConnection(address);
     }
 
@@ -332,8 +336,9 @@ public class xMsg {
      *
      * @param proxyHost the host name of the proxy
      * @return a connection to the proxy
+     * @throws xMsgException if a new connection could not be created
      */
-    public xMsgConnection getConnection(String proxyHost) {
+    public xMsgConnection getConnection(String proxyHost) throws xMsgException {
         xMsgProxyAddress address = new xMsgProxyAddress(proxyHost);
         return connectionManager.getProxyConnection(address);
     }
@@ -343,8 +348,9 @@ public class xMsg {
      * If there is no available connection, a new one will be created.
      *
      * @return a connection to the proxy
+     * @throws xMsgException if a new connection could not be created
      */
-    public xMsgConnection getConnection() {
+    public xMsgConnection getConnection() throws xMsgException {
         return connectionManager.getProxyConnection(defaultProxyAddress);
     }
 

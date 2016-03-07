@@ -28,6 +28,7 @@ import java.util.Random;
 
 import org.jlab.coda.xmsg.core.xMsgConstants;
 import org.jlab.coda.xmsg.core.xMsgUtil;
+import org.jlab.coda.xmsg.excp.xMsgException;
 import org.jlab.coda.xmsg.xsys.regdis.xMsgRegDriver;
 import org.zeromq.ZContext;
 import org.zeromq.ZMQ;
@@ -47,7 +48,8 @@ public class xMsgConnectionFactory {
     }
 
     public xMsgConnection createProxyConnection(xMsgProxyAddress address,
-                                                xMsgConnectionSetup setup) {
+                                                xMsgConnectionSetup setup) throws xMsgException {
+
         Socket pubSock = context.createSocket(ZMQ.PUB);
         Socket subSock = context.createSocket(ZMQ.SUB);
         Socket ctrlSock = context.createSocket(ZMQ.DEALER);
@@ -70,7 +72,7 @@ public class xMsgConnectionFactory {
             context.destroySocket(pubSock);
             context.destroySocket(subSock);
             context.destroySocket(ctrlSock);
-            throw new RuntimeException("Could not connect to " + address.toString());
+            throw new xMsgException("Could not connect to " + address);
         }
         setup.postConnection();
 
@@ -84,7 +86,7 @@ public class xMsgConnectionFactory {
         return connection;
     }
 
-    public xMsgRegDriver createRegistrarConnection(xMsgRegAddress address) {
+    public xMsgRegDriver createRegistrarConnection(xMsgRegAddress address) throws xMsgException {
         Socket socket = context.createSocket(ZMQ.REQ);
         socket.setHWM(0);
         socket.connect("tcp://" + address.host() + ":" + address.port());

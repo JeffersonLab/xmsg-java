@@ -22,6 +22,7 @@
 
 package org.jlab.coda.xmsg.core;
 
+import org.jlab.coda.xmsg.excp.xMsgException;
 import org.jlab.coda.xmsg.net.xMsgConnection;
 import org.jlab.coda.xmsg.net.xMsgConnectionFactory;
 import org.jlab.coda.xmsg.net.xMsgProxyAddress;
@@ -49,7 +50,7 @@ public class ConnectionManagerTest {
     private xMsgConnectionFactory factory;
     private ConnectionManager manager;
 
-    public ConnectionManagerTest() {
+    public ConnectionManagerTest() throws Exception {
         factory = mock(xMsgConnectionFactory.class);
 
         when(factory.createProxyConnection(any(), any()))
@@ -108,8 +109,8 @@ public class ConnectionManagerTest {
     }
 
     private <A, C> void createConnections(Function<String, A> address,
-                                          Function<A, C> create,
-                                          Function<C, A> inspect) {
+                                          ConnectionBuilder<A, C> create,
+                                          Function<C, A> inspect) throws Exception {
         A addr1 = address.apply("10.2.9.1");
         A addr2 = address.apply("10.2.9.2");
 
@@ -127,8 +128,8 @@ public class ConnectionManagerTest {
     }
 
     private <A, C> void reuseConnections(Function<String, A> address,
-                                         Function<A, C> create,
-                                         Consumer<C> release) {
+                                         ConnectionBuilder<A, C> create,
+                                         Consumer<C> release) throws Exception {
         A addr1 = address.apply("10.2.9.1");
         A addr2 = address.apply("10.2.9.2");
 
@@ -147,5 +148,10 @@ public class ConnectionManagerTest {
         assertThat(c1, is(sameInstance(cc1)));
         assertThat(c2, is(sameInstance(cc3)));
         assertThat(c3, is(sameInstance(cc2)));
+    }
+
+    @FunctionalInterface
+    public interface ConnectionBuilder<A, C> {
+        C apply(A a) throws xMsgException;
     }
 }

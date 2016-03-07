@@ -28,6 +28,7 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentLinkedQueue;
 import java.util.function.Consumer;
 
+import org.jlab.coda.xmsg.excp.xMsgException;
 import org.jlab.coda.xmsg.net.xMsgConnection;
 import org.jlab.coda.xmsg.net.xMsgConnectionFactory;
 import org.jlab.coda.xmsg.net.xMsgConnectionSetup;
@@ -63,21 +64,21 @@ class ConnectionManager {
         defaultConnectionOption = new xMsgConnectionSetup() { };
     }
 
-    xMsgConnection createProxyConnection(xMsgProxyAddress address) {
+    xMsgConnection createProxyConnection(xMsgProxyAddress address) throws xMsgException {
         return createProxyConnection(address, defaultConnectionOption);
     }
 
     xMsgConnection createProxyConnection(xMsgProxyAddress address,
-                                      xMsgConnectionSetup setup) {
+                                      xMsgConnectionSetup setup) throws xMsgException {
         return factory.createProxyConnection(address, setup);
     }
 
-    xMsgConnection getProxyConnection(xMsgProxyAddress address) {
+    xMsgConnection getProxyConnection(xMsgProxyAddress address) throws xMsgException {
         return getProxyConnection(address, defaultConnectionOption);
     }
 
     xMsgConnection getProxyConnection(xMsgProxyAddress address,
-                                      xMsgConnectionSetup setup) {
+                                      xMsgConnectionSetup setup) throws xMsgException {
         xMsgConnection cachedConnection = proxyConnections.getConnection(address);
         if (cachedConnection != null) {
             return cachedConnection;
@@ -93,7 +94,7 @@ class ConnectionManager {
         factory.destroyProxyConnection(connection);
     }
 
-    xMsgRegDriver getRegistrarConnection(xMsgRegAddress address) {
+    xMsgRegDriver getRegistrarConnection(xMsgRegAddress address) throws xMsgException {
         xMsgRegDriver cachedConnection = registrarConnections.getConnection(address);
         if (cachedConnection != null) {
             return cachedConnection;
