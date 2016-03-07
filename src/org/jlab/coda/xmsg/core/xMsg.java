@@ -319,7 +319,7 @@ public class xMsg {
      * If there is no available connection, a new one will be created.
      *
      * @param address the address of the proxy
-     * @return a connection the proxy
+     * @return a connection to the proxy
      */
     public xMsgConnection getConnection(xMsgProxyAddress address) {
         return connectionManager.getProxyConnection(address);
@@ -331,7 +331,7 @@ public class xMsg {
      * If there is no available connection, a new one will be created.
      *
      * @param proxyHost the host name of the proxy
-     * @return a connection the proxy
+     * @return a connection to the proxy
      */
     public xMsgConnection getConnection(String proxyHost) {
         xMsgProxyAddress address = new xMsgProxyAddress(proxyHost);
@@ -342,7 +342,7 @@ public class xMsg {
      * Obtains a connection to the default proxy.
      * If there is no available connection, a new one will be created.
      *
-     * @return a connection the proxy
+     * @return a connection to the proxy
      */
     public xMsgConnection getConnection() {
         return connectionManager.getProxyConnection(defaultProxyAddress);
