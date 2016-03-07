@@ -185,14 +185,14 @@ public class PublishersTest {
                 xMsgConnection connection = actor.createConnection();
                 xMsgTopic topic = xMsgTopic.wrap(rawTopic);
                 xMsgSubscription sub = actor.subscribe(connection, topic, msg -> {
-                    xMsgConnection pubConnection = actor.connect();
+                    xMsgConnection pubConnection = actor.getConnection();
                     try {
                         xMsgMessage res = xMsgMessage.createResponse(msg);
                         actor.publish(pubConnection, res);
                     } catch (xMsgException e) {
                         e.printStackTrace();
                     } finally {
-                        actor.release(pubConnection);
+                        actor.releaseConnection(pubConnection);
                     }
                 });
                 subReady.countDown();
@@ -224,7 +224,7 @@ public class PublishersTest {
                     xMsg actor = new xMsg("test_sync_publisher_" + start);
                     xMsgTopic topic = xMsgTopic.build(rawTopic, Integer.toString(start));
                     for (int i = start; i < end; i++) {
-                        xMsgConnection connection = actor.connect();
+                        xMsgConnection connection = actor.getConnection();
                         try {
                             xMsgMessage msg = createMessage(topic, i);
                             xMsgMessage res = actor.syncPublish(connection, msg, 1000);
@@ -232,7 +232,7 @@ public class PublishersTest {
                             check.counter.incrementAndGet();
                             check.sum.addAndGet(r);
                         } finally {
-                            actor.release(connection);
+                            actor.releaseConnection(connection);
                         }
                     }
                 } catch (IOException | xMsgException | TimeoutException e) {

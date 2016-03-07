@@ -141,7 +141,7 @@ public class SubscriptionsTest {
             try {
                 final xMsg subActor = new xMsg("test_subscriber");
                 final xMsgConnection subCon = subActor.createConnection();
-                final xMsgConnection repCon = subActor.connect();
+                final xMsgConnection repCon = subActor.getConnection();
 
                 xMsgTopic subTopic = xMsgTopic.wrap("test_topic");
                 xMsgSubscription sub = subActor.subscribe(subCon, subTopic, msg -> {
@@ -194,7 +194,7 @@ public class SubscriptionsTest {
             try {
                 xMsg subActor = new xMsg("test_subscriber");
                 xMsgConnection subCon = subActor.createConnection();
-                xMsgConnection repCon = subActor.connect();
+                xMsgConnection repCon = subActor.getConnection();
 
                 xMsgTopic subTopic = xMsgTopic.wrap("test_topic");
                 xMsgSubscription sub = subActor.subscribe(subCon, subTopic, msg -> {

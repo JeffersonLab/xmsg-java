@@ -321,7 +321,7 @@ public class xMsg {
      * @param address the address of the proxy
      * @return a connection the proxy
      */
-    public xMsgConnection connect(xMsgProxyAddress address) {
+    public xMsgConnection getConnection(xMsgProxyAddress address) {
         return connectionManager.getProxyConnection(address);
     }
 
@@ -333,7 +333,7 @@ public class xMsg {
      * @param proxyHost the host name of the proxy
      * @return a connection the proxy
      */
-    public xMsgConnection connect(String proxyHost) {
+    public xMsgConnection getConnection(String proxyHost) {
         xMsgProxyAddress address = new xMsgProxyAddress(proxyHost);
         return connectionManager.getProxyConnection(address);
     }
@@ -344,7 +344,7 @@ public class xMsg {
      *
      * @return a connection the proxy
      */
-    public xMsgConnection connect() {
+    public xMsgConnection getConnection() {
         return connectionManager.getProxyConnection(defaultProxyAddress);
     }
 
@@ -353,7 +353,7 @@ public class xMsg {
      *
      * @param connection the returned connection
      */
-    public void release(xMsgConnection connection) {
+    public void releaseConnection(xMsgConnection connection) {
         connectionManager.releaseProxyConnection(connection);
     }
 
