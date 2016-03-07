@@ -141,15 +141,17 @@ public class SubscriptionsTest {
             try {
                 final xMsg subActor = new xMsg("test_subscriber");
                 final xMsgConnection subCon = subActor.createConnection();
-                final xMsgConnection repCon = subActor.getConnection();
 
                 xMsgTopic subTopic = xMsgTopic.wrap("test_topic");
                 xMsgSubscription sub = subActor.subscribe(subCon, subTopic, msg -> {
+                    xMsgConnection repCon = subActor.getConnection();
                     try {
                         xMsgMessage response = xMsgMessage.createResponse(msg);
                         subActor.publish(repCon, response);
                     } catch (xMsgException e) {
                         e.printStackTrace();
+                    } finally {
+                        subActor.releaseConnection(repCon);
                     }
                 });
                 xMsgUtil.sleep(100);
@@ -194,10 +196,10 @@ public class SubscriptionsTest {
             try {
                 xMsg subActor = new xMsg("test_subscriber");
                 xMsgConnection subCon = subActor.createConnection();
-                xMsgConnection repCon = subActor.getConnection();
 
                 xMsgTopic subTopic = xMsgTopic.wrap("test_topic");
                 xMsgSubscription sub = subActor.subscribe(subCon, subTopic, msg -> {
+                    xMsgConnection repCon = subActor.getConnection();
                     try {
                         check.received = true;
                         xMsgUtil.sleep(1500);
@@ -205,6 +207,8 @@ public class SubscriptionsTest {
                         subActor.publish(repCon, response);
                     } catch (xMsgException e) {
                         e.printStackTrace();
+                    } finally {
+                        subActor.releaseConnection(repCon);
                     }
                 });
                 xMsgUtil.sleep(100);
