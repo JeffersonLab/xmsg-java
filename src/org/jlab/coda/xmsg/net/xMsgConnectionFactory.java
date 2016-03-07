@@ -57,40 +57,50 @@ public class xMsgConnectionFactory {
         String identity = getCtrlId();
         ctrlSock.setIdentity(identity.getBytes());
 
-        setup.preConnection(pubSock);
-        setup.preConnection(subSock);
+        try {
+            setup.preConnection(pubSock);
+            setup.preConnection(subSock);
 
-        int pubPort = address.port();
-        int subPort = pubPort + 1;
-        int ctrlPort = subPort + 1;
+            int pubPort = address.port();
+            int subPort = pubPort + 1;
+            int ctrlPort = subPort + 1;
 
-        connectSocket(pubSock, address.host(), pubPort);
-        connectSocket(subSock, address.host(), subPort);
-        connectSocket(ctrlSock, address.host(), ctrlPort);
+            connectSocket(pubSock, address.host(), pubPort);
+            connectSocket(subSock, address.host(), subPort);
+            connectSocket(ctrlSock, address.host(), ctrlPort);
 
-        if (!checkConnection(pubSock, ctrlSock, identity)) {
+            if (!checkConnection(pubSock, ctrlSock, identity)) {
+                throw new xMsgException("Could not connect to " + address);
+            }
+            setup.postConnection();
+
+            xMsgConnection connection = new xMsgConnection();
+            connection.setAddress(address);
+            connection.setPubSock(pubSock);
+            connection.setSubSock(subSock);
+            connection.setControlSock(ctrlSock);
+            connection.setIdentity(identity);
+
+            return connection;
+
+        } catch (ZMQException | xMsgException e) {
             context.destroySocket(pubSock);
             context.destroySocket(subSock);
             context.destroySocket(ctrlSock);
-            throw new xMsgException("Could not connect to " + address);
+            throw e;
         }
-        setup.postConnection();
-
-        xMsgConnection connection = new xMsgConnection();
-        connection.setAddress(address);
-        connection.setPubSock(pubSock);
-        connection.setSubSock(subSock);
-        connection.setControlSock(ctrlSock);
-        connection.setIdentity(identity);
-
-        return connection;
     }
 
     public xMsgRegDriver createRegistrarConnection(xMsgRegAddress address) throws xMsgException {
         Socket socket = createSocket(ZMQ.REQ);
-        socket.setHWM(0);
-        connectSocket(socket, address.host(), address.port());
-        return new xMsgRegDriver(address, socket);
+        try {
+            socket.setHWM(0);
+            connectSocket(socket, address.host(), address.port());
+            return new xMsgRegDriver(address, socket);
+        } catch (ZMQException | xMsgException e) {
+            context.destroySocket(socket);
+            throw e;
+        }
     }
 
     public void destroyProxyConnection(xMsgConnection connection) {
