@@ -50,9 +50,9 @@ public class xMsgConnectionFactory {
     public xMsgConnection createProxyConnection(xMsgProxyAddress address,
                                                 xMsgConnectionSetup setup) throws xMsgException {
 
-        Socket pubSock = context.createSocket(ZMQ.PUB);
-        Socket subSock = context.createSocket(ZMQ.SUB);
-        Socket ctrlSock = context.createSocket(ZMQ.DEALER);
+        Socket pubSock = createSocket(ZMQ.PUB);
+        Socket subSock = createSocket(ZMQ.SUB);
+        Socket ctrlSock = createSocket(ZMQ.DEALER);
 
         String identity = getCtrlId();
         ctrlSock.setIdentity(identity.getBytes());
@@ -64,9 +64,9 @@ public class xMsgConnectionFactory {
         int subPort = pubPort + 1;
         int ctrlPort = subPort + 1;
 
-        pubSock.connect("tcp://" + address.host() + ":" + pubPort);
-        subSock.connect("tcp://" + address.host() + ":" + subPort);
-        ctrlSock.connect("tcp://" + address.host() + ":" + ctrlPort);
+        connectSocket(pubSock, address.host(), pubPort);
+        connectSocket(subSock, address.host(), subPort);
+        connectSocket(ctrlSock, address.host(), ctrlPort);
 
         if (!checkConnection(pubSock, ctrlSock, identity)) {
             context.destroySocket(pubSock);
@@ -87,9 +87,9 @@ public class xMsgConnectionFactory {
     }
 
     public xMsgRegDriver createRegistrarConnection(xMsgRegAddress address) throws xMsgException {
-        Socket socket = context.createSocket(ZMQ.REQ);
+        Socket socket = createSocket(ZMQ.REQ);
         socket.setHWM(0);
-        socket.connect("tcp://" + address.host() + ":" + address.port());
+        connectSocket(socket, address.host(), address.port());
         return new xMsgRegDriver(address, socket);
     }
 
@@ -110,6 +110,24 @@ public class xMsgConnectionFactory {
         context.destroy();
     }
 
+
+    private Socket createSocket(int type) throws xMsgException {
+        try {
+            return context.createSocket(type);
+        } catch (IllegalStateException e) {
+            throw new xMsgException("Reached maximum number of sockets");
+        }
+    }
+
+    private void connectSocket(Socket socket, String host, int port) throws xMsgException {
+        try {
+            socket.connect("tcp://" + host + ":" + port);
+        } catch (ZMQException e) {
+            if (e.getErrorCode() == ZMQ.Error.EMTHREAD.getCode()) {
+                throw new xMsgException("No I/O thread available", e);
+            }
+        }
+    }
 
     private boolean checkConnection(Socket pubSocket, Socket ctrlSocket, String identity) {
         ZMQ.Poller items = new ZMQ.Poller(1);
