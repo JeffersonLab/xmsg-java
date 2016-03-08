@@ -100,6 +100,9 @@ public abstract class xMsgSubscription {
                 try {
                     if (sub.hasMsg(100)) {
                         ZMsg msg = sub.recvMsg();
+                        if (msg == null) {
+                            break; // interrupted
+                        }
                         try {
                             if (msg.size() == 2) {
                                 // ignore control message
