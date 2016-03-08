@@ -679,12 +679,6 @@ public class xMsg {
             throw new xMsgException("xMsg-Warning:  Subscription exists.");
         }
 
-        // get sub socket
-        Socket sock = connection.getSubSock();
-        if (sock == null) {
-            throw new xMsgException("xMsg-Error: null sub socket");
-        }
-
         xMsgSubscription sHandle = new xMsgSubscription(name, connection, topic) {
             @Override
             public void handle(xMsgMessage inputMsg) throws xMsgException, IOException {
