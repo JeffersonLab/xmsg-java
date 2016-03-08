@@ -71,7 +71,10 @@ class DataSubscription {
     }
 
     boolean hasMsg(int timeout) {
-        items.poll(timeout);
+        int rc = items.poll(timeout);
+        if (rc < 0) {
+            throw new ZMQException(subSocket.base().errno());
+        }
         return items.pollin(0);
     }
 
