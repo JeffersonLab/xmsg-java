@@ -84,7 +84,9 @@ public class SubscriptionsTest {
                     check.counter.incrementAndGet();
                     check.sum.addAndGet(i);
                 });
-                while (check.counter.get() < Check.N) {
+                int shutdownCounter = 0;
+                while (check.counter.get() < Check.N && shutdownCounter < 100) {
+                    shutdownCounter++;
                     xMsgUtil.sleep(100);
                 }
                 actor.unsubscribe(sub);
