@@ -148,7 +148,7 @@ public abstract class xMsgSubscription {
      * Indicates if the subscription thread is running.
      */
     public boolean isAlive() {
-        return isRunning;
+        return thread.isAlive();
     }
 
     /**
