@@ -33,10 +33,8 @@ import java.util.concurrent.atomic.AtomicLong;
 import org.jlab.coda.xmsg.excp.xMsgException;
 import org.jlab.coda.xmsg.net.xMsgConnection;
 import org.jlab.coda.xmsg.testing.IntegrationTest;
-import org.jlab.coda.xmsg.xsys.xMsgProxy;
 import org.junit.Test;
 import org.junit.experimental.categories.Category;
-import org.zeromq.ZContext;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.is;
@@ -56,20 +54,12 @@ public class PublishersTest {
 
         }
 
-        final ZContext context = new ZContext();
         final Check check = new Check();
 
         final String rawTopic = "test_topic";
         final CountDownLatch subReady = new CountDownLatch(1);
 
-        Thread proxyThread = xMsgUtil.newThread("proxy-thread", () -> {
-            try {
-                xMsgProxy proxy = new xMsgProxy(context);
-                proxy.start();
-            } catch (xMsgException e) {
-                e.printStackTrace();
-            }
-        });
+        ProxyThread proxyThread = new ProxyThread();
         proxyThread.start();
 
 
@@ -141,9 +131,7 @@ public class PublishersTest {
             pubThread.join();
         }
 
-        context.destroy();
-        proxyThread.interrupt();
-        proxyThread.join();
+        proxyThread.stop();
 
 
         assertThat(check.counter.get(), is(Check.N));
@@ -162,20 +150,12 @@ public class PublishersTest {
 
         }
 
-        final ZContext context = new ZContext();
         final Check check = new Check();
 
         final String rawTopic = "test_topic";
         final CountDownLatch subReady = new CountDownLatch(1);
 
-        Thread proxyThread = xMsgUtil.newThread("proxy-thread", () -> {
-            try {
-                xMsgProxy proxy = new xMsgProxy(context);
-                proxy.start();
-            } catch (xMsgException e) {
-                e.printStackTrace();
-            }
-        });
+        ProxyThread proxyThread = new ProxyThread();
         proxyThread.start();
 
 
@@ -258,9 +238,7 @@ public class PublishersTest {
             pubThread.join();
         }
 
-        context.destroy();
-        proxyThread.interrupt();
-        proxyThread.join();
+        proxyThread.stop();
 
 
         assertThat(check.counter.get(), is(Check.N));

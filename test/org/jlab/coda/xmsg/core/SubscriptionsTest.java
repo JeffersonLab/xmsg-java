@@ -25,10 +25,8 @@ package org.jlab.coda.xmsg.core;
 import org.jlab.coda.xmsg.excp.xMsgException;
 import org.jlab.coda.xmsg.net.xMsgConnection;
 import org.jlab.coda.xmsg.testing.IntegrationTest;
-import org.jlab.coda.xmsg.xsys.xMsgProxy;
 import org.junit.Test;
 import org.junit.experimental.categories.Category;
-import org.zeromq.ZContext;
 
 import java.io.IOException;
 import java.util.concurrent.TimeoutException;
@@ -237,34 +235,5 @@ public class SubscriptionsTest {
 
         assertTrue("not received", check.received);
         assertTrue("no timeout", check.timeout);
-    }
-
-
-    private class ProxyThread {
-
-        private final ZContext context = new ZContext();
-        private final Thread proxyThread;
-
-        ProxyThread() {
-            proxyThread = xMsgUtil.newThread("proxy-thread", () -> {
-                try {
-                    xMsgProxy proxy = new xMsgProxy(context);
-                    proxy.start();
-                } catch (xMsgException e) {
-                    e.printStackTrace();
-                }
-            });
-        }
-
-        public void start() {
-            proxyThread.start();
-            xMsgUtil.sleep(100);
-        }
-
-        public void stop() throws InterruptedException {
-            context.destroy();
-            proxyThread.interrupt();
-            proxyThread.join();
-        }
     }
 }
