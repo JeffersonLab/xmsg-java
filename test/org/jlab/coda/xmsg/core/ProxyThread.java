@@ -33,11 +33,14 @@ class ProxyThread {
 
     ProxyThread() {
         proxyThread = xMsgUtil.newThread("proxy-thread", () -> {
+            ZContext shadow = ZContext.shadow(context);
             try {
-                xMsgProxy proxy = new xMsgProxy(context);
+                xMsgProxy proxy = new xMsgProxy(shadow);
                 proxy.start();
             } catch (xMsgException e) {
                 e.printStackTrace();
+            } finally {
+                shadow.destroy();
             }
         });
     }
