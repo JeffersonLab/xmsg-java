@@ -28,9 +28,9 @@ import java.io.IOException;
 import java.io.PrintStream;
 
 import org.jlab.coda.xmsg.core.xMsgConstants;
-import org.jlab.coda.xmsg.core.xMsgContext;
 import org.jlab.coda.xmsg.core.xMsgUtil;
 import org.jlab.coda.xmsg.excp.xMsgException;
+import org.jlab.coda.xmsg.net.xMsgContext;
 import org.jlab.coda.xmsg.net.xMsgProxyAddress;
 import org.zeromq.ZContext;
 import org.zeromq.ZFrame;

@@ -20,7 +20,7 @@
  *    Department of Experimental Nuclear Physics, Jefferson Lab.
  */
 
-package org.jlab.coda.xmsg.core;
+package org.jlab.coda.xmsg.net;
 
 import org.zeromq.ZContext;
 
@@ -33,9 +33,10 @@ import org.zeromq.ZContext;
  * @since 2.x
  */
 public final class xMsgContext {
+
     private static xMsgContext ourInstance = new xMsgContext();
 
-    private ZContext context;
+    private final ZContext context;
 
     private xMsgContext() {
         context = new ZContext();
@@ -48,5 +49,4 @@ public final class xMsgContext {
     public static ZContext getContext() {
         return getInstance().context;
     }
-
 }
