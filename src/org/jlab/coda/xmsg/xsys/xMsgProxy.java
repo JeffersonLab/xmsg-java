@@ -93,6 +93,15 @@ public class xMsgProxy {
             if (options.has("verbose")) {
                 proxy.verbose();
             }
+
+            Runtime.getRuntime().addShutdownHook(new Thread() {
+                @Override
+                public void run() {
+                    xMsgContext.getContext().destroy();
+                    proxy.shutdown();
+                }
+            });
+
             proxy.start();
 
         } catch (OptionException e) {
