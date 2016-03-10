@@ -340,13 +340,22 @@ public class xMsgProxy {
         public void run(Object[] args, ZContext ctx, Socket pipe) {
             //  Print everything that arrives on pipe
             while (true) {
-                ZMsg msg = ZMsg.recvMsg(pipe);
-                if (msg == null) {
-                    System.out.println("Interrupted...");
+                try {
+                    ZMsg msg = ZMsg.recvMsg(pipe);
+                    if (msg == null) {
+                        break;
+                    }
+                    msg.pop().print(null);
+                    msg.destroy();
+                } catch (ZMQException e) {
+                    if (e.getErrorCode() == ZMQ.Error.ETERM.getCode()) {
+                        break;
+                    }
+                    e.printStackTrace();
+                } catch (Exception e) {
+                    e.printStackTrace();
                     break;
                 }
-                msg.pop().print(null);
-                msg.destroy();
             }
         }
     }
