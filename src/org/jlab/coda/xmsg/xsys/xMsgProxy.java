@@ -60,6 +60,8 @@ public class xMsgProxy {
 
     private final xMsgProxyAddress addr;
     private final ZContext ctx;
+
+    private final Thread proxy;
     private final Thread controller;
 
     private boolean verbose = false;
@@ -129,6 +131,7 @@ public class xMsgProxy {
     public xMsgProxy(ZContext context, xMsgProxyAddress address) throws xMsgException {
         ctx = context;
         addr = address;
+        proxy = xMsgUtil.newThread("proxy", new Proxy());
         controller = xMsgUtil.newThread("control", new Controller());
     }
 
@@ -144,33 +147,51 @@ public class xMsgProxy {
      *
      * @throws xMsgException if the proxy could not be started
      */
-    public void start() throws xMsgException {
+    public void start() {
+        proxy.start();
+        controller.start();
+    }
 
-        try {
-            // socket where clients publish their data/messages
-            ZMQ.Socket in = createSocket(ctx, ZMQ.XSUB);
-            bindSocket(in, addr.port());
 
-            // socket where clients subscribe data/messages
-            ZMQ.Socket out = createSocket(ctx, ZMQ.XPUB);
-            bindSocket(out, addr.port() + 1);
+    /**
+     * The proxy forwards pub/sub communications.
+     */
+    private class Proxy implements Runnable {
 
-            // start controller
-            controller.start();
+        final ZContext shadowContext;
 
-            System.out.println(xMsgUtil.currentTime(4) +
-                    " xMsg-Info: Running xMsg proxy on the host = " +
-                    addr.host() + " port = " + addr.port() + "\n");
+        final Socket in;
+        final Socket out;
 
-            // start proxy. this will block for ever
-            if (verbose) {
-                Socket listener = ZThread.fork(ctx, new Listener());
-                ZMQ.proxy(in, out, listener);
-            } else {
-                ZMQ.proxy(in, out, null);
+        Proxy() throws xMsgException {
+            shadowContext = ZContext.shadow(ctx);
+            try {
+                in = createSocket(shadowContext, ZMQ.XSUB);
+                out = createSocket(shadowContext, ZMQ.XPUB);
+                bindSocket(in, addr.port());
+                bindSocket(out, addr.port() + 1);
+            } catch (ZMQException e) {
+                shadowContext.destroy();
+                throw new xMsgException(e.getMessage());
             }
-        } catch (ZMQException e) {
-            throw new xMsgException(e.getMessage());
+        }
+
+        @Override
+        public void run() {
+            try {
+                System.out.println(xMsgUtil.currentTime(4) +
+                        " xMsg-Info: Running xMsg proxy on the host = " +
+                        addr.host() + " port = " + addr.port() + "\n");
+                if (verbose) {
+                    Socket listener = ZThread.fork(shadowContext, new Listener());
+                    ZMQ.proxy(in, out, listener);
+                } else {
+                    ZMQ.proxy(in, out, null);
+                }
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+            shadowContext.destroy();
         }
     }
 
