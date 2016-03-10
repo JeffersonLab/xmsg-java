@@ -173,6 +173,13 @@ public class xMsgProxy {
         return proxy.isAlive() && controller.isAlive();
     }
 
+    /**
+     * Returns the address of the proxy.
+     */
+    public xMsgProxyAddress address() {
+        return addr;
+    }
+
 
     /**
      * The proxy forwards pub/sub communications.
