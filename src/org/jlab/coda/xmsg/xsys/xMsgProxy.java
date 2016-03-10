@@ -113,8 +113,9 @@ public class xMsgProxy {
      * Construct the proxy on a local host.
      *
      * @param context zmq context object
+     * @throws xMsgException
      */
-    public xMsgProxy(ZContext context) {
+    public xMsgProxy(ZContext context) throws xMsgException {
         this(context, new xMsgProxyAddress());
     }
 
@@ -123,8 +124,9 @@ public class xMsgProxy {
      *
      * @param context zmq context object
      * @param address the local address
+     * @throws xMsgException
      */
-    public xMsgProxy(ZContext context, xMsgProxyAddress address) {
+    public xMsgProxy(ZContext context, xMsgProxyAddress address) throws xMsgException {
         ctx = context;
         addr = address;
         controller = xMsgUtil.newThread("control", new Controller());
@@ -179,15 +181,19 @@ public class xMsgProxy {
      */
     private class Controller implements Runnable {
 
-        @Override
-        public void run() {
-            ZContext shadowContext = ZContext.shadow(ctx);
+        final ZContext shadowContext;
 
-            Socket control = createSocket(shadowContext, ZMQ.SUB);
-            Socket publisher = createSocket(shadowContext, ZMQ.PUB);
-            Socket router = createSocket(shadowContext, ZMQ.ROUTER);
+        final Socket control;
+        final Socket publisher;
+        final Socket router;
 
+        Controller() throws xMsgException {
+            shadowContext = ZContext.shadow(ctx);
             try {
+                control = createSocket(shadowContext, ZMQ.SUB);
+                publisher = createSocket(shadowContext, ZMQ.PUB);
+                router = createSocket(shadowContext, ZMQ.ROUTER);
+
                 connectSocket(control, addr.host(), addr.port() + 1);
                 connectSocket(publisher, addr.host(), addr.port());
 
@@ -196,10 +202,13 @@ public class xMsgProxy {
 
                 control.subscribe(xMsgConstants.CTRL_TOPIC.getBytes());
             } catch (ZMQException e) {
-                e.printStackTrace();
-                return;
+                shadowContext.destroy();
+                throw new xMsgException(e.getMessage());
             }
+        }
 
+        @Override
+        public void run() {
             while (!Thread.currentThread().isInterrupted()) {
                 try {
                     ZMsg msg = ZMsg.recvMsg(control);
