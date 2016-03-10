@@ -166,6 +166,13 @@ public class xMsgProxy {
         }
     }
 
+    /**
+     * Tests if the proxy is running.
+     */
+    public boolean isAlive() {
+        return proxy.isAlive() && controller.isAlive();
+    }
+
 
     /**
      * The proxy forwards pub/sub communications.
