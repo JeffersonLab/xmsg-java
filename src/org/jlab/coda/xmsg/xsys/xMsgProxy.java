@@ -152,6 +152,20 @@ public class xMsgProxy {
         controller.start();
     }
 
+    /**
+     * Stops the proxy. The context must be destroyed first.
+     */
+    public void shutdown() {
+        try {
+            proxy.interrupt();
+            controller.interrupt();
+            proxy.join();
+            controller.join();
+        } catch (InterruptedException e) {
+            Thread.currentThread().interrupt();
+        }
+    }
+
 
     /**
      * The proxy forwards pub/sub communications.
