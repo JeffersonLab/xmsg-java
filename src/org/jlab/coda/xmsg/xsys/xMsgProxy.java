@@ -24,7 +24,6 @@ package org.jlab.coda.xmsg.xsys;
 
 import static java.util.Arrays.asList;
 
-import java.io.IOException;
 import java.io.PrintStream;
 
 import org.jlab.coda.xmsg.core.xMsgConstants;
@@ -97,7 +96,7 @@ public class xMsgProxy {
         } catch (OptionException e) {
             System.err.println(e.getMessage());
             System.exit(1);
-        } catch (IOException | xMsgException e) {
+        } catch (Exception e) {
             e.printStackTrace();
             System.exit(1);
         }
