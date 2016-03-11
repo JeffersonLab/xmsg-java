@@ -61,6 +61,7 @@ public class xMsgRegistrar {
                     .withRequiredArg()
                     .ofType(Integer.class)
                     .defaultsTo(xMsgConstants.REGISTRAR_PORT);
+            parser.accepts("verbose");
             parser.acceptsAll(asList("h", "help")).forHelp();
             OptionSet options = parser.parse(args);
 
@@ -69,13 +70,17 @@ public class xMsgRegistrar {
                 System.exit(0);
             }
 
-            LOGGER.setLevel(Level.INFO);
-
             int port = options.valueOf(portSpec);
             xMsgRegAddress address = new xMsgRegAddress("localhost", port);
 
             final ZContext context = xMsgContext.getContext();
             final xMsgRegistrar registrar = new xMsgRegistrar(context, address);
+
+            if (options.has("verbose")) {
+                registrar.verbose();
+            } else {
+                LOGGER.setLevel(Level.INFO);
+            }
 
             Runtime.getRuntime().addShutdownHook(new Thread() {
                 @Override
@@ -95,7 +100,9 @@ public class xMsgRegistrar {
     }
 
     private static void usage(PrintStream out) {
-        out.printf("usage: jx_registrar [ -port <port> ]%n");
+        out.printf("usage: jx_registrar [options]%n%n  Options:%n");
+        out.printf("  %-22s  %s%n", "-port <port>", "use the given port");
+        out.printf("  %-22s  %s%n", "-verbose", "print debug information");
     }
 
     /**
