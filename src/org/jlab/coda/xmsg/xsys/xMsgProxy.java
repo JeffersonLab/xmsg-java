@@ -110,6 +110,15 @@ public class xMsgProxy {
     }
 
     /**
+     * Construct the proxy on a local host.
+     *
+     * @param context zmq context object
+     */
+    public xMsgProxy(ZContext context) {
+        this(context, new xMsgProxyAddress());
+    }
+
+    /**
      * Construct the proxy with the given local address.
      *
      * @param context zmq context object
@@ -119,15 +128,6 @@ public class xMsgProxy {
         ctx = context;
         addr = address;
         controller = xMsgUtil.newThread("control", new Controller());
-    }
-
-    /**
-     * Construct the proxy on a local host.
-     *
-     * @param context zmq context object
-     */
-    public xMsgProxy(ZContext context) {
-        this(context, new xMsgProxyAddress());
     }
 
     /**
