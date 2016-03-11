@@ -124,7 +124,7 @@ public class xMsgProxy {
      * Construct the proxy on a local host.
      *
      * @param context zmq context object
-     * @throws xMsgException
+     * @throws xMsgException if the address is already in use
      */
     public xMsgProxy(ZContext context) throws xMsgException {
         this(context, new xMsgProxyAddress());
@@ -136,6 +136,7 @@ public class xMsgProxy {
      * @param context zmq context object
      * @param address the local address
      * @throws xMsgException
+     * @throws xMsgException if the address is already in use
      */
     public xMsgProxy(ZContext context, xMsgProxyAddress address) throws xMsgException {
         ctx = context;
@@ -207,9 +208,9 @@ public class xMsgProxy {
                 out = createSocket(shadowContext, ZMQ.XPUB);
                 bindSocket(in, addr.port());
                 bindSocket(out, addr.port() + 1);
-            } catch (ZMQException e) {
+            } catch (Exception e) {
                 shadowContext.destroy();
-                throw new xMsgException(e.getMessage());
+                throw e;
             }
         }
 
@@ -259,9 +260,9 @@ public class xMsgProxy {
                 bindSocket(router, addr.port() + 2);
 
                 control.subscribe(xMsgConstants.CTRL_TOPIC.getBytes());
-            } catch (ZMQException e) {
+            } catch (Exception e) {
                 shadowContext.destroy();
-                throw new xMsgException(e.getMessage());
+                throw e;
             }
         }
 
@@ -368,9 +369,15 @@ public class xMsgProxy {
         return socket;
     }
 
-
-    private static void bindSocket(Socket socket, int port) {
-        socket.bind("tcp://*:" + port);
+    private static void bindSocket(Socket socket, int port) throws xMsgException {
+        try {
+            socket.bind("tcp://*:" + port);
+        } catch (ZMQException e) {
+            if (e.getErrorCode() == ZMQ.Error.EADDRINUSE.getCode()) {
+                throw new xMsgException("Could not bind to port " + port);
+            }
+            throw e;
+        }
     }
 
 
