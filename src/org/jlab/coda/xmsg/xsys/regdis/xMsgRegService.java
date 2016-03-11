@@ -81,6 +81,13 @@ public class xMsgRegService implements Runnable {
         this.regAddress = regAddress;
     }
 
+    /**
+     * Returns the address of the registrar.
+     */
+    public xMsgRegAddress address() {
+        return regAddress;
+    }
+
     @Override
     public void run() {
         printStartup();

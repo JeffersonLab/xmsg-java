@@ -45,6 +45,7 @@ import joptsimple.OptionSpec;
  */
 public class xMsgRegistrar {
 
+    private final xMsgRegAddress addr;
     private final Thread registrar;
 
     public static void main(String[] args) {
@@ -106,6 +107,7 @@ public class xMsgRegistrar {
      * @param address the address of the registrar service
      */
     public xMsgRegistrar(ZContext context, xMsgRegAddress address) {
+        this.addr = address;
         this.registrar = xMsgUtil.newThread("registration-service",
                                             new xMsgRegService(context, address));
     }
@@ -135,5 +137,12 @@ public class xMsgRegistrar {
      */
     public boolean isAlive() {
         return registrar.isAlive();
+    }
+
+    /**
+     * Returns the address of the registrar.
+     */
+    public xMsgRegAddress address() {
+        return addr;
     }
 }
