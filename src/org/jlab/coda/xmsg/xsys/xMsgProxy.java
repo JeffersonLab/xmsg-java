@@ -25,12 +25,15 @@ package org.jlab.coda.xmsg.xsys;
 import static java.util.Arrays.asList;
 
 import java.io.PrintStream;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 import org.jlab.coda.xmsg.core.xMsgConstants;
 import org.jlab.coda.xmsg.core.xMsgUtil;
 import org.jlab.coda.xmsg.excp.xMsgException;
 import org.jlab.coda.xmsg.net.xMsgContext;
 import org.jlab.coda.xmsg.net.xMsgProxyAddress;
+import org.jlab.coda.xmsg.xsys.util.LogUtils;
 import org.zeromq.ZContext;
 import org.zeromq.ZFrame;
 import org.zeromq.ZMQ;
@@ -64,7 +67,7 @@ public class xMsgProxy {
     private final Thread proxy;
     private final Thread controller;
 
-    private boolean verbose = false;
+    private static final Logger LOGGER = LogUtils.getConsoleLogger("xMsgProxy");
 
     public static void main(String[] args) {
         try {
@@ -92,6 +95,8 @@ public class xMsgProxy {
             xMsgProxy proxy = new xMsgProxy(xMsgContext.getContext(), address);
             if (options.has("verbose")) {
                 proxy.verbose();
+            } else {
+                LOGGER.setLevel(Level.INFO);
             }
 
             Runtime.getRuntime().addShutdownHook(new Thread() {
@@ -164,7 +169,7 @@ public class xMsgProxy {
      * Prints every received message.
      */
     public void verbose() {
-        this.verbose = true;
+        LOGGER.setLevel(Level.FINE);
     }
 
     /**
@@ -232,17 +237,15 @@ public class xMsgProxy {
         @Override
         public void run() {
             try {
-                System.out.println(xMsgUtil.currentTime(4) +
-                        " xMsg-Info: Running xMsg proxy on the host = " +
-                        addr.host() + " port = " + addr.port() + "\n");
-                if (verbose) {
+                LOGGER.info("running on host = " + addr.host() + "  port = " + addr.port());
+                if (LOGGER.isLoggable(Level.FINE)) {
                     Socket listener = ZThread.fork(shadowContext, new Listener());
                     ZMQ.proxy(in, out, listener);
                 } else {
                     ZMQ.proxy(in, out, null);
                 }
             } catch (Exception e) {
-                e.printStackTrace();
+                LOGGER.severe(LogUtils.exceptionReporter(e));
             }  finally {
                 shadowContext.destroy();
             }
@@ -296,11 +299,11 @@ public class xMsgProxy {
                         if (e.getErrorCode() == ZMQ.Error.ETERM.getCode()) {
                             break;
                         }
-                        e.printStackTrace();
+                        LOGGER.warning(LogUtils.exceptionReporter(e));
                     }
                 }
             } catch (Exception e) {
-                e.printStackTrace();
+                LOGGER.severe(LogUtils.exceptionReporter(e));
             } finally {
                 shadowContext.destroy();
             }
@@ -337,7 +340,7 @@ public class xMsgProxy {
                         break;
                     }
                     default:
-                        System.err.println("Unexepected request: " + type);
+                        LOGGER.warning("unexpected request: " + type);
                 }
             } finally {
                 topicFrame.destroy();
@@ -363,15 +366,15 @@ public class xMsgProxy {
                     if (msg == null) {
                         break;
                     }
-                    msg.pop().print(null);
+                    LOGGER.fine("received topic = " + msg.popString());
                     msg.destroy();
                 } catch (ZMQException e) {
                     if (e.getErrorCode() == ZMQ.Error.ETERM.getCode()) {
                         break;
                     }
-                    e.printStackTrace();
+                    LOGGER.warning(LogUtils.exceptionReporter(e));
                 } catch (Exception e) {
-                    e.printStackTrace();
+                    LOGGER.severe(LogUtils.exceptionReporter(e));
                     break;
                 }
             }
