@@ -267,19 +267,23 @@ public class xMsgProxy {
 
         @Override
         public void run() {
-            while (!Thread.currentThread().isInterrupted()) {
-                try {
-                    ZMsg msg = ZMsg.recvMsg(control);
-                    if (msg == null) {
-                        break;
+            try {
+                while (!Thread.currentThread().isInterrupted()) {
+                    try {
+                        ZMsg msg = ZMsg.recvMsg(control);
+                        if (msg == null) {
+                            break;
+                        }
+                        processRequet(msg);
+                    } catch (ZMQException e) {
+                        if (e.getErrorCode() == ZMQ.Error.ETERM.getCode()) {
+                            break;
+                        }
+                        e.printStackTrace();
                     }
-                    processRequet(msg);
-                } catch (ZMQException e) {
-                    if (e.getErrorCode() == ZMQ.Error.ETERM.getCode()) {
-                        break;
-                    }
-                    e.printStackTrace();
                 }
+            } catch (Exception e) {
+                e.printStackTrace();
             }
             shadowContext.destroy();
         }
