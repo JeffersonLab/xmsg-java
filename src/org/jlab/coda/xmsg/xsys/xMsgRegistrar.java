@@ -129,4 +129,11 @@ public class xMsgRegistrar {
             e.printStackTrace();
         }
     }
+
+    /**
+     * Tests if the registrar is running.
+     */
+    public boolean isAlive() {
+        return registrar.isAlive();
+    }
 }
