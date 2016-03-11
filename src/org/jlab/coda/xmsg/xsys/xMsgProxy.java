@@ -141,8 +141,23 @@ public class xMsgProxy {
     public xMsgProxy(ZContext context, xMsgProxyAddress address) throws xMsgException {
         ctx = context;
         addr = address;
-        proxy = xMsgUtil.newThread("proxy", new Proxy());
-        controller = xMsgUtil.newThread("control", new Controller());
+
+        Proxy proxyTask = null;
+        Controller controllerTask = null;
+        try {
+            proxyTask = new Proxy();
+            controllerTask = new Controller();
+            proxy = xMsgUtil.newThread("proxy", proxyTask);
+            controller = xMsgUtil.newThread("control", controllerTask);
+        } catch (Exception e) {
+            if (proxyTask != null) {
+                proxyTask.shadowContext.destroy();
+            }
+            if (controllerTask != null) {
+                controllerTask.shadowContext.destroy();
+            }
+            throw e;
+        }
     }
 
     /**
@@ -228,8 +243,9 @@ public class xMsgProxy {
                 }
             } catch (Exception e) {
                 e.printStackTrace();
+            }  finally {
+                shadowContext.destroy();
             }
-            shadowContext.destroy();
         }
     }
 
@@ -285,8 +301,9 @@ public class xMsgProxy {
                 }
             } catch (Exception e) {
                 e.printStackTrace();
+            } finally {
+                shadowContext.destroy();
             }
-            shadowContext.destroy();
         }
 
         private void processRequet(ZMsg msg) {
