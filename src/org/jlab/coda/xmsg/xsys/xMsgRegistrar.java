@@ -22,11 +22,20 @@
 
 package org.jlab.coda.xmsg.xsys;
 
+import static java.util.Arrays.asList;
+
+import org.jlab.coda.xmsg.core.xMsgConstants;
 import org.jlab.coda.xmsg.core.xMsgUtil;
 import org.jlab.coda.xmsg.net.xMsgContext;
 import org.jlab.coda.xmsg.net.xMsgRegAddress;
 import org.jlab.coda.xmsg.xsys.regdis.xMsgRegService;
 import org.zeromq.ZContext;
+
+import java.io.PrintStream;
+
+import joptsimple.OptionParser;
+import joptsimple.OptionSet;
+import joptsimple.OptionSpec;
 
 /**
  * xMsgRegistrar executable. Starts a local registrar service in it's own thread.
@@ -71,20 +80,21 @@ public class xMsgRegistrar {
 
     public static void main(String[] args) {
         try {
-            xMsgRegAddress address = new xMsgRegAddress();
-            if (args.length == 2) {
-                if (args[0].equals("-port")) {
-                    int port = Integer.parseInt(args[1]);
-                    if (port <= 0) {
-                        System.err.println("Invalid port: " + port);
-                        System.exit(1);
-                    }
-                    address = new xMsgRegAddress("localhost", port);
-                } else {
-                    System.err.println("Wrong option. Accepts -port option only.");
-                    System.exit(1);
-                }
+            OptionParser parser = new OptionParser();
+            OptionSpec<Integer> portSpec = parser.accepts("port")
+                    .withRequiredArg()
+                    .ofType(Integer.class)
+                    .defaultsTo(xMsgConstants.REGISTRAR_PORT);
+            parser.acceptsAll(asList("h", "help")).forHelp();
+            OptionSet options = parser.parse(args);
+
+            if (options.has("help")) {
+                usage(System.out);
+                System.exit(0);
             }
+
+            int port = options.valueOf(portSpec);
+            xMsgRegAddress address = new xMsgRegAddress("localhost", port);
 
             final ZContext context = xMsgContext.getContext();
             final xMsgRegistrar registrar = new xMsgRegistrar(context, address);
@@ -104,6 +114,10 @@ public class xMsgRegistrar {
             System.out.println("exiting...");
             System.exit(1);
         }
+    }
+
+    private static void usage(PrintStream out) {
+        out.printf("usage: jx_registrar [ -port <port> ]%n");
     }
 
     /**
