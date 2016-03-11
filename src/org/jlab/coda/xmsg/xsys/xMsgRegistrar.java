@@ -45,7 +45,6 @@ import joptsimple.OptionSpec;
  */
 public class xMsgRegistrar {
 
-    private final ZContext context;
     private final Thread registrar;
 
     public static void main(String[] args) {
@@ -72,6 +71,7 @@ public class xMsgRegistrar {
             Runtime.getRuntime().addShutdownHook(new Thread() {
                 @Override
                 public void run() {
+                    context.destroy();
                     registrar.shutdown();
                 }
             });
@@ -106,7 +106,6 @@ public class xMsgRegistrar {
      * @param address the address of the registrar service
      */
     public xMsgRegistrar(ZContext context, xMsgRegAddress address) {
-        this.context = context;
         this.registrar = xMsgUtil.newThread("registration-service",
                                             new xMsgRegService(context, address));
     }
@@ -120,10 +119,10 @@ public class xMsgRegistrar {
 
     /**
      * Stops the registration and discovery service.
+     * The context must be destroyed first.
      */
     public void shutdown() {
         try {
-            context.destroy();
             registrar.interrupt();
             registrar.join();
         } catch (InterruptedException e) {
