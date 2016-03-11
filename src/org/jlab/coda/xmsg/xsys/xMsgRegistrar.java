@@ -48,36 +48,6 @@ public class xMsgRegistrar {
     private final Thread regServiceThread;
     private final ZContext context;
 
-    /**
-     * Constructs a registrar that uses the default
-     * {@link org.jlab.coda.xmsg.core.xMsgConstants#REGISTRAR_PORT port}.
-     *
-     * @param context the context to run the registrar service
-     */
-    public xMsgRegistrar(ZContext context) {
-        this(context, new xMsgRegAddress());
-    }
-
-    /**
-     * Constructs a registrar that uses the specified port number.
-     *
-     * @param context the context to run the registrar service
-     * @param address the address of the registrar service
-     */
-    public xMsgRegistrar(ZContext context, xMsgRegAddress address) {
-
-        this.context = context;
-        ZContext shadowContext = ZContext.shadow(context);
-
-        // create registrar service object
-        xMsgRegService regService = new xMsgRegService(shadowContext, address);
-
-        // create a new thread that will satisfy registration and discovery requests
-        // using created registrar runnable object
-        regServiceThread = xMsgUtil.newThread("registration-service", regService);
-    }
-
-
     public static void main(String[] args) {
         try {
             OptionParser parser = new OptionParser();
@@ -106,7 +76,6 @@ public class xMsgRegistrar {
                 }
             });
 
-            // start the thread to service the requests
             registrar.start();
 
         } catch (Exception e) {
@@ -118,6 +87,29 @@ public class xMsgRegistrar {
 
     private static void usage(PrintStream out) {
         out.printf("usage: jx_registrar [ -port <port> ]%n");
+    }
+
+    /**
+     * Constructs a registrar that uses the localhost and
+     * {@link org.jlab.coda.xmsg.core.xMsgConstants#REGISTRAR_PORT default port}.
+     *
+     * @param context the context to run the registrar service
+     */
+    public xMsgRegistrar(ZContext context) {
+        this(context, new xMsgRegAddress());
+    }
+
+    /**
+     * Constructs a registrar that uses the specified address.
+     *
+     * @param context the context to run the registrar service
+     * @param address the address of the registrar service
+     */
+    public xMsgRegistrar(ZContext context, xMsgRegAddress address) {
+        this.context = context;
+        ZContext shadowContext = ZContext.shadow(context);
+        xMsgRegService regService = new xMsgRegService(shadowContext, address);
+        regServiceThread = xMsgUtil.newThread("registration-service", regService);
     }
 
     /**
