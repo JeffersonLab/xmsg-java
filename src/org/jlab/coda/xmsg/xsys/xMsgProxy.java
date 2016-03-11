@@ -270,6 +270,9 @@ public class xMsgProxy {
             while (!Thread.currentThread().isInterrupted()) {
                 try {
                     ZMsg msg = ZMsg.recvMsg(control);
+                    if (msg == null) {
+                        break;
+                    }
                     processRequet(msg);
                 } catch (ZMQException e) {
                     if (e.getErrorCode() == ZMQ.Error.ETERM.getCode()) {
