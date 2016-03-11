@@ -30,6 +30,7 @@ import org.jlab.coda.xmsg.excp.xMsgException;
 import org.jlab.coda.xmsg.net.xMsgRegAddress;
 import org.zeromq.ZContext;
 import org.zeromq.ZMQ;
+import org.zeromq.ZMQ.Socket;
 import org.zeromq.ZMQException;
 import org.zeromq.ZMsg;
 
@@ -68,6 +69,9 @@ public class xMsgRegService implements Runnable {
     // Address of the registrar
     private final xMsgRegAddress regAddress;
 
+    // Address of the registrar
+    private final Socket regSocket;
+
 
     /**
      * Creates an xMsg registrar object.
@@ -79,6 +83,13 @@ public class xMsgRegService implements Runnable {
     public xMsgRegService(ZContext context, xMsgRegAddress address) {
         shadowContext = ZContext.shadow(context);
         regAddress = address;
+        try {
+            regSocket = shadowContext.createSocket(ZMQ.REP);
+            regSocket.bind("tcp://" + regAddress.host() + ":" + regAddress.port());
+        } catch (ZMQException e) {
+            shadowContext.destroy();
+            throw e;
+        }
     }
 
     /**
@@ -91,10 +102,6 @@ public class xMsgRegService implements Runnable {
     @Override
     public void run() {
         printStartup();
-
-        ZMQ.Socket regSocket = shadowContext.createSocket(ZMQ.REP);
-        regSocket.bind("tcp://" + regAddress.host() + ":" + regAddress.port());
-
         while (!Thread.currentThread().isInterrupted()) {
             try {
                 ZMsg request = ZMsg.recvMsg(regSocket);
