@@ -46,7 +46,6 @@ import static org.junit.Assert.fail;
 @Category(IntegrationTest.class)
 public class xMsgRegistrarTest {
 
-    private xMsgRegistrar registrar;
     private xMsgRegDriver driver;
 
     private Set<xMsgRegistration> registration = new HashSet<>();
@@ -54,12 +53,18 @@ public class xMsgRegistrarTest {
 
     @Test
     public void testRegistrationDataBase() throws Exception {
+        ZContext context = new ZContext();
+        xMsgRegistrar registrar = null;
         try {
-            ZContext context = new ZContext();
+            try {
+                registrar = new xMsgRegistrar(context);
+                registrar.start();
+            } catch (xMsgException e) {
+                System.err.println(e.getMessage());
+            }
+
             xMsgConnectionFactory factory = new xMsgConnectionFactory(context);
             driver = factory.createRegistrarConnection(new xMsgRegAddress());
-            registrar = new xMsgRegistrar(context);
-            registrar.start();
             xMsgUtil.sleep(200);
 
             long start = System.currentTimeMillis();
@@ -85,6 +90,7 @@ public class xMsgRegistrarTest {
             long end = System.currentTimeMillis();
             System.out.println("Total time: " + (end - start) / 1000.0);
         } finally {
+            context.destroy();
             if (registrar != null) {
                 registrar.shutdown();
             }
