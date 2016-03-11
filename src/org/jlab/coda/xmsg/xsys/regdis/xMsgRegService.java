@@ -93,6 +93,9 @@ public class xMsgRegService implements Runnable {
                 throw new xMsgException("Could not bind to port " + regAddress.port());
             }
             throw e;
+        } catch (Exception e) {
+            shadowContext.destroy();
+            throw e;
         }
     }
 
@@ -124,8 +127,9 @@ public class xMsgRegService implements Runnable {
             }
         } catch (Exception e) {
             log(e);
+        } finally {
+            shadowContext.destroy();
         }
-        shadowContext.destroy();
         log("xMsg-Info: shutting down xMsg registration and discovery server");
     }
 
