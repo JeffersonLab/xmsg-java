@@ -45,8 +45,8 @@ import joptsimple.OptionSpec;
  */
 public class xMsgRegistrar {
 
-    private final Thread regServiceThread;
     private final ZContext context;
+    private final Thread registrar;
 
     public static void main(String[] args) {
         try {
@@ -109,14 +109,14 @@ public class xMsgRegistrar {
         this.context = context;
         ZContext shadowContext = ZContext.shadow(context);
         xMsgRegService regService = new xMsgRegService(shadowContext, address);
-        regServiceThread = xMsgUtil.newThread("registration-service", regService);
+        this.registrar = xMsgUtil.newThread("registration-service", regService);
     }
 
     /**
      * Starts the registration and discovery servicing thread.
      */
     public void start() {
-        regServiceThread.start();
+        registrar.start();
     }
 
     /**
@@ -125,8 +125,8 @@ public class xMsgRegistrar {
     public void shutdown() {
         try {
             context.destroy();
-            regServiceThread.interrupt();
-            regServiceThread.join();
+            registrar.interrupt();
+            registrar.join();
         } catch (InterruptedException e) {
             e.printStackTrace();
         }
