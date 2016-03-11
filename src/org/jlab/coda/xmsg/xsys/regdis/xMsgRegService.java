@@ -72,12 +72,12 @@ public class xMsgRegService implements Runnable {
     /**
      * Creates an xMsg registrar object.
      *
-     * @param shadowContext shadow context
+     * @param context the context to run the registrar service
      * @param regAddress the address of the registrar service
      * @see ZContext#shadow
      */
-    public xMsgRegService(ZContext shadowContext, xMsgRegAddress regAddress) {
-        this.shadowContext = shadowContext;
+    public xMsgRegService(ZContext context, xMsgRegAddress regAddress) {
+        this.shadowContext = ZContext.shadow(context);
         this.regAddress = regAddress;
     }
 

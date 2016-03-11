@@ -107,9 +107,8 @@ public class xMsgRegistrar {
      */
     public xMsgRegistrar(ZContext context, xMsgRegAddress address) {
         this.context = context;
-        ZContext shadowContext = ZContext.shadow(context);
-        xMsgRegService regService = new xMsgRegService(shadowContext, address);
-        this.registrar = xMsgUtil.newThread("registration-service", regService);
+        this.registrar = xMsgUtil.newThread("registration-service",
+                                            new xMsgRegService(context, address));
     }
 
     /**
