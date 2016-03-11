@@ -109,12 +109,7 @@ public class xMsgRegService implements Runnable {
                     continue;
                 }
                 ZMsg reply = processRequest(request);
-                try {
-                    reply.send(regSocket);
-                } finally {
-                    reply.destroy();
-                    request.destroy();
-                }
+                reply.send(regSocket);
             } catch (ZMQException e) {
                 if (e.getErrorCode() == ZMQ.Error.ETERM.getCode()) {
                     break;
@@ -193,6 +188,8 @@ public class xMsgRegService implements Runnable {
         } catch (xMsgException | InvalidProtocolBufferException e) {
             log(e);
             reply = new xMsgRegResponse(topic, sender, e.getLocalizedMessage());
+        } finally {
+            requestMsg.destroy();
         }
 
         return reply.msg();
