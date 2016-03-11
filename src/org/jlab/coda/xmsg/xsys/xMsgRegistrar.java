@@ -26,6 +26,7 @@ import static java.util.Arrays.asList;
 
 import org.jlab.coda.xmsg.core.xMsgConstants;
 import org.jlab.coda.xmsg.core.xMsgUtil;
+import org.jlab.coda.xmsg.excp.xMsgException;
 import org.jlab.coda.xmsg.net.xMsgContext;
 import org.jlab.coda.xmsg.net.xMsgRegAddress;
 import org.jlab.coda.xmsg.xsys.regdis.xMsgRegService;
@@ -95,8 +96,9 @@ public class xMsgRegistrar {
      * {@link org.jlab.coda.xmsg.core.xMsgConstants#REGISTRAR_PORT default port}.
      *
      * @param context the context to run the registrar service
+     * @throws xMsgException if the address is already in use
      */
-    public xMsgRegistrar(ZContext context) {
+    public xMsgRegistrar(ZContext context) throws xMsgException {
         this(context, new xMsgRegAddress());
     }
 
@@ -105,8 +107,9 @@ public class xMsgRegistrar {
      *
      * @param context the context to run the registrar service
      * @param address the address of the registrar service
+     * @throws xMsgException if the address is already in use
      */
-    public xMsgRegistrar(ZContext context, xMsgRegAddress address) {
+    public xMsgRegistrar(ZContext context, xMsgRegAddress address) throws xMsgException {
         addr = address;
         registrar = xMsgUtil.newThread("registration-service",
                                        new xMsgRegService(context, address));

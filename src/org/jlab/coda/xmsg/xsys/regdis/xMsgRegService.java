@@ -78,9 +78,10 @@ public class xMsgRegService implements Runnable {
      *
      * @param context the context to run the registrar service
      * @param address the address of the registrar service
+     * @throws xMsgException if the address is already in use
      * @see ZContext#shadow
      */
-    public xMsgRegService(ZContext context, xMsgRegAddress address) {
+    public xMsgRegService(ZContext context, xMsgRegAddress address) throws xMsgException {
         shadowContext = ZContext.shadow(context);
         regAddress = address;
         try {
@@ -88,6 +89,9 @@ public class xMsgRegService implements Runnable {
             regSocket.bind("tcp://" + regAddress.host() + ":" + regAddress.port());
         } catch (ZMQException e) {
             shadowContext.destroy();
+            if (e.getErrorCode() == ZMQ.Error.EADDRINUSE.getCode()) {
+                throw new xMsgException("Could not bind to port " + regAddress.port());
+            }
             throw e;
         }
     }
