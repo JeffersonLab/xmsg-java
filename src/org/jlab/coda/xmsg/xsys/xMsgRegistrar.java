@@ -30,9 +30,12 @@ import org.jlab.coda.xmsg.excp.xMsgException;
 import org.jlab.coda.xmsg.net.xMsgContext;
 import org.jlab.coda.xmsg.net.xMsgRegAddress;
 import org.jlab.coda.xmsg.xsys.regdis.xMsgRegService;
+import org.jlab.coda.xmsg.xsys.util.LogUtils;
 import org.zeromq.ZContext;
 
 import java.io.PrintStream;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 import joptsimple.OptionParser;
 import joptsimple.OptionSet;
@@ -49,6 +52,8 @@ public class xMsgRegistrar {
     private final xMsgRegAddress addr;
     private final Thread registrar;
 
+    private static final Logger LOGGER = LogUtils.getConsoleLogger("xMsgRegistrar");
+
     public static void main(String[] args) {
         try {
             OptionParser parser = new OptionParser();
@@ -63,6 +68,8 @@ public class xMsgRegistrar {
                 usage(System.out);
                 System.exit(0);
             }
+
+            LOGGER.setLevel(Level.INFO);
 
             int port = options.valueOf(portSpec);
             xMsgRegAddress address = new xMsgRegAddress("localhost", port);

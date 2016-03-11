@@ -24,10 +24,10 @@ package org.jlab.coda.xmsg.xsys.regdis;
 
 import com.google.protobuf.InvalidProtocolBufferException;
 import org.jlab.coda.xmsg.core.xMsgConstants;
-import org.jlab.coda.xmsg.core.xMsgUtil;
 import org.jlab.coda.xmsg.data.xMsgR.xMsgRegistration;
 import org.jlab.coda.xmsg.excp.xMsgException;
 import org.jlab.coda.xmsg.net.xMsgRegAddress;
+import org.jlab.coda.xmsg.xsys.util.LogUtils;
 import org.zeromq.ZContext;
 import org.zeromq.ZMQ;
 import org.zeromq.ZMQ.Socket;
@@ -36,6 +36,7 @@ import org.zeromq.ZMsg;
 
 import java.util.HashSet;
 import java.util.Set;
+import java.util.logging.Logger;
 
 /**
  * The main registrar service or registrar (names are used interchangeably).
@@ -71,6 +72,8 @@ public class xMsgRegService implements Runnable {
 
     // Address of the registrar
     private final Socket regSocket;
+
+    private static final Logger LOGGER = Logger.getLogger("xMsgRegistrar");
 
 
     /**
@@ -109,7 +112,7 @@ public class xMsgRegService implements Runnable {
     @Override
     public void run() {
         try {
-            printStartup();
+            LOGGER.info("running on host = " + regAddress.host() + "  port = " + regAddress.port());
             while (!Thread.currentThread().isInterrupted()) {
                 try {
                     ZMsg request = ZMsg.recvMsg(regSocket);
@@ -122,15 +125,14 @@ public class xMsgRegService implements Runnable {
                     if (e.getErrorCode() == ZMQ.Error.ETERM.getCode()) {
                         break;
                     }
-                    log(e);
+                    LOGGER.warning(LogUtils.exceptionReporter(e));
                 }
             }
         } catch (Exception e) {
-            log(e);
+            LOGGER.severe(LogUtils.exceptionReporter(e));
         } finally {
             shadowContext.destroy();
         }
-        log("xMsg-Info: shutting down xMsg registration and discovery server");
     }
 
     /**
@@ -190,7 +192,7 @@ public class xMsgRegService implements Runnable {
                                                 data.getType());
 
             }  else {
-                log("xMsg-Warning: unknown registration request type");
+                LOGGER.warning("unknown registration request type: " + topic);
                 reply = new xMsgRegResponse(topic, sender, "unknown registration request");
                 return reply.msg();
             }
@@ -198,34 +200,12 @@ public class xMsgRegService implements Runnable {
             reply = new xMsgRegResponse(topic, sender, registration);
 
         } catch (xMsgException | InvalidProtocolBufferException e) {
-            log(e);
-            reply = new xMsgRegResponse(topic, sender, e.getLocalizedMessage());
+            LOGGER.warning(LogUtils.exceptionReporter(e));
+            reply = new xMsgRegResponse(topic, sender, e.getMessage());
         } finally {
             requestMsg.destroy();
         }
 
         return reply.msg();
-    }
-
-    private void printStartup() {
-        String regAddr = "tcp://" + regAddress.host() + ":" + regAddress.port();
-        String logMsg = " xMsg-Info: registration and discovery server is started at address = ";
-        log(xMsgUtil.currentTime(4) + logMsg + regAddr);
-    }
-
-    /**
-     * Prints on a stdio with an appropriate time stamp.
-     */
-    private void log(String msg) {
-        System.out.println(xMsgUtil.currentTime(4) + " " + msg);
-    }
-
-    /**
-     * Prints exception stacktrace with an appropriate time stamp.
-     */
-    private void log(Exception e) {
-        System.err.print(xMsgUtil.currentTime(4) +
-                " message = " + e.getMessage() + " cause = " + e.getCause() + " ");
-        e.printStackTrace();
     }
 }
