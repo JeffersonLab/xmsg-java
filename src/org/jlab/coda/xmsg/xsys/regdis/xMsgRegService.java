@@ -101,21 +101,25 @@ public class xMsgRegService implements Runnable {
 
     @Override
     public void run() {
-        printStartup();
-        while (!Thread.currentThread().isInterrupted()) {
-            try {
-                ZMsg request = ZMsg.recvMsg(regSocket);
-                if (request == null) {
-                    continue;
+        try {
+            printStartup();
+            while (!Thread.currentThread().isInterrupted()) {
+                try {
+                    ZMsg request = ZMsg.recvMsg(regSocket);
+                    if (request == null) {
+                        continue;
+                    }
+                    ZMsg reply = processRequest(request);
+                    reply.send(regSocket);
+                } catch (ZMQException e) {
+                    if (e.getErrorCode() == ZMQ.Error.ETERM.getCode()) {
+                        break;
+                    }
+                    log(e);
                 }
-                ZMsg reply = processRequest(request);
-                reply.send(regSocket);
-            } catch (ZMQException e) {
-                if (e.getErrorCode() == ZMQ.Error.ETERM.getCode()) {
-                    break;
-                }
-                log(e);
             }
+        } catch (Exception e) {
+            log(e);
         }
         shadowContext.destroy();
         log("xMsg-Info: shutting down xMsg registration and discovery server");
