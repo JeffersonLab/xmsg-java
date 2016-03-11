@@ -107,7 +107,7 @@ public class xMsgRegService implements Runnable {
                 try {
                     ZMsg request = ZMsg.recvMsg(regSocket);
                     if (request == null) {
-                        continue;
+                        break;
                     }
                     ZMsg reply = processRequest(request);
                     reply.send(regSocket);
