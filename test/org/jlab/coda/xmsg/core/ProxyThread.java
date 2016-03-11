@@ -28,31 +28,28 @@ import org.zeromq.ZContext;
 
 class ProxyThread {
 
-    private final ZContext context = new ZContext();
-    private final Thread proxyThread;
+    private ZContext context = new ZContext();
+    private xMsgProxy proxy = null;
 
     ProxyThread() {
-        proxyThread = xMsgUtil.newThread("proxy-thread", () -> {
-            ZContext shadow = ZContext.shadow(context);
-            try {
-                xMsgProxy proxy = new xMsgProxy(shadow);
-                proxy.start();
-            } catch (xMsgException e) {
-                e.printStackTrace();
-            } finally {
-                shadow.destroy();
-            }
-        });
+        try {
+            proxy = new xMsgProxy(context);
+        } catch (xMsgException e) {
+            System.err.println(e.getMessage());
+        }
     }
 
     public void start() {
-        proxyThread.start();
-        xMsgUtil.sleep(100);
+        if (proxy != null) {
+            proxy.start();
+            xMsgUtil.sleep(100);
+        }
     }
 
     public void stop() throws InterruptedException {
         context.destroy();
-        proxyThread.interrupt();
-        proxyThread.join(1000);
+        if (proxy != null) {
+            proxy.shutdown();
+        }
     }
 }
