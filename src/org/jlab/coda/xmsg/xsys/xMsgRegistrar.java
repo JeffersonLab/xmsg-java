@@ -107,9 +107,9 @@ public class xMsgRegistrar {
      * @param address the address of the registrar service
      */
     public xMsgRegistrar(ZContext context, xMsgRegAddress address) {
-        this.addr = address;
-        this.registrar = xMsgUtil.newThread("registration-service",
-                                            new xMsgRegService(context, address));
+        addr = address;
+        registrar = xMsgUtil.newThread("registration-service",
+                                       new xMsgRegService(context, address));
     }
 
     /**
