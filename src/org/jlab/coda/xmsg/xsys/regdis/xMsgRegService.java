@@ -164,29 +164,36 @@ public class xMsgRegService implements Runnable {
             topic = request.topic();
 
             if (topic.equals(xMsgConstants.REGISTER_PUBLISHER)) {
+                logRegistration("registered", "publisher ", request.data());
                 publishers.register(request.data());
 
             } else if (topic.equals(xMsgConstants.REGISTER_SUBSCRIBER)) {
+                logRegistration("registered", "subscriber", request.data());
                 subscribers.register(request.data());
 
             } else if (topic.equals(xMsgConstants.REMOVE_PUBLISHER)) {
+                logRegistration("removed", "publisher ", request.data());
                 publishers.remove(request.data());
 
             } else if (topic.equals(xMsgConstants.REMOVE_SUBSCRIBER)) {
+                logRegistration("removed", "subscriber", request.data());
                 subscribers.remove(request.data());
 
             } else if (topic.equals(xMsgConstants.REMOVE_ALL_REGISTRATION)) {
+                LOGGER.fine(() -> "removed all host = " + request.text());
                 publishers.remove(request.text());
                 subscribers.remove(request.text());
 
             } else if (topic.equals(xMsgConstants.FIND_PUBLISHER)) {
                 xMsgRegistration data = request.data();
+                logDiscovery("publishers ", data);
                 registration = publishers.find(data.getDomain(),
                                                data.getSubject(),
                                                data.getType());
 
             } else if (topic.equals(xMsgConstants.FIND_SUBSCRIBER)) {
                 xMsgRegistration data = request.data();
+                logDiscovery("subscribers", data);
                 registration = subscribers.find(data.getDomain(),
                                                 data.getSubject(),
                                                 data.getType());
@@ -207,5 +214,22 @@ public class xMsgRegService implements Runnable {
         }
 
         return reply.msg();
+    }
+
+
+    private void logRegistration(String action, String type, xMsgRegistration data) {
+        LOGGER.fine(() -> {
+            return String.format("%s %s name = %s  host = %s  port = %d  topic = %s:%s:%s",
+                    action, type, data.getName(),
+                    data.getHost(), data.getPort(),
+                    data.getDomain(), data.getSubject(), data.getType());
+        });
+    }
+
+    private void logDiscovery(String type, xMsgRegistration data) {
+        LOGGER.fine(() -> {
+            return String.format("search %s topic = %s:%s:%s",
+                    type, data.getDomain(), data.getSubject(), data.getType());
+        });
     }
 }

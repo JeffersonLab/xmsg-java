@@ -123,6 +123,13 @@ public class xMsgRegistrar {
     }
 
     /**
+     * Prints every received message.
+     */
+    public void verbose() {
+        LOGGER.setLevel(Level.FINE);
+    }
+
+    /**
      * Starts the registration and discovery servicing thread.
      */
     public void start() {
