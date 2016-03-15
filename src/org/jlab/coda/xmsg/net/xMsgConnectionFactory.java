@@ -35,9 +35,11 @@ import org.zeromq.ZMsg;
 public class xMsgConnectionFactory {
 
     private final ZContext context;
+    private final xMsgSocketFactory factory;
 
     public xMsgConnectionFactory(ZContext context) {
         this.context = context;
+        this.factory = new xMsgSocketFactory(context);
 
         // fix default linger
         this.context.setLinger(-1);
@@ -46,9 +48,9 @@ public class xMsgConnectionFactory {
     public xMsgConnection createProxyConnection(xMsgProxyAddress address,
                                                 xMsgConnectionSetup setup) throws xMsgException {
 
-        Socket pubSock = createSocket(ZMQ.PUB);
-        Socket subSock = createSocket(ZMQ.SUB);
-        Socket ctrlSock = createSocket(ZMQ.DEALER);
+        Socket pubSock = factory.createSocket(ZMQ.PUB);
+        Socket subSock = factory.createSocket(ZMQ.SUB);
+        Socket ctrlSock = factory.createSocket(ZMQ.DEALER);
 
         String identity = IdentityGenerator.getCtrlId();
         ctrlSock.setIdentity(identity.getBytes());
@@ -61,9 +63,9 @@ public class xMsgConnectionFactory {
             int subPort = pubPort + 1;
             int ctrlPort = subPort + 1;
 
-            connectSocket(pubSock, address.host(), pubPort);
-            connectSocket(subSock, address.host(), subPort);
-            connectSocket(ctrlSock, address.host(), ctrlPort);
+            factory.connectSocket(pubSock, address.host(), pubPort);
+            factory.connectSocket(subSock, address.host(), subPort);
+            factory.connectSocket(ctrlSock, address.host(), ctrlPort);
 
             if (!checkConnection(pubSock, ctrlSock, identity)) {
                 throw new xMsgException("Could not connect to " + address);
@@ -73,32 +75,32 @@ public class xMsgConnectionFactory {
             return new xMsgConnection(address, identity, pubSock, subSock, ctrlSock);
 
         } catch (ZMQException | xMsgException e) {
-            context.destroySocket(pubSock);
-            context.destroySocket(subSock);
-            context.destroySocket(ctrlSock);
+            factory.destroySocket(pubSock);
+            factory.destroySocket(subSock);
+            factory.destroySocket(ctrlSock);
             throw e;
         }
     }
 
     public xMsgRegDriver createRegistrarConnection(xMsgRegAddress address) throws xMsgException {
-        Socket socket = createSocket(ZMQ.REQ);
+        Socket socket = factory.createSocket(ZMQ.REQ);
         try {
             socket.setHWM(0);
-            connectSocket(socket, address.host(), address.port());
+            factory.connectSocket(socket, address.host(), address.port());
             return new xMsgRegDriver(address, socket);
         } catch (ZMQException | xMsgException e) {
-            context.destroySocket(socket);
+            factory.destroySocket(socket);
             throw e;
         }
     }
 
     public void destroyProxyConnection(xMsgConnection connection) {
-        context.destroySocket(connection.getPubSock());
-        context.destroySocket(connection.getSubSock());
+        factory.destroySocket(connection.getPubSock());
+        factory.destroySocket(connection.getSubSock());
     }
 
     public void destroyRegistrarConnection(xMsgRegDriver connection) {
-        context.destroySocket(connection.getSocket());
+        factory.destroySocket(connection.getSocket());
     }
 
     public void setLinger(int linger) {
@@ -111,24 +113,6 @@ public class xMsgConnectionFactory {
         }
     }
 
-
-    private Socket createSocket(int type) throws xMsgException {
-        try {
-            return context.createSocket(type);
-        } catch (IllegalStateException e) {
-            throw new xMsgException("Reached maximum number of sockets");
-        }
-    }
-
-    private void connectSocket(Socket socket, String host, int port) throws xMsgException {
-        try {
-            socket.connect("tcp://" + host + ":" + port);
-        } catch (ZMQException e) {
-            if (e.getErrorCode() == ZMQ.Error.EMTHREAD.getCode()) {
-                throw new xMsgException("No I/O thread available", e);
-            }
-        }
-    }
 
     private boolean checkConnection(Socket pubSocket, Socket ctrlSocket, String identity) {
         ZMQ.Poller items = new ZMQ.Poller(1);

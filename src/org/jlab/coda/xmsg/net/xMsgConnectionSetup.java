@@ -39,8 +39,7 @@ public interface xMsgConnectionSetup {
      * @see <a href="http://api.zeromq.org/3-2:zmq-setsockopt">ZMQ_LINGER</a>
      */
     default void preConnection(Socket socket) {
-        socket.setRcvHWM(0);
-        socket.setSndHWM(0);
+        // nothing
     }
 
     /**

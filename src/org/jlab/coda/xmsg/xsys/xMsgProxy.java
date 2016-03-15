@@ -33,6 +33,7 @@ import org.jlab.coda.xmsg.core.xMsgUtil;
 import org.jlab.coda.xmsg.excp.xMsgException;
 import org.jlab.coda.xmsg.net.xMsgContext;
 import org.jlab.coda.xmsg.net.xMsgProxyAddress;
+import org.jlab.coda.xmsg.net.xMsgSocketFactory;
 import org.jlab.coda.xmsg.xsys.util.LogUtils;
 import org.zeromq.ZContext;
 import org.zeromq.ZFrame;
@@ -224,10 +225,11 @@ public class xMsgProxy {
         Proxy() throws xMsgException {
             shadowContext = ZContext.shadow(ctx);
             try {
-                in = createSocket(shadowContext, ZMQ.XSUB);
-                out = createSocket(shadowContext, ZMQ.XPUB);
-                bindSocket(in, addr.port());
-                bindSocket(out, addr.port() + 1);
+                xMsgSocketFactory factory = new xMsgSocketFactory(shadowContext);
+                in = factory.createSocket(ZMQ.XSUB);
+                out = factory.createSocket(ZMQ.XPUB);
+                factory.bindSocket(in, addr.port());
+                factory.bindSocket(out, addr.port() + 1);
             } catch (Exception e) {
                 shadowContext.destroy();
                 throw e;
@@ -268,15 +270,16 @@ public class xMsgProxy {
         Controller() throws xMsgException {
             shadowContext = ZContext.shadow(ctx);
             try {
-                control = createSocket(shadowContext, ZMQ.SUB);
-                publisher = createSocket(shadowContext, ZMQ.PUB);
-                router = createSocket(shadowContext, ZMQ.ROUTER);
+                xMsgSocketFactory factory = new xMsgSocketFactory(shadowContext);
+                control = factory.createSocket(ZMQ.SUB);
+                publisher = factory.createSocket(ZMQ.PUB);
+                router = factory.createSocket(ZMQ.ROUTER);
 
-                connectSocket(control, addr.host(), addr.port() + 1);
-                connectSocket(publisher, addr.host(), addr.port());
+                factory.connectSocket(control, addr.host(), addr.port() + 1);
+                factory.connectSocket(publisher, addr.host(), addr.port());
 
                 router.setRouterHandlover(true);
-                bindSocket(router, addr.port() + 2);
+                factory.bindSocket(router, addr.port() + 2);
 
                 control.subscribe(xMsgConstants.CTRL_TOPIC.getBytes());
             } catch (Exception e) {
@@ -379,29 +382,5 @@ public class xMsgProxy {
                 }
             }
         }
-    }
-
-
-    private static Socket createSocket(ZContext ctx, int type) {
-        Socket socket = ctx.createSocket(type);
-        socket.setRcvHWM(0);
-        socket.setSndHWM(0);
-        return socket;
-    }
-
-    private static void bindSocket(Socket socket, int port) throws xMsgException {
-        try {
-            socket.bind("tcp://*:" + port);
-        } catch (ZMQException e) {
-            if (e.getErrorCode() == ZMQ.Error.EADDRINUSE.getCode()) {
-                throw new xMsgException("Could not bind to port " + port);
-            }
-            throw e;
-        }
-    }
-
-
-    private static void connectSocket(Socket socket, String host, int port) {
-        socket.connect("tcp://" + host + ":" + port);
     }
 }

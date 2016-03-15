@@ -27,6 +27,7 @@ import org.jlab.coda.xmsg.core.xMsgConstants;
 import org.jlab.coda.xmsg.data.xMsgR.xMsgRegistration;
 import org.jlab.coda.xmsg.excp.xMsgException;
 import org.jlab.coda.xmsg.net.xMsgRegAddress;
+import org.jlab.coda.xmsg.net.xMsgSocketFactory;
 import org.jlab.coda.xmsg.xsys.util.LogUtils;
 import org.zeromq.ZContext;
 import org.zeromq.ZMQ;
@@ -88,14 +89,9 @@ public class xMsgRegService implements Runnable {
         shadowContext = ZContext.shadow(context);
         regAddress = address;
         try {
-            regSocket = shadowContext.createSocket(ZMQ.REP);
-            regSocket.bind("tcp://" + regAddress.host() + ":" + regAddress.port());
-        } catch (ZMQException e) {
-            shadowContext.destroy();
-            if (e.getErrorCode() == ZMQ.Error.EADDRINUSE.getCode()) {
-                throw new xMsgException("Could not bind to port " + regAddress.port());
-            }
-            throw e;
+            xMsgSocketFactory factory = new xMsgSocketFactory(shadowContext);
+            regSocket = factory.createSocket(ZMQ.REP);
+            factory.bindSocket(regSocket, regAddress.port());
         } catch (Exception e) {
             shadowContext.destroy();
             throw e;
