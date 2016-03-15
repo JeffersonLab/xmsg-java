@@ -40,8 +40,10 @@ and/or thread enabled.
 
 In a conclusion we present the xMsg entire API
 
-    connect
-    release
+    createConnection
+    getConnection
+    releaseConnection
+    destroyConnection
     publish
     syncPublish
     subscribe
