@@ -118,7 +118,9 @@ public class xMsgConnectionFactory {
     }
 
     public void destroy() {
-        context.destroy();
+        if (!context.isMain()) {
+            context.destroy();
+        }
     }
 
 
