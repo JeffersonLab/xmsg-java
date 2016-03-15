@@ -34,50 +34,41 @@ import org.zeromq.ZMQ.Socket;
  */
 public class xMsgConnection {
 
-    private xMsgProxyAddress address;
-    private Socket pubSock = null;
-    private Socket subSock = null;
-    private Socket ctrlSock = null;
-    private String identity = null;
+    private final xMsgProxyAddress address;
+    private final String identity;
+    private final Socket pubSock;
+    private final Socket subSock;
+    private final Socket ctrlSock;
 
+    xMsgConnection(xMsgProxyAddress address,
+                   String identity,
+                   Socket pubSocket,
+                   Socket subSocket,
+                   Socket ctrSocket) {
+        this.address = address;
+        this.identity = identity;
+        this.pubSock = pubSocket;
+        this.subSock = subSocket;
+        this.ctrlSock = ctrSocket;
+    }
 
     public xMsgProxyAddress getAddress() {
         return address;
-    }
-
-    public void setAddress(xMsgProxyAddress address) {
-        this.address = address;
-    }
-
-    public Socket getPubSock() {
-        return pubSock;
-    }
-
-    public void setPubSock(Socket pubSock) {
-        this.pubSock = pubSock;
-    }
-
-    public Socket getSubSock() {
-        return subSock;
-    }
-
-    public void setSubSock(Socket subSock) {
-        this.subSock = subSock;
-    }
-
-    public Socket getControlSock() {
-        return ctrlSock;
-    }
-
-    public void setControlSock(Socket subSock) {
-        this.ctrlSock = subSock;
     }
 
     public String getIdentity() {
         return identity;
     }
 
-    public void setIdentity(String id) {
-        this.identity = id;
+    public Socket getPubSock() {
+        return pubSock;
+    }
+
+    public Socket getSubSock() {
+        return subSock;
+    }
+
+    public Socket getControlSock() {
+        return ctrlSock;
     }
 }

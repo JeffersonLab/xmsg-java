@@ -53,8 +53,9 @@ public class ConnectionManagerTest {
 
         when(factory.createProxyConnection(any(), any()))
                 .thenAnswer(invocation -> {
-                    xMsgConnection c = new xMsgConnection();
-                    c.setAddress((xMsgProxyAddress) invocation.getArguments()[0]);
+                    xMsgProxyAddress a = (xMsgProxyAddress) invocation.getArguments()[0];
+                    xMsgConnection c = mock(xMsgConnection.class);
+                    when(c.getAddress()).thenReturn(a);
                     return c;
                 });
 

@@ -70,14 +70,7 @@ public class xMsgConnectionFactory {
             }
             setup.postConnection();
 
-            xMsgConnection connection = new xMsgConnection();
-            connection.setAddress(address);
-            connection.setPubSock(pubSock);
-            connection.setSubSock(subSock);
-            connection.setControlSock(ctrlSock);
-            connection.setIdentity(identity);
-
-            return connection;
+            return new xMsgConnection(address, identity, pubSock, subSock, ctrlSock);
 
         } catch (ZMQException | xMsgException e) {
             context.destroySocket(pubSock);
