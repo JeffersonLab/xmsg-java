@@ -38,7 +38,7 @@ class DataSubscription {
     }
 
     ZMsg recvMsg() {
-        return ZMsg.recvMsg(connection.getSubSock());
+        return connection.recv();
     }
 
     void stop() {

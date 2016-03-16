@@ -180,6 +180,14 @@ public class xMsgConnection {
         subSocket.unsubscribe(topic.getBytes());
     }
 
+    public void send(ZMsg msg) {
+        msg.send(pubSocket);
+    }
+
+    public ZMsg recv() {
+        return ZMsg.recvMsg(subSocket);
+    }
+
     public void close() {
         factory.destroySocket(pubSocket);
         factory.destroySocket(subSocket);

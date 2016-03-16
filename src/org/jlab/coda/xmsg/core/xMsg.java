@@ -30,7 +30,6 @@ import org.jlab.coda.xmsg.net.xMsgContext;
 import org.jlab.coda.xmsg.net.xMsgProxyAddress;
 import org.jlab.coda.xmsg.net.xMsgRegAddress;
 import org.jlab.coda.xmsg.xsys.regdis.xMsgRegDriver;
-import org.zeromq.ZMQ.Socket;
 import org.zeromq.ZMQException;
 import org.zeromq.ZMsg;
 
@@ -774,15 +773,10 @@ public class xMsg {
 
 
     private void _publish(xMsgConnection connection, xMsgMessage msg) throws xMsgException {
-        Socket sock = connection.getPubSock();
-        ZMsg outputMsg = msg.serialize();
         try {
-            outputMsg.send(sock);
+            connection.send(msg.serialize());
         } catch (ZMQException e) {
             throw new xMsgException("Publishing failed: " + e.getMessage());
-        } finally {
-            outputMsg.destroy();
         }
-
     }
 }
