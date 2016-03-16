@@ -36,9 +36,9 @@ public class xMsgConnection {
 
     private final xMsgProxyAddress address;
     private final String identity;
-    private final Socket pubSock;
-    private final Socket subSock;
-    private final Socket ctrlSock;
+    private final Socket pubSocket;
+    private final Socket subSocket;
+    private final Socket ctrlSocket;
 
     xMsgConnection(xMsgProxyAddress address,
                    String identity,
@@ -47,9 +47,9 @@ public class xMsgConnection {
                    Socket ctrSocket) {
         this.address = address;
         this.identity = identity;
-        this.pubSock = pubSocket;
-        this.subSock = subSocket;
-        this.ctrlSock = ctrSocket;
+        this.pubSocket = pubSocket;
+        this.subSocket = subSocket;
+        this.ctrlSocket = ctrSocket;
     }
 
     public xMsgProxyAddress getAddress() {
@@ -61,14 +61,14 @@ public class xMsgConnection {
     }
 
     public Socket getPubSock() {
-        return pubSock;
+        return pubSocket;
     }
 
     public Socket getSubSock() {
-        return subSock;
+        return subSocket;
     }
 
     public Socket getControlSock() {
-        return ctrlSock;
+        return ctrlSocket;
     }
 }
