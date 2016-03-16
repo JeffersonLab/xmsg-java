@@ -24,6 +24,7 @@ package org.jlab.coda.xmsg.core;
 
 import org.jlab.coda.xmsg.excp.xMsgException;
 import org.jlab.coda.xmsg.net.xMsgConnection;
+import org.jlab.coda.xmsg.net.xMsgPoller;
 import org.zeromq.ZMQ;
 import org.zeromq.ZMQException;
 import org.zeromq.ZMsg;
@@ -84,18 +85,27 @@ public abstract class xMsgSubscription {
      */
     private class Handler implements Runnable {
 
-        private final DataSubscription sub;
+        private final xMsgConnection connection;
+        private final String topic;
 
         Handler(xMsgConnection connection, xMsgTopic topic) throws xMsgException {
-            this.sub = new DataSubscription(connection, topic);
+            this.connection = connection;
+            this.topic = topic.toString();
+
+            this.connection.subscribe(topic.toString());
+            if (!this.connection.checkSubscription(topic.toString())) {
+                throw new xMsgException("could not subscribe to " + topic);
+            }
+            xMsgUtil.sleep(10);
         }
 
         @Override
         public void run() {
+            xMsgPoller poller = new xMsgPoller(connection);
             while (isRunning) {
                 try {
-                    if (sub.hasMsg(100)) {
-                        ZMsg msg = sub.recvMsg();
+                    if (poller.poll(100)) {
+                        ZMsg msg = connection.recv();
                         if (msg == null) {
                             break; // interrupted
                         }
@@ -119,7 +129,7 @@ public abstract class xMsgSubscription {
                     e.printStackTrace();
                 }
             }
-            sub.stop();
+            connection.unsubscribe(topic);
         }
     }
 
