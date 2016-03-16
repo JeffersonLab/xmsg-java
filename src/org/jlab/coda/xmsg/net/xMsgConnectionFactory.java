@@ -22,12 +22,7 @@
 
 package org.jlab.coda.xmsg.net;
 
-import java.io.IOException;
-import java.io.UncheckedIOException;
-import java.util.Random;
-
 import org.jlab.coda.xmsg.core.xMsgConstants;
-import org.jlab.coda.xmsg.core.xMsgUtil;
 import org.jlab.coda.xmsg.excp.xMsgException;
 import org.jlab.coda.xmsg.xsys.regdis.xMsgRegDriver;
 import org.zeromq.ZContext;
@@ -55,7 +50,7 @@ public class xMsgConnectionFactory {
         Socket subSock = createSocket(ZMQ.SUB);
         Socket ctrlSock = createSocket(ZMQ.DEALER);
 
-        String identity = getCtrlId();
+        String identity = IdentityGenerator.getCtrlId();
         ctrlSock.setIdentity(identity.getBytes());
 
         try {
@@ -181,25 +176,5 @@ public class xMsgConnectionFactory {
             }
         }
         return false;
-    }
-
-
-    // CHECKSTYLE.OFF: ConstantName
-    private static final Random randomGenerator = new Random();
-    private static final long ctrlIdPrefix = getCtrlIdPrefix();
-    // CHECKSTYLE.ON: ConstantName
-
-    private static long getCtrlIdPrefix() {
-        try {
-            final int javaId = 1;
-            final int ipHash = xMsgUtil.localhost().hashCode() & Integer.MAX_VALUE;
-            return javaId * 100000000 + (ipHash % 1000) * 100000;
-        } catch (IOException e) {
-            throw new UncheckedIOException(e);
-        }
-    }
-
-    static String getCtrlId() {
-        return Long.toString(ctrlIdPrefix + randomGenerator.nextInt(100000));
     }
 }

@@ -28,20 +28,20 @@ import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.is;
 import static org.hamcrest.Matchers.not;
 
-public class xMsgConnectionFactoryTest {
+public class IdentityGeneratorTest {
 
     @Test
     public void ctrlIdentityHas9Digits() throws Exception {
-        assertThat(xMsgConnectionFactory.getCtrlId().length(), is(9));
-        assertThat(xMsgConnectionFactory.getCtrlId().length(), is(9));
-        assertThat(xMsgConnectionFactory.getCtrlId().length(), is(9));
+        assertThat(IdentityGenerator.getCtrlId().length(), is(9));
+        assertThat(IdentityGenerator.getCtrlId().length(), is(9));
+        assertThat(IdentityGenerator.getCtrlId().length(), is(9));
     }
 
     @Test
     public void ctrlIdentityPrefixHas3Digits() throws Exception {
-        String prefix1 = xMsgConnectionFactory.getCtrlId().substring(1, 4);
-        String prefix2 = xMsgConnectionFactory.getCtrlId().substring(1, 4);
-        String prefix3 = xMsgConnectionFactory.getCtrlId().substring(1, 4);
+        String prefix1 = IdentityGenerator.getCtrlId().substring(1, 4);
+        String prefix2 = IdentityGenerator.getCtrlId().substring(1, 4);
+        String prefix3 = IdentityGenerator.getCtrlId().substring(1, 4);
 
         assertThat(prefix1, is(prefix2));
         assertThat(prefix1, is(prefix3));
@@ -50,16 +50,16 @@ public class xMsgConnectionFactoryTest {
 
     @Test
     public void ctrlIdentityFourthDigitIsJavaIdentifier() throws Exception {
-        assertThat(xMsgConnectionFactory.getCtrlId().charAt(0), is('1'));
-        assertThat(xMsgConnectionFactory.getCtrlId().charAt(0), is('1'));
-        assertThat(xMsgConnectionFactory.getCtrlId().charAt(0), is('1'));
+        assertThat(IdentityGenerator.getCtrlId().charAt(0), is('1'));
+        assertThat(IdentityGenerator.getCtrlId().charAt(0), is('1'));
+        assertThat(IdentityGenerator.getCtrlId().charAt(0), is('1'));
     }
 
     @Test
     public void ctrlIdentityPrefixLastFiveDigitsAreRandom() throws Exception {
-        String suffix1 = xMsgConnectionFactory.getCtrlId().substring(4);
-        String suffix2 = xMsgConnectionFactory.getCtrlId().substring(4);
-        String suffix3 = xMsgConnectionFactory.getCtrlId().substring(4);
+        String suffix1 = IdentityGenerator.getCtrlId().substring(4);
+        String suffix2 = IdentityGenerator.getCtrlId().substring(4);
+        String suffix3 = IdentityGenerator.getCtrlId().substring(4);
 
         assertThat(suffix1, is(not(suffix2)));
         assertThat(suffix1, is(not(suffix3)));
