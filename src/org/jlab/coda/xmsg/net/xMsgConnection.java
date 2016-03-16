@@ -53,9 +53,29 @@ public class xMsgConnection {
                    xMsgSocketFactory factory) throws xMsgException {
         this.address = address;
         this.identity = IdentityGenerator.getCtrlId();
-        this.pubSocket = factory.createSocket(ZMQ.PUB);
-        this.subSocket = factory.createSocket(ZMQ.SUB);
-        this.ctrlSocket = factory.createSocket(ZMQ.DEALER);
+
+        Socket pub = null;
+        Socket sub = null;
+        Socket ctrl = null;
+        try {
+            pub = factory.createSocket(ZMQ.PUB);
+            sub = factory.createSocket(ZMQ.SUB);
+            ctrl = factory.createSocket(ZMQ.DEALER);
+        } catch (Exception e) {
+            if (pub == null) {
+                factory.destroySocket(pub);
+            }
+            if (sub == null) {
+                factory.destroySocket(sub);
+            }
+            if (ctrl == null) {
+                factory.destroySocket(ctrl);
+            }
+            throw e;
+        }
+        this.pubSocket = pub;
+        this.subSocket = sub;
+        this.ctrlSocket = ctrl;
         this.factory = factory;
 
         this.ctrlSocket.setIdentity(this.identity.getBytes());
