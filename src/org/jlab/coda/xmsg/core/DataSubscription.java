@@ -2,87 +2,46 @@ package org.jlab.coda.xmsg.core;
 
 import org.jlab.coda.xmsg.excp.xMsgException;
 import org.jlab.coda.xmsg.net.xMsgConnection;
-import org.zeromq.ZFrame;
 import org.zeromq.ZMQ.Poller;
-import org.zeromq.ZMQ.Socket;
 import org.zeromq.ZMQException;
 import org.zeromq.ZMsg;
 
 class DataSubscription {
 
-    final Socket pubSocket;
-    final Socket subSocket;
+    final xMsgConnection connection;
     final String topic;
     final Poller items;
 
     DataSubscription(xMsgConnection connection, xMsgTopic topic) throws xMsgException {
-        this.pubSocket = connection.getPubSock();
-        this.subSocket = connection.getSubSock();
+        this.connection = connection;
         this.topic = topic.toString();
         this.items = new Poller(1);
 
         start();
-        xMsgUtil.sleep(10);
     }
 
     private void start() throws xMsgException {
-        this.subSocket.subscribe(topic.getBytes());
-        this.items.register(subSocket, Poller.POLLIN);
-
-        int retry = 0;
-        while (retry < 10) {
-            retry++;
-            ZMsg ctrlMsg = new ZMsg();
-            try {
-                ctrlMsg.add(xMsgConstants.CTRL_TOPIC);
-                ctrlMsg.add(xMsgConstants.CTRL_SUBSCRIBE);
-                ctrlMsg.add(topic);
-                ctrlMsg.send(pubSocket);
-
-                items.poll(100);
-                if (items.pollin(0)) {
-                    ZMsg replyMsg = ZMsg.recvMsg(subSocket);
-                    try {
-                        if (replyMsg.size() == 2) {
-                            ZFrame idFrame = replyMsg.pop();
-                            ZFrame typeFrame = replyMsg.pop();
-                            try {
-                                String id = new String(idFrame.getData());
-                                String type = new String(typeFrame.getData());
-                                if (id.equals(topic) && type.equals(xMsgConstants.CTRL_SUBSCRIBE)) {
-                                    return;
-                                }
-                            } finally {
-                                idFrame.destroy();
-                                typeFrame.destroy();
-                            }
-                        }
-                    } finally {
-                        replyMsg.destroy();
-                    }
-                }
-            } catch (ZMQException e) {
-                e.printStackTrace();
-            } finally {
-                ctrlMsg.destroy();
-            }
+        items.register(connection.getSubSock(), Poller.POLLIN);
+        connection.subscribe(topic);
+        if (!connection.checkSubscription(topic)) {
+            throw new xMsgException("could not subscribe to " + topic);
         }
-        throw new xMsgException("Could not subscribe to " + topic);
+        xMsgUtil.sleep(10);
     }
 
     boolean hasMsg(int timeout) {
         int rc = items.poll(timeout);
         if (rc < 0) {
-            throw new ZMQException(subSocket.base().errno());
+            throw new ZMQException(connection.getSubSock().base().errno());
         }
         return items.pollin(0);
     }
 
     ZMsg recvMsg() {
-        return ZMsg.recvMsg(subSocket);
+        return ZMsg.recvMsg(connection.getSubSock());
     }
 
     void stop() {
-        subSocket.unsubscribe(topic.getBytes());
+        connection.unsubscribe(topic);
     }
 }

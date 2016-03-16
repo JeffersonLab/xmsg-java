@@ -110,6 +110,56 @@ public class xMsgConnection {
         return false;
     }
 
+    public void subscribe(String topic) {
+        subSocket.subscribe(topic.getBytes());
+    }
+
+    public boolean checkSubscription(String topic) {
+        Poller items = new Poller(1);
+        items.register(subSocket, Poller.POLLIN);
+        int retry = 0;
+        while (retry < 10) {
+            try {
+                retry++;
+                ZMsg ctrlMsg = new ZMsg();
+                ctrlMsg.add(xMsgConstants.CTRL_TOPIC);
+                ctrlMsg.add(xMsgConstants.CTRL_SUBSCRIBE);
+                ctrlMsg.add(topic);
+                ctrlMsg.send(pubSocket);
+
+                items.poll(100);
+                if (items.pollin(0)) {
+                    ZMsg replyMsg = ZMsg.recvMsg(subSocket);
+                    try {
+                        if (replyMsg.size() == 2) {
+                            ZFrame idFrame = replyMsg.pop();
+                            ZFrame typeFrame = replyMsg.pop();
+                            try {
+                                String id = new String(idFrame.getData());
+                                String type = new String(typeFrame.getData());
+                                if (id.equals(topic) && type.equals(xMsgConstants.CTRL_SUBSCRIBE)) {
+                                    return true;
+                                }
+                            } finally {
+                                idFrame.destroy();
+                                typeFrame.destroy();
+                            }
+                        }
+                    } finally {
+                        replyMsg.destroy();
+                    }
+                }
+            } catch (ZMQException e) {
+                e.printStackTrace();
+            }
+        }
+        return false;
+    }
+
+    public void unsubscribe(String topic) {
+        subSocket.unsubscribe(topic.getBytes());
+    }
+
     public void close() {
         factory.destroySocket(pubSocket);
         factory.destroySocket(subSocket);
