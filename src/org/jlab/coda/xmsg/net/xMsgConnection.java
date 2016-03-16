@@ -22,7 +22,14 @@
 
 package org.jlab.coda.xmsg.net;
 
+import org.jlab.coda.xmsg.core.xMsgConstants;
+import org.jlab.coda.xmsg.excp.xMsgException;
+import org.zeromq.ZFrame;
+import org.zeromq.ZMQ;
+import org.zeromq.ZMQ.Poller;
 import org.zeromq.ZMQ.Socket;
+import org.zeromq.ZMQException;
+import org.zeromq.ZMsg;
 
 /**
  * The standard connection to xMsg nodes.
@@ -40,16 +47,73 @@ public class xMsgConnection {
     private final Socket subSocket;
     private final Socket ctrlSocket;
 
+    private final xMsgSocketFactory factory;
+
     xMsgConnection(xMsgProxyAddress address,
-                   String identity,
-                   Socket pubSocket,
-                   Socket subSocket,
-                   Socket ctrSocket) {
+                   xMsgSocketFactory factory) throws xMsgException {
         this.address = address;
-        this.identity = identity;
-        this.pubSocket = pubSocket;
-        this.subSocket = subSocket;
-        this.ctrlSocket = ctrSocket;
+        this.identity = IdentityGenerator.getCtrlId();
+        this.pubSocket = factory.createSocket(ZMQ.PUB);
+        this.subSocket = factory.createSocket(ZMQ.SUB);
+        this.ctrlSocket = factory.createSocket(ZMQ.DEALER);
+        this.factory = factory;
+
+        this.ctrlSocket.setIdentity(this.identity.getBytes());
+    }
+
+    public void connect() throws xMsgException {
+        int pubPort = address.port();
+        int subPort = pubPort + 1;
+        int ctrlPort = subPort + 1;
+
+        factory.connectSocket(pubSocket, address.host(), pubPort);
+        factory.connectSocket(subSocket, address.host(), subPort);
+        factory.connectSocket(ctrlSocket, address.host(), ctrlPort);
+    }
+
+    public boolean checkConnection() {
+        Poller items = new Poller(1);
+        items.register(ctrlSocket, Poller.POLLIN);
+        int retry = 0;
+        while (retry < 10) {
+            try {
+                retry++;
+                ZMsg ctrlMsg = new ZMsg();
+                ctrlMsg.add(xMsgConstants.CTRL_TOPIC);
+                ctrlMsg.add(xMsgConstants.CTRL_CONNECT);
+                ctrlMsg.add(identity);
+                ctrlMsg.send(pubSocket);
+
+                items.poll(100);
+                if (items.pollin(0)) {
+                    ZMsg replyMsg = ZMsg.recvMsg(ctrlSocket);
+                    try {
+                        if (replyMsg.size() == 1) {
+                            ZFrame typeFrame = replyMsg.pop();
+                            try {
+                                String type = new String(typeFrame.getData());
+                                if (type.equals(xMsgConstants.CTRL_CONNECT)) {
+                                    return true;
+                                }
+                            } finally {
+                                typeFrame.destroy();
+                            }
+                        }
+                    } finally {
+                        replyMsg.destroy();
+                    }
+                }
+            } catch (ZMQException e) {
+                e.printStackTrace();
+            }
+        }
+        return false;
+    }
+
+    public void close() {
+        factory.destroySocket(pubSocket);
+        factory.destroySocket(subSocket);
+        factory.destroySocket(ctrlSocket);
     }
 
     public xMsgProxyAddress getAddress() {
