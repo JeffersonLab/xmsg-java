@@ -60,23 +60,14 @@ public abstract class xMsgSubscription {
 
     /**
      * Creates a long-running subscription that process messages on the background.
-     * @throws xMsgException
      *
      * @see xMsg#subscribe
      */
-    xMsgSubscription(String name, xMsgConnection connection, xMsgTopic topic)
-            throws xMsgException {
+    xMsgSubscription(String name, xMsgConnection connection, xMsgTopic topic) {
         this.name = name;
         this.connection = connection;
         this.topic = topic.toString();
         this.thread = xMsgUtil.newThread(name, new Handler());
-
-        this.connection.subscribe(topic.toString());
-        if (!this.connection.checkSubscription(topic.toString())) {
-            connection.unsubscribe(topic.toString());
-            throw new xMsgException("could not subscribe to " + topic);
-        }
-        xMsgUtil.sleep(10);
     }
 
 
@@ -132,8 +123,15 @@ public abstract class xMsgSubscription {
 
     /**
      * Starts the subscription thread.
+     *
+     * @throws xMsgException if subscription could not be started
      */
-    void start() {
+    void start() throws xMsgException {
+        this.connection.subscribe(topic.toString());
+        if (!this.connection.checkSubscription(topic.toString())) {
+            throw new xMsgException("could not subscribe to " + topic);
+        }
+        xMsgUtil.sleep(10);
         isRunning = true;
         thread.start();
     }
