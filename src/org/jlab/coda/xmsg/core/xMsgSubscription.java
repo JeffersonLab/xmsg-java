@@ -129,6 +129,7 @@ public abstract class xMsgSubscription {
     void start() throws xMsgException {
         this.connection.subscribe(topic.toString());
         if (!this.connection.checkSubscription(topic.toString())) {
+            connection.unsubscribe(topic);
             throw new xMsgException("could not subscribe to " + topic);
         }
         xMsgUtil.sleep(10);
