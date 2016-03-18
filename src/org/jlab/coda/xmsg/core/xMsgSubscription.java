@@ -52,6 +52,8 @@ import java.io.IOException;
 public abstract class xMsgSubscription {
 
     private final String name;
+    private final xMsgConnection connection;
+    private final String topic;
 
     private final Thread thread;
     private volatile boolean isRunning = false;
@@ -65,7 +67,16 @@ public abstract class xMsgSubscription {
     xMsgSubscription(String name, xMsgConnection connection, xMsgTopic topic)
             throws xMsgException {
         this.name = name;
-        this.thread = xMsgUtil.newThread(name, new Handler(connection, topic));
+        this.connection = connection;
+        this.topic = topic.toString();
+        this.thread = xMsgUtil.newThread(name, new Handler());
+
+        this.connection.subscribe(topic.toString());
+        if (!this.connection.checkSubscription(topic.toString())) {
+            connection.unsubscribe(topic.toString());
+            throw new xMsgException("could not subscribe to " + topic);
+        }
+        xMsgUtil.sleep(10);
     }
 
 
@@ -84,20 +95,6 @@ public abstract class xMsgSubscription {
      * Receives messages and runs user's callback.
      */
     private class Handler implements Runnable {
-
-        private final xMsgConnection connection;
-        private final String topic;
-
-        Handler(xMsgConnection connection, xMsgTopic topic) throws xMsgException {
-            this.connection = connection;
-            this.topic = topic.toString();
-
-            this.connection.subscribe(topic.toString());
-            if (!this.connection.checkSubscription(topic.toString())) {
-                throw new xMsgException("could not subscribe to " + topic);
-            }
-            xMsgUtil.sleep(10);
-        }
 
         @Override
         public void run() {
