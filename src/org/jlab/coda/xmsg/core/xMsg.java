@@ -34,9 +34,9 @@ import org.zeromq.ZMQException;
 import org.zeromq.ZMsg;
 
 import java.io.IOException;
-import java.util.HashMap;
-import java.util.Map;
 import java.util.Set;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.ConcurrentMap;
 import java.util.concurrent.ThreadPoolExecutor;
 import java.util.concurrent.TimeoutException;
 
@@ -121,7 +121,7 @@ public class xMsg {
     private ConnectionManager connectionManager;
 
     // map of active subscriptions
-    private Map<String, xMsgSubscription> mySubscriptions = new HashMap<>();
+    private ConcurrentMap<String, xMsgSubscription> mySubscriptions = new ConcurrentHashMap<>();
 
 
     /**
@@ -674,24 +674,21 @@ public class xMsg {
         // define a unique name for the subscription
         String name = "sub-" + myName + "-" + connection.getAddress() + "-" + topic;
 
-        // check to see if the subscription already exists
-        if (mySubscriptions.containsKey(name)) {
-            throw new xMsgException("xMsg-Warning:  Subscription exists.");
-        }
-
-        xMsgSubscription sHandle = new xMsgSubscription(name, connection, topic) {
-            @Override
-            public void handle(xMsgMessage inputMsg) throws xMsgException, IOException {
-                threadPool.submit(() -> callback.callback(inputMsg));
+        xMsgSubscription sHandle = mySubscriptions.get(name);
+        if (sHandle == null) {
+            sHandle = new xMsgSubscription(name, connection, topic) {
+                @Override
+                public void handle(xMsgMessage inputMsg) throws xMsgException, IOException {
+                    threadPool.submit(() -> callback.callback(inputMsg));
+                }
+            };
+            xMsgSubscription result = mySubscriptions.putIfAbsent(name, sHandle);
+            if (result == null) {
+                sHandle.start();
+                return sHandle;
             }
-        };
-
-        sHandle.start();
-
-        // add the new subscription to the subscriptions map
-        mySubscriptions.put(name, sHandle);
-
-        return sHandle;
+        }
+        throw new IllegalStateException("subscription already exists");
     }
 
     /**
