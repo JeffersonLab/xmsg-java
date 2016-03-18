@@ -50,15 +50,10 @@ import java.io.IOException;
  */
 public abstract class xMsgSubscription {
 
-    // thread to wait for the published message and run the handle
-    private final Thread thread;
-
-    // the name for the subscription
     private final String name;
 
-    // handle to stop the subscription
+    private final Thread thread;
     private volatile boolean isRunning = false;
-
 
     /**
      * Creates a long-running subscription that process messages on the background.
@@ -66,7 +61,8 @@ public abstract class xMsgSubscription {
      *
      * @see xMsg#subscribe
      */
-    xMsgSubscription(String name, xMsgConnection connection, xMsgTopic topic) throws xMsgException {
+    xMsgSubscription(String name, xMsgConnection connection, xMsgTopic topic)
+            throws xMsgException {
         this.name = name;
         this.thread = xMsgUtil.newThread(name, new Handler(connection, topic));
     }
