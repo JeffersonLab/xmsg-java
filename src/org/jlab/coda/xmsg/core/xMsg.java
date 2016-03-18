@@ -109,9 +109,6 @@ public class xMsg {
     // thread pool
     private final ThreadPoolExecutor threadPool;
 
-    // default thread pool size
-    private int defaultPoolSize;
-
     // default proxy address
     private xMsgProxyAddress defaultProxyAddress;
 
@@ -207,12 +204,11 @@ public class xMsg {
         this.myName = name;
         this.myId = xMsgUtil.encodeIdentity(defaultRegistrar.toString(), name);
 
-        this.defaultPoolSize = poolSize;
         this.defaultProxyAddress = defaultProxy;
         this.defaultRegistrarAddress = defaultRegistrar;
 
         // create fixed size thread pool
-        this.threadPool = xMsgUtil.newFixedThreadPool(defaultPoolSize, name);
+        this.threadPool = xMsgUtil.newFixedThreadPool(poolSize, name);
 
         // create the connection pool
         this.connectionManager = new ConnectionManager(xMsgContext.getContext());
@@ -227,12 +223,11 @@ public class xMsg {
         this.myName = name;
         this.myId = xMsgUtil.encodeIdentity("localhost", name);
 
-        this.defaultPoolSize = poolSize;
         this.defaultProxyAddress = new xMsgProxyAddress();
         this.defaultRegistrarAddress = new xMsgRegAddress();
 
         // create fixed size thread pool
-        this.threadPool = xMsgUtil.newFixedThreadPool(defaultPoolSize, name);
+        this.threadPool = xMsgUtil.newFixedThreadPool(poolSize, name);
 
         // create the connection pool
         this.connectionManager = connectionManager;
@@ -256,7 +251,7 @@ public class xMsg {
      * Returns the size of the callback thread pool.
      */
     public int getPoolSize() {
-        return defaultPoolSize;
+        return threadPool.getPoolSize();
     }
 
     /**
