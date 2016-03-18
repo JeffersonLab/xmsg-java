@@ -55,6 +55,20 @@ public class PublishersTest {
         }
     }
 
+    @Test
+    public void suscribeReceivesAllMessagesSinglePublisher() throws Exception {
+        try (TestRunner test = new AsyncRunner(true)) {
+            test.run(100_000, 8);
+        }
+    }
+
+    @Test
+    public void syncSuscribeReceivesAllMessagesSinglePublisher() throws Exception {
+        try (TestRunner test = new SyncRunner(true)) {
+            test.run(1000, 4);
+        }
+    }
+
 
     private abstract static class TestRunner implements AutoCloseable {
 
