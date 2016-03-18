@@ -22,11 +22,9 @@
 
 package org.jlab.coda.xmsg.core;
 
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.CountDownLatch;
-import java.util.concurrent.TimeoutException;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.atomic.AtomicLong;
 
@@ -45,204 +43,16 @@ public class PublishersTest {
 
     @Test
     public void suscribeReceivesAllMessages() throws Exception {
-        class Check {
-            AtomicInteger counter = new AtomicInteger();
-            AtomicLong sum = new AtomicLong();
-
-            static final int N = 100000;
-            static final long SUM_N = 4999950000L;
-
+        try (TestRunner test = new AsyncRunner(false)) {
+            test.run(100_000, 8);
         }
-
-        final Check check = new Check();
-
-        final String rawTopic = "test_topic";
-        final CountDownLatch subReady = new CountDownLatch(1);
-
-        ProxyThread proxyThread = new ProxyThread();
-        proxyThread.start();
-
-
-        Thread subThread = xMsgUtil.newThread("sub-thread", () -> {
-            try {
-                xMsg actor = new xMsg("test_subscriber");
-                xMsgConnection connection = actor.createConnection();
-                xMsgTopic topic = xMsgTopic.wrap(rawTopic);
-                xMsgSubscription sub = actor.subscribe(connection, topic, msg -> {
-                    int i = xMsgMessage.parseData(msg, Integer.class);
-                    check.counter.incrementAndGet();
-                    check.sum.addAndGet(i);
-                });
-                subReady.countDown();
-                int counter = 0;
-                while (check.counter.get() < Check.N) {
-                    xMsgUtil.sleep(100);
-                    if (++counter * 1000 > Check.N) {
-                        break;
-                    }
-                }
-                actor.unsubscribe(sub);
-            } catch (xMsgException e) {
-                e.printStackTrace();
-            }
-        });
-        subThread.start();
-        subReady.await();
-
-
-        class Publisher implements Runnable {
-
-            final int start;
-            final int end;
-
-            Publisher(int start, int n) {
-                this.start = start;
-                this.end = start + n;
-            }
-
-            @Override
-            public void run() {
-                try {
-                    xMsg actor = new xMsg("test_publisher_" + start);
-                    xMsgTopic topic = xMsgTopic.build(rawTopic, Integer.toString(start));
-                    xMsgConnection connection = actor.createConnection();
-                    for (int i = start; i < end; i++) {
-                        xMsgMessage msg = xMsgMessage.createFrom(topic, i);
-                        actor.publish(connection, msg);
-                    }
-                } catch (IOException | xMsgException e) {
-                    e.printStackTrace();
-                }
-            }
-        }
-
-        final int numPublishers = 8;
-        final int n = Check.N / numPublishers;
-        List<Thread> publishers = new ArrayList<>();
-        for (int i = 0; i < numPublishers; i++) {
-            Thread pubThread = new Thread(new Publisher(i * n, n));
-            publishers.add(pubThread);
-            pubThread.start();
-        }
-
-
-        subThread.join();
-        for (Thread pubThread : publishers) {
-            pubThread.join();
-        }
-
-        proxyThread.stop();
-
-
-        assertThat(check.counter.get(), is(Check.N));
-        assertThat(check.sum.get(), is(Check.SUM_N));
     }
-
 
     @Test
     public void syncSuscribeReceivesAllMessages() throws Exception {
-        class Check {
-            AtomicInteger counter = new AtomicInteger();
-            AtomicLong sum = new AtomicLong();
-
-            static final int N = 1000;
-            static final long SUM_N = 499500L;
-
+        try (TestRunner test = new SyncRunner(false)) {
+            test.run(1000, 4);
         }
-
-        final Check check = new Check();
-
-        final String rawTopic = "test_topic";
-        final CountDownLatch subReady = new CountDownLatch(1);
-
-        ProxyThread proxyThread = new ProxyThread();
-        proxyThread.start();
-
-
-        Thread subThread = xMsgUtil.newThread("sub-thread", () -> {
-            try {
-                xMsg actor = new xMsg("test_reply_subscriber");
-                xMsgConnection connection = actor.createConnection();
-                xMsgTopic topic = xMsgTopic.wrap(rawTopic);
-                xMsgSubscription sub = actor.subscribe(connection, topic, msg -> {
-                    try {
-                        xMsgConnection pubConnection = actor.getConnection();
-                        try {
-                            xMsgMessage res = xMsgMessage.createResponse(msg);
-                            actor.publish(pubConnection, res);
-                        } finally {
-                            actor.releaseConnection(pubConnection);
-                        }
-                    } catch (xMsgException e) {
-                        e.printStackTrace();
-                    }
-                });
-                subReady.countDown();
-                while (check.counter.get() < Check.N) {
-                    xMsgUtil.sleep(100);
-                }
-                actor.unsubscribe(sub);
-            } catch (xMsgException e) {
-                e.printStackTrace();
-            }
-        });
-        subThread.start();
-        subReady.await();
-
-
-        class Publisher implements Runnable {
-
-            final int start;
-            final int end;
-
-            Publisher(int start, int n) {
-                this.start = start;
-                this.end = start + n;
-            }
-
-            @Override
-            public void run() {
-                try {
-                    xMsg actor = new xMsg("test_sync_publisher_" + start);
-                    xMsgTopic topic = xMsgTopic.build(rawTopic, Integer.toString(start));
-                    for (int i = start; i < end; i++) {
-                        xMsgConnection connection = actor.getConnection();
-                        try {
-                            xMsgMessage msg = xMsgMessage.createFrom(topic, i);
-                            xMsgMessage res = actor.syncPublish(connection, msg, 1000);
-                            Integer r = xMsgMessage.parseData(res, Integer.class);
-                            check.counter.incrementAndGet();
-                            check.sum.addAndGet(r);
-                        } finally {
-                            actor.releaseConnection(connection);
-                        }
-                    }
-                } catch (IOException | xMsgException | TimeoutException e) {
-                    e.printStackTrace();
-                }
-            }
-        }
-
-        final int numPublishers = 4;
-        final int n = Check.N / numPublishers;
-        List<Thread> publishers = new ArrayList<>();
-        for (int i = 0; i < numPublishers; i++) {
-            Thread pubThread = new Thread(new Publisher(i * n, n));
-            publishers.add(pubThread);
-            pubThread.start();
-        }
-
-
-        subThread.join();
-        for (Thread pubThread : publishers) {
-            pubThread.join();
-        }
-
-        proxyThread.stop();
-
-
-        assertThat(check.counter.get(), is(Check.N));
-        assertThat(check.sum.get(), is(Check.SUM_N));
     }
 
 
