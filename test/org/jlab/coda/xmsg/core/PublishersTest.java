@@ -69,7 +69,7 @@ public class PublishersTest {
                 xMsgConnection connection = actor.createConnection();
                 xMsgTopic topic = xMsgTopic.wrap(rawTopic);
                 xMsgSubscription sub = actor.subscribe(connection, topic, msg -> {
-                    int i = parseData(msg);
+                    int i = xMsgMessage.parseData(msg, Integer.class);
                     check.counter.incrementAndGet();
                     check.sum.addAndGet(i);
                 });
@@ -107,7 +107,7 @@ public class PublishersTest {
                     xMsgTopic topic = xMsgTopic.build(rawTopic, Integer.toString(start));
                     xMsgConnection connection = actor.createConnection();
                     for (int i = start; i < end; i++) {
-                        xMsgMessage msg = createMessage(topic, i);
+                        xMsgMessage msg = xMsgMessage.createFrom(topic, i);
                         actor.publish(connection, msg);
                     }
                 } catch (IOException | xMsgException e) {
@@ -208,7 +208,7 @@ public class PublishersTest {
                     for (int i = start; i < end; i++) {
                         xMsgConnection connection = actor.getConnection();
                         try {
-                            xMsgMessage msg = createMessage(topic, i);
+                            xMsgMessage msg = xMsgMessage.createFrom(topic, i);
                             xMsgMessage res = actor.syncPublish(connection, msg, 1000);
                             Integer r = xMsgMessage.parseData(res, Integer.class);
                             check.counter.incrementAndGet();
@@ -243,26 +243,5 @@ public class PublishersTest {
 
         assertThat(check.counter.get(), is(Check.N));
         assertThat(check.sum.get(), is(Check.SUM_N));
-    }
-
-
-    private xMsgMessage createMessage(xMsgTopic topic, int data) throws IOException {
-        return xMsgMessage.createFrom(topic, data);
-//        xMsgMessage msg = new xMsgMessage(topic);
-//        xMsgData.Builder b = xMsgData.newBuilder();
-//        b.setFLSINT32(data);
-//        msg.setData(b.build());
-//        return msg;
-    }
-
-
-    private int parseData(xMsgMessage msg) {
-        return xMsgMessage.parseData(msg, Integer.class);
-//        try {
-//            xMsgData data = xMsgData.parseFrom(msg.getData());
-//            return data.getFLSINT32();
-//        } catch (InvalidProtocolBufferException e) {
-//            throw new RuntimeException(e);
-//        }
     }
 }
