@@ -25,8 +25,6 @@ package org.jlab.coda.xmsg.net;
 import org.jlab.coda.xmsg.excp.xMsgException;
 import org.jlab.coda.xmsg.xsys.regdis.xMsgRegDriver;
 import org.zeromq.ZContext;
-import org.zeromq.ZMQ;
-import org.zeromq.ZMQ.Socket;
 import org.zeromq.ZMQException;
 
 public class xMsgConnectionFactory {
@@ -65,13 +63,12 @@ public class xMsgConnectionFactory {
     }
 
     public xMsgRegDriver createRegistrarConnection(xMsgRegAddress address) throws xMsgException {
-        Socket socket = factory.createSocket(ZMQ.REQ);
+        xMsgRegDriver driver = new xMsgRegDriver(address, factory);
         try {
-            socket.setHWM(0);
-            factory.connectSocket(socket, address.host(), address.port());
-            return new xMsgRegDriver(address, socket);
+            driver.connect();
+            return driver;
         } catch (ZMQException | xMsgException e) {
-            factory.destroySocket(socket);
+            driver.close();
             throw e;
         }
     }
@@ -81,7 +78,7 @@ public class xMsgConnectionFactory {
     }
 
     public void destroyRegistrarConnection(xMsgRegDriver connection) {
-        factory.destroySocket(connection.getSocket());
+        connection.close();
     }
 
     public void setLinger(int linger) {

@@ -61,8 +61,10 @@ public class ConnectionManagerTest {
 
         when(factory.createRegistrarConnection(any()))
                 .thenAnswer(invocation -> {
-                    xMsgRegAddress addr = (xMsgRegAddress) invocation.getArguments()[0];
-                    return new xMsgRegDriver(addr, null);
+                    xMsgRegAddress a = (xMsgRegAddress) invocation.getArguments()[0];
+                    xMsgRegDriver d = mock(xMsgRegDriver.class);
+                    when(d.getAddress()).thenReturn(a);
+                    return d;
                 });
     }
 

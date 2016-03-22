@@ -26,6 +26,7 @@ import org.jlab.coda.xmsg.core.xMsgConstants;
 import org.jlab.coda.xmsg.data.xMsgR.xMsgRegistration;
 import org.jlab.coda.xmsg.excp.xMsgException;
 import org.jlab.coda.xmsg.net.xMsgRegAddress;
+import org.jlab.coda.xmsg.net.xMsgSocketFactory;
 import org.zeromq.ZMQ;
 import org.zeromq.ZMQ.Socket;
 import org.zeromq.ZMQException;
@@ -49,16 +50,23 @@ public class xMsgRegDriver {
     private final xMsgRegAddress address;
     private final Socket socket;
 
+    private final xMsgSocketFactory factory;
 
     /**
      * Creates a driver to the registrar running in the given address.
      *
      * @param address registrar service address
      * @param socket registrar connection socket
+     * @throws xMsgException
      */
-    public xMsgRegDriver(xMsgRegAddress address, Socket socket) {
+    public xMsgRegDriver(xMsgRegAddress address, xMsgSocketFactory factory) throws xMsgException {
         this.address = address;
-        this.socket = socket;
+        this.socket = factory.createSocket(ZMQ.REQ);
+        this.factory = factory;
+    }
+
+    public void connect() throws xMsgException {
+        factory.connectSocket(socket, address.host(), address.port());
     }
 
     /**
@@ -176,6 +184,10 @@ public class xMsgRegDriver {
         xMsgRegRequest request = new xMsgRegRequest(topic, data.getName(), data);
         xMsgRegResponse response = request(request, timeout);
         return response.data();
+    }
+
+    public void close() {
+        factory.destroySocket(socket);
     }
 
     /**

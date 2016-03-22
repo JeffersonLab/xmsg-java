@@ -28,9 +28,9 @@ import org.jlab.coda.xmsg.core.xMsgUtil;
 import org.jlab.coda.xmsg.data.xMsgR.xMsgRegistration;
 import org.jlab.coda.xmsg.data.xMsgR.xMsgRegistration.Builder;
 import org.jlab.coda.xmsg.net.xMsgRegAddress;
+import org.jlab.coda.xmsg.net.xMsgSocketFactory;
 import org.junit.Before;
 import org.junit.Test;
-import org.zeromq.ZMQ.Socket;
 
 import java.io.IOException;
 import java.util.Arrays;
@@ -70,7 +70,9 @@ public class xMsgRegDriverTest {
 
     @Before
     public void setup() throws Exception {
-        driver = spy(new xMsgRegDriver(new xMsgRegAddress("10.2.9.1"), mock(Socket.class)));
+        xMsgRegAddress address = new xMsgRegAddress("10.2.9.1");
+        xMsgSocketFactory factory = mock(xMsgSocketFactory.class);
+        driver = spy(new xMsgRegDriver(address, factory));
         setResponse(new xMsgRegResponse("", ""));
     }
 
