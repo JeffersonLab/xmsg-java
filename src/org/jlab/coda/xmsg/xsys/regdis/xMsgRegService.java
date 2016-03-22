@@ -85,7 +85,7 @@ public class xMsgRegService implements Runnable {
      * @see ZContext#shadow
      */
     public xMsgRegService(ZContext context, xMsgRegAddress address) throws xMsgException {
-        factory = new xMsgSocketFactory(ZContext.shadow(context));
+        factory = new xMsgSocketFactory(context.getContext());
         regAddress = address;
         regSocket = factory.createSocket(ZMQ.REP);
         try {
@@ -125,7 +125,7 @@ public class xMsgRegService implements Runnable {
         } catch (Exception e) {
             LOGGER.severe(LogUtils.exceptionReporter(e));
         } finally {
-            factory.destroySocket(regSocket);
+            factory.closeQuietly(regSocket);
         }
     }
 

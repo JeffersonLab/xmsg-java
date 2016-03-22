@@ -220,7 +220,7 @@ public class xMsgProxy {
         final Socket in;
         final Socket out;
 
-        final xMsgSocketFactory factory = new xMsgSocketFactory(ZContext.shadow(ctx));
+        final xMsgSocketFactory factory = new xMsgSocketFactory(ctx.getContext());
 
         Proxy() throws xMsgException {
             Socket in = null;
@@ -257,8 +257,8 @@ public class xMsgProxy {
         }
 
         public void close() {
-            factory.destroySocket(in);
-            factory.destroySocket(out);
+            factory.closeQuietly(in);
+            factory.closeQuietly(out);
         }
     }
 
@@ -273,7 +273,7 @@ public class xMsgProxy {
         final Socket publisher;
         final Socket router;
 
-        final xMsgSocketFactory factory = new xMsgSocketFactory(ZContext.shadow(ctx));
+        final xMsgSocketFactory factory = new xMsgSocketFactory(ctx.getContext());
 
         Controller() throws xMsgException {
             Socket control = null;
@@ -368,9 +368,9 @@ public class xMsgProxy {
         }
 
         public void close() {
-            factory.destroySocket(control);
-            factory.destroySocket(publisher);
-            factory.destroySocket(router);
+            factory.closeQuietly(control);
+            factory.closeQuietly(publisher);
+            factory.closeQuietly(router);
         }
     }
 

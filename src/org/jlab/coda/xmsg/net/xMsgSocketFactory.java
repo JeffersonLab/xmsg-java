@@ -23,8 +23,8 @@
 package org.jlab.coda.xmsg.net;
 
 import org.jlab.coda.xmsg.excp.xMsgException;
-import org.zeromq.ZContext;
 import org.zeromq.ZMQ;
+import org.zeromq.ZMQ.Context;
 import org.zeromq.ZMQ.Socket;
 import org.zeromq.ZMQException;
 
@@ -32,15 +32,15 @@ import zmq.ZError;
 
 public class xMsgSocketFactory {
 
-    private final ZContext ctx;
+    private final Context ctx;
 
-    public xMsgSocketFactory(ZContext ctx) {
+    public xMsgSocketFactory(Context ctx) {
         this.ctx = ctx;
     }
 
     public Socket createSocket(int type) throws xMsgException {
         try {
-            Socket socket = ctx.createSocket(type);
+            Socket socket = ctx.socket(type);
             socket.setRcvHWM(0);
             socket.setSndHWM(0);
             return socket;
@@ -78,13 +78,9 @@ public class xMsgSocketFactory {
         }
     }
 
-    public void destroySocket(Socket socket) {
-        ctx.destroySocket(socket);
-    }
-
     public void closeQuietly(Socket socket) {
         if (socket != null) {
-            ctx.destroySocket(socket);
+            socket.close();
         }
     }
 }

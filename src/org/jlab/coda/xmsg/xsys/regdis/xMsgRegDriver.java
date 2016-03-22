@@ -187,7 +187,7 @@ public class xMsgRegDriver {
     }
 
     public void close() {
-        factory.destroySocket(socket);
+        factory.closeQuietly(socket);
     }
 
     /**

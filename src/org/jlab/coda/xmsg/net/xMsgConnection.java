@@ -183,18 +183,18 @@ public class xMsgConnection {
     }
 
     public void close() {
-        factory.destroySocket(pubSocket);
-        factory.destroySocket(subSocket);
-        factory.destroySocket(ctrlSocket);
+        factory.closeQuietly(pubSocket);
+        factory.closeQuietly(subSocket);
+        factory.closeQuietly(ctrlSocket);
     }
 
     public void close(int linger) {
         factory.setLinger(pubSocket, linger);
         factory.setLinger(subSocket, linger);
         factory.setLinger(ctrlSocket, linger);
-        factory.destroySocket(pubSocket);
-        factory.destroySocket(subSocket);
-        factory.destroySocket(ctrlSocket);
+        factory.closeQuietly(pubSocket);
+        factory.closeQuietly(subSocket);
+        factory.closeQuietly(ctrlSocket);
     }
 
     public xMsgProxyAddress getAddress() {

@@ -32,7 +32,7 @@ public class xMsgConnectionFactory {
     private final xMsgSocketFactory factory;
 
     public xMsgConnectionFactory(ZContext context) {
-        this.factory = new xMsgSocketFactory(context);
+        this.factory = new xMsgSocketFactory(context.getContext());
     }
 
     public xMsgConnection createProxyConnection(xMsgProxyAddress address,

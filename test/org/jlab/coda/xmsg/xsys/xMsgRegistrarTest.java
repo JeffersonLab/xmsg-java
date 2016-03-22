@@ -90,6 +90,7 @@ public class xMsgRegistrarTest {
             long end = System.currentTimeMillis();
             System.out.println("Total time: " + (end - start) / 1000.0);
         } finally {
+            driver.close();
             context.destroy();
             if (registrar != null) {
                 registrar.shutdown();
