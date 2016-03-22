@@ -523,10 +523,8 @@ public class xMsg {
      * @return a set with the registration data of the matching publishers
      * @throws xMsgException if the request failed
      */
-    public Set<xMsgRegistration> findPublishers(xMsgRegAddress address,
-                                                xMsgTopic topic)
+    public Set<xMsgRegistration> findPublishers(xMsgRegAddress address, xMsgTopic topic)
             throws xMsgException {
-
         return _findRegistration(address, topic, true);
     }
 
@@ -540,7 +538,6 @@ public class xMsg {
      */
     public Set<xMsgRegistration> findPublishers(xMsgTopic topic)
             throws xMsgException {
-
         return _findRegistration(defaultRegistrarAddress, topic, true);
     }
 
@@ -553,10 +550,8 @@ public class xMsg {
      * @return a set with the registration data of the matching subscribers
      * @throws xMsgException if the request failed
      */
-    public Set<xMsgRegistration> findSubscribers(xMsgRegAddress address,
-                                                 xMsgTopic topic)
+    public Set<xMsgRegistration> findSubscribers(xMsgRegAddress address, xMsgTopic topic)
             throws xMsgException {
-
         return _findRegistration(address, topic, false);
     }
 
@@ -570,7 +565,6 @@ public class xMsg {
      */
     public Set<xMsgRegistration> findSubscribers(xMsgTopic topic)
             throws xMsgException {
-
         return _findRegistration(defaultRegistrarAddress, topic, false);
     }
 
@@ -582,7 +576,6 @@ public class xMsg {
      * @throws xMsgException if the request failed
      */
     public void publish(xMsgConnection connection, xMsgMessage msg) throws xMsgException {
-
         // just make sure that receiver knows that this is not a sync request.
         // need this in case we reuse messages.
         msg.getMetaData().clearReplyTo();
@@ -610,7 +603,6 @@ public class xMsg {
     public xMsgMessage syncPublish(xMsgConnection connection,
                                    xMsgMessage msg,
                                    int timeout) throws xMsgException, TimeoutException {
-
         // address/topic where the subscriber should send the result
         String returnAddress = xMsgUtil.getUniqueReplyTo(myId);
 
@@ -661,11 +653,9 @@ public class xMsg {
      * @param callback the user action to run when a message is received
      * @throws xMsgException
      */
-    public xMsgSubscription subscribe(final xMsgConnection connection,
-                                      final xMsgTopic topic,
-                                      final xMsgCallBack callback)
-            throws xMsgException {
-
+    public xMsgSubscription subscribe(xMsgConnection connection,
+                                      xMsgTopic topic,
+                                      xMsgCallBack callback) throws xMsgException {
         // define a unique name for the subscription
         String name = "sub-" + myName + "-" + connection.getAddress() + "-" + topic;
 
@@ -716,10 +706,8 @@ public class xMsg {
     private void _register(xMsgRegAddress regAddress,
                            xMsgTopic topic,
                            String description,
-                           boolean isPublisher)
-            throws xMsgException {
+                           boolean isPublisher) throws xMsgException {
         xMsgRegDriver regDriver = connectionManager.getRegistrarConnection(regAddress);
-
         xMsgRegistration.Builder regb = _createRegistration(topic);
         if (isPublisher) {
             regb.setOwnerType(xMsgRegistration.OwnerType.PUBLISHER);
@@ -733,9 +721,7 @@ public class xMsg {
 
     private void _removeRegistration(xMsgRegAddress regAddress,
                                      xMsgTopic topic,
-                                     boolean isPublisher)
-            throws xMsgException {
-
+                                     boolean isPublisher) throws xMsgException {
         xMsgRegDriver regDriver = connectionManager.getRegistrarConnection(regAddress);
         xMsgRegistration.Builder regb = _createRegistration(topic);
         if (isPublisher) {
@@ -749,9 +735,7 @@ public class xMsg {
 
     private Set<xMsgRegistration> _findRegistration(xMsgRegAddress regAddress,
                                                     xMsgTopic topic,
-                                                    boolean isPublisher)
-            throws xMsgException {
-
+                                                    boolean isPublisher) throws xMsgException {
         xMsgRegDriver regDriver = connectionManager.getRegistrarConnection(regAddress);
         xMsgRegistration.Builder regb = _createRegistration(topic);
         if (isPublisher) {
@@ -762,7 +746,6 @@ public class xMsg {
         xMsgRegistration regData = regb.build();
         return regDriver.findRegistration(regData, isPublisher);
     }
-
 
     private void _publish(xMsgConnection connection, xMsgMessage msg) throws xMsgException {
         try {
