@@ -377,8 +377,8 @@ public class xMsg {
         for (xMsgSubscription sh : mySubscriptions.values()) {
             unsubscribe(sh);
         }
-        connectionManager.destroy();
         threadPool.shutdown();
+        connectionManager.destroy();
     }
 
     /**
