@@ -40,7 +40,7 @@ import java.util.concurrent.ConcurrentMap;
  * @author smancill
  * @version 2.x
  */
-public class xMsgRegDatabase {
+class xMsgRegDatabase {
 
     private final ConcurrentMap<xMsgTopic, Set<xMsgRegistration>> db =  new ConcurrentHashMap<>();
 

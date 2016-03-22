@@ -43,7 +43,7 @@ import java.util.Set;
  * @author gurjyan
  * @since 2.x
  */
-public class xMsgRegResponse {
+class xMsgRegResponse {
 
     private final String topic;
     private final String sender;
