@@ -713,25 +713,44 @@ public class xMsg {
                            String description,
                            boolean isPublisher) throws xMsgException {
         xMsgRegDriver regDriver = connectionManager.getRegistrarConnection(regAddress);
-        xMsgRegistration.Builder regb = _createRegistration(topic);
-        regb.setDescription(description);
-        regDriver.register(regb.build(), isPublisher);
+        try {
+            xMsgRegistration.Builder regb = _createRegistration(topic, isPublisher);
+            regb.setDescription(description);
+            regDriver.register(regb.build(), isPublisher);
+            connectionManager.releaseRegistrarConnection(regDriver);
+        } catch (ZMQException | xMsgException e) {
+            regDriver.close();
+            throw e;
+        }
     }
 
     private void _removeRegistration(xMsgRegAddress regAddress,
                                      xMsgTopic topic,
                                      boolean isPublisher) throws xMsgException {
         xMsgRegDriver regDriver = connectionManager.getRegistrarConnection(regAddress);
-        xMsgRegistration.Builder regb = _createRegistration(topic, isPublisher);
-        regDriver.removeRegistration(regb.build(), isPublisher);
+        try {
+            xMsgRegistration.Builder regb = _createRegistration(topic, isPublisher);
+            regDriver.removeRegistration(regb.build(), isPublisher);
+            connectionManager.releaseRegistrarConnection(regDriver);
+        } catch (ZMQException | xMsgException e) {
+            regDriver.close();
+            throw e;
+        }
     }
 
     private Set<xMsgRegistration> _findRegistration(xMsgRegAddress regAddress,
                                                     xMsgTopic topic,
                                                     boolean isPublisher) throws xMsgException {
         xMsgRegDriver regDriver = connectionManager.getRegistrarConnection(regAddress);
-        xMsgRegistration.Builder regb = _createRegistration(topic, isPublisher);
-        return regDriver.findRegistration(regb.build(), isPublisher);
+        try {
+            xMsgRegistration.Builder regb = _createRegistration(topic, isPublisher);
+            Set<xMsgRegistration> result = regDriver.findRegistration(regb.build(), isPublisher);
+            connectionManager.releaseRegistrarConnection(regDriver);
+            return result;
+        } catch (ZMQException | xMsgException e) {
+            regDriver.close();
+            throw e;
+        }
     }
 
     private void _publish(xMsgConnection connection, xMsgMessage msg) throws xMsgException {
