@@ -29,15 +29,10 @@ import org.zeromq.ZMQException;
 
 public class xMsgConnectionFactory {
 
-    private final ZContext context;
     private final xMsgSocketFactory factory;
 
     public xMsgConnectionFactory(ZContext context) {
-        this.context = context;
         this.factory = new xMsgSocketFactory(context);
-
-        // fix default linger
-        this.context.setLinger(-1);
     }
 
     public xMsgConnection createProxyConnection(xMsgProxyAddress address,
@@ -70,24 +65,6 @@ public class xMsgConnectionFactory {
         } catch (ZMQException | xMsgException e) {
             driver.close();
             throw e;
-        }
-    }
-
-    public void destroyProxyConnection(xMsgConnection connection) {
-        connection.close();
-    }
-
-    public void destroyRegistrarConnection(xMsgRegDriver connection) {
-        connection.close();
-    }
-
-    public void setLinger(int linger) {
-        context.setLinger(linger);
-    }
-
-    public void destroy() {
-        if (!context.isMain()) {
-            context.destroy();
         }
     }
 }

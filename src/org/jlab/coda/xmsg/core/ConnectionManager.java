@@ -90,10 +90,6 @@ class ConnectionManager {
         proxyConnections.setConnection(connection.getAddress(), connection);
     }
 
-    void destroyProxyConnection(xMsgConnection connection) {
-        factory.destroyProxyConnection(connection);
-    }
-
     xMsgRegDriver getRegistrarConnection(xMsgRegAddress address) throws xMsgException {
         xMsgRegDriver cachedConnection = registrarConnections.getConnection(address);
         if (cachedConnection != null) {
@@ -110,14 +106,14 @@ class ConnectionManager {
         defaultConnectionOption = setup;
     }
 
-    void setLinger(int linger) {
-        factory.setLinger(linger);
+    void destroy() {
+        proxyConnections.destroyAll(c -> c.close());
+        registrarConnections.destroyAll(c -> c.close());
     }
 
-    void destroy() {
-        proxyConnections.destroyAll(c -> factory.destroyProxyConnection(c));
-        registrarConnections.destroyAll(c -> factory.destroyRegistrarConnection(c));
-        factory.destroy();
+    void destroy(int linger) {
+        proxyConnections.destroyAll(c -> c.close(linger));
+        registrarConnections.destroyAll(c -> c.close());
     }
 
 

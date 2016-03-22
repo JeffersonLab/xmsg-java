@@ -364,7 +364,7 @@ public class xMsg {
      * @param connection the connection to be destroyed
      */
     public void destroyConnection(xMsgConnection connection) {
-        connectionManager.destroyProxyConnection(connection);
+        connection.close();
     }
 
     /**
@@ -389,8 +389,7 @@ public class xMsg {
      * @throws xMsgException
      */
     public void destroy(int linger) throws xMsgException {
-        connectionManager.setLinger(linger);
-        destroy();
+        connectionManager.destroy(linger);
     }
 
     /**
