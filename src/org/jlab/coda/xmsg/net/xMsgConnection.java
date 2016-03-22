@@ -194,6 +194,15 @@ public class xMsgConnection {
         factory.destroySocket(ctrlSocket);
     }
 
+    public void close(int linger) {
+        factory.setLinger(pubSocket, linger);
+        factory.setLinger(subSocket, linger);
+        factory.setLinger(ctrlSocket, linger);
+        factory.destroySocket(pubSocket);
+        factory.destroySocket(subSocket);
+        factory.destroySocket(ctrlSocket);
+    }
+
     public xMsgProxyAddress getAddress() {
         return address;
     }

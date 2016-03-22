@@ -28,6 +28,8 @@ import org.zeromq.ZMQ;
 import org.zeromq.ZMQ.Socket;
 import org.zeromq.ZMQException;
 
+import zmq.ZError;
+
 public class xMsgSocketFactory {
 
     private final ZContext ctx;
@@ -65,6 +67,14 @@ public class xMsgSocketFactory {
             if (e.getErrorCode() == ZMQ.Error.EMTHREAD.getCode()) {
                 throw new xMsgException("No I/O thread available", e);
             }
+        }
+    }
+
+    public void setLinger(Socket socket, int linger) {
+        try {
+            socket.setLinger(linger);
+        } catch (ZError.CtxTerminatedException e) {
+            // ignore
         }
     }
 
