@@ -692,7 +692,7 @@ public class xMsg {
     //                        Private section
     // ..............................................................//
 
-    private xMsgRegistration.Builder _createRegistration(xMsgTopic topic) {
+    private xMsgRegistration.Builder _createRegistration(xMsgTopic topic, boolean isPublisher) {
         xMsgRegistration.Builder regb = xMsgRegistration.newBuilder();
         regb.setName(myName);
         regb.setHost(defaultProxyAddress.host());
@@ -700,6 +700,11 @@ public class xMsg {
         regb.setDomain(topic.domain());
         regb.setSubject(topic.subject());
         regb.setType(topic.type());
+        if (isPublisher) {
+            regb.setOwnerType(xMsgRegistration.OwnerType.PUBLISHER);
+        } else {
+            regb.setOwnerType(xMsgRegistration.OwnerType.SUBSCRIBER);
+        }
         return regb;
     }
 
@@ -709,42 +714,24 @@ public class xMsg {
                            boolean isPublisher) throws xMsgException {
         xMsgRegDriver regDriver = connectionManager.getRegistrarConnection(regAddress);
         xMsgRegistration.Builder regb = _createRegistration(topic);
-        if (isPublisher) {
-            regb.setOwnerType(xMsgRegistration.OwnerType.PUBLISHER);
-        } else {
-            regb.setOwnerType(xMsgRegistration.OwnerType.SUBSCRIBER);
-        }
         regb.setDescription(description);
-        xMsgRegistration regData = regb.build();
-        regDriver.register(regData, isPublisher);
+        regDriver.register(regb.build(), isPublisher);
     }
 
     private void _removeRegistration(xMsgRegAddress regAddress,
                                      xMsgTopic topic,
                                      boolean isPublisher) throws xMsgException {
         xMsgRegDriver regDriver = connectionManager.getRegistrarConnection(regAddress);
-        xMsgRegistration.Builder regb = _createRegistration(topic);
-        if (isPublisher) {
-            regb.setOwnerType(xMsgRegistration.OwnerType.PUBLISHER);
-        } else {
-            regb.setOwnerType(xMsgRegistration.OwnerType.SUBSCRIBER);
-        }
-        xMsgRegistration regData = regb.build();
-        regDriver.removeRegistration(regData, isPublisher);
+        xMsgRegistration.Builder regb = _createRegistration(topic, isPublisher);
+        regDriver.removeRegistration(regb.build(), isPublisher);
     }
 
     private Set<xMsgRegistration> _findRegistration(xMsgRegAddress regAddress,
                                                     xMsgTopic topic,
                                                     boolean isPublisher) throws xMsgException {
         xMsgRegDriver regDriver = connectionManager.getRegistrarConnection(regAddress);
-        xMsgRegistration.Builder regb = _createRegistration(topic);
-        if (isPublisher) {
-            regb.setOwnerType(xMsgRegistration.OwnerType.PUBLISHER);
-        } else {
-            regb.setOwnerType(xMsgRegistration.OwnerType.SUBSCRIBER);
-        }
-        xMsgRegistration regData = regb.build();
-        return regDriver.findRegistration(regData, isPublisher);
+        xMsgRegistration.Builder regb = _createRegistration(topic, isPublisher);
+        return regDriver.findRegistration(regb.build(), isPublisher);
     }
 
     private void _publish(xMsgConnection connection, xMsgMessage msg) throws xMsgException {
