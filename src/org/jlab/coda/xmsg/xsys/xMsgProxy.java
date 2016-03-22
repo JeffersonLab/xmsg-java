@@ -157,10 +157,10 @@ public class xMsgProxy {
             controller = xMsgUtil.newThread("control", controllerTask);
         } catch (Exception e) {
             if (proxyTask != null) {
-                proxyTask.shadowContext.destroy();
+                proxyTask.close();
             }
             if (controllerTask != null) {
-                controllerTask.shadowContext.destroy();
+                controllerTask.close();
             }
             throw e;
         }
@@ -217,23 +217,26 @@ public class xMsgProxy {
      */
     private class Proxy implements Runnable {
 
-        final ZContext shadowContext;
-
         final Socket in;
         final Socket out;
 
+        final xMsgSocketFactory factory = new xMsgSocketFactory(ZContext.shadow(ctx));
+
         Proxy() throws xMsgException {
-            shadowContext = ZContext.shadow(ctx);
+            Socket in = null;
+            Socket out = null;
             try {
-                xMsgSocketFactory factory = new xMsgSocketFactory(shadowContext);
                 in = factory.createSocket(ZMQ.XSUB);
                 out = factory.createSocket(ZMQ.XPUB);
                 factory.bindSocket(in, addr.pubPort());
                 factory.bindSocket(out, addr.subPort());
             } catch (Exception e) {
-                shadowContext.destroy();
+                factory.closeQuietly(in);
+                factory.closeQuietly(out);
                 throw e;
             }
+            this.in = in;
+            this.out = out;
         }
 
         @Override
@@ -241,7 +244,7 @@ public class xMsgProxy {
             try {
                 LOGGER.info("running on host = " + addr.host() + "  port = " + addr.pubPort());
                 if (LOGGER.isLoggable(Level.FINE)) {
-                    Socket listener = ZThread.fork(shadowContext, new Listener());
+                    Socket listener = ZThread.fork(ctx, new Listener());
                     ZMQ.proxy(in, out, listener);
                 } else {
                     ZMQ.proxy(in, out, null);
@@ -249,8 +252,13 @@ public class xMsgProxy {
             } catch (Exception e) {
                 LOGGER.severe(LogUtils.exceptionReporter(e));
             }  finally {
-                shadowContext.destroy();
+                close();
             }
+        }
+
+        public void close() {
+            factory.destroySocket(in);
+            factory.destroySocket(out);
         }
     }
 
@@ -261,16 +269,17 @@ public class xMsgProxy {
      */
     private class Controller implements Runnable {
 
-        final ZContext shadowContext;
-
         final Socket control;
         final Socket publisher;
         final Socket router;
 
+        final xMsgSocketFactory factory = new xMsgSocketFactory(ZContext.shadow(ctx));
+
         Controller() throws xMsgException {
-            shadowContext = ZContext.shadow(ctx);
+            Socket control = null;
+            Socket publisher = null;
+            Socket router = null;
             try {
-                xMsgSocketFactory factory = new xMsgSocketFactory(shadowContext);
                 control = factory.createSocket(ZMQ.SUB);
                 publisher = factory.createSocket(ZMQ.PUB);
                 router = factory.createSocket(ZMQ.ROUTER);
@@ -283,9 +292,14 @@ public class xMsgProxy {
 
                 control.subscribe(xMsgConstants.CTRL_TOPIC.getBytes());
             } catch (Exception e) {
-                shadowContext.destroy();
+                factory.closeQuietly(control);
+                factory.closeQuietly(publisher);
+                factory.closeQuietly(router);
                 throw e;
             }
+            this.control = control;
+            this.publisher = publisher;
+            this.router = router;
         }
 
         @Override
@@ -308,7 +322,7 @@ public class xMsgProxy {
             } catch (Exception e) {
                 LOGGER.severe(LogUtils.exceptionReporter(e));
             } finally {
-                shadowContext.destroy();
+                close();
             }
         }
 
@@ -351,6 +365,12 @@ public class xMsgProxy {
                 typeFrame.destroy();
                 msg.destroy();
             }
+        }
+
+        public void close() {
+            factory.destroySocket(control);
+            factory.destroySocket(publisher);
+            factory.destroySocket(router);
         }
     }
 
