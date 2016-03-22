@@ -46,11 +46,8 @@ import java.util.Set;
  */
 public class xMsgRegDriver {
 
-    // Registrar address
-    private final xMsgRegAddress _address;
-
-    // Registrar server (req/rep) connection socket.
-    private final Socket _connectionSocket;
+    private final xMsgRegAddress address;
+    private final Socket socket;
 
 
     /**
@@ -60,15 +57,8 @@ public class xMsgRegDriver {
      * @param socket registrar connection socket
      */
     public xMsgRegDriver(xMsgRegAddress address, Socket socket) {
-        _address = address;
-        _connectionSocket = socket;
-    }
-
-    /**
-     * Returns the address of the registrar service.
-     */
-    public xMsgRegAddress getAddress() {
-        return _address;
+        this.address = address;
+        this.socket = socket;
     }
 
     /**
@@ -83,7 +73,7 @@ public class xMsgRegDriver {
             throws xMsgException {
         ZMsg requestMsg = request.msg();
         try {
-            requestMsg.send(_connectionSocket);
+            requestMsg.send(socket);
         } catch (ZMQException e) {
             throw new xMsgException("xMsg-Error: sending registration message. " +
                     e.getMessage(), e.getCause());
@@ -91,10 +81,10 @@ public class xMsgRegDriver {
             requestMsg.destroy();
         }
 
-        ZMQ.PollItem[] items = {new ZMQ.PollItem(_connectionSocket, ZMQ.Poller.POLLIN)};
+        ZMQ.PollItem[] items = {new ZMQ.PollItem(socket, ZMQ.Poller.POLLIN)};
         int rc = ZMQ.poll(items, timeout);
         if (rc != -1 && items[0].isReadable()) {
-            ZMsg responseMsg = ZMsg.recvMsg(_connectionSocket);
+            ZMsg responseMsg = ZMsg.recvMsg(socket);
             try {
                 xMsgRegResponse response = new xMsgRegResponse(responseMsg);
                 String status = response.status();
@@ -111,15 +101,6 @@ public class xMsgRegDriver {
     }
 
     /**
-     * Checks if the registration data is initialized.
-     */
-    private void _validateData(xMsgRegistration data) throws xMsgException {
-        if (!data.isInitialized()) {
-            throw new xMsgException("xMsg-Error: registration data is incomplete");
-        }
-    }
-
-    /**
      * Sends a registration request to the registrar service.
      *
      * @param data the registration data
@@ -127,12 +108,9 @@ public class xMsgRegDriver {
      *                     otherwise this is a request to register a subscriber
      * @throws xMsgException
      */
-    public void register(xMsgRegistration data,
-                         boolean isPublisher)
+    public void register(xMsgRegistration data, boolean isPublisher)
             throws xMsgException {
-
-        _validateData(data);
-
+        validateData(data);
         String topic = isPublisher ? xMsgConstants.REGISTER_PUBLISHER
                                    : xMsgConstants.REGISTER_SUBSCRIBER;
         int timeout = xMsgConstants.REGISTER_REQUEST_TIMEOUT;
@@ -149,12 +127,9 @@ public class xMsgRegDriver {
      *                     otherwise this is a request to register a subscriber
      * @throws xMsgException
      */
-    public void removeRegistration(xMsgRegistration data,
-                                   boolean isPublisher)
+    public void removeRegistration(xMsgRegistration data, boolean isPublisher)
             throws xMsgException {
-
-        _validateData(data);
-
+        validateData(data);
         String topic = isPublisher ? xMsgConstants.REMOVE_PUBLISHER
                                    : xMsgConstants.REMOVE_SUBSCRIBER;
         int timeout = xMsgConstants.REMOVE_REQUEST_TIMEOUT;
@@ -176,7 +151,6 @@ public class xMsgRegDriver {
      */
     public void removeAllRegistration(String sender, String host)
             throws xMsgException {
-
         String topic = xMsgConstants.REMOVE_ALL_REGISTRATION;
         int timeout = xMsgConstants.REMOVE_REQUEST_TIMEOUT;
 
@@ -195,12 +169,9 @@ public class xMsgRegDriver {
      * @return set of publishers or subscribers to the required topic.
      * @throws xMsgException
      */
-    public Set<xMsgRegistration> findRegistration(xMsgRegistration data,
-                                                  boolean isPublisher)
+    public Set<xMsgRegistration> findRegistration(xMsgRegistration data, boolean isPublisher)
             throws xMsgException {
-
-        _validateData(data);
-
+        validateData(data);
         String topic = isPublisher ? xMsgConstants.FIND_PUBLISHER
                                    : xMsgConstants.FIND_SUBSCRIBER;
         int timeout = xMsgConstants.FIND_REQUEST_TIMEOUT;
@@ -210,7 +181,20 @@ public class xMsgRegDriver {
         return response.data();
     }
 
+    private void validateData(xMsgRegistration data) throws xMsgException {
+        if (!data.isInitialized()) {
+            throw new xMsgException("xMsg-Error: registration data is incomplete");
+        }
+    }
+
+    /**
+     * Returns the address of the registrar service.
+     */
+    public xMsgRegAddress getAddress() {
+        return address;
+    }
+
     public Socket getSocket() {
-        return _connectionSocket;
+        return socket;
     }
 }
