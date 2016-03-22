@@ -59,9 +59,6 @@ import java.util.logging.Logger;
  */
 public class xMsgRegService implements Runnable {
 
-    // 0MQ context.
-    private final ZContext shadowContext;
-
     // Database to store publishers
     private final xMsgRegDatabase publishers = new xMsgRegDatabase();
 
@@ -73,6 +70,8 @@ public class xMsgRegService implements Runnable {
 
     // Address of the registrar
     private final Socket regSocket;
+
+    private final xMsgSocketFactory factory;
 
     private static final Logger LOGGER = Logger.getLogger("xMsgRegistrar");
 
@@ -86,14 +85,13 @@ public class xMsgRegService implements Runnable {
      * @see ZContext#shadow
      */
     public xMsgRegService(ZContext context, xMsgRegAddress address) throws xMsgException {
-        shadowContext = ZContext.shadow(context);
+        factory = new xMsgSocketFactory(ZContext.shadow(context));
         regAddress = address;
+        regSocket = factory.createSocket(ZMQ.REP);
         try {
-            xMsgSocketFactory factory = new xMsgSocketFactory(shadowContext);
-            regSocket = factory.createSocket(ZMQ.REP);
             factory.bindSocket(regSocket, regAddress.port());
         } catch (Exception e) {
-            shadowContext.destroy();
+            factory.closeQuietly(regSocket);
             throw e;
         }
     }
@@ -127,7 +125,7 @@ public class xMsgRegService implements Runnable {
         } catch (Exception e) {
             LOGGER.severe(LogUtils.exceptionReporter(e));
         } finally {
-            shadowContext.destroy();
+            factory.destroySocket(regSocket);
         }
     }
 
