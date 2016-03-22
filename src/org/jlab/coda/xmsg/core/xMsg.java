@@ -696,7 +696,7 @@ public class xMsg {
         xMsgRegistration.Builder regb = xMsgRegistration.newBuilder();
         regb.setName(myName);
         regb.setHost(defaultProxyAddress.host());
-        regb.setPort(defaultProxyAddress.port());
+        regb.setPort(defaultProxyAddress.pubPort());
         regb.setDomain(topic.domain());
         regb.setSubject(topic.subject());
         regb.setType(topic.type());

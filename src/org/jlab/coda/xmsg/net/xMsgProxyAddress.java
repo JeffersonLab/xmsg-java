@@ -23,6 +23,10 @@
 package org.jlab.coda.xmsg.net;
 
 import org.jlab.coda.xmsg.core.xMsgConstants;
+import org.jlab.coda.xmsg.core.xMsgUtil;
+import org.jlab.coda.xmsg.excp.xMsgAddressException;
+
+import java.io.IOException;
 
 /**
  * xMsg proxy address.
@@ -30,17 +34,97 @@ import org.jlab.coda.xmsg.core.xMsgConstants;
  * @author gurjyan
  * @version 2.x
  */
-public class xMsgProxyAddress extends xMsgAddress {
+public final class xMsgProxyAddress {
 
+    private final String host;
+    private final int pubPort;
+    private final int subPort;
+
+    /**
+     * Creates an address with default host and ports.
+     *
+     * @throws xMsgAddressException if the IP address of the host could not be resolved
+     */
     public xMsgProxyAddress() {
-        super("localhost", xMsgConstants.DEFAULT_PORT);
+        this("localhost", xMsgConstants.DEFAULT_PORT);
     }
 
+    /**
+     * Creates an address with provided host and default ports.
+     *
+     * @throws xMsgAddressException if the IP address of the host could not be resolved
+     */
     public xMsgProxyAddress(String host) {
-        super(host, xMsgConstants.DEFAULT_PORT);
+        this(host, xMsgConstants.DEFAULT_PORT);
     }
 
+    /**
+     * Creates an address using provided host and publication port.
+     * Subscription port is the publication port plus one.
+     *
+     * @param host the host address
+     * @param port the publication port number
+     * @throws xMsgAddressException if the IP address of the host could not be resolved
+     */
     public xMsgProxyAddress(String host, int port) {
-        super(host, port);
+        try {
+            if (host == null) {
+                throw new IllegalArgumentException("Null IP address");
+            }
+            if (port <= 1023) {
+                throw new IllegalArgumentException("Illegal port: " + port);
+            }
+            this.host = xMsgUtil.toHostAddress(host);
+            this.pubPort = port;
+            this.subPort = port + 1;
+        } catch (IOException e) {
+            throw new xMsgAddressException(e);
+        }
+    }
+
+    /**
+     * Returns the host address.
+     */
+    public String host() {
+        return host;
+    }
+
+    /**
+     * Returns the publication port number.
+     */
+    public int pubPort() {
+        return pubPort;
+    }
+
+    /**
+     * Returns the subscription port number.
+     */
+    public int subPort() {
+        return subPort;
+    }
+
+    @Override
+    public String toString() {
+        return host + ":" + pubPort;
+    }
+
+    @Override
+    public int hashCode() {
+        return 31 * host.hashCode() + pubPort;
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+        if (this == obj) {
+            return true;
+        }
+        if (obj == null) {
+            return false;
+        }
+        if (getClass() != obj.getClass()) {
+            return false;
+        }
+        xMsgProxyAddress other = (xMsgProxyAddress) obj;
+        return host.equals(other.host) && pubPort == other.pubPort;
     }
 }

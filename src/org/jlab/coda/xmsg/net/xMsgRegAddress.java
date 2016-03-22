@@ -23,6 +23,10 @@
 package org.jlab.coda.xmsg.net;
 
 import org.jlab.coda.xmsg.core.xMsgConstants;
+import org.jlab.coda.xmsg.core.xMsgUtil;
+import org.jlab.coda.xmsg.excp.xMsgAddressException;
+
+import java.io.IOException;
 
 /**
  * xMsg Registrar address.
@@ -30,17 +34,87 @@ import org.jlab.coda.xmsg.core.xMsgConstants;
  * @author gurjyan
  * @version 2.x
  */
-public class xMsgRegAddress extends xMsgAddress {
+public final class xMsgRegAddress {
 
+    private final String host;
+    private final int port;
+
+    /**
+     * Creates an address with default host and port.
+     *
+     * @throws xMsgAddressException if the IP address of the host could not be resolved
+     */
     public xMsgRegAddress() {
-        super("localhost", xMsgConstants.REGISTRAR_PORT);
+        this("localhost", xMsgConstants.REGISTRAR_PORT);
     }
 
+    /**
+     * Creates an address with provided host and default port.
+     *
+     * @throws xMsgAddressException if the IP address of the host could not be resolved
+     */
     public xMsgRegAddress(String host) {
-        super(host, xMsgConstants.REGISTRAR_PORT);
+        this(host, xMsgConstants.REGISTRAR_PORT);
     }
 
+    /**
+     * Creates an address using provided host and port.
+     *
+     * @param host the host address
+     * @param port the port number
+     * @throws xMsgAddressException if the IP address of the host could not be resolved
+     */
     public xMsgRegAddress(String host, int port) {
-        super(host, port);
+        try {
+            if (host == null) {
+                throw new IllegalArgumentException("Null IP address");
+            }
+            if (port <= 1023) {
+                throw new IllegalArgumentException("Illegal port: " + port);
+            }
+            this.host = xMsgUtil.toHostAddress(host);
+            this.port = port;
+        } catch (IOException e) {
+            throw new xMsgAddressException(e);
+        }
+    }
+
+    /**
+     * Returns the host address.
+     */
+    public String host() {
+        return host;
+    }
+
+    /**
+     * Returns the port number.
+     */
+    public int port() {
+        return port;
+    }
+
+    @Override
+    public String toString() {
+        return host + ":" + port;
+    }
+
+    @Override
+    public int hashCode() {
+        return 31 * host.hashCode() + port;
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+        if (this == obj) {
+            return true;
+        }
+        if (obj == null) {
+            return false;
+        }
+        if (getClass() != obj.getClass()) {
+            return false;
+        }
+        xMsgRegAddress other = (xMsgRegAddress) obj;
+        return host.equals(other.host) && port == other.port;
     }
 }

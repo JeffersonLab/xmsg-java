@@ -82,8 +82,8 @@ public class xMsgConnection {
     }
 
     public void connect() throws xMsgException {
-        int pubPort = address.port();
-        int subPort = pubPort + 1;
+        int pubPort = address.pubPort();
+        int subPort = address.subPort();
         int ctrlPort = subPort + 1;
 
         factory.connectSocket(pubSocket, address.host(), pubPort);

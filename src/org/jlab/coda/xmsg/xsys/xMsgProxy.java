@@ -228,8 +228,8 @@ public class xMsgProxy {
                 xMsgSocketFactory factory = new xMsgSocketFactory(shadowContext);
                 in = factory.createSocket(ZMQ.XSUB);
                 out = factory.createSocket(ZMQ.XPUB);
-                factory.bindSocket(in, addr.port());
-                factory.bindSocket(out, addr.port() + 1);
+                factory.bindSocket(in, addr.pubPort());
+                factory.bindSocket(out, addr.subPort());
             } catch (Exception e) {
                 shadowContext.destroy();
                 throw e;
@@ -239,7 +239,7 @@ public class xMsgProxy {
         @Override
         public void run() {
             try {
-                LOGGER.info("running on host = " + addr.host() + "  port = " + addr.port());
+                LOGGER.info("running on host = " + addr.host() + "  port = " + addr.pubPort());
                 if (LOGGER.isLoggable(Level.FINE)) {
                     Socket listener = ZThread.fork(shadowContext, new Listener());
                     ZMQ.proxy(in, out, listener);
@@ -275,11 +275,11 @@ public class xMsgProxy {
                 publisher = factory.createSocket(ZMQ.PUB);
                 router = factory.createSocket(ZMQ.ROUTER);
 
-                factory.connectSocket(control, addr.host(), addr.port() + 1);
-                factory.connectSocket(publisher, addr.host(), addr.port());
+                factory.connectSocket(control, addr.host(), addr.subPort());
+                factory.connectSocket(publisher, addr.host(), addr.pubPort());
 
                 router.setRouterHandlover(true);
-                factory.bindSocket(router, addr.port() + 2);
+                factory.bindSocket(router, addr.pubPort() + 2);
 
                 control.subscribe(xMsgConstants.CTRL_TOPIC.getBytes());
             } catch (Exception e) {
