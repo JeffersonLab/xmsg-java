@@ -110,7 +110,6 @@ public class xMsgRegDriver {
      */
     public void register(xMsgRegistration data, boolean isPublisher)
             throws xMsgException {
-        validateData(data);
         String topic = isPublisher ? xMsgConstants.REGISTER_PUBLISHER
                                    : xMsgConstants.REGISTER_SUBSCRIBER;
         int timeout = xMsgConstants.REGISTER_REQUEST_TIMEOUT;
@@ -129,7 +128,6 @@ public class xMsgRegDriver {
      */
     public void removeRegistration(xMsgRegistration data, boolean isPublisher)
             throws xMsgException {
-        validateData(data);
         String topic = isPublisher ? xMsgConstants.REMOVE_PUBLISHER
                                    : xMsgConstants.REMOVE_SUBSCRIBER;
         int timeout = xMsgConstants.REMOVE_REQUEST_TIMEOUT;
@@ -171,7 +169,6 @@ public class xMsgRegDriver {
      */
     public Set<xMsgRegistration> findRegistration(xMsgRegistration data, boolean isPublisher)
             throws xMsgException {
-        validateData(data);
         String topic = isPublisher ? xMsgConstants.FIND_PUBLISHER
                                    : xMsgConstants.FIND_SUBSCRIBER;
         int timeout = xMsgConstants.FIND_REQUEST_TIMEOUT;
@@ -179,12 +176,6 @@ public class xMsgRegDriver {
         xMsgRegRequest request = new xMsgRegRequest(topic, data.getName(), data);
         xMsgRegResponse response = request(request, timeout);
         return response.data();
-    }
-
-    private void validateData(xMsgRegistration data) throws xMsgException {
-        if (!data.isInitialized()) {
-            throw new xMsgException("xMsg-Error: registration data is incomplete");
-        }
     }
 
     /**
