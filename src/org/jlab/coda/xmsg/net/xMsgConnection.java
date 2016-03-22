@@ -62,15 +62,9 @@ public class xMsgConnection {
             sub = factory.createSocket(ZMQ.SUB);
             ctrl = factory.createSocket(ZMQ.DEALER);
         } catch (Exception e) {
-            if (pub == null) {
-                factory.destroySocket(pub);
-            }
-            if (sub == null) {
-                factory.destroySocket(sub);
-            }
-            if (ctrl == null) {
-                factory.destroySocket(ctrl);
-            }
+            factory.closeQuietly(pub);
+            factory.closeQuietly(sub);
+            factory.closeQuietly(ctrl);
             throw e;
         }
         this.pubSocket = pub;

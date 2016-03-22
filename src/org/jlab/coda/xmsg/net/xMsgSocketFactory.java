@@ -81,4 +81,10 @@ public class xMsgSocketFactory {
     public void destroySocket(Socket socket) {
         ctx.destroySocket(socket);
     }
+
+    public void closeQuietly(Socket socket) {
+        if (socket != null) {
+            ctx.destroySocket(socket);
+        }
+    }
 }
