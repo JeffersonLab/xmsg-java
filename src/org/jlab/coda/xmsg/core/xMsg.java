@@ -371,10 +371,8 @@ public class xMsg {
     /**
      * Unsubscribes all previous subscriptions,
      * shuts down thread pool and closes all connections.
-     *
-     * @throws xMsgException
      */
-    public void destroy() throws xMsgException {
+    public void destroy() {
         final int infiniteLinger = -1;
         destroy(infiniteLinger);
     }
@@ -384,9 +382,8 @@ public class xMsg {
      * shuts down thread pool and closes all connections.
      *
      * @param linger linger period for closing the 0MQ context
-     * @throws xMsgException
      */
-    public void destroy(int linger) throws xMsgException {
+    public void destroy(int linger) {
         for (xMsgSubscription sh : mySubscriptions.values()) {
             unsubscribe(sh);
         }
