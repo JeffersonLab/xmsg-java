@@ -688,8 +688,7 @@ public class xMsg {
      * @param handle an active subscription
      * @throws xMsgException
      */
-    public void unsubscribe(xMsgSubscription handle)
-            throws xMsgException {
+    public void unsubscribe(xMsgSubscription handle) {
         handle.stop();
         mySubscriptions.remove(handle.getName());
     }
