@@ -59,7 +59,7 @@ class xMsgRegResponse {
      * @param topic the request being responded
      * @param sender the sender of the response
      */
-    public xMsgRegResponse(String topic, String sender) {
+    xMsgRegResponse(String topic, String sender) {
         this.topic = topic;
         this.sender = sender;
         this.status = xMsgConstants.SUCCESS;
@@ -77,7 +77,7 @@ class xMsgRegResponse {
      * @param sender the sender of the response
      * @param data the registration data
      */
-    public xMsgRegResponse(String topic, String sender, Set<xMsgRegistration> data) {
+    xMsgRegResponse(String topic, String sender, Set<xMsgRegistration> data) {
         this.topic = topic;
         this.sender = sender;
         this.status = xMsgConstants.SUCCESS;
@@ -95,7 +95,7 @@ class xMsgRegResponse {
      * @param sender the sender of the response
      * @param statusOrData the error description or string data.
      */
-    public xMsgRegResponse(String topic, String sender, String statusOrData) {
+    xMsgRegResponse(String topic, String sender, String statusOrData) {
         this.topic = topic;
         this.sender = sender;
         this.status = statusOrData;
@@ -112,7 +112,7 @@ class xMsgRegResponse {
      *         or when the response is an error
      *         (and the exception message is set to the error description)
      */
-    public xMsgRegResponse(ZMsg msg) throws xMsgException {
+    xMsgRegResponse(ZMsg msg) throws xMsgException {
 
         if (msg.size() < 3) {
             throw new xMsgException("xMsg-Error: registration message format violation");
