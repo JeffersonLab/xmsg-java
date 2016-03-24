@@ -34,6 +34,15 @@ import org.zeromq.ZContext;
  */
 public final class xMsgContext {
 
+    static {
+        Runtime.getRuntime().addShutdownHook(new Thread() {
+            @Override
+            public void run() {
+                destroyContext();
+            }
+        });
+    }
+
     private static xMsgContext ourInstance = new xMsgContext();
 
     private final ZContext context;
@@ -48,5 +57,11 @@ public final class xMsgContext {
 
     public static ZContext getContext() {
         return getInstance().context;
+    }
+
+    public static void destroyContext() {
+        synchronized (ourInstance) {
+            ourInstance.context.destroy();
+        }
     }
 }
