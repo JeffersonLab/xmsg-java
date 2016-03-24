@@ -55,9 +55,9 @@ public final class LocalThroughput {
         final Timer timer = new Timer();
 
         try {
-            final xMsg subscriber = new xMsg("throughput_subscriber", 1);
+            xMsg subscriber = new xMsg("throughput_subscriber", 1);
             xMsgConnection con = subscriber.createConnection(bindTo);
-            final xMsgTopic topic = xMsgTopic.wrap("thr_topic");
+            xMsgTopic topic = xMsgTopic.wrap("thr_topic");
 
             xMsgSubscription sub = subscriber.subscribe(con, topic, msg -> {
                 int size = msg.getDataSize();

@@ -73,8 +73,7 @@ public class xMsgRegistrar {
             int port = options.valueOf(portSpec);
             xMsgRegAddress address = new xMsgRegAddress("localhost", port);
 
-            final ZContext context = xMsgContext.getContext();
-            final xMsgRegistrar registrar = new xMsgRegistrar(context, address);
+            xMsgRegistrar registrar = new xMsgRegistrar(xMsgContext.getContext(), address);
 
             if (options.has("verbose")) {
                 registrar.verbose();
