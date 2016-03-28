@@ -46,7 +46,7 @@ class ProxyThread {
         }
     }
 
-    public void stop() throws InterruptedException {
+    public void stop() {
         context.destroy();
         if (proxy != null) {
             proxy.shutdown();

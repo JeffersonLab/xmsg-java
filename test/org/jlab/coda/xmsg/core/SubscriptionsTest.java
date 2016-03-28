@@ -25,6 +25,8 @@ package org.jlab.coda.xmsg.core;
 import org.jlab.coda.xmsg.excp.xMsgException;
 import org.jlab.coda.xmsg.net.xMsgConnection;
 import org.jlab.coda.xmsg.testing.IntegrationTest;
+import org.junit.After;
+import org.junit.Before;
 import org.junit.Test;
 import org.junit.experimental.categories.Category;
 
@@ -42,19 +44,29 @@ import static org.junit.Assert.assertTrue;
 @Category(IntegrationTest.class)
 public class SubscriptionsTest {
 
+    private ProxyThread proxyThread;
+
+    @Before
+    public void setup() {
+        proxyThread = new ProxyThread();
+        proxyThread.start();
+    }
+
+
+    @After
+    public void teardown() {
+        proxyThread.stop();
+    }
+
+
     @Test
     public void unsuscribeStopsThread() throws Exception {
-        ProxyThread proxyThread = new ProxyThread();
-        proxyThread.start();
-
         xMsg actor = new xMsg("test");
         xMsgConnection con = actor.createConnection();
 
         xMsgSubscription subscription = actor.subscribe(con, xMsgTopic.wrap("topic"), null);
         xMsgUtil.sleep(1000);
         actor.unsubscribe(subscription);
-
-        proxyThread.stop();
 
         assertFalse(subscription.isAlive());
     }
@@ -70,9 +82,6 @@ public class SubscriptionsTest {
         }
 
         final Check check = new Check();
-
-        ProxyThread proxyThread = new ProxyThread();
-        proxyThread.start();
 
         Thread subThread = xMsgUtil.newThread("sub-thread", () -> {
             try {
@@ -117,8 +126,6 @@ public class SubscriptionsTest {
         subThread.join();
         pubThread.join();
 
-        proxyThread.stop();
-
         assertThat(check.counter.get(), is(Check.N));
         assertThat(check.sum.get(), is(Check.SUM_N));
     }
@@ -134,9 +141,6 @@ public class SubscriptionsTest {
         }
 
         final Check check = new Check();
-
-        ProxyThread proxyThread = new ProxyThread();
-        proxyThread.start();
 
         Thread pubThread = xMsgUtil.newThread("syncpub-thread", () -> {
             try {
@@ -176,9 +180,7 @@ public class SubscriptionsTest {
             }
         });
         pubThread.start();
-
         pubThread.join();
-        proxyThread.stop();
 
         assertThat(check.counter, is(Check.N));
         assertThat(check.sum, is(Check.SUM_N));
@@ -193,9 +195,6 @@ public class SubscriptionsTest {
         }
 
         final Check check = new Check();
-
-        ProxyThread proxyThread = new ProxyThread();
-        proxyThread.start();
 
         Thread pubThread = xMsgUtil.newThread("syncpub-thread", () -> {
             try {
@@ -237,8 +236,6 @@ public class SubscriptionsTest {
         });
         pubThread.start();
         pubThread.join();
-
-        proxyThread.stop();
 
         assertTrue("not received", check.received);
         assertTrue("no timeout", check.timeout);
