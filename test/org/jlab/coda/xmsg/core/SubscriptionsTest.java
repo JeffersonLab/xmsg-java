@@ -140,8 +140,8 @@ public class SubscriptionsTest {
 
         Thread pubThread = xMsgUtil.newThread("syncpub-thread", () -> {
             try {
-                final xMsg subActor = new xMsg("test_subscriber");
-                final xMsgConnection subCon = subActor.createConnection();
+                xMsg subActor = new xMsg("test_subscriber");
+                xMsgConnection subCon = subActor.createConnection();
 
                 xMsgTopic subTopic = xMsgTopic.wrap("test_topic");
                 xMsgSubscription sub = subActor.subscribe(subCon, subTopic, msg -> {
