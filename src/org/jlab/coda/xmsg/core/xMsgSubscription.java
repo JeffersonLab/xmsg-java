@@ -118,6 +118,7 @@ public abstract class xMsgSubscription {
                 }
             }
             connection.unsubscribe(topic);
+            connection.close();
         }
     }
 
