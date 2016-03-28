@@ -51,7 +51,7 @@ public final class RemoteThroughput {
                 xMsgMessage msg = new xMsgMessage(topic, "data/binary", data);
                 publisher.publish(con, msg);
             }
-            publisher.destroy();
+            publisher.destroyConnection(con);
         } catch (xMsgException e) {
             e.printStackTrace();
             System.exit(1);

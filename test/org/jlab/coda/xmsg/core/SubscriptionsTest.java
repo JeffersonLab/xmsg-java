@@ -107,6 +107,7 @@ public class SubscriptionsTest {
                     xMsgMessage msg = xMsgMessage.createFrom(topic, i);
                     actor.publish(con, msg);
                 }
+                actor.destroyConnection(con);
             } catch (IOException | xMsgException e) {
                 e.printStackTrace();
             }
@@ -167,7 +168,9 @@ public class SubscriptionsTest {
                     check.sum += data;
                     check.counter++;
                 }
+                pubActor.destroyConnection(pubCon);
                 subActor.unsubscribe(sub);
+                subActor.destroy();
             } catch (IOException | xMsgException | TimeoutException e) {
                 e.printStackTrace();
             }
@@ -225,7 +228,9 @@ public class SubscriptionsTest {
                 } catch (TimeoutException e) {
                     check.timeout = true;
                 }
+                pubActor.destroyConnection(pubCon);
                 subActor.unsubscribe(sub);
+                subActor.destroy();
             } catch (IOException | xMsgException e) {
                 e.printStackTrace();
             }

@@ -105,6 +105,7 @@ public class PublishersTest {
                     subReady.countDown();
                     wait(check);
                     actor.unsubscribe(sub);
+                    actor.destroy();
                 } catch (xMsgException e) {
                     e.printStackTrace();
                 }
@@ -129,6 +130,9 @@ public class PublishersTest {
                         for (int j = start; j < end; j++) {
                             xMsgMessage msg = xMsgMessage.createFrom(topic, j);
                             publish(actor, msg, check);
+                        }
+                        if (actor != pubActor) {
+                            actor.destroy();
                         }
                     } catch (Exception e) {
                         e.printStackTrace();
@@ -158,8 +162,11 @@ public class PublishersTest {
         @Override
         public void close() {
             try {
+                if (pubActor != null) {
+                    pubActor.destroy();
+                }
                 proxyThread.stop();
-            } catch (InterruptedException e) {
+            } catch (Exception e) {
                 e.printStackTrace();
             }
         }
