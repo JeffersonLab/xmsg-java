@@ -73,12 +73,12 @@ public class Publisher extends xMsg {
     }
 
     public static void main(String[] args) {
-        try {
-            if (args.length != 1) {
-                System.err.println("Usage: Publisher <data_size in KB>");
-                System.exit(1);
-            }
+        if (args.length != 1) {
+            System.err.println("Usage: Publisher <data_size in KB>");
+            System.exit(1);
+        }
 
+        try {
             // create a publisher object
             Publisher publisher = new Publisher();
 
@@ -99,7 +99,6 @@ public class Publisher extends xMsg {
             while (true) {
                 publisher.publish(publisher.con, msg);
             }
-
         } catch (xMsgException | IOException e) {
             e.printStackTrace();
             System.exit(1);
