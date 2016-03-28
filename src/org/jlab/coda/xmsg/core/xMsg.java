@@ -38,6 +38,7 @@ import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
 import java.util.concurrent.ThreadPoolExecutor;
+import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
 
 /**
@@ -389,7 +390,12 @@ public class xMsg {
         for (xMsgSubscription sh : mySubscriptions.values()) {
             unsubscribe(sh);
         }
-        threadPool.shutdown();
+        try {
+            threadPool.shutdownNow();
+            threadPool.awaitTermination(30, TimeUnit.SECONDS);
+        } catch (InterruptedException e) {
+            System.err.println("Interrupted when shutting down subscription thread-pool.");
+        }
         connectionManager.destroy(linger);
     }
 
