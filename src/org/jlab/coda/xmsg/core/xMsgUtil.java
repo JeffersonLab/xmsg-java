@@ -354,15 +354,10 @@ public final class xMsgUtil {
     public static Thread newThread(String name, Runnable target) {
         Objects.requireNonNull(name, "name is null");
         Objects.requireNonNull(target, "target is null");
-        Thread t = new Thread(target);
-        t.setName(name);
-        t.setUncaughtExceptionHandler(new Thread.UncaughtExceptionHandler() {
-            @Override
-            public void uncaughtException(Thread t, Throwable e) {
-                e.printStackTrace();
-            }
-        });
-        return t;
+        Thread thread = new Thread(target);
+        thread.setName(name);
+        thread.setUncaughtExceptionHandler((t, e) -> e.printStackTrace());
+        return thread;
     }
 
 
