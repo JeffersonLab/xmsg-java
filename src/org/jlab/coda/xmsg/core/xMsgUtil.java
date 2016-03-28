@@ -134,7 +134,7 @@ public final class xMsgUtil {
         try {
             Thread.sleep(millis);
         } catch (InterruptedException e) {
-            System.out.println(e.getMessage());
+            // nothing
         }
     }
 
