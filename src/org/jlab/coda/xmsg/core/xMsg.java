@@ -99,7 +99,7 @@ import java.util.concurrent.TimeoutException;
  * @see xMsgMessage
  * @see xMsgTopic
  */
-public class xMsg {
+public class xMsg implements AutoCloseable {
 
     /** The identifier of this actor. */
     protected final String myName;
@@ -366,6 +366,15 @@ public class xMsg {
      */
     public void destroyConnection(xMsgConnection connection) {
         connection.close();
+    }
+
+    /**
+     * Unsubscribes all previous subscriptions,
+     * shuts down thread pool and closes all connections.
+     */
+    @Override
+    public void close() {
+        destroy();
     }
 
     /**

@@ -54,8 +54,8 @@ public final class LocalThroughput {
         final CountDownLatch finished = new CountDownLatch(1);
         final Timer timer = new Timer();
 
-        try {
-            xMsg subscriber = new xMsg("throughput_subscriber", 1);
+        try (xMsg subscriber = new xMsg("throughput_subscriber", 1)) {
+
             xMsgConnection con = subscriber.createConnection(bindTo);
             xMsgTopic topic = xMsgTopic.wrap("thr_topic");
 
@@ -92,7 +92,6 @@ public final class LocalThroughput {
             printf("mean throughput: %.3f [Mb/s]%n", megabits);
 
             subscriber.unsubscribe(sub);
-            subscriber.destroy();
 
         } catch (xMsgException e) {
             e.printStackTrace();

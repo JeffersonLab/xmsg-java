@@ -76,9 +76,7 @@ public class SyncPublisher extends xMsg {
     }
 
     public static void main(String[] args) {
-        try {
-
-            SyncPublisher publisher = new SyncPublisher();
+        try (SyncPublisher publisher = new SyncPublisher()) {
 
             xMsgMessage msg = xMsgMessage.createFrom(publisher.topic, 111);
 

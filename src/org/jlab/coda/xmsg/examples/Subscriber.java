@@ -80,10 +80,7 @@ public class Subscriber extends xMsg {
     }
 
     public static void main(String[] args) {
-        try {
-            // create a subscriber object
-            new Subscriber();
-
+        try (Subscriber subscriber = new Subscriber()) {
             xMsgUtil.keepAlive();
         } catch (xMsgException | IOException e) {
             e.printStackTrace();

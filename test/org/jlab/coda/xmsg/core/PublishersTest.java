@@ -91,8 +91,7 @@ public class PublishersTest {
             final CountDownLatch subReady = new CountDownLatch(1);
 
             Thread subThread = xMsgUtil.newThread("sub-thread", () -> {
-                try {
-                    xMsg actor = new xMsg("test_subscriber");
+                try (xMsg actor = new xMsg("test_subscriber")) {
                     xMsgConnection connection = actor.createConnection();
                     xMsgTopic topic = xMsgTopic.wrap(rawTopic);
                     xMsgSubscription sub = actor.subscribe(connection, topic, msg -> {
@@ -105,7 +104,6 @@ public class PublishersTest {
                     subReady.countDown();
                     wait(check);
                     actor.unsubscribe(sub);
-                    actor.destroy();
                 } catch (xMsgException e) {
                     e.printStackTrace();
                 }

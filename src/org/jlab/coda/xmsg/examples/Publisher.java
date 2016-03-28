@@ -78,10 +78,8 @@ public class Publisher extends xMsg {
             System.exit(1);
         }
 
-        try {
-            // create a publisher object
-            Publisher publisher = new Publisher();
-
+        // create a publisher object
+        try (Publisher publisher = new Publisher()) {
             // get the data size to be sent periodically
             int dataSize = Integer.parseInt(args[0]);
             System.out.println("Byte array size = " + dataSize);

@@ -61,14 +61,15 @@ public class SubscriptionsTest {
 
     @Test
     public void unsuscribeStopsThread() throws Exception {
-        xMsg actor = new xMsg("test");
-        xMsgConnection con = actor.createConnection();
+        try (xMsg actor = new xMsg("test")) {
+            xMsgConnection con = actor.createConnection();
 
-        xMsgSubscription subscription = actor.subscribe(con, xMsgTopic.wrap("topic"), null);
-        xMsgUtil.sleep(1000);
-        actor.unsubscribe(subscription);
+            xMsgSubscription subscription = actor.subscribe(con, xMsgTopic.wrap("topic"), null);
+            xMsgUtil.sleep(1000);
+            actor.unsubscribe(subscription);
 
-        assertFalse(subscription.isAlive());
+            assertFalse(subscription.isAlive());
+        }
     }
 
 
@@ -84,8 +85,7 @@ public class SubscriptionsTest {
         final Check check = new Check();
 
         Thread subThread = xMsgUtil.newThread("sub-thread", () -> {
-            try {
-                xMsg actor = new xMsg("test_subscriber");
+            try (xMsg actor = new xMsg("test_subscriber")) {
                 xMsgConnection con = actor.createConnection();
                 xMsgTopic topic = xMsgTopic.wrap("test_topic");
                 xMsgSubscription sub = actor.subscribe(con, topic, msg -> {
@@ -107,10 +107,8 @@ public class SubscriptionsTest {
         xMsgUtil.sleep(100);
 
         Thread pubThread = xMsgUtil.newThread("pub-thread", () -> {
-            try {
-                xMsg actor = new xMsg("test_publisher");
+            try (xMsg actor = new xMsg("test_publisher")) {
                 xMsgConnection con = actor.createConnection();
-
                 xMsgTopic topic = xMsgTopic.wrap("test_topic");
                 for (int i = 0; i < Check.N; i++) {
                     xMsgMessage msg = xMsgMessage.createFrom(topic, i);
@@ -143,10 +141,9 @@ public class SubscriptionsTest {
         final Check check = new Check();
 
         Thread pubThread = xMsgUtil.newThread("syncpub-thread", () -> {
-            try {
-                xMsg subActor = new xMsg("test_subscriber");
+            try (xMsg subActor = new xMsg("test_subscriber");
+                 xMsg pubActor = new xMsg("test_publisher")) {
                 xMsgConnection subCon = subActor.createConnection();
-
                 xMsgTopic subTopic = xMsgTopic.wrap("test_topic");
                 xMsgSubscription sub = subActor.subscribe(subCon, subTopic, msg -> {
                     try {
@@ -162,7 +159,6 @@ public class SubscriptionsTest {
                     }
                 });
                 xMsgUtil.sleep(100);
-                xMsg pubActor = new xMsg("test_publisher");
                 xMsgConnection pubCon = subActor.createConnection();
                 xMsgTopic pubTopic = xMsgTopic.wrap("test_topic");
                 for (int i = 0; i < Check.N; i++) {
@@ -197,10 +193,9 @@ public class SubscriptionsTest {
         final Check check = new Check();
 
         Thread pubThread = xMsgUtil.newThread("syncpub-thread", () -> {
-            try {
-                xMsg subActor = new xMsg("test_subscriber");
+            try (xMsg subActor = new xMsg("test_subscriber");
+                 xMsg pubActor = new xMsg("test_publisher")) {
                 xMsgConnection subCon = subActor.createConnection();
-
                 xMsgTopic subTopic = xMsgTopic.wrap("test_topic");
                 xMsgSubscription sub = subActor.subscribe(subCon, subTopic, msg -> {
                     try {
@@ -218,7 +213,6 @@ public class SubscriptionsTest {
                     }
                 });
                 xMsgUtil.sleep(100);
-                xMsg pubActor = new xMsg("test_publisher");
                 xMsgConnection pubCon = pubActor.createConnection();
                 xMsgTopic pubTopic = xMsgTopic.wrap("test_topic");
                 xMsgMessage msg = xMsgMessage.createFrom(pubTopic, 1);
@@ -229,7 +223,6 @@ public class SubscriptionsTest {
                 }
                 pubActor.destroyConnection(pubCon);
                 subActor.unsubscribe(sub);
-                subActor.destroy();
             } catch (IOException | xMsgException e) {
                 e.printStackTrace();
             }
