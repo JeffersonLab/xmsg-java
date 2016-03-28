@@ -121,8 +121,8 @@ public class PublishersTest {
                 final int end = start + numMessages;
 
                 Thread pubThread = xMsgUtil.newThread("pub-" + start, () -> {
+                    xMsg actor = pubActor;
                     try {
-                        xMsg actor = pubActor;
                         if (actor == null) {
                             actor = new xMsg("test_publisher_" + start);
                         }
@@ -131,11 +131,12 @@ public class PublishersTest {
                             xMsgMessage msg = xMsgMessage.createFrom(topic, j);
                             publish(actor, msg, check);
                         }
-                        if (actor != pubActor) {
-                            actor.destroy();
-                        }
                     } catch (Exception e) {
                         e.printStackTrace();
+                    } finally {
+                        if (actor != pubActor && actor != null) {
+                            actor.destroy();
+                        }
                     }
                 });
                 publishers.add(pubThread);
