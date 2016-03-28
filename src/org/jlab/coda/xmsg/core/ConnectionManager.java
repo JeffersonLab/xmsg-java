@@ -106,11 +106,6 @@ class ConnectionManager {
         defaultConnectionOption = setup;
     }
 
-    void destroy() {
-        proxyConnections.destroyAll(c -> c.close());
-        registrarConnections.destroyAll(c -> c.close());
-    }
-
     void destroy(int linger) {
         proxyConnections.destroyAll(c -> c.close(linger));
         registrarConnections.destroyAll(c -> c.close());
