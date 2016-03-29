@@ -25,6 +25,7 @@ package org.jlab.coda.xmsg.core;
 import org.jlab.coda.xmsg.data.xMsgR.xMsgRegistration;
 import org.jlab.coda.xmsg.excp.xMsgException;
 import org.jlab.coda.xmsg.net.xMsgConnection;
+import org.jlab.coda.xmsg.net.xMsgConnectionFactory;
 import org.jlab.coda.xmsg.net.xMsgConnectionSetup;
 import org.jlab.coda.xmsg.net.xMsgContext;
 import org.jlab.coda.xmsg.net.xMsgProxyAddress;
@@ -203,7 +204,7 @@ public class xMsg implements AutoCloseable {
         this(name,
              defaultProxy,
              defaultRegistrar,
-             new ConnectionManager(xMsgContext.getContext()),
+             new xMsgConnectionFactory(xMsgContext.getContext()),
              poolSize);
     }
 
@@ -213,7 +214,7 @@ public class xMsg implements AutoCloseable {
     protected xMsg(String name,
                    xMsgProxyAddress defaultProxy,
                    xMsgRegAddress defaultRegistrar,
-                   ConnectionManager connectionManager,
+                   xMsgConnectionFactory factory,
                    int poolSize) {
         // We need to have a name for an actor
         this.myName = name;
@@ -226,7 +227,7 @@ public class xMsg implements AutoCloseable {
         this.threadPool = xMsgUtil.newFixedThreadPool(poolSize, name);
 
         // create the connection pool
-        this.connectionManager = connectionManager;
+        this.connectionManager = new ConnectionManager(factory);
 
         // create the map of running subscriptions
         this.mySubscriptions = new ConcurrentHashMap<>();

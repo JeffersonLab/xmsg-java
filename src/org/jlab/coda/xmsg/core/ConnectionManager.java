@@ -35,7 +35,6 @@ import org.jlab.coda.xmsg.net.xMsgConnectionSetup;
 import org.jlab.coda.xmsg.net.xMsgProxyAddress;
 import org.jlab.coda.xmsg.net.xMsgRegAddress;
 import org.jlab.coda.xmsg.xsys.regdis.xMsgRegDriver;
-import org.zeromq.ZContext;
 
 class ConnectionManager {
 
@@ -50,10 +49,6 @@ class ConnectionManager {
 
     // default connection option
     private xMsgConnectionSetup defaultConnectionOption;
-
-    ConnectionManager(ZContext context) {
-        this(new xMsgConnectionFactory(context));
-    }
 
     ConnectionManager(xMsgConnectionFactory factory) {
         this.factory = factory;

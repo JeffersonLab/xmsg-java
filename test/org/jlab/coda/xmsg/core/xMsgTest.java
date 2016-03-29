@@ -24,6 +24,7 @@ package org.jlab.coda.xmsg.core;
 
 import org.jlab.coda.xmsg.data.xMsgR.xMsgRegistration;
 import org.jlab.coda.xmsg.data.xMsgR.xMsgRegistration.Builder;
+import org.jlab.coda.xmsg.net.xMsgConnectionFactory;
 import org.jlab.coda.xmsg.net.xMsgProxyAddress;
 import org.jlab.coda.xmsg.net.xMsgRegAddress;
 import org.jlab.coda.xmsg.xsys.regdis.xMsgRegDriver;
@@ -41,7 +42,7 @@ import static org.mockito.Mockito.verify;
 
 public class xMsgTest {
 
-    private ConnectionManager manager;
+    private xMsgConnectionFactory factory;
     private xMsgRegDriver driver;
     private xMsg core;
     private String name = "asimov";
@@ -49,9 +50,10 @@ public class xMsgTest {
     @Before
     public void setup() throws Exception {
         driver = mock(xMsgRegDriver.class);
-        manager = mock(ConnectionManager.class);
-        doReturn(driver).when(manager).getRegistrarConnection(any(xMsgRegAddress.class));
-        core = new xMsg(name, new xMsgProxyAddress(), new xMsgRegAddress(), manager, 1);
+        factory = mock(xMsgConnectionFactory.class);
+        doReturn(new xMsgRegAddress()).when(driver).getAddress();
+        doReturn(driver).when(factory).createRegistrarConnection(any(xMsgRegAddress.class));
+        core = new xMsg(name, new xMsgProxyAddress(), new xMsgRegAddress(), factory, 1);
     }
 
 
