@@ -111,15 +111,15 @@ public class xMsg implements AutoCloseable {
     private final ThreadPoolExecutor threadPool;
 
     // default proxy address
-    private xMsgProxyAddress defaultProxyAddress;
+    private final xMsgProxyAddress defaultProxyAddress;
 
     // default registrar address where registrar and
-    private xMsgRegAddress defaultRegistrarAddress;
+    private final xMsgRegAddress defaultRegistrarAddress;
 
-    private ConnectionManager connectionManager;
+    private final ConnectionManager connectionManager;
 
     // map of active subscriptions
-    private ConcurrentMap<String, xMsgSubscription> mySubscriptions = new ConcurrentHashMap<>();
+    private final ConcurrentMap<String, xMsgSubscription> mySubscriptions;
 
 
     /**
@@ -227,6 +227,9 @@ public class xMsg implements AutoCloseable {
 
         // create the connection pool
         this.connectionManager = connectionManager;
+
+        // create the map of running subscriptions
+        this.mySubscriptions = new ConcurrentHashMap<>();
     }
 
     /**
