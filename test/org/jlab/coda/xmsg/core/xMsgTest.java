@@ -24,6 +24,7 @@ package org.jlab.coda.xmsg.core;
 
 import org.jlab.coda.xmsg.data.xMsgR.xMsgRegistration;
 import org.jlab.coda.xmsg.data.xMsgR.xMsgRegistration.Builder;
+import org.jlab.coda.xmsg.net.xMsgProxyAddress;
 import org.jlab.coda.xmsg.net.xMsgRegAddress;
 import org.jlab.coda.xmsg.xsys.regdis.xMsgRegDriver;
 import org.junit.Before;
@@ -50,7 +51,7 @@ public class xMsgTest {
         driver = mock(xMsgRegDriver.class);
         manager = mock(ConnectionManager.class);
         doReturn(driver).when(manager).getRegistrarConnection(any(xMsgRegAddress.class));
-        core = new xMsg(name, 1, manager);
+        core = new xMsg(name, new xMsgProxyAddress(), new xMsgRegAddress(), manager, 1);
     }
 
 

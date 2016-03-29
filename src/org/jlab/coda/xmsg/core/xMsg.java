@@ -200,32 +200,27 @@ public class xMsg implements AutoCloseable {
                 xMsgProxyAddress defaultProxy,
                 xMsgRegAddress defaultRegistrar,
                 int poolSize) {
+        this(name,
+             defaultProxy,
+             defaultRegistrar,
+             new ConnectionManager(xMsgContext.getContext()),
+             poolSize);
+    }
 
+    /**
+     * Full constructor.
+     */
+    protected xMsg(String name,
+                   xMsgProxyAddress defaultProxy,
+                   xMsgRegAddress defaultRegistrar,
+                   ConnectionManager connectionManager,
+                   int poolSize) {
         // We need to have a name for an actor
         this.myName = name;
         this.myId = xMsgUtil.encodeIdentity(defaultRegistrar.toString(), name);
 
         this.defaultProxyAddress = defaultProxy;
         this.defaultRegistrarAddress = defaultRegistrar;
-
-        // create fixed size thread pool
-        this.threadPool = xMsgUtil.newFixedThreadPool(poolSize, name);
-
-        // create the connection pool
-        this.connectionManager = new ConnectionManager(xMsgContext.getContext());
-    }
-
-    /**
-     * Constructor for testing purposes.
-     */
-    xMsg(String name, int poolSize, ConnectionManager connectionManager) {
-
-        // We need to have a name for an actor
-        this.myName = name;
-        this.myId = xMsgUtil.encodeIdentity("localhost", name);
-
-        this.defaultProxyAddress = new xMsgProxyAddress();
-        this.defaultRegistrarAddress = new xMsgRegAddress();
 
         // create fixed size thread pool
         this.threadPool = xMsgUtil.newFixedThreadPool(poolSize, name);
