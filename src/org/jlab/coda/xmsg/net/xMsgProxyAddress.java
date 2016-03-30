@@ -34,7 +34,7 @@ import java.io.IOException;
  * @author gurjyan
  * @version 2.x
  */
-public final class xMsgProxyAddress {
+public class xMsgProxyAddress {
 
     private final String host;
     private final int pubPort;
