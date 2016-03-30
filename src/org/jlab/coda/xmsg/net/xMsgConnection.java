@@ -93,7 +93,7 @@ public class xMsgConnection {
             try {
                 retry++;
                 ZMsg ctrlMsg = new ZMsg();
-                ctrlMsg.add(xMsgConstants.CTRL_TOPIC);
+                ctrlMsg.add(xMsgConstants.CTRL_TOPIC + ":con");
                 ctrlMsg.add(xMsgConstants.CTRL_CONNECT);
                 ctrlMsg.add(identity);
                 ctrlMsg.send(pubSocket);
@@ -136,7 +136,7 @@ public class xMsgConnection {
             try {
                 retry++;
                 ZMsg ctrlMsg = new ZMsg();
-                ctrlMsg.add(xMsgConstants.CTRL_TOPIC);
+                ctrlMsg.add(xMsgConstants.CTRL_TOPIC + ":sub");
                 ctrlMsg.add(xMsgConstants.CTRL_SUBSCRIBE);
                 ctrlMsg.add(topic);
                 ctrlMsg.send(pubSocket);
