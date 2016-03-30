@@ -389,8 +389,18 @@ public class xMsgProxy {
                     if (msg == null) {
                         break;
                     }
-                    LOGGER.fine("received topic = " + msg.popString());
-                    msg.destroy();
+                    ZFrame frame = msg.pop();
+                    byte[] data = frame.getData();
+                    if (data[0] == 1) {
+                        String topic = new String(data, 1, data.length - 1);
+                        LOGGER.fine("subscribed topic = " + topic);
+                    } else if (data[0] == 0) {
+                        String topic = new String(data, 1, data.length - 1);
+                        LOGGER.fine("unsubscribed topic = " + topic);
+                    } else {
+                        LOGGER.fine("received topic = " + frame.toString());
+                    }
+                    frame.destroy();
                 } catch (ZMQException e) {
                     if (e.getErrorCode() == ZMQ.Error.ETERM.getCode()) {
                         break;
