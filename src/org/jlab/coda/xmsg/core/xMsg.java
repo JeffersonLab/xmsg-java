@@ -32,7 +32,6 @@ import org.jlab.coda.xmsg.net.xMsgProxyAddress;
 import org.jlab.coda.xmsg.net.xMsgRegAddress;
 import org.jlab.coda.xmsg.xsys.regdis.xMsgRegDriver;
 import org.zeromq.ZMQException;
-import org.zeromq.ZMsg;
 
 import java.io.IOException;
 import java.util.Set;
@@ -122,6 +121,7 @@ public class xMsg implements AutoCloseable {
     // map of active subscriptions
     private final ConcurrentMap<String, xMsgSubscription> mySubscriptions;
 
+    private ResponseListener syncPubListener;
 
     /**
      * Creates an actor with default settings.
@@ -228,6 +228,10 @@ public class xMsg implements AutoCloseable {
 
         // create the connection pool
         this.connectionManager = new ConnectionManager(factory);
+
+        // create the responses listener
+        this.syncPubListener = new ResponseListener(myId, factory);
+        this.syncPubListener.start();
 
         // create the map of running subscriptions
         this.mySubscriptions = new ConcurrentHashMap<>();
@@ -395,6 +399,7 @@ public class xMsg implements AutoCloseable {
         for (xMsgSubscription sh : mySubscriptions.values()) {
             unsubscribe(sh);
         }
+        syncPubListener.stop();
         try {
             threadPool.shutdownNow();
             threadPool.awaitTermination(30, TimeUnit.SECONDS);
@@ -621,36 +626,16 @@ public class xMsg implements AutoCloseable {
         msg.getMetaData().setReplyTo(returnAddress);
 
         // subscribe to the returnAddress
-        DataSubscription sub = new DataSubscription(connection, xMsgTopic.wrap(returnAddress));
+        syncPubListener.register(connection.getAddress());
 
         try {
             // it must be the internal _publish, to keep the replyTo field
             _publish(connection, msg);
 
             // wait for the response
-            int t = 0;
-            while (t < timeout) {
-                try {
-                    if (sub.hasMsg(10)) {
-                        ZMsg rawMsg = sub.recvMsg();
-                        try {
-                            if (rawMsg.size() == 2) {
-                                continue;
-                            }
-                            return new xMsgMessage(rawMsg);
-                        } finally {
-                            rawMsg.destroy();
-                        }
-                    }
-                    t += 10;
-                } catch (ZMQException e) {
-                    e.printStackTrace();
-                }
-            }
-            throw new TimeoutException("Error: no response for time_out = " + t);
+            return syncPubListener.waitMessage(returnAddress, timeout);
         } finally {
             msg.getMetaData().setReplyTo(xMsgConstants.UNDEFINED.toString());
-            sub.stop();
         }
     }
 
