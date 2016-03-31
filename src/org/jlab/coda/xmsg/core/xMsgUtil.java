@@ -130,7 +130,7 @@ public final class xMsgUtil {
      *
      * @param millis the length of time to sleep in milliseconds
      */
-    public static void sleep(int millis) {
+    public static void sleep(long millis) {
         try {
             Thread.sleep(millis);
         } catch (InterruptedException e) {
