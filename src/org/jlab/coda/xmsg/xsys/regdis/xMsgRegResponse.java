@@ -43,7 +43,7 @@ import java.util.Set;
  * @author gurjyan
  * @since 2.x
  */
-class xMsgRegResponse {
+public class xMsgRegResponse {
 
     private final String topic;
     private final String sender;
@@ -59,7 +59,7 @@ class xMsgRegResponse {
      * @param topic the request being responded
      * @param sender the sender of the response
      */
-    xMsgRegResponse(String topic, String sender) {
+    public xMsgRegResponse(String topic, String sender) {
         this.topic = topic;
         this.sender = sender;
         this.status = xMsgConstants.SUCCESS;
@@ -77,7 +77,7 @@ class xMsgRegResponse {
      * @param sender the sender of the response
      * @param data the registration data
      */
-    xMsgRegResponse(String topic, String sender, Set<xMsgRegistration> data) {
+    public xMsgRegResponse(String topic, String sender, Set<xMsgRegistration> data) {
         this.topic = topic;
         this.sender = sender;
         this.status = xMsgConstants.SUCCESS;
@@ -95,7 +95,7 @@ class xMsgRegResponse {
      * @param sender the sender of the response
      * @param statusOrData the error description or string data.
      */
-    xMsgRegResponse(String topic, String sender, String statusOrData) {
+    public xMsgRegResponse(String topic, String sender, String statusOrData) {
         this.topic = topic;
         this.sender = sender;
         this.status = statusOrData;
@@ -112,7 +112,7 @@ class xMsgRegResponse {
      *         or when the response is an error
      *         (and the exception message is set to the error description)
      */
-    xMsgRegResponse(ZMsg msg) throws xMsgException {
+    public xMsgRegResponse(ZMsg msg) throws xMsgException {
 
         if (msg.size() < 3) {
             throw new xMsgException("xMsg-Error: registration message format violation");
