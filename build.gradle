@@ -219,6 +219,11 @@ task(remoteThr, dependsOn: 'classes', type: JavaExec) {
 }
 
 
+task printClasspath << {
+    println sourceSets.test.runtimeClasspath.asPath
+}
+
+
 
 checkstyle {
     toolVersion = "6.14"
