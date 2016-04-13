@@ -164,61 +164,6 @@ task deploy(type: Copy, overwrite: true, dependsOn: install) {
 }
 
 
-
-task(startRegistrar, dependsOn: 'classes', type: JavaExec) {
-    main = 'org.jlab.coda.xmsg.xsys.xMsgRegistrar'
-    if (project.hasProperty("regArgs")) {
-        args Eval.me(regArgs)
-    }
-    classpath = sourceSets.main.runtimeClasspath
-}
-
-task(startProxy, dependsOn: 'classes', type: JavaExec) {
-    main = 'org.jlab.coda.xmsg.xsys.xMsgProxy'
-    if (project.hasProperty("proxyArgs")) {
-        args Eval.me(proxyArgs)
-    }
-    classpath = sourceSets.main.runtimeClasspath
-}
-
-
-task(runPub, dependsOn: 'classes', type: JavaExec) {
-    main = 'org.jlab.coda.xmsg.examples.Publisher'
-    if (project.hasProperty("pubArgs")) {
-        args Eval.me(pubArgs)
-    }
-    classpath = sourceSets.main.runtimeClasspath
-}
-
-task(runSyncPub, dependsOn: 'classes', type: JavaExec) {
-    main = 'org.jlab.coda.xmsg.examples.SyncPublisher'
-    classpath = sourceSets.main.runtimeClasspath
-}
-
-task(runSub, dependsOn: 'classes', type: JavaExec) {
-    main = 'org.jlab.coda.xmsg.examples.Subscriber'
-    classpath = sourceSets.main.runtimeClasspath
-}
-
-
-
-task(localThr, dependsOn: 'classes', type: JavaExec) {
-    main = 'perf.LocalThroughput'
-    if (project.hasProperty("locThrArgs")) {
-        args Eval.me(locThrArgs)
-    }
-    classpath = sourceSets.test.runtimeClasspath
-}
-
-task(remoteThr, dependsOn: 'classes', type: JavaExec) {
-    main = 'perf.RemoteThroughput'
-    if (project.hasProperty("remThrArgs")) {
-        args Eval.me(remThrArgs)
-    }
-    classpath = sourceSets.test.runtimeClasspath
-}
-
-
 task printClasspath << {
     println sourceSets.test.runtimeClasspath.asPath
 }

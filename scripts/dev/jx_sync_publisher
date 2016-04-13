@@ -1,0 +1,4 @@
+#!/bin/sh
+
+CLASSPATH=$(gradle -q printClasspath)
+java -cp "$CLASSPATH" org.jlab.coda.xmsg.examples.SyncPublisher "$@"

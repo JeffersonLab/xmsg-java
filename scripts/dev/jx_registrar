@@ -1,9 +1,4 @@
-#!/usr/bin/env bash
+#!/bin/sh
 
-# Join arguments in a string. But not quite like you'd expect... see next line.
-printf -v var "'%s', " "$@"
-
-# Remove trailing ", "
-var=${var%??}
-
-gradle --console plain startRegistrar -PregArgs="[$var]"
+CLASSPATH=$(gradle -q printClasspath)
+java -cp "$CLASSPATH" org.jlab.coda.xmsg.xsys.xMsgRegistrar "$@"
