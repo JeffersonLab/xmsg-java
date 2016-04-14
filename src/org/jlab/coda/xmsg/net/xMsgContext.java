@@ -26,8 +26,8 @@ import org.zeromq.ZContext;
 
 
 /**
- * Singleton class that provides unique 0MQ context
- * {@link org.zeromq.ZContext} for entire JVM process.
+ * Singleton class that provides unique
+ * {@link org.zeromq.ZContext 0MQ contex} for entire JVM process.
  *
  * @author gurjyan
  * @since 2.x
@@ -46,10 +46,17 @@ public final class xMsgContext {
         return ourInstance;
     }
 
+    /**
+     * Returns the global singleton 0MQ context.
+     */
     public static ZContext getContext() {
         return getInstance().context;
     }
 
+    /**
+     * Destroys the global singleton 0MQ context.
+     * All connections and actors must be closed otherwise this will hang.
+     */
     public static void destroyContext() {
         synchronized (ourInstance) {
             ourInstance.context.destroy();
