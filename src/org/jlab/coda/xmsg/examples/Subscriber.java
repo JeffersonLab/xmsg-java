@@ -114,8 +114,7 @@ public class Subscriber extends xMsg {
 
         @Override
         public void callback(xMsgMessage msg) {
-            if (msg.getMetaData().getReplyTo().equals(xMsgConstants.UNDEFINED)) {
-
+            if (!msg.getMetaData().hasReplyTo()) {
                 // we get the data, but will not do anything with it for
                 // communication benchmarking purposes.
                 /* List<Integer> data = */ parseData(msg);
