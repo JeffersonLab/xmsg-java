@@ -54,6 +54,20 @@ public final class xMsgContext {
     }
 
     /**
+     * Set the size of the 0MQ thread pool to handle I/O operations.
+     */
+    public static void setMaxThreads(int ioThreads) {
+        ourInstance.context.getContext().setIOThreads(ioThreads);
+    }
+
+    /**
+     * Sets the maximum number of sockets allowed on the context.
+     */
+    public static void setMaxSockets(int maxSockets) {
+        ourInstance.context.getContext().setMaxSockets(maxSockets);
+    }
+
+    /**
      * Destroys the global singleton 0MQ context.
      * All connections and actors must be closed otherwise this will hang.
      */
