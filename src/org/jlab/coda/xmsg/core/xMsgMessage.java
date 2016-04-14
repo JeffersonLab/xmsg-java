@@ -25,6 +25,7 @@ package org.jlab.coda.xmsg.core;
 import com.google.protobuf.InvalidProtocolBufferException;
 import org.jlab.coda.xmsg.data.xMsgD.xMsgData;
 import org.jlab.coda.xmsg.data.xMsgM.xMsgMeta;
+import org.jlab.coda.xmsg.data.xMsgMimeType;
 import org.jlab.coda.xmsg.excp.xMsgException;
 import org.zeromq.ZFrame;
 import org.zeromq.ZMsg;
@@ -196,51 +197,51 @@ public class xMsgMessage {
         xMsgData.Builder xd = xMsgData.newBuilder();
 
         if (data instanceof Integer) {
-            mimeType = xMsgConstants.MimeType.SFIXED32;
+            mimeType = xMsgMimeType.SFIXED32;
             xd.setFLSINT32((Integer) data);
 
         } else if (data instanceof Long) {
-            mimeType = xMsgConstants.MimeType.SFIXED64;
+            mimeType = xMsgMimeType.SFIXED64;
             xd.setFLSINT64((Long) data);
 
         } else if (data instanceof Float) {
-            mimeType = xMsgConstants.MimeType.FLOAT;
+            mimeType = xMsgMimeType.FLOAT;
             xd.setFLOAT((Float) data);
 
         } else if (data instanceof Double) {
-            mimeType = xMsgConstants.MimeType.DOUBLE;
+            mimeType = xMsgMimeType.DOUBLE;
             xd.setDOUBLE((Double) data);
 
         } else if (data instanceof String) {
-            mimeType = xMsgConstants.MimeType.STRING;
+            mimeType = xMsgMimeType.STRING;
             xd.setSTRING((String) data);
 
         } else if (data instanceof Integer[]) {
-            mimeType = xMsgConstants.MimeType.ARRAY_SFIXED32;
+            mimeType = xMsgMimeType.ARRAY_SFIXED32;
             xd.addAllFLSINT32A(Arrays.asList((Integer[]) data));
 
         } else if (data instanceof Long[]) {
-            mimeType = xMsgConstants.MimeType.ARRAY_SFIXED64;
+            mimeType = xMsgMimeType.ARRAY_SFIXED64;
             xd.addAllFLSINT64A(Arrays.asList((Long[]) data));
 
         } else if (data instanceof Float[]) {
-            mimeType = xMsgConstants.MimeType.ARRAY_FLOAT;
+            mimeType = xMsgMimeType.ARRAY_FLOAT;
             xd.addAllFLOATA(Arrays.asList((Float[]) data));
 
         } else if (data instanceof Double[]) {
-            mimeType = xMsgConstants.MimeType.ARRAY_DOUBLE;
+            mimeType = xMsgMimeType.ARRAY_DOUBLE;
             xd.addAllDOUBLEA(Arrays.asList((Double[]) data));
 
         } else if (data instanceof String[]) {
-            mimeType = xMsgConstants.MimeType.ARRAY_STRING;
+            mimeType = xMsgMimeType.ARRAY_STRING;
             xd.addAllSTRINGA(Arrays.asList((String[]) data));
 
         } else if (data instanceof byte[]) {
-            mimeType = xMsgConstants.MimeType.BYTES;
+            mimeType = xMsgMimeType.BYTES;
             ba = (byte[]) data;
 
         } else {
-            mimeType = xMsgConstants.MimeType.JOBJECT;
+            mimeType = xMsgMimeType.JOBJECT;
             ba = xMsgUtil.serializeToBytes(data);
         }
 

@@ -25,12 +25,12 @@ package org.jlab.coda.xmsg.examples;
 import com.google.protobuf.InvalidProtocolBufferException;
 import org.jlab.coda.xmsg.core.xMsg;
 import org.jlab.coda.xmsg.core.xMsgCallBack;
-import org.jlab.coda.xmsg.core.xMsgConstants;
 import org.jlab.coda.xmsg.core.xMsgMessage;
 import org.jlab.coda.xmsg.core.xMsgTopic;
 import org.jlab.coda.xmsg.core.xMsgUtil;
 import org.jlab.coda.xmsg.data.xMsgD.xMsgData;
 import org.jlab.coda.xmsg.data.xMsgM;
+import org.jlab.coda.xmsg.data.xMsgMimeType;
 import org.jlab.coda.xmsg.excp.xMsgException;
 import org.jlab.coda.xmsg.net.xMsgConnection;
 
@@ -150,7 +150,7 @@ public class Subscriber extends xMsg {
         private List<Integer> parseData(xMsgMessage msg) {
             try {
                 xMsgM.xMsgMeta.Builder metadata = msg.getMetaData();
-                if (metadata.getDataType().equals(xMsgConstants.MimeType.ARRAY_SFIXED32)) {
+                if (metadata.getDataType().equals(xMsgMimeType.ARRAY_SFIXED32)) {
                     xMsgData data = xMsgData.parseFrom(msg.getData());
                     return data.getFLSINT32AList();
                 }

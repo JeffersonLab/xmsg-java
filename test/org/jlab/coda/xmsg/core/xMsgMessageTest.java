@@ -31,6 +31,7 @@ import java.util.List;
 
 import org.jlab.coda.xmsg.data.xMsgD.xMsgData;
 import org.jlab.coda.xmsg.data.xMsgM.xMsgMeta;
+import org.jlab.coda.xmsg.data.xMsgMimeType;
 import org.junit.Test;
 
 public class xMsgMessageTest {
@@ -90,7 +91,7 @@ public class xMsgMessageTest {
 
         assertThat(res.getTopic().toString(), is("return_123"));
         assertThat(xMsgData.parseFrom(res.getData()).getFLSINT32(), is(1000));
-        assertThat(res.getMetaData().getDataType(), is(xMsgConstants.MimeType.SFIXED32));
+        assertThat(res.getMetaData().getDataType(), is(xMsgMimeType.SFIXED32));
         assertFalse(res.getMetaData().hasReplyTo());
     }
 }
