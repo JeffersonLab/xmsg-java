@@ -59,7 +59,7 @@ public class Subscriber extends xMsg {
      * @throws IOException
      */
     public Subscriber() throws IOException, xMsgException {
-        super("test_subscriber");
+        super("test_subscriber", 1);
 
         // connect to default proxy (local host, default proxy port)
         con = createConnection();
