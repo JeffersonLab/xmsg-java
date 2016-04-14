@@ -54,13 +54,13 @@ import java.util.List;
 public class xMsgMessage {
 
     // topic of the message
-    private xMsgTopic topic;
+    private final xMsgTopic topic;
 
     // metadata of the message
-    private xMsgMeta.Builder metaData;
+    private final xMsgMeta.Builder metaData;
 
     // data of the message
-    private byte[] data;
+    private final byte[] data;
 
 
     /**
@@ -166,17 +166,6 @@ public class xMsgMessage {
         return data;
     }
 
-    public void setTopic(xMsgTopic topic) {
-        this.topic = topic;
-    }
-
-    public void setMetaData(xMsgMeta.Builder metaData) {
-        this.metaData = metaData;
-    }
-
-    public void setData(byte[] data) {
-        this.data = data;
-    }
 
     /**
      * Constructs a message, data of which is passed as an Object. This method will
@@ -353,6 +342,7 @@ public class xMsgMessage {
             throw new IllegalArgumentException("Message doesn't contain a valid xMsg data buffer");
         }
     }
+
 
     /**
      * Creates a response to the given message, using the same data.
