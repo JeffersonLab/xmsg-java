@@ -92,7 +92,7 @@ public class SyncPublisher extends xMsg {
                 long delta = (t2 - t1) / 1000000L;
                 System.out.printf("Received response = %s in %d ms%n", recData, delta);
                 counter++;
-                xMsgUtil.sleep(2000);
+                xMsgUtil.sleep(100);
             }
         } catch (xMsgException | TimeoutException | IOException e) {
             e.printStackTrace();
