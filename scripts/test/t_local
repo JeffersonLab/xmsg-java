@@ -1,0 +1,50 @@
+#!/usr/bin/env bash
+
+tmux="tmux"
+sn=xlocal
+
+x_dir="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)/../.."
+x_prx="./scripts/dev/jx_proxy"
+x_reg="./scripts/dev/jx_registrar"
+
+
+function run_local()
+{
+    $tmux send-keys -t "$sn:$1.$2" " $3" "C-m"
+}
+
+
+function split_window()
+{
+    for (( i=1; i<="$2"; i++ )); do
+        $tmux split-window -v -t "$sn:$1"
+        $tmux select-layout -t "$sn:$1" tiled
+    done
+}
+
+
+function local_test()
+{
+    cli_win=1
+
+    $tmux setw -q -t "$sn:$cli_win" pane-base-index 1
+    split_window $cli_win 3
+
+    run_local $cli_win 1 "$x_prx"
+    run_local $cli_win 2 "$x_reg"
+
+    $tmux select-pane -t $sn:$cli_win.4
+}
+
+
+$tmux has-session -t "$sn" 2>/dev/null
+if [[ "$?" -eq 1 ]]; then
+    echo "No session found. Creating and configuring."
+
+    cd "$x_dir" || exit
+    $tmux new-session -s "$sn" -n scia -d
+
+    local_test
+fi
+
+$tmux -2 attach-session -t "$sn"
