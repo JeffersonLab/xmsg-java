@@ -33,7 +33,6 @@ import org.jlab.coda.xmsg.net.xMsgRegAddress;
 import org.jlab.coda.xmsg.xsys.regdis.xMsgRegDriver;
 import org.zeromq.ZMQException;
 
-import java.io.IOException;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
@@ -659,7 +658,7 @@ public class xMsg implements AutoCloseable {
         if (sHandle == null) {
             sHandle = new xMsgSubscription(name, connection, topic) {
                 @Override
-                public void handle(xMsgMessage inputMsg) throws xMsgException, IOException {
+                public void handle(xMsgMessage inputMsg) throws xMsgException {
                     threadPool.submit(() -> callback.callback(inputMsg));
                 }
             };

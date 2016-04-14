@@ -28,8 +28,6 @@ import org.jlab.coda.xmsg.core.xMsgTopic;
 import org.jlab.coda.xmsg.excp.xMsgException;
 import org.jlab.coda.xmsg.net.xMsgConnection;
 
-import java.io.IOException;
-
 /**
  * An example of a publisher that publishes data for ever.
  * It does not matter who is subscribing to the messages.
@@ -50,11 +48,8 @@ public class Publisher extends xMsg {
      * Calls the parent constructor, connects to the
      * local proxy and creates a topic of conversation,
      * as well as registers with the local registrar.
-     *
-     * @throws IOException
-     *
      */
-    public Publisher() throws IOException, xMsgException {
+    public Publisher() throws xMsgException {
         super("test_publisher");
 
         // connect to default proxy (local host, default proxy port)
@@ -97,7 +92,7 @@ public class Publisher extends xMsg {
             while (true) {
                 publisher.publish(publisher.con, msg);
             }
-        } catch (xMsgException | IOException e) {
+        } catch (xMsgException e) {
             e.printStackTrace();
             System.exit(1);
         } catch (NumberFormatException e) {

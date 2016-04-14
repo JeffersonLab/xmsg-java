@@ -188,10 +188,9 @@ public class xMsgMessage {
      *
      * @param topic the topic of the message
      * @param data the data object
-     * @throws IOException
+     * @throws UncheckedIOException if data is a Java object and serialization failed
      */
-    public static xMsgMessage createFrom(xMsgTopic topic, Object data)
-            throws IOException {
+    public static xMsgMessage createFrom(xMsgTopic topic, Object data) {
 
         byte[] ba = null;
         final String mimeType;
@@ -243,7 +242,11 @@ public class xMsgMessage {
 
         } else {
             mimeType = xMsgMimeType.JOBJECT;
-            ba = xMsgUtil.serializeToBytes(data);
+            try {
+                ba = xMsgUtil.serializeToBytes(data);
+            } catch (IOException e) {
+                throw new UncheckedIOException("could not serialize object", e);
+            }
         }
 
         if (ba == null) {
@@ -358,8 +361,7 @@ public class xMsgMessage {
      * @param msg the received message to be responded
      * @return a response message with the proper topic and the same received data
      */
-    public static xMsgMessage createResponse(xMsgMessage msg)
-            throws xMsgException {
+    public static xMsgMessage createResponse(xMsgMessage msg) {
         xMsgTopic resTopic = xMsgTopic.wrap(msg.metaData.getReplyTo());
         xMsgMeta.Builder resMeta = xMsgMeta.newBuilder(msg.metaData.build());
         resMeta.clearReplyTo();
@@ -373,10 +375,8 @@ public class xMsgMessage {
      * @param msg the received message to be responded
      * @param data the data to be sent back
      * @return a response message with the proper topic and the given data
-     * @throws IOException if data could not be serialized
      */
-    public static xMsgMessage createResponse(xMsgMessage msg, Object data)
-            throws IOException {
+    public static xMsgMessage createResponse(xMsgMessage msg, Object data) {
         xMsgTopic resTopic = xMsgTopic.wrap(msg.metaData.getReplyTo());
         xMsgMessage res = createFrom(resTopic, data);
         return res;

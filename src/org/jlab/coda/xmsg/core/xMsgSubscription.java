@@ -29,8 +29,6 @@ import org.zeromq.ZMQ;
 import org.zeromq.ZMQException;
 import org.zeromq.ZMsg;
 
-import java.io.IOException;
-
 /**
  * A subscription object uses a {@link xMsgConnection connection} to receive
  * {@link xMsgMessage messages} of the interested {@link xMsgTopic topic},
@@ -77,9 +75,8 @@ public abstract class xMsgSubscription {
      * @param msg {@link org.zeromq.ZMsg} object of the wire
      * @throws xMsgException
      * @throws TimeoutException
-     * @throws IOException
      */
-    abstract void handle(xMsgMessage msg) throws xMsgException, IOException;
+    abstract void handle(xMsgMessage msg) throws xMsgException;
 
 
     /**
@@ -104,7 +101,7 @@ public abstract class xMsgSubscription {
                                 continue;
                             }
                             handle(new xMsgMessage(msg));
-                        } catch (xMsgException | IOException e) {
+                        } catch (xMsgException e) {
                             e.printStackTrace();
                         } finally {
                             msg.destroy();

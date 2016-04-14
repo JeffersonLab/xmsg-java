@@ -6,7 +6,6 @@ import org.jlab.coda.xmsg.net.xMsgConnection;
 import org.jlab.coda.xmsg.net.xMsgProxyAddress;
 import org.jlab.coda.xmsg.net.xMsgRegAddress;
 
-import java.io.IOException;
 import java.util.Set;
 import java.util.concurrent.ThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
@@ -27,7 +26,7 @@ public final class SyncPublishTest {
     /**
      * Replies back any received message.
      */
-    private void listener(int poolSize) throws IOException {
+    private void listener(int poolSize) {
         String name = xMsgUtil.localhost();
         xMsgTopic topic = xMsgTopic.build(TOPIC, name);
         try (xMsg actor = new xMsg(name, regAddress, poolSize)) {
@@ -108,7 +107,7 @@ public final class SyncPublishTest {
                                 }
                             }
                         }
-                    } catch (xMsgException | IOException e) {
+                    } catch (xMsgException e) {
                         e.printStackTrace();
                     }
                 });

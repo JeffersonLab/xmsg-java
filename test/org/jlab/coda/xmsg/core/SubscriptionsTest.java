@@ -30,7 +30,6 @@ import org.junit.Before;
 import org.junit.Test;
 import org.junit.experimental.categories.Category;
 
-import java.io.IOException;
 import java.util.concurrent.TimeoutException;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.atomic.AtomicLong;
@@ -115,7 +114,7 @@ public class SubscriptionsTest {
                     actor.publish(con, msg);
                 }
                 actor.destroyConnection(con);
-            } catch (IOException | xMsgException e) {
+            } catch (xMsgException e) {
                 e.printStackTrace();
             }
         });
@@ -171,7 +170,7 @@ public class SubscriptionsTest {
                 pubActor.destroyConnection(pubCon);
                 subActor.unsubscribe(sub);
                 subActor.destroy();
-            } catch (IOException | xMsgException | TimeoutException e) {
+            } catch (xMsgException | TimeoutException e) {
                 e.printStackTrace();
             }
         });
@@ -223,7 +222,7 @@ public class SubscriptionsTest {
                 }
                 pubActor.destroyConnection(pubCon);
                 subActor.unsubscribe(sub);
-            } catch (IOException | xMsgException e) {
+            } catch (xMsgException e) {
                 e.printStackTrace();
             }
         });

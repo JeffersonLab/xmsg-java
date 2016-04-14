@@ -34,7 +34,6 @@ import org.jlab.coda.xmsg.data.xMsgMimeType;
 import org.jlab.coda.xmsg.excp.xMsgException;
 import org.jlab.coda.xmsg.net.xMsgConnection;
 
-import java.io.IOException;
 import java.util.List;
 
 /**
@@ -55,10 +54,8 @@ public class Subscriber extends xMsg {
      * Calls the parent constructor.
      * Registers with a local registrar.
      * subscribes to a hardcoded topic.
-     *
-     * @throws IOException
      */
-    public Subscriber() throws IOException, xMsgException {
+    public Subscriber() throws xMsgException {
         super("test_subscriber", 1);
 
         // connect to default proxy (local host, default proxy port)
@@ -83,7 +80,7 @@ public class Subscriber extends xMsg {
     public static void main(String[] args) {
         try (Subscriber subscriber = new Subscriber()) {
             xMsgUtil.keepAlive();
-        } catch (xMsgException | IOException e) {
+        } catch (xMsgException e) {
             e.printStackTrace();
         }
     }
@@ -98,7 +95,7 @@ public class Subscriber extends xMsg {
     public void respondBack(xMsgMessage msg, Object data) {
         try {
             publish(con, xMsgMessage.createResponse(msg, data));
-        } catch (xMsgException | IOException e) {
+        } catch (xMsgException e) {
             e.printStackTrace();
         }
     }

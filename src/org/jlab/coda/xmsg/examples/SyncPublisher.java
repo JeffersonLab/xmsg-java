@@ -29,7 +29,6 @@ import org.jlab.coda.xmsg.core.xMsgUtil;
 import org.jlab.coda.xmsg.excp.xMsgException;
 import org.jlab.coda.xmsg.net.xMsgConnection;
 
-import java.io.IOException;
 import java.util.concurrent.TimeoutException;
 
 /**
@@ -54,10 +53,8 @@ public class SyncPublisher extends xMsg {
      * Calls the parent constructor, connects to the
      * local proxy and creates a topic of conversation,
      * as well as registers with the local registrar.
-     *
-     * @throws IOException
      */
-    public SyncPublisher() throws IOException, xMsgException {
+    public SyncPublisher() throws xMsgException {
         super("test_sync_publisher");
 
         // connect to default proxy (local host, default proxy port)
@@ -94,7 +91,7 @@ public class SyncPublisher extends xMsg {
                 counter++;
                 xMsgUtil.sleep(100);
             }
-        } catch (xMsgException | TimeoutException | IOException e) {
+        } catch (xMsgException | TimeoutException e) {
             e.printStackTrace();
         }
     }
