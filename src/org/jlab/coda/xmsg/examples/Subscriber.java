@@ -76,6 +76,7 @@ public class Subscriber extends xMsg {
 
         // Subscribe by passing a callback to the subscription
         subscribe(con, topic, new MyCallBack());
+        System.out.printf("Subscribed to = %s%n", topic);
 
     }
 
@@ -128,8 +129,9 @@ public class Subscriber extends xMsg {
                     long dt = t2 - t1;
                     double pt = (double) dt / (double) nr;
                     long pr = (nr * 1000) / dt;
-                    System.out.println("transfer time = " + pt + " ms");
-                    System.out.println("transfer rate = " + pr + " Hz");
+                    System.out.println();
+                    System.out.printf("transfer time = %.3f [ms]%n", pt);
+                    System.out.printf("transfer rate = %d [Hz]%n", pr);
                     nr = 0;
                 }
             } else {

@@ -74,7 +74,7 @@ public class Publisher extends xMsg {
 
     public static void main(String[] args) {
         if (args.length != 1) {
-            System.err.println("Usage: Publisher <data_size in KB>");
+            System.err.println("Usage: Publisher <data_size in bytes>");
             System.exit(1);
         }
 
@@ -101,7 +101,7 @@ public class Publisher extends xMsg {
             e.printStackTrace();
             System.exit(1);
         } catch (NumberFormatException e) {
-            System.err.println("Parameter must be an integer (the data size in KB)!!");
+            System.err.println("Parameter must be an integer (the data size in bytes)!!");
             System.exit(1);
         }
     }

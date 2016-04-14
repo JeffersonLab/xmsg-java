@@ -86,11 +86,11 @@ public class SyncPublisher extends xMsg {
                 long t1 = System.nanoTime();
 
                 //sync publish data. Note this will block for up to 5sec for data to arrive.
-                Object recData = publisher.syncPublish(publisher.con, msg, 5000);
+                xMsgMessage recData = publisher.syncPublish(publisher.con, msg, 5000);
 
                 long t2 = System.nanoTime();
-                long delta = (t2 - t1) / 1000000L;
-                System.out.printf("Received response = %s in %d ms%n", recData, delta);
+                double delta = (t2 - t1) / 1000000.0;
+                System.out.printf("Received response in %.3f ms%n", recData, delta);
                 counter++;
                 xMsgUtil.sleep(100);
             }
