@@ -125,23 +125,6 @@ public class xMsg implements AutoCloseable {
     /**
      * Creates an actor with default settings.
      * The local node and the standard ports will be used for both
-     * default proxy and registrar.
-     *
-     * @param name the name of this actor
-     * @param poolSize the initial size of the callback thread-pool
-     * @see xMsgProxyAddress
-     * @see xMsgRegAddress
-     */
-    public xMsg(String name, int poolSize) {
-        this(name,
-             new xMsgProxyAddress(),
-             new xMsgRegAddress(),
-             poolSize);
-    }
-
-    /**
-     * Creates an actor with default settings.
-     * The local node and the standard ports will be used for both
      * default proxy and registrar, and the callback thread-pool will use the
      * {@link org.jlab.coda.xmsg.core.xMsgConstants#DEFAULT_POOL_SIZE default pool size}.
      *
@@ -157,18 +140,19 @@ public class xMsg implements AutoCloseable {
     }
 
     /**
-     * Creates an actor specifying the default registrar to be used.
-     * The local node and the standard ports will be used for the default proxy.
+     * Creates an actor with default settings.
+     * The local node and the standard ports will be used for both
+     * default proxy and registrar.
      *
      * @param name the name of this actor
-     * @param defaultRegistrar the address to the default registrar
      * @param poolSize the initial size of the callback thread-pool
      * @see xMsgProxyAddress
+     * @see xMsgRegAddress
      */
-    public xMsg(String name, xMsgRegAddress defaultRegistrar, int poolSize) {
+    public xMsg(String name, int poolSize) {
         this(name,
              new xMsgProxyAddress(),
-             defaultRegistrar,
+             new xMsgRegAddress(),
              poolSize);
     }
 
@@ -186,6 +170,22 @@ public class xMsg implements AutoCloseable {
              new xMsgProxyAddress(),
              defaultRegistrar,
              xMsgConstants.DEFAULT_POOL_SIZE);
+    }
+
+    /**
+     * Creates an actor specifying the default registrar to be used.
+     * The local node and the standard ports will be used for the default proxy.
+     *
+     * @param name the name of this actor
+     * @param defaultRegistrar the address to the default registrar
+     * @param poolSize the initial size of the callback thread-pool
+     * @see xMsgProxyAddress
+     */
+    public xMsg(String name, xMsgRegAddress defaultRegistrar, int poolSize) {
+        this(name,
+             new xMsgProxyAddress(),
+             defaultRegistrar,
+             poolSize);
     }
 
     /**
