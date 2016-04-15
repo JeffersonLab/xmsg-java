@@ -275,41 +275,6 @@ public class xMsg implements AutoCloseable {
     }
 
     /**
-     * Returns the name of this actor.
-     */
-    public String getName() {
-        return myName;
-    }
-
-    /**
-     * Changes the size of the callback thread-pool.
-     */
-    public void setPoolSize(int poolSize) {
-        threadPool.setCorePoolSize(poolSize);
-    }
-
-    /**
-     * Returns the size of the callback thread pool.
-     */
-    public int getPoolSize() {
-        return threadPool.getMaximumPoolSize();
-    }
-
-    /**
-     * Returns the address of the default proxy used by this actor.
-     */
-    public xMsgProxyAddress getDefaultProxyAddress() {
-        return defaultProxyAddress;
-    }
-
-    /**
-     * Returns the address of the default registrar used by this actor.
-     */
-    public xMsgRegAddress getDefaultRegistrarAddress() {
-        return defaultRegistrarAddress;
-    }
-
-    /**
      * Overwrites the default setup for all created connection.
      * This setup will be applied every time a new connection is created.
      *
@@ -680,6 +645,41 @@ public class xMsg implements AutoCloseable {
     public void unsubscribe(xMsgSubscription handle) {
         handle.stop();
         mySubscriptions.remove(handle.getName());
+    }
+
+    /**
+     * Returns the name of this actor.
+     */
+    public String getName() {
+        return myName;
+    }
+
+    /**
+     * Returns the address of the default proxy used by this actor.
+     */
+    public xMsgProxyAddress getDefaultProxyAddress() {
+        return defaultProxyAddress;
+    }
+
+    /**
+     * Returns the address of the default registrar used by this actor.
+     */
+    public xMsgRegAddress getDefaultRegistrarAddress() {
+        return defaultRegistrarAddress;
+    }
+
+    /**
+     * Changes the size of the callback thread-pool.
+     */
+    public void setPoolSize(int poolSize) {
+        threadPool.setCorePoolSize(poolSize);
+    }
+
+    /**
+     * Returns the size of the callback thread pool.
+     */
+    public int getPoolSize() {
+        return threadPool.getMaximumPoolSize();
     }
 
     // ..............................................................//
