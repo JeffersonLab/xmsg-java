@@ -153,6 +153,13 @@ public class xMsgMessage {
     }
 
     /**
+     * Returns the mime-type of the message data.
+     */
+    public String getMimeType() {
+        return metaData.getDataType();
+    }
+
+    /**
      * Returns the size of the message data (i.e. serialized byte[] ).
      */
     public int getDataSize() {
