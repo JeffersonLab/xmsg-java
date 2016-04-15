@@ -160,6 +160,22 @@ public class xMsgMessage {
     }
 
     /**
+     * Checks if the message has a reply topic.
+     * If true, the message is part of a sync-publish request and a response is
+     * expected to be published to the reply topic.
+     */
+    public boolean hasReplyTopic() {
+        return metaData.hasReplyTo();
+    }
+
+    /**
+     * Returns the topic this message should be replied to.
+     */
+    public xMsgTopic getReplyTopic() {
+        return xMsgTopic.wrap(metaData.getReplyTo());
+    }
+
+    /**
      * Returns the size of the message data (i.e. serialized byte[] ).
      */
     public int getDataSize() {
