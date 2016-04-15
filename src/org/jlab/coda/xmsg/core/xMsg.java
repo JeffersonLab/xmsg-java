@@ -237,6 +237,44 @@ public class xMsg implements AutoCloseable {
     }
 
     /**
+     * Unsubscribes all previous subscriptions,
+     * shuts down thread pool and closes all connections.
+     */
+    public void destroy() {
+        final int infiniteLinger = -1;
+        destroy(infiniteLinger);
+    }
+
+    /**
+     * Unsubscribes all previous subscriptions,
+     * shuts down thread pool and closes all connections.
+     *
+     * @param linger linger period for closing the 0MQ context
+     */
+    public void destroy(int linger) {
+        for (xMsgSubscription sh : mySubscriptions.values()) {
+            unsubscribe(sh);
+        }
+        syncPubListener.stop();
+        try {
+            threadPool.shutdownNow();
+            threadPool.awaitTermination(30, TimeUnit.SECONDS);
+        } catch (InterruptedException e) {
+            System.err.println("Interrupted when shutting down subscription thread-pool.");
+        }
+        connectionManager.destroy(linger);
+    }
+
+    /**
+     * Unsubscribes all previous subscriptions,
+     * shuts down thread pool and closes all connections.
+     */
+    @Override
+    public void close() {
+        destroy();
+    }
+
+    /**
      * Returns the name of this actor.
      */
     public String getName() {
@@ -368,44 +406,6 @@ public class xMsg implements AutoCloseable {
      */
     public void destroyConnection(xMsgConnection connection) {
         connection.close();
-    }
-
-    /**
-     * Unsubscribes all previous subscriptions,
-     * shuts down thread pool and closes all connections.
-     */
-    @Override
-    public void close() {
-        destroy();
-    }
-
-    /**
-     * Unsubscribes all previous subscriptions,
-     * shuts down thread pool and closes all connections.
-     */
-    public void destroy() {
-        final int infiniteLinger = -1;
-        destroy(infiniteLinger);
-    }
-
-    /**
-     * Unsubscribes all previous subscriptions,
-     * shuts down thread pool and closes all connections.
-     *
-     * @param linger linger period for closing the 0MQ context
-     */
-    public void destroy(int linger) {
-        for (xMsgSubscription sh : mySubscriptions.values()) {
-            unsubscribe(sh);
-        }
-        syncPubListener.stop();
-        try {
-            threadPool.shutdownNow();
-            threadPool.awaitTermination(30, TimeUnit.SECONDS);
-        } catch (InterruptedException e) {
-            System.err.println("Interrupted when shutting down subscription thread-pool.");
-        }
-        connectionManager.destroy(linger);
     }
 
     /**
