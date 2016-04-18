@@ -64,6 +64,11 @@ public class xMsgRegDriver {
         this.socket = factory.createSocket(ZMQ.REQ);
     }
 
+    /**
+     * Connects to the registrar server.
+     *
+     * @throws xMsgException if the connection failed
+     */
     public void connect() throws xMsgException {
         factory.connectSocket(socket, address.host(), address.port());
     }
@@ -148,10 +153,9 @@ public class xMsgRegDriver {
      * This will remove all publishers and subscribers running
      * on the given host from the registrar service connected
      * by this driver.
-     * <p>
-     * This method is usually called by the xMsgNode registrar when
-     * it shuts down or gets interrupted.
      *
+     * @param sender the sender of the request
+     * @param host the host of the actors to be removed
      * @throws xMsgException
      */
     public void removeAllRegistration(String sender, String host)
@@ -167,7 +171,7 @@ public class xMsgRegDriver {
      * Sends a request to search the database for publishers or subscribers
      * to a specific topic to the registrar server and waits the response.
      * The topic of interest is defined within the given registration data.
-     * <v>
+     *
      * @param data the registration data object
      * @param isPublisher if true then this is a request to find publishers,
      *                     otherwise this is a request to find subscribers
@@ -185,6 +189,9 @@ public class xMsgRegDriver {
         return response.data();
     }
 
+    /**
+     * Closes the connection to the registrar.
+     */
     public void close() {
         factory.closeQuietly(socket);
     }
