@@ -196,8 +196,4 @@ public class xMsgRegDriver {
     public xMsgRegAddress getAddress() {
         return address;
     }
-
-    public Socket getSocket() {
-        return socket;
-    }
 }
