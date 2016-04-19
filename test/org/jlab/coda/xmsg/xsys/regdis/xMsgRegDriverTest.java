@@ -48,6 +48,7 @@ import static org.mockito.Mockito.verify;
 public class xMsgRegDriverTest {
 
     private xMsgRegDriver driver;
+    private String sender = "testSender";
 
     private final String topic = "writer:scifi:books";
 
@@ -66,12 +67,11 @@ public class xMsgRegDriverTest {
         Builder publisher = newRegistration("bradbury_pub", topic, true);
         publisher.setDescription("bradbury books");
 
-        driver.addRegistration(publisher.build());
+        driver.addRegistration(sender, publisher.build());
 
-        assertRequest("bradbury_pub",
-                publisher.build(),
-                xMsgConstants.REGISTER_PUBLISHER,
-                xMsgConstants.REGISTER_REQUEST_TIMEOUT);
+        assertRequest(publisher.build(),
+                      xMsgConstants.REGISTER_PUBLISHER,
+                      xMsgConstants.REGISTER_REQUEST_TIMEOUT);
     }
 
 
@@ -80,12 +80,11 @@ public class xMsgRegDriverTest {
         Builder subscriber = newRegistration("bradbury_sub", topic, false);
         subscriber.setDescription("bradbury books");
 
-        driver.addRegistration(subscriber.build());
+        driver.addRegistration(sender, subscriber.build());
 
-        assertRequest("bradbury_sub",
-                subscriber.build(),
-                xMsgConstants.REGISTER_SUBSCRIBER,
-                xMsgConstants.REGISTER_REQUEST_TIMEOUT);
+        assertRequest(subscriber.build(),
+                      xMsgConstants.REGISTER_SUBSCRIBER,
+                      xMsgConstants.REGISTER_REQUEST_TIMEOUT);
     }
 
 
@@ -93,12 +92,11 @@ public class xMsgRegDriverTest {
     public void sendPublisherRemoval() throws Exception {
         Builder publisher = newRegistration("bradbury_pub", topic, true);
 
-        driver.removeRegistration(publisher.build());
+        driver.removeRegistration(sender, publisher.build());
 
-        assertRequest("bradbury_pub",
-                publisher.build(),
-                xMsgConstants.REMOVE_PUBLISHER,
-                xMsgConstants.REMOVE_REQUEST_TIMEOUT);
+        assertRequest(publisher.build(),
+                      xMsgConstants.REMOVE_PUBLISHER,
+                      xMsgConstants.REMOVE_REQUEST_TIMEOUT);
     }
 
 
@@ -106,55 +104,51 @@ public class xMsgRegDriverTest {
     public void sendSubscriberRemoval() throws Exception {
         Builder subscriber = newRegistration("bradbury_sub", topic, false);
 
-        driver.removeRegistration(subscriber.build());
+        driver.removeRegistration(sender, subscriber.build());
 
-        assertRequest("bradbury_sub",
-                subscriber.build(),
-                xMsgConstants.REMOVE_SUBSCRIBER,
-                xMsgConstants.REMOVE_REQUEST_TIMEOUT);
+        assertRequest(subscriber.build(),
+                      xMsgConstants.REMOVE_SUBSCRIBER,
+                      xMsgConstants.REMOVE_REQUEST_TIMEOUT);
     }
 
 
     @Test
     public void sendHostRemoval() throws Exception {
-        driver.removeAllRegistration("10.2.9.1_node", "10.2.9.1");
+        driver.removeAllRegistration(sender, "10.2.9.1");
 
-        assertRequest("10.2.9.1_node",
-                "10.2.9.1",
-                xMsgConstants.REMOVE_ALL_REGISTRATION,
-                xMsgConstants.REMOVE_REQUEST_TIMEOUT);
+        assertRequest("10.2.9.1",
+                      xMsgConstants.REMOVE_ALL_REGISTRATION,
+                      xMsgConstants.REMOVE_REQUEST_TIMEOUT);
     }
 
 
     @Test
     public void sendPublisherFind() throws Exception {
-        Builder data = newRegistration("10.2.9.1_node", topic, true);
+        Builder data = newRegistration("", topic, true);
 
-        driver.findRegistration(data.build());
+        driver.findRegistration(sender, data.build());
 
-        assertRequest("10.2.9.1_node",
-                data.build(),
-                xMsgConstants.FIND_PUBLISHER,
-                xMsgConstants.FIND_REQUEST_TIMEOUT);
+        assertRequest(data.build(),
+                      xMsgConstants.FIND_PUBLISHER,
+                      xMsgConstants.FIND_REQUEST_TIMEOUT);
     }
 
 
     @Test
     public void sendSubscriberFind() throws Exception {
-        Builder data = newRegistration("10.2.9.1_node", topic, false);
+        Builder data = newRegistration("", topic, false);
 
-        driver.findRegistration(data.build());
+        driver.findRegistration(sender, data.build());
 
-        assertRequest("10.2.9.1_node",
-                data.build(),
-                xMsgConstants.FIND_SUBSCRIBER,
-                xMsgConstants.FIND_REQUEST_TIMEOUT);
+        assertRequest(data.build(),
+                      xMsgConstants.FIND_SUBSCRIBER,
+                      xMsgConstants.FIND_REQUEST_TIMEOUT);
     }
 
 
     @Test
     public void getRegistration() throws Exception {
-        Builder data = newRegistration("10.2.9.1_node", topic, true);
+        Builder data = newRegistration("", topic, true);
 
         Builder pub1 = newRegistration("bradbury1", topic, true);
         Builder pub2 = newRegistration("bradbury2", topic, true);
@@ -162,23 +156,23 @@ public class xMsgRegDriverTest {
 
         setResponse(new xMsgRegResponse("", "", regData));
 
-        Set<xMsgRegistration> regRes = driver.findRegistration(data.build());
+        Set<xMsgRegistration> regRes = driver.findRegistration(sender, data.build());
 
         assertThat(regRes, is(regData));
     }
 
 
 
-    private void assertRequest(String name, xMsgRegistration data, String topic, int timeout)
+    private void assertRequest(xMsgRegistration data, String topic, int timeout)
             throws Exception {
-        xMsgRegRequest request = new xMsgRegRequest(topic, name, data);
+        xMsgRegRequest request = new xMsgRegRequest(topic, sender, data);
         verify(driver).request(request, timeout);
     }
 
 
-    private void assertRequest(String name, String data, String topic, int timeout)
+    private void assertRequest(String data, String topic, int timeout)
             throws Exception {
-        xMsgRegRequest request = new xMsgRegRequest(topic, name, data);
+        xMsgRegRequest request = new xMsgRegRequest(topic, sender, data);
         verify(driver).request(request, timeout);
     }
 

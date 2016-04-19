@@ -104,7 +104,7 @@ public class xMsgRegistrarTest {
         for (int i = 0; i < size; i++) {
             Builder rndReg = RegistrationDataFactory.randomRegistration();
             xMsgRegistration data = rndReg.build();
-            driver.addRegistration(data);
+            driver.addRegistration(name, data);
             registration.add(data);
         }
     }
@@ -124,7 +124,7 @@ public class xMsgRegistrarTest {
             xMsgRegistration reg = it.next();
             if (i >= first) {
                 it.remove();
-                driver.removeRegistration(reg);
+                driver.removeRegistration(name, reg);
             }
             i++;
         }
@@ -168,7 +168,7 @@ public class xMsgRegistrarTest {
         for (String topic : RegistrationDataFactory.testTopics) {
             Builder data = discoveryRequest(topic, isPublisher);
 
-            Set<xMsgRegistration> result = driver.findRegistration(data.build());
+            Set<xMsgRegistration> result = driver.findRegistration(name, data.build());
             Set<xMsgRegistration> expected = find(topic, isPublisher);
 
             if (result.equals(expected)) {

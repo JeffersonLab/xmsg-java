@@ -116,34 +116,36 @@ public class xMsgRegDriver {
     /**
      * Sends a registration request to the registrar service.
      *
+     * @param sender the sender of the request
      * @param data the registration data
      * @throws xMsgException
      */
-    public void addRegistration(xMsgRegistration data)
+    public void addRegistration(String sender, xMsgRegistration data)
             throws xMsgException {
         String topic = selectTopic(data.getOwnerType(),
                                    xMsgConstants.REGISTER_PUBLISHER,
                                    xMsgConstants.REGISTER_SUBSCRIBER);
         int timeout = xMsgConstants.REGISTER_REQUEST_TIMEOUT;
 
-        xMsgRegRequest request = new xMsgRegRequest(topic, data.getName(), data);
+        xMsgRegRequest request = new xMsgRegRequest(topic, sender, data);
         request(request, timeout);
     }
 
     /**
      * Sends a remove registration request to the registrar service.
      *
+     * @param sender the sender of the request
      * @param data the registration data
      * @throws xMsgException
      */
-    public void removeRegistration(xMsgRegistration data)
+    public void removeRegistration(String sender, xMsgRegistration data)
             throws xMsgException {
         String topic = selectTopic(data.getOwnerType(),
                                    xMsgConstants.REMOVE_PUBLISHER,
                                    xMsgConstants.REMOVE_SUBSCRIBER);
         int timeout = xMsgConstants.REMOVE_REQUEST_TIMEOUT;
 
-        xMsgRegRequest request = new xMsgRegRequest(topic, data.getName(), data);
+        xMsgRegRequest request = new xMsgRegRequest(topic, sender, data);
         request(request, timeout);
     }
 
@@ -171,18 +173,19 @@ public class xMsgRegDriver {
      * to a specific topic to the registrar server and waits the response.
      * The topic of interest is defined within the given registration data.
      *
+     * @param sender the sender of the request
      * @param data the registration data object
      * @return set of publishers or subscribers to the required topic.
      * @throws xMsgException
      */
-    public Set<xMsgRegistration> findRegistration(xMsgRegistration data)
+    public Set<xMsgRegistration> findRegistration(String sender, xMsgRegistration data)
             throws xMsgException {
         String topic = selectTopic(data.getOwnerType(),
                                    xMsgConstants.FIND_PUBLISHER,
                                    xMsgConstants.FIND_SUBSCRIBER);
         int timeout = xMsgConstants.FIND_REQUEST_TIMEOUT;
 
-        xMsgRegRequest request = new xMsgRegRequest(topic, data.getName(), data);
+        xMsgRegRequest request = new xMsgRegRequest(topic, sender, data);
         xMsgRegResponse response = request(request, timeout);
         return response.data();
     }
