@@ -28,6 +28,8 @@ import org.jlab.coda.xmsg.net.xMsgProxyAddress;
 import org.jlab.coda.xmsg.net.xMsgRegAddress;
 import org.jlab.coda.xmsg.xsys.regdis.RegistrationDataFactory;
 import org.jlab.coda.xmsg.xsys.regdis.xMsgRegDriver;
+import org.jlab.coda.xmsg.xsys.regdis.xMsgRegInfo;
+import org.jlab.coda.xmsg.xsys.regdis.xMsgRegQuery;
 import org.junit.Before;
 import org.junit.Test;
 
@@ -44,13 +46,14 @@ public class xMsgTest {
 
     private final String name = "asimov";
     private final xMsgTopic topic = xMsgTopic.wrap("writer:scifi:book");
+    private final xMsgRegAddress regAddr = new xMsgRegAddress();
 
     @Before
     public void setup() throws Exception {
         xMsgConnectionFactory factory = mock(xMsgConnectionFactory.class);
 
         driver = mock(xMsgRegDriver.class);
-        core = new xMsg(name, new xMsgProxyAddress(), new xMsgRegAddress(), factory, 1);
+        core = new xMsg(name, new xMsgProxyAddress(), regAddr, factory, 1);
 
         doReturn(new xMsgRegAddress()).when(driver).getAddress();
         doReturn(driver).when(factory).createRegistrarConnection(any(xMsgRegAddress.class));
@@ -59,67 +62,73 @@ public class xMsgTest {
 
     @Test
     public void registerPublisher() throws Exception {
-        core.registerAsPublisher(topic, "test pub");
+        core.register(xMsgRegInfo.publisher(topic, "test pub"), regAddr, 1000);
 
         xMsgRegistration.Builder expected = createRegistration(topic, true);
         expected.setDescription("test pub");
 
-        verify(driver).addRegistration(eq(name), eq(expected.build()));
+        verify(driver).addRegistration(eq(name), eq(expected.build()), eq(1000));
     }
 
 
     @Test
     public void registerSubscriber() throws Exception {
-        core.registerAsSubscriber(topic, "test sub");
+        core.register(xMsgRegInfo.subscriber(topic, "test sub"), regAddr, 1000);
 
         xMsgRegistration.Builder expected = createRegistration(topic, false);
         expected.setDescription("test sub");
 
-        verify(driver).addRegistration(eq(name), eq(expected.build()));
+        verify(driver).addRegistration(eq(name), eq(expected.build()), eq(1000));
     }
 
 
     @Test
     public void removePublisher() throws Exception {
-        core.deregisterAsPublisher(topic);
+        core.deregister(xMsgRegInfo.publisher(topic), regAddr, 1500);
 
         xMsgRegistration.Builder expected = createRegistration(topic, true);
 
-        verify(driver).removeRegistration(eq(name), eq(expected.build()));
+        verify(driver).removeRegistration(eq(name), eq(expected.build()), eq(1500));
     }
 
 
     @Test
     public void removeSubscriber() throws Exception {
-        core.deregisterAsSubscriber(topic);
+        core.deregister(xMsgRegInfo.subscriber(topic), regAddr, 1500);
 
         xMsgRegistration.Builder expected = createRegistration(topic, false);
 
-        verify(driver).removeRegistration(eq(name), eq(expected.build()));
+        verify(driver).removeRegistration(eq(name), eq(expected.build()), eq(1500));
     }
 
 
     @Test
     public void findPublishers() throws Exception {
-        core.findPublishers(topic);
+        core.discover(xMsgRegQuery.publishers(topic), regAddr, 2000);
 
-        xMsgRegistration.Builder expected = createRegistration(topic, true);
+        xMsgRegistration.Builder expected = createQuery(topic, true);
 
-        verify(driver).findRegistration(eq(name), eq(expected.build()));
+        verify(driver).findRegistration(eq(name), eq(expected.build()), eq(2000));
     }
 
 
     @Test
     public void findSubscribers() throws Exception {
-        core.findSubscribers(topic);
+        core.discover(xMsgRegQuery.subscribers(topic), regAddr, 2000);
 
-        xMsgRegistration.Builder expected = createRegistration(topic, false);
+        xMsgRegistration.Builder expected = createQuery(topic, false);
 
-        verify(driver).findRegistration(eq(name), eq(expected.build()));
+        verify(driver).findRegistration(eq(name), eq(expected.build()), eq(2000));
     }
 
 
     private xMsgRegistration.Builder createRegistration(xMsgTopic topic, boolean isPublisher) {
         return RegistrationDataFactory.newRegistration(name, topic.toString(), isPublisher);
+    }
+
+
+    private xMsgRegistration.Builder createQuery(xMsgTopic topic, boolean isPublisher) {
+        String udf = xMsgConstants.UNDEFINED;
+        return RegistrationDataFactory.newRegistration(udf, udf, topic.toString(), isPublisher);
     }
 }

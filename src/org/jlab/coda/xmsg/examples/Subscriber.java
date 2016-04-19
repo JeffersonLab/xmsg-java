@@ -33,6 +33,7 @@ import org.jlab.coda.xmsg.data.xMsgM;
 import org.jlab.coda.xmsg.data.xMsgMimeType;
 import org.jlab.coda.xmsg.excp.xMsgException;
 import org.jlab.coda.xmsg.net.xMsgConnection;
+import org.jlab.coda.xmsg.xsys.regdis.xMsgRegInfo;
 
 import java.util.List;
 
@@ -69,7 +70,7 @@ public class Subscriber extends xMsg {
         topic = xMsgTopic.build(domain, subject, type);
 
         // Register this subscriber
-        registerAsSubscriber(topic, description);
+        register(xMsgRegInfo.subscriber(topic, description));
 
         // Subscribe by passing a callback to the subscription
         subscribe(con, topic, new MyCallBack());

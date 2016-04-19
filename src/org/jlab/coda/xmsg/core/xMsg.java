@@ -31,6 +31,9 @@ import org.jlab.coda.xmsg.net.xMsgContext;
 import org.jlab.coda.xmsg.net.xMsgProxyAddress;
 import org.jlab.coda.xmsg.net.xMsgRegAddress;
 import org.jlab.coda.xmsg.xsys.regdis.xMsgRegDriver;
+import org.jlab.coda.xmsg.xsys.regdis.xMsgRegInfo;
+import org.jlab.coda.xmsg.xsys.regdis.xMsgRegQuery;
+import org.jlab.coda.xmsg.xsys.regdis.xMsgRegRecord;
 import org.zeromq.ZMQException;
 
 import java.util.Set;
@@ -39,6 +42,7 @@ import java.util.concurrent.ConcurrentMap;
 import java.util.concurrent.ThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
+import java.util.stream.Collectors;
 
 /**
  * The main xMsg pub/sub actor.
@@ -374,181 +378,6 @@ public class xMsg implements AutoCloseable {
     }
 
     /**
-     * Registers this actor as a publisher of the specified topic,
-     * on the given registrar service.
-     *
-     * The actor will be registered as publishing through the default proxy.
-     *
-     * @param address the address of the registrar service
-     * @param topic the topic to which messages will be published
-     * @param description general description of the published messages
-     * @throws xMsgException if the registration failed
-     */
-    public void registerAsPublisher(xMsgRegAddress address,
-                                    xMsgTopic topic,
-                                    String description)
-            throws xMsgException {
-        _register(address, topic, description, true);
-    }
-
-    /**
-     * Registers this actor as a publisher of the specified topic,
-     * on the default registrar service.
-     *
-     * The actor will be registered as publishing through the default proxy.
-     *
-     * @param topic the topic to which messages will be published
-     * @param description general description of the published messages
-     * @throws xMsgException if the registration failed
-     */
-    public void registerAsPublisher(xMsgTopic topic,
-                                    String description)
-            throws xMsgException {
-        _register(defaultRegistrarAddress, topic, description, true);
-    }
-
-    /**
-     * Registers this actor as a subscriber of the specified topic,
-     * on the given registrar service.
-     *
-     * The actor will be registered as subscribed through the default proxy.
-     *
-     * @param address the address of the registrar service
-     * @param topic the topic of the subscription
-     * @param description general description of the subscription
-     * @throws xMsgException if the registration failed
-     */
-    public void registerAsSubscriber(xMsgRegAddress address,
-                                     xMsgTopic topic,
-                                     String description)
-            throws xMsgException {
-        _register(address, topic, description, false);
-    }
-
-    /**
-     * Registers this actor as a subscriber of the specified topic,
-     * on the default registrar service.
-     *
-     * The actor will be registered as subscribed through the default proxy.
-     *
-     * @param topic the topic of the subscription
-     * @param description general description of the subscription
-     * @throws xMsgException if the registration failed
-     */
-    public void registerAsSubscriber(xMsgTopic topic,
-                                     String description)
-            throws xMsgException {
-        _register(defaultRegistrarAddress, topic, description, false);
-    }
-
-    /**
-     * Removes this actor as a publisher of the specified topic,
-     * from the given registrar service.
-     *
-     * @param address the address of the registrar service
-     * @param topic the topic to which messages are published
-     * @throws xMsgException if the request failed
-     */
-    public void deregisterAsPublisher(xMsgRegAddress address,
-                                      xMsgTopic topic)
-            throws xMsgException {
-        _removeRegistration(address, topic, true);
-    }
-
-    /**
-     * Removes this actor as a publisher of the specified topic,
-     * from the default registrar service.
-     *
-     * @param topic the topic to which messages are published
-     * @throws xMsgException if the request failed
-     */
-    public void deregisterAsPublisher(xMsgTopic topic)
-            throws xMsgException {
-        _removeRegistration(defaultRegistrarAddress, topic, true);
-    }
-
-    /**
-     * Removes this actor as a subscriber of the specified topic,
-     * from the given registrar service.
-     *
-     * @param address the address of the registrar service
-     * @param topic the topic of the subscription
-     * @throws xMsgException if the request failed
-     */
-    public void deregisterAsSubscriber(xMsgRegAddress address,
-                                       xMsgTopic topic)
-            throws xMsgException {
-        _removeRegistration(address, topic, false);
-    }
-
-    /**
-     * Removes this actor as a subscriber from the given registrar.
-     * The default registrar is defined at the constructor.
-     *
-     * @param topic the subscription topic
-     * @throws xMsgException if the request failed
-     */
-    public void deregisterAsSubscriber(xMsgTopic topic)
-            throws xMsgException {
-        _removeRegistration(defaultRegistrarAddress, topic, false);
-    }
-
-
-    /**
-     * Finds all publishers of the specified topic
-     * that are registered on the given registrar service.
-     *
-     * @param address the address to the registrar service
-     * @param topic the topic of interest
-     * @return a set with the registration data of the matching publishers
-     * @throws xMsgException if the request failed
-     */
-    public Set<xMsgRegistration> findPublishers(xMsgRegAddress address, xMsgTopic topic)
-            throws xMsgException {
-        return _findRegistration(address, topic, true);
-    }
-
-    /**
-     * Finds all publishers of the specified topic
-     * that are registered on the default registrar service.
-     *
-     * @param topic the topic of interest
-     * @return a set with the registration data of the matching publishers
-     * @throws xMsgException if the request failed
-     */
-    public Set<xMsgRegistration> findPublishers(xMsgTopic topic)
-            throws xMsgException {
-        return _findRegistration(defaultRegistrarAddress, topic, true);
-    }
-
-    /**
-     * Finds all subscribers to the specified topic
-     * that are registered on the given registrar service.
-     *
-     * @param address the address to the registrar service
-     * @param topic the topic of interest
-     * @return a set with the registration data of the matching subscribers
-     * @throws xMsgException if the request failed
-     */
-    public Set<xMsgRegistration> findSubscribers(xMsgRegAddress address, xMsgTopic topic)
-            throws xMsgException {
-        return _findRegistration(address, topic, false);
-    }
-
-    /**
-     * Finds all subscribers to the specified topic
-     * that are registered on the default registrar service.
-     *
-     * @param topic the topic of interest
-     * @return a set with the registration data of the matching subscribers
-     * @throws xMsgException if the request failed
-     */
-    public Set<xMsgRegistration> findSubscribers(xMsgTopic topic)
-            throws xMsgException {
-        return _findRegistration(defaultRegistrarAddress, topic, false);
-    }
-
-    /**
      * Publishes a message through the specified proxy connection.
      *
      * @param connection the connection to the proxy
@@ -648,6 +477,184 @@ public class xMsg implements AutoCloseable {
     }
 
     /**
+     * Registers this actor on the <i>default</i> registrar service.
+     * The actor will be registered as communicating through messages
+     * of the given topic, using the default proxy.
+     * Waits up to {@value org.jlab.coda.xmsg.core.xMsgConstants#REGISTER_REQUEST_TIMEOUT}
+     * milliseconds for a status response.
+     *
+     * @param info the parameters of the registration
+     *             (publisher or subscriber, topic of interest, description)
+     * @throws xMsgException if the registration failed
+     */
+    public void register(xMsgRegInfo info) throws xMsgException {
+        register(info, defaultRegistrarAddress);
+    }
+
+    /**
+     * Registers this actor on the specified registrar service.
+     * The actor will be registered as communicating through messages
+     * of the given topic, using the default proxy.
+     * Waits up to {@value org.jlab.coda.xmsg.core.xMsgConstants#REGISTER_REQUEST_TIMEOUT}
+     * milliseconds for a status response.
+     *
+     * @param info the parameters of the registration
+     *             (publisher or subscriber, topic of interest, description)
+     * @param address the address of the registrar service
+     * @throws xMsgException if the registration failed
+     */
+    public void register(xMsgRegInfo info, xMsgRegAddress address) throws xMsgException {
+        register(info, address, xMsgConstants.REGISTER_REQUEST_TIMEOUT);
+    }
+
+    /**
+     * Registers this actor on the specified registrar service.
+     * The actor will be registered as communicating through messages
+     * of the given topic, using the default proxy.
+     * Waits up to {@code timeout} milliseconds for a status response.
+     *
+     * @param info the parameters of the registration
+     *             (publisher or subscriber, topic of interest, description)
+     * @param address the address of the registrar service
+     * @param timeout milliseconds to wait for a response
+     * @throws xMsgException if the registration failed
+     */
+    public void register(xMsgRegInfo info, xMsgRegAddress address, int timeout)
+            throws xMsgException {
+        xMsgRegDriver regDriver = connectionManager.getRegistrarConnection(address);
+        try {
+            xMsgRegistration.Builder reg = _createRegistration(info);
+            reg.setDescription(info.description());
+            regDriver.addRegistration(myName, reg.build(), timeout);
+            connectionManager.releaseRegistrarConnection(regDriver);
+        } catch (ZMQException | xMsgException e) {
+            regDriver.close();
+            throw e;
+        }
+    }
+
+    /**
+     * Removes this actor from the <i>default</i> registrar service.
+     * The actor will be removed from the registered actors communicating
+     * through messages of the given topic.
+     * Waits up to {@value org.jlab.coda.xmsg.core.xMsgConstants#REMOVE_REQUEST_TIMEOUT}
+     * milliseconds for a status response.
+     *
+     * @param info the parameters used to register the actor
+     *             (publisher or subscriber, the topic of interest)
+     * @throws xMsgException if the request failed
+     */
+    public void deregister(xMsgRegInfo info) throws xMsgException {
+        deregister(info, defaultRegistrarAddress);
+    }
+
+    /**
+     * Removes this actor from the specified registrar service.
+     * The actor will be removed from the registered actors communicating
+     * through messages of the given topic.
+     * Waits up to {@value org.jlab.coda.xmsg.core.xMsgConstants#REMOVE_REQUEST_TIMEOUT}
+     * milliseconds for a status response.
+     *
+     * @param info the parameters used to register the actor
+     *             (publisher or subscriber, the topic of interest)
+     * @param address the address of the registrar service
+     * @throws xMsgException if the request failed
+     */
+    public void deregister(xMsgRegInfo info, xMsgRegAddress address) throws xMsgException {
+        deregister(info, address, xMsgConstants.REMOVE_REQUEST_TIMEOUT);
+    }
+
+    /**
+     * Removes this actor from the specified registrar service.
+     * The actor will be removed from the registered actors communicating
+     * through messages of the given topic.
+     * Waits up to {@code timeout} milliseconds for a status response.
+     *
+     * @param info the parameters used to register the actor
+     *             (publisher or subscriber, the topic of interest)
+     * @param address the address of the registrar service
+     * @param timeout milliseconds to wait for a response
+     * @throws xMsgException if the request failed
+     */
+    public void deregister(xMsgRegInfo info, xMsgRegAddress address, int timeout)
+            throws xMsgException {
+        xMsgRegDriver regDriver = connectionManager.getRegistrarConnection(address);
+        try {
+            xMsgRegistration.Builder reg = _createRegistration(info);
+            regDriver.removeRegistration(myName, reg.build(), timeout);
+            connectionManager.releaseRegistrarConnection(regDriver);
+        } catch (ZMQException | xMsgException e) {
+            regDriver.close();
+            throw e;
+        }
+    }
+
+    /**
+     * Searches the <i>default</i> registrar service for actors that match the given query.
+     * A registered actor will be selected only if it matches all the parameters
+     * of interest defined by the query. The registrar service will then reply
+     * the registration data of all the matching actors.
+     * Waits up to {@value org.jlab.coda.xmsg.core.xMsgConstants#FIND_REQUEST_TIMEOUT}
+     * milliseconds for a response.
+     *
+     * @param query the registration parameters to determine if an actor
+     *              should be selected (publisher or subscriber, topic of interest)
+     * @return a set with the registration data of the matching actors, if any
+     * @throws xMsgException if the request failed
+     */
+    public Set<xMsgRegRecord> discover(xMsgRegQuery query) throws xMsgException {
+        return discover(query, defaultRegistrarAddress);
+    }
+
+    /**
+     * Searches the specified registrar service for actors that match the given query.
+     * A registered actor will be selected only if it matches all the parameters
+     * of interest defined by the query. The registrar service will then reply
+     * the registration data of all the matching actors.
+     * Waits up to {@value org.jlab.coda.xmsg.core.xMsgConstants#FIND_REQUEST_TIMEOUT}
+     * milliseconds for a response.
+     *
+     * @param query the registration parameters to determine if an actor
+     *              should be selected (publisher or subscriber, topic of interest)
+     * @param address the address of the registrar service
+     * @return a set with the registration data of the matching actors, if any
+     * @throws xMsgException if the request failed
+     */
+    public Set<xMsgRegRecord> discover(xMsgRegQuery query, xMsgRegAddress address)
+            throws xMsgException {
+        return discover(query, address, xMsgConstants.FIND_REQUEST_TIMEOUT);
+    }
+
+    /**
+     * Searches the specified registrar service for actors that match the given query.
+     * A registered actor will be selected only if it matches all the parameters
+     * of interest defined by the query. The registrar service will then reply
+     * the registration data of all the matching actors.
+     * Waits up to {@code timeout} milliseconds for a response.
+     *
+     * @param query the registration parameters to determine if an actor
+     *              should be selected (publisher or subscriber, topic of interest)
+     * @param address the address of the registrar service
+     * @param timeout milliseconds to wait for a response
+     * @return a set with the registration data of the matching actors, if any
+     * @throws xMsgException if the request failed
+     */
+    public Set<xMsgRegRecord> discover(xMsgRegQuery query, xMsgRegAddress address, int timeout)
+            throws xMsgException {
+        xMsgRegDriver regDriver = connectionManager.getRegistrarConnection(address);
+        try {
+            xMsgRegistration.Builder reg = query.data();
+            Set<xMsgRegistration> result = regDriver.findRegistration(myName, reg.build(), timeout);
+            connectionManager.releaseRegistrarConnection(regDriver);
+
+            return result.stream().map(xMsgRegRecord::new).collect(Collectors.toSet());
+        } catch (ZMQException | xMsgException e) {
+            regDriver.close();
+            throw e;
+        }
+    }
+
+    /**
      * Returns the name of this actor.
      */
     public String getName() {
@@ -682,69 +689,16 @@ public class xMsg implements AutoCloseable {
         return threadPool.getMaximumPoolSize();
     }
 
-    // ..............................................................//
-    //                        Private section
-    // ..............................................................//
-
-    private xMsgRegistration.Builder _createRegistration(xMsgTopic topic, boolean isPublisher) {
+    private xMsgRegistration.Builder _createRegistration(xMsgRegInfo info) {
         xMsgRegistration.Builder regb = xMsgRegistration.newBuilder();
         regb.setName(myName);
         regb.setHost(defaultProxyAddress.host());
         regb.setPort(defaultProxyAddress.pubPort());
-        regb.setDomain(topic.domain());
-        regb.setSubject(topic.subject());
-        regb.setType(topic.type());
-        if (isPublisher) {
-            regb.setOwnerType(xMsgRegistration.OwnerType.PUBLISHER);
-        } else {
-            regb.setOwnerType(xMsgRegistration.OwnerType.SUBSCRIBER);
-        }
+        regb.setDomain(info.topic().domain());
+        regb.setSubject(info.topic().subject());
+        regb.setType(info.topic().type());
+        regb.setOwnerType(info.type());
         return regb;
-    }
-
-    private void _register(xMsgRegAddress regAddress,
-                           xMsgTopic topic,
-                           String description,
-                           boolean isPublisher) throws xMsgException {
-        xMsgRegDriver regDriver = connectionManager.getRegistrarConnection(regAddress);
-        try {
-            xMsgRegistration.Builder regb = _createRegistration(topic, isPublisher);
-            regb.setDescription(description);
-            regDriver.addRegistration(myName, regb.build());
-            connectionManager.releaseRegistrarConnection(regDriver);
-        } catch (ZMQException | xMsgException e) {
-            regDriver.close();
-            throw e;
-        }
-    }
-
-    private void _removeRegistration(xMsgRegAddress regAddress,
-                                     xMsgTopic topic,
-                                     boolean isPublisher) throws xMsgException {
-        xMsgRegDriver regDriver = connectionManager.getRegistrarConnection(regAddress);
-        try {
-            xMsgRegistration.Builder regb = _createRegistration(topic, isPublisher);
-            regDriver.removeRegistration(myName, regb.build());
-            connectionManager.releaseRegistrarConnection(regDriver);
-        } catch (ZMQException | xMsgException e) {
-            regDriver.close();
-            throw e;
-        }
-    }
-
-    private Set<xMsgRegistration> _findRegistration(xMsgRegAddress regAddress,
-                                                    xMsgTopic topic,
-                                                    boolean isPublisher) throws xMsgException {
-        xMsgRegDriver regDriver = connectionManager.getRegistrarConnection(regAddress);
-        try {
-            xMsgRegistration.Builder regb = _createRegistration(topic, isPublisher);
-            Set<xMsgRegistration> result = regDriver.findRegistration(myName, regb.build());
-            connectionManager.releaseRegistrarConnection(regDriver);
-            return result;
-        } catch (ZMQException | xMsgException e) {
-            regDriver.close();
-            throw e;
-        }
     }
 
     private void _publish(xMsgConnection connection, xMsgMessage msg) throws xMsgException {

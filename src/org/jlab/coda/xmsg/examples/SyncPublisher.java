@@ -28,6 +28,7 @@ import org.jlab.coda.xmsg.core.xMsgTopic;
 import org.jlab.coda.xmsg.core.xMsgUtil;
 import org.jlab.coda.xmsg.excp.xMsgException;
 import org.jlab.coda.xmsg.net.xMsgConnection;
+import org.jlab.coda.xmsg.xsys.regdis.xMsgRegInfo;
 
 import java.util.concurrent.TimeoutException;
 
@@ -68,7 +69,7 @@ public class SyncPublisher extends xMsg {
         topic = xMsgTopic.build(domain, subject, type);
 
         // Register this publisher
-        registerAsPublisher(topic, description);
+        register(xMsgRegInfo.publisher(topic, description));
 
     }
 

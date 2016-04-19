@@ -1,10 +1,11 @@
 package org.jlab.coda.xmsg.core;
 
-import org.jlab.coda.xmsg.data.xMsgR.xMsgRegistration;
 import org.jlab.coda.xmsg.excp.xMsgException;
 import org.jlab.coda.xmsg.net.xMsgConnection;
-import org.jlab.coda.xmsg.net.xMsgProxyAddress;
 import org.jlab.coda.xmsg.net.xMsgRegAddress;
+import org.jlab.coda.xmsg.xsys.regdis.xMsgRegInfo;
+import org.jlab.coda.xmsg.xsys.regdis.xMsgRegQuery;
+import org.jlab.coda.xmsg.xsys.regdis.xMsgRegRecord;
 
 import java.util.Set;
 import java.util.concurrent.ThreadPoolExecutor;
@@ -32,7 +33,7 @@ public final class SyncPublishTest {
         try (xMsg actor = new xMsg(name, regAddress, poolSize)) {
             xMsgConnection subCon = actor.getConnection();
             try {
-                actor.registerAsSubscriber(topic, "");
+                actor.register(xMsgRegInfo.subscriber(topic, "test subscriber"));
                 System.out.printf("Registered with %s%n", regAddress);
                 actor.subscribe(subCon, topic, (msg) -> {
                     try {
@@ -71,7 +72,8 @@ public final class SyncPublishTest {
         long endTime = 0;
 
         try (xMsg actor = new xMsg("sync_tester", regAddress)) {
-            Set<xMsgRegistration> listeners = actor.findSubscribers(xMsgTopic.wrap(TOPIC));
+            xMsgRegQuery query = xMsgRegQuery.subscribers(xMsgTopic.wrap(TOPIC));
+            Set<xMsgRegRecord> listeners = actor.discover(query);
             numListeners = listeners.size();
             if (numListeners == 0) {
                 System.out.printf("No subscribers registered on %s%n", regAddress);
@@ -91,11 +93,9 @@ public final class SyncPublishTest {
                 pool.submit(() -> {
                     try {
                         for (int j = start; j < end; j++) {
-                            for (xMsgRegistration reg : listeners) {
-                                xMsgProxyAddress address = parseAddress(reg);
-                                xMsgTopic topic = parseTopic(reg);
-                                xMsgMessage data = xMsgMessage.createFrom(topic, j);
-                                xMsgConnection pubCon = actor.getConnection(address);
+                            for (xMsgRegRecord reg : listeners) {
+                                xMsgMessage data = xMsgMessage.createFrom(reg.topic(), j);
+                                xMsgConnection pubCon = actor.getConnection(reg.address());
                                 try {
                                     xMsgMessage res = actor.syncPublish(pubCon, data, TIME_OUT);
                                     int value = xMsgMessage.parseData(res, Integer.class);
@@ -146,15 +146,6 @@ public final class SyncPublishTest {
         }
         return sum;
     }
-
-    private static xMsgTopic parseTopic(xMsgRegistration reg) {
-        return xMsgTopic.build(reg.getDomain(), reg.getSubject(), reg.getType());
-    }
-
-    private static xMsgProxyAddress parseAddress(xMsgRegistration reg) {
-        return new xMsgProxyAddress(reg.getHost(), reg.getPort());
-    }
-
 
     public static void main(String[] args) throws Exception {
         if (args.length != 3) {
