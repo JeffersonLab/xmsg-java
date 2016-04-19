@@ -24,6 +24,7 @@ package org.jlab.coda.xmsg.xsys.regdis;
 
 import org.jlab.coda.xmsg.core.xMsgConstants;
 import org.jlab.coda.xmsg.core.xMsgTopic;
+import org.jlab.coda.xmsg.core.xMsgUtil;
 import org.jlab.coda.xmsg.data.xMsgR.xMsgRegistration;
 import org.jlab.coda.xmsg.data.xMsgR.xMsgRegistration.Builder;
 
@@ -71,6 +72,12 @@ public final class RegistrationDataFactory {
 
     private RegistrationDataFactory() {
     }
+
+
+    public static Builder newRegistration(String name, String topic, boolean isPublisher) {
+        return newRegistration(name, xMsgUtil.localhost(), topic, isPublisher);
+    }
+
 
     public static Builder newRegistration(String name,
                                           String host,
