@@ -66,7 +66,7 @@ public class xMsgRegDriverTest {
         Builder publisher = newRegistration("bradbury_pub", topic, true);
         publisher.setDescription("bradbury books");
 
-        driver.addRegistration(publisher.build(), true);
+        driver.addRegistration(publisher.build());
 
         assertRequest("bradbury_pub",
                 publisher.build(),
@@ -80,7 +80,7 @@ public class xMsgRegDriverTest {
         Builder subscriber = newRegistration("bradbury_sub", topic, false);
         subscriber.setDescription("bradbury books");
 
-        driver.addRegistration(subscriber.build(), false);
+        driver.addRegistration(subscriber.build());
 
         assertRequest("bradbury_sub",
                 subscriber.build(),
@@ -93,7 +93,7 @@ public class xMsgRegDriverTest {
     public void sendPublisherRemoval() throws Exception {
         Builder publisher = newRegistration("bradbury_pub", topic, true);
 
-        driver.removeRegistration(publisher.build(), true);
+        driver.removeRegistration(publisher.build());
 
         assertRequest("bradbury_pub",
                 publisher.build(),
@@ -106,7 +106,7 @@ public class xMsgRegDriverTest {
     public void sendSubscriberRemoval() throws Exception {
         Builder subscriber = newRegistration("bradbury_sub", topic, false);
 
-        driver.removeRegistration(subscriber.build(), false);
+        driver.removeRegistration(subscriber.build());
 
         assertRequest("bradbury_sub",
                 subscriber.build(),
@@ -130,7 +130,7 @@ public class xMsgRegDriverTest {
     public void sendPublisherFind() throws Exception {
         Builder data = newRegistration("10.2.9.1_node", topic, true);
 
-        driver.findRegistration(data.build(), true);
+        driver.findRegistration(data.build());
 
         assertRequest("10.2.9.1_node",
                 data.build(),
@@ -143,7 +143,7 @@ public class xMsgRegDriverTest {
     public void sendSubscriberFind() throws Exception {
         Builder data = newRegistration("10.2.9.1_node", topic, false);
 
-        driver.findRegistration(data.build(), false);
+        driver.findRegistration(data.build());
 
         assertRequest("10.2.9.1_node",
                 data.build(),
@@ -162,7 +162,7 @@ public class xMsgRegDriverTest {
 
         setResponse(new xMsgRegResponse("", "", regData));
 
-        Set<xMsgRegistration> regRes = driver.findRegistration(data.build(), false);
+        Set<xMsgRegistration> regRes = driver.findRegistration(data.build());
 
         assertThat(regRes, is(regData));
     }

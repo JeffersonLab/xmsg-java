@@ -710,7 +710,7 @@ public class xMsg implements AutoCloseable {
         try {
             xMsgRegistration.Builder regb = _createRegistration(topic, isPublisher);
             regb.setDescription(description);
-            regDriver.addRegistration(regb.build(), isPublisher);
+            regDriver.addRegistration(regb.build());
             connectionManager.releaseRegistrarConnection(regDriver);
         } catch (ZMQException | xMsgException e) {
             regDriver.close();
@@ -724,7 +724,7 @@ public class xMsg implements AutoCloseable {
         xMsgRegDriver regDriver = connectionManager.getRegistrarConnection(regAddress);
         try {
             xMsgRegistration.Builder regb = _createRegistration(topic, isPublisher);
-            regDriver.removeRegistration(regb.build(), isPublisher);
+            regDriver.removeRegistration(regb.build());
             connectionManager.releaseRegistrarConnection(regDriver);
         } catch (ZMQException | xMsgException e) {
             regDriver.close();
@@ -738,7 +738,7 @@ public class xMsg implements AutoCloseable {
         xMsgRegDriver regDriver = connectionManager.getRegistrarConnection(regAddress);
         try {
             xMsgRegistration.Builder regb = _createRegistration(topic, isPublisher);
-            Set<xMsgRegistration> result = regDriver.findRegistration(regb.build(), isPublisher);
+            Set<xMsgRegistration> result = regDriver.findRegistration(regb.build());
             connectionManager.releaseRegistrarConnection(regDriver);
             return result;
         } catch (ZMQException | xMsgException e) {

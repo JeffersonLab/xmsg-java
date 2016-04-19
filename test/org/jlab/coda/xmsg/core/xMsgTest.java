@@ -64,7 +64,7 @@ public class xMsgTest {
         xMsgRegistration.Builder expected = createRegistration(topic, true);
         expected.setDescription("test pub");
 
-        verify(driver).addRegistration(eq(expected.build()), eq(true));
+        verify(driver).addRegistration(eq(expected.build()));
     }
 
 
@@ -75,7 +75,7 @@ public class xMsgTest {
         xMsgRegistration.Builder expected = createRegistration(topic, false);
         expected.setDescription("test sub");
 
-        verify(driver).addRegistration(eq(expected.build()), eq(false));
+        verify(driver).addRegistration(eq(expected.build()));
     }
 
 
@@ -85,7 +85,7 @@ public class xMsgTest {
 
         xMsgRegistration.Builder expected = createRegistration(topic, true);
 
-        verify(driver).removeRegistration(eq(expected.build()), eq(true));
+        verify(driver).removeRegistration(eq(expected.build()));
     }
 
 
@@ -95,7 +95,7 @@ public class xMsgTest {
 
         xMsgRegistration.Builder expected = createRegistration(topic, false);
 
-        verify(driver).removeRegistration(eq(expected.build()), eq(false));
+        verify(driver).removeRegistration(eq(expected.build()));
     }
 
 
@@ -105,7 +105,7 @@ public class xMsgTest {
 
         xMsgRegistration.Builder expected = createRegistration(topic, true);
 
-        verify(driver).findRegistration(eq(expected.build()), eq(true));
+        verify(driver).findRegistration(eq(expected.build()));
     }
 
 
@@ -115,7 +115,7 @@ public class xMsgTest {
 
         xMsgRegistration.Builder expected = createRegistration(topic, false);
 
-        verify(driver).findRegistration(eq(expected.build()), eq(false));
+        verify(driver).findRegistration(eq(expected.build()));
     }
 
 

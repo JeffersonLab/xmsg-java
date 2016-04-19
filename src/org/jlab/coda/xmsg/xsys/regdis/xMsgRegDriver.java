@@ -24,6 +24,7 @@ package org.jlab.coda.xmsg.xsys.regdis;
 
 import org.jlab.coda.xmsg.core.xMsgConstants;
 import org.jlab.coda.xmsg.data.xMsgR.xMsgRegistration;
+import org.jlab.coda.xmsg.data.xMsgR.xMsgRegistration.OwnerType;
 import org.jlab.coda.xmsg.excp.xMsgException;
 import org.jlab.coda.xmsg.net.xMsgRegAddress;
 import org.jlab.coda.xmsg.net.xMsgSocketFactory;
@@ -116,14 +117,13 @@ public class xMsgRegDriver {
      * Sends a registration request to the registrar service.
      *
      * @param data the registration data
-     * @param isPublisher if true then this is a request to register a publisher,
-     *                     otherwise this is a request to register a subscriber
      * @throws xMsgException
      */
-    public void addRegistration(xMsgRegistration data, boolean isPublisher)
+    public void addRegistration(xMsgRegistration data)
             throws xMsgException {
-        String topic = isPublisher ? xMsgConstants.REGISTER_PUBLISHER
-                                   : xMsgConstants.REGISTER_SUBSCRIBER;
+        String topic = selectTopic(data.getOwnerType(),
+                                   xMsgConstants.REGISTER_PUBLISHER,
+                                   xMsgConstants.REGISTER_SUBSCRIBER);
         int timeout = xMsgConstants.REGISTER_REQUEST_TIMEOUT;
 
         xMsgRegRequest request = new xMsgRegRequest(topic, data.getName(), data);
@@ -134,14 +134,13 @@ public class xMsgRegDriver {
      * Sends a remove registration request to the registrar service.
      *
      * @param data the registration data
-     * @param isPublisher if true then this is a request to register a publisher,
-     *                     otherwise this is a request to register a subscriber
      * @throws xMsgException
      */
-    public void removeRegistration(xMsgRegistration data, boolean isPublisher)
+    public void removeRegistration(xMsgRegistration data)
             throws xMsgException {
-        String topic = isPublisher ? xMsgConstants.REMOVE_PUBLISHER
-                                   : xMsgConstants.REMOVE_SUBSCRIBER;
+        String topic = selectTopic(data.getOwnerType(),
+                                   xMsgConstants.REMOVE_PUBLISHER,
+                                   xMsgConstants.REMOVE_SUBSCRIBER);
         int timeout = xMsgConstants.REMOVE_REQUEST_TIMEOUT;
 
         xMsgRegRequest request = new xMsgRegRequest(topic, data.getName(), data);
@@ -173,15 +172,14 @@ public class xMsgRegDriver {
      * The topic of interest is defined within the given registration data.
      *
      * @param data the registration data object
-     * @param isPublisher if true then this is a request to find publishers,
-     *                     otherwise this is a request to find subscribers
      * @return set of publishers or subscribers to the required topic.
      * @throws xMsgException
      */
-    public Set<xMsgRegistration> findRegistration(xMsgRegistration data, boolean isPublisher)
+    public Set<xMsgRegistration> findRegistration(xMsgRegistration data)
             throws xMsgException {
-        String topic = isPublisher ? xMsgConstants.FIND_PUBLISHER
-                                   : xMsgConstants.FIND_SUBSCRIBER;
+        String topic = selectTopic(data.getOwnerType(),
+                                   xMsgConstants.FIND_PUBLISHER,
+                                   xMsgConstants.FIND_SUBSCRIBER);
         int timeout = xMsgConstants.FIND_REQUEST_TIMEOUT;
 
         xMsgRegRequest request = new xMsgRegRequest(topic, data.getName(), data);
@@ -201,5 +199,14 @@ public class xMsgRegDriver {
      */
     public xMsgRegAddress getAddress() {
         return address;
+    }
+
+
+    private static String selectTopic(OwnerType type, String pubTopic, String subTopic) {
+        switch (type) {
+            case PUBLISHER: return pubTopic;
+            case SUBSCRIBER: return subTopic;
+            default: throw new RuntimeException("Invalid registration owner-type: " + type);
+        }
     }
 }
