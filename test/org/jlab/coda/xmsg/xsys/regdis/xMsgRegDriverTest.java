@@ -66,7 +66,7 @@ public class xMsgRegDriverTest {
         Builder publisher = newRegistration("bradbury_pub", topic, true);
         publisher.setDescription("bradbury books");
 
-        driver.register(publisher.build(), true);
+        driver.addRegistration(publisher.build(), true);
 
         assertRequest("bradbury_pub",
                 publisher.build(),
@@ -80,7 +80,7 @@ public class xMsgRegDriverTest {
         Builder subscriber = newRegistration("bradbury_sub", topic, false);
         subscriber.setDescription("bradbury books");
 
-        driver.register(subscriber.build(), false);
+        driver.addRegistration(subscriber.build(), false);
 
         assertRequest("bradbury_sub",
                 subscriber.build(),

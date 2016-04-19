@@ -120,7 +120,7 @@ public class xMsgRegDriver {
      *                     otherwise this is a request to register a subscriber
      * @throws xMsgException
      */
-    public void register(xMsgRegistration data, boolean isPublisher)
+    public void addRegistration(xMsgRegistration data, boolean isPublisher)
             throws xMsgException {
         String topic = isPublisher ? xMsgConstants.REGISTER_PUBLISHER
                                    : xMsgConstants.REGISTER_SUBSCRIBER;

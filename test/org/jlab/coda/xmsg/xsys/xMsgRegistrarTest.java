@@ -104,7 +104,7 @@ public class xMsgRegistrarTest {
         for (int i = 0; i < size; i++) {
             Builder rndReg = RegistrationDataFactory.randomRegistration();
             xMsgRegistration data = rndReg.build();
-            driver.register(data, checkPublisher(data));
+            driver.addRegistration(data, checkPublisher(data));
             registration.add(data);
         }
     }

@@ -710,7 +710,7 @@ public class xMsg implements AutoCloseable {
         try {
             xMsgRegistration.Builder regb = _createRegistration(topic, isPublisher);
             regb.setDescription(description);
-            regDriver.register(regb.build(), isPublisher);
+            regDriver.addRegistration(regb.build(), isPublisher);
             connectionManager.releaseRegistrarConnection(regDriver);
         } catch (ZMQException | xMsgException e) {
             regDriver.close();

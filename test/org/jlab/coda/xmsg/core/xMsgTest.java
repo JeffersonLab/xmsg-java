@@ -64,7 +64,7 @@ public class xMsgTest {
         xMsgRegistration.Builder expected = createRegistration(topic, true);
         expected.setDescription("test pub");
 
-        verify(driver).register(eq(expected.build()), eq(true));
+        verify(driver).addRegistration(eq(expected.build()), eq(true));
     }
 
 
@@ -75,7 +75,7 @@ public class xMsgTest {
         xMsgRegistration.Builder expected = createRegistration(topic, false);
         expected.setDescription("test sub");
 
-        verify(driver).register(eq(expected.build()), eq(false));
+        verify(driver).addRegistration(eq(expected.build()), eq(false));
     }
 
 
