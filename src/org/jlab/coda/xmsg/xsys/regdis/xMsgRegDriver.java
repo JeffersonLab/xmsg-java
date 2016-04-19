@@ -122,10 +122,22 @@ public class xMsgRegDriver {
      */
     public void addRegistration(String sender, xMsgRegistration data)
             throws xMsgException {
+        addRegistration(sender, data, xMsgConstants.REGISTER_REQUEST_TIMEOUT);
+    }
+
+    /**
+     * Sends a registration request to the registrar service.
+     *
+     * @param sender the sender of the request
+     * @param data the registration data
+     * @param timeout the milliseconds to wait for a response
+     * @throws xMsgException
+     */
+    public void addRegistration(String sender, xMsgRegistration data, int timeout)
+            throws xMsgException {
         String topic = selectTopic(data.getOwnerType(),
                                    xMsgConstants.REGISTER_PUBLISHER,
                                    xMsgConstants.REGISTER_SUBSCRIBER);
-        int timeout = xMsgConstants.REGISTER_REQUEST_TIMEOUT;
 
         xMsgRegRequest request = new xMsgRegRequest(topic, sender, data);
         request(request, timeout);
@@ -140,10 +152,22 @@ public class xMsgRegDriver {
      */
     public void removeRegistration(String sender, xMsgRegistration data)
             throws xMsgException {
+        removeRegistration(sender, data, xMsgConstants.REMOVE_REQUEST_TIMEOUT);
+    }
+
+    /**
+     * Sends a remove registration request to the registrar service.
+     *
+     * @param sender the sender of the request
+     * @param data the registration data
+     * @param timeout the milliseconds to wait for a response
+     * @throws xMsgException
+     */
+    public void removeRegistration(String sender, xMsgRegistration data, int timeout)
+            throws xMsgException {
         String topic = selectTopic(data.getOwnerType(),
                                    xMsgConstants.REMOVE_PUBLISHER,
                                    xMsgConstants.REMOVE_SUBSCRIBER);
-        int timeout = xMsgConstants.REMOVE_REQUEST_TIMEOUT;
 
         xMsgRegRequest request = new xMsgRegRequest(topic, sender, data);
         request(request, timeout);
@@ -161,8 +185,23 @@ public class xMsgRegDriver {
      */
     public void removeAllRegistration(String sender, String host)
             throws xMsgException {
+        removeAllRegistration(sender, host, xMsgConstants.REMOVE_REQUEST_TIMEOUT);
+    }
+
+    /**
+     * Removes registration of all xMsg actors of the specified node.
+     * This will remove all publishers and subscribers running
+     * on the given host from the registrar service connected
+     * by this driver.
+     *
+     * @param sender the sender of the request
+     * @param host the host of the actors to be removed
+     * @param timeout the milliseconds to wait for a response
+     * @throws xMsgException
+     */
+    public void removeAllRegistration(String sender, String host, int timeout)
+            throws xMsgException {
         String topic = xMsgConstants.REMOVE_ALL_REGISTRATION;
-        int timeout = xMsgConstants.REMOVE_REQUEST_TIMEOUT;
 
         xMsgRegRequest request = new xMsgRegRequest(topic, sender, host);
         request(request, timeout);
@@ -180,10 +219,27 @@ public class xMsgRegDriver {
      */
     public Set<xMsgRegistration> findRegistration(String sender, xMsgRegistration data)
             throws xMsgException {
+        return findRegistration(sender, data, xMsgConstants.FIND_REQUEST_TIMEOUT);
+    }
+
+    /**
+     * Sends a request to search the database for publishers or subscribers
+     * to a specific topic to the registrar server and waits the response.
+     * The topic of interest is defined within the given registration data.
+     *
+     * @param sender the sender of the request
+     * @param data the registration data object
+     * @param timeout the milliseconds to wait for a response
+     * @return set of publishers or subscribers to the required topic.
+     * @throws xMsgException
+     */
+    public Set<xMsgRegistration> findRegistration(String sender,
+                                                  xMsgRegistration data,
+                                                  int timeout)
+            throws xMsgException {
         String topic = selectTopic(data.getOwnerType(),
                                    xMsgConstants.FIND_PUBLISHER,
                                    xMsgConstants.FIND_SUBSCRIBER);
-        int timeout = xMsgConstants.FIND_REQUEST_TIMEOUT;
 
         xMsgRegRequest request = new xMsgRegRequest(topic, sender, data);
         xMsgRegResponse response = request(request, timeout);
