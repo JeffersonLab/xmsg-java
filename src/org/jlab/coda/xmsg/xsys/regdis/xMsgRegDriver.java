@@ -48,9 +48,8 @@ import java.util.Set;
 public class xMsgRegDriver {
 
     private final xMsgRegAddress address;
-    private final Socket socket;
-
     private final xMsgSocketFactory factory;
+    private final Socket socket;
 
     /**
      * Creates a driver to the registrar running in the given address.
@@ -61,8 +60,8 @@ public class xMsgRegDriver {
      */
     public xMsgRegDriver(xMsgRegAddress address, xMsgSocketFactory factory) throws xMsgException {
         this.address = address;
-        this.socket = factory.createSocket(ZMQ.REQ);
         this.factory = factory;
+        this.socket = factory.createSocket(ZMQ.REQ);
     }
 
     public void connect() throws xMsgException {
