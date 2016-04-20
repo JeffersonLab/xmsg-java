@@ -23,17 +23,16 @@
 package org.jlab.coda.xmsg.core;
 
 import org.jlab.coda.xmsg.data.xMsgR.xMsgRegistration;
-import org.jlab.coda.xmsg.data.xMsgR.xMsgRegistration.Builder;
 import org.jlab.coda.xmsg.net.xMsgConnectionFactory;
 import org.jlab.coda.xmsg.net.xMsgProxyAddress;
 import org.jlab.coda.xmsg.net.xMsgRegAddress;
+import org.jlab.coda.xmsg.xsys.regdis.RegistrationDataFactory;
 import org.jlab.coda.xmsg.xsys.regdis.xMsgRegDriver;
+import org.jlab.coda.xmsg.xsys.regdis.xMsgRegInfo;
+import org.jlab.coda.xmsg.xsys.regdis.xMsgRegQuery;
 import org.junit.Before;
 import org.junit.Test;
-import org.mockito.ArgumentCaptor;
 
-import static org.hamcrest.MatcherAssert.assertThat;
-import static org.hamcrest.Matchers.is;
 import static org.mockito.Mockito.any;
 import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.eq;
@@ -42,151 +41,94 @@ import static org.mockito.Mockito.verify;
 
 public class xMsgTest {
 
-    private xMsgConnectionFactory factory;
     private xMsgRegDriver driver;
     private xMsg core;
-    private String name = "asimov";
+
+    private final String name = "asimov";
+    private final xMsgTopic topic = xMsgTopic.wrap("writer:scifi:book");
+    private final xMsgRegAddress regAddr = new xMsgRegAddress();
 
     @Before
     public void setup() throws Exception {
+        xMsgConnectionFactory factory = mock(xMsgConnectionFactory.class);
+
         driver = mock(xMsgRegDriver.class);
-        factory = mock(xMsgConnectionFactory.class);
+        core = new xMsg(name, new xMsgProxyAddress(), regAddr, factory, 1);
+
         doReturn(new xMsgRegAddress()).when(driver).getAddress();
         doReturn(driver).when(factory).createRegistrarConnection(any(xMsgRegAddress.class));
-        core = new xMsg(name, new xMsgProxyAddress(), new xMsgRegAddress(), factory, 1);
     }
 
 
     @Test
     public void registerPublisher() throws Exception {
-        xMsgTopic topic = xMsgTopic.wrap("writer:scifi:book");
+        core.register(xMsgRegInfo.publisher(topic, "test pub"), regAddr, 1000);
 
-        core.registerAsPublisher(topic, "test pub");
+        xMsgRegistration.Builder expected = createRegistration(topic, true);
+        expected.setDescription("test pub");
 
-        RegValidator validator = new RegValidator(topic, true);
-        validator.desc = "test pub";
-        validator.assertDriverCall("register");
+        verify(driver).addRegistration(eq(name), eq(expected.build()), eq(1000));
     }
+
 
     @Test
     public void registerSubscriber() throws Exception {
-        xMsgTopic topic = xMsgTopic.wrap("writer:scifi:book");
+        core.register(xMsgRegInfo.subscriber(topic, "test sub"), regAddr, 1000);
 
-        core.registerAsSubscriber(topic, "test sub");
+        xMsgRegistration.Builder expected = createRegistration(topic, false);
+        expected.setDescription("test sub");
 
-        RegValidator validator = new RegValidator(topic, false);
-        validator.desc = "test sub";
-        validator.assertDriverCall("register");
+        verify(driver).addRegistration(eq(name), eq(expected.build()), eq(1000));
     }
+
 
     @Test
     public void removePublisher() throws Exception {
-        xMsgTopic topic = xMsgTopic.wrap("writer:scifi:book");
+        core.deregister(xMsgRegInfo.publisher(topic), regAddr, 1500);
 
-        core.deregisterAsPublisher(topic);
+        xMsgRegistration.Builder expected = createRegistration(topic, true);
 
-        RegValidator validator = new RegValidator(topic, true);
-        validator.assertDriverCall("remove");
+        verify(driver).removeRegistration(eq(name), eq(expected.build()), eq(1500));
     }
+
 
     @Test
     public void removeSubscriber() throws Exception {
-        xMsgTopic topic = xMsgTopic.wrap("writer:scifi:book");
+        core.deregister(xMsgRegInfo.subscriber(topic), regAddr, 1500);
 
-        core.deregisterAsSubscriber(topic);
+        xMsgRegistration.Builder expected = createRegistration(topic, false);
 
-        RegValidator validator = new RegValidator(topic, false);
-        validator.assertDriverCall("remove");
+        verify(driver).removeRegistration(eq(name), eq(expected.build()), eq(1500));
     }
-
 
 
     @Test
     public void findPublishers() throws Exception {
-        xMsgTopic topic = xMsgTopic.wrap("writer:scifi:book");
+        core.discover(xMsgRegQuery.publishers(topic), regAddr, 2000);
 
-        core.findPublishers(topic);
+        xMsgRegistration.Builder expected = createQuery(topic, true);
 
-        RegValidator validator = new RegValidator(topic, true);
-        validator.assertDriverCall("find");
+        verify(driver).findRegistration(eq(name), eq(expected.build()), eq(2000));
     }
 
 
     @Test
     public void findSubscribers() throws Exception {
-        xMsgTopic topic = xMsgTopic.wrap("writer:scifi");
-        core.findSubscribers(topic);
+        core.discover(xMsgRegQuery.subscribers(topic), regAddr, 2000);
 
-        RegValidator validator = new RegValidator(topic, false);
-        validator.assertDriverCall("find");
+        xMsgRegistration.Builder expected = createQuery(topic, false);
+
+        verify(driver).findRegistration(eq(name), eq(expected.build()), eq(2000));
     }
 
 
+    private xMsgRegistration.Builder createRegistration(xMsgTopic topic, boolean isPublisher) {
+        return RegistrationDataFactory.newRegistration(name, topic.toString(), isPublisher);
+    }
 
-    private class RegValidator {
 
-        private String host;
-        private int port;
-        private xMsgTopic topic;
-        private String desc;
-        private boolean isPublisher;
-
-        private ArgumentCaptor<xMsgRegistration> dataArg;
-
-        RegValidator(xMsgTopic topic, boolean isPublisher) throws Exception {
-            this.host = xMsgUtil.toHostAddress("localhost");
-            this.port = xMsgConstants.DEFAULT_PORT;
-            this.topic = topic;
-            this.desc = "";
-
-            this.isPublisher = isPublisher;
-            this.dataArg = ArgumentCaptor.forClass(xMsgRegistration.class);
-        }
-
-        private void assertDriverCall(String method) throws Exception {
-            verifyCalled(method);
-            verifyData();
-        }
-
-        private void verifyCalled(String method) throws Exception {
-            xMsgRegDriver v = verify(driver);
-            switch (method) {
-                case "register":
-                    v.register(dataArg.capture(), eq(isPublisher));
-                    break;
-                case "remove":
-                    v.removeRegistration(dataArg.capture(), eq(isPublisher));
-                    break;
-                case "find":
-                    v.findRegistration(dataArg.capture(), eq(isPublisher));
-                    break;
-                default:
-                    throw new IllegalArgumentException("Illegal method " + method);
-            }
-        }
-
-        private void verifyData() throws Exception {
-            xMsgRegistration data = dataArg.getValue();
-            assertThat(data, is(expectedData()));
-        }
-
-        private xMsgRegistration expectedData()
-                throws Exception {
-            xMsgRegistration.OwnerType dataType = isPublisher
-                    ? xMsgRegistration.OwnerType.PUBLISHER
-                    : xMsgRegistration.OwnerType.SUBSCRIBER;
-            Builder data = xMsgRegistration.newBuilder();
-            data.setName(name);
-            data.setHost(host);
-            data.setPort(port);
-            data.setDomain(topic.domain());
-            data.setSubject(topic.subject());
-            data.setType(topic.type());
-            data.setOwnerType(dataType);
-            if (!desc.isEmpty()) {
-                data.setDescription(desc);
-            }
-            return data.build();
-        }
+    private xMsgRegistration.Builder createQuery(xMsgTopic topic, boolean isPublisher) {
+        String udf = xMsgConstants.UNDEFINED;
+        return RegistrationDataFactory.newRegistration(udf, udf, topic.toString(), isPublisher);
     }
 }

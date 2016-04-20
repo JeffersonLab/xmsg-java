@@ -48,12 +48,9 @@ In a conclusion we present the xMsg entire API
     syncPublish
     subscribe
     unsubscribe
-    registerAsPublisher
-    registerAsSubscriber
-    deregisterAsPublisher
-    deregisterAsSubscriber
-    findPublishers
-    findSubscribers
+    register
+    deregister
+    discover
 
 For more details and API method signatures check the Javadoc.
 

@@ -23,8 +23,6 @@
 package org.jlab.coda.xmsg.xsys.regdis;
 
 import org.jlab.coda.xmsg.core.xMsgConstants;
-import org.jlab.coda.xmsg.core.xMsgTopic;
-import org.jlab.coda.xmsg.core.xMsgUtil;
 import org.jlab.coda.xmsg.data.xMsgR.xMsgRegistration;
 import org.jlab.coda.xmsg.data.xMsgR.xMsgRegistration.Builder;
 import org.jlab.coda.xmsg.net.xMsgRegAddress;
@@ -35,6 +33,8 @@ import org.junit.Test;
 import java.util.Arrays;
 import java.util.HashSet;
 import java.util.Set;
+
+import static org.jlab.coda.xmsg.xsys.regdis.RegistrationDataFactory.newRegistration;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.is;
@@ -48,23 +48,9 @@ import static org.mockito.Mockito.verify;
 public class xMsgRegDriverTest {
 
     private xMsgRegDriver driver;
+    private String sender = "testSender";
 
-    private Builder subscriber;
-    private Builder publisher;
-    private Set<xMsgRegistration> registration;
-
-
-    public xMsgRegDriverTest() {
-        publisher = createRegData("bradbury_pub", "writer:scifi:books");
-        publisher.setOwnerType(xMsgRegistration.OwnerType.PUBLISHER);
-        publisher.setDescription("bradbury books");
-
-        subscriber = createRegData("bradbury_sub", "writer:scifi:books");
-        subscriber.setOwnerType(xMsgRegistration.OwnerType.SUBSCRIBER);
-        subscriber.setDescription("bradbury books");
-
-        registration = new HashSet<>(Arrays.asList(publisher.build(), subscriber.build()));
-    }
+    private final String topic = "writer:scifi:books";
 
 
     @Before
@@ -78,121 +64,120 @@ public class xMsgRegDriverTest {
 
     @Test
     public void sendPublisherRegistration() throws Exception {
-        driver.register(publisher.build(), true);
-        assertRequest("bradbury_pub",
-                publisher.build(),
-                xMsgConstants.REGISTER_PUBLISHER,
-                xMsgConstants.REGISTER_REQUEST_TIMEOUT);
+        Builder publisher = newRegistration("bradbury_pub", topic, true);
+        publisher.setDescription("bradbury books");
+
+        driver.addRegistration(sender, publisher.build());
+
+        assertRequest(publisher.build(),
+                      xMsgConstants.REGISTER_PUBLISHER,
+                      xMsgConstants.REGISTER_REQUEST_TIMEOUT);
     }
 
 
     @Test
     public void sendSubscriberRegistration() throws Exception {
-        driver.register(subscriber.build(), false);
-        assertRequest("bradbury_sub",
-                subscriber.build(),
-                xMsgConstants.REGISTER_SUBSCRIBER,
-                xMsgConstants.REGISTER_REQUEST_TIMEOUT);
+        Builder subscriber = newRegistration("bradbury_sub", topic, false);
+        subscriber.setDescription("bradbury books");
+
+        driver.addRegistration(sender, subscriber.build());
+
+        assertRequest(subscriber.build(),
+                      xMsgConstants.REGISTER_SUBSCRIBER,
+                      xMsgConstants.REGISTER_REQUEST_TIMEOUT);
     }
 
 
     @Test
     public void sendPublisherRemoval() throws Exception {
-        driver.removeRegistration(publisher.build(), true);
-        assertRequest("bradbury_pub",
-                publisher.build(),
-                xMsgConstants.REMOVE_PUBLISHER,
-                xMsgConstants.REMOVE_REQUEST_TIMEOUT);
+        Builder publisher = newRegistration("bradbury_pub", topic, true);
+
+        driver.removeRegistration(sender, publisher.build());
+
+        assertRequest(publisher.build(),
+                      xMsgConstants.REMOVE_PUBLISHER,
+                      xMsgConstants.REMOVE_REQUEST_TIMEOUT);
     }
 
 
     @Test
     public void sendSubscriberRemoval() throws Exception {
-        driver.removeRegistration(subscriber.build(), false);
-        assertRequest("bradbury_sub",
-                subscriber.build(),
-                xMsgConstants.REMOVE_SUBSCRIBER,
-                xMsgConstants.REMOVE_REQUEST_TIMEOUT);
+        Builder subscriber = newRegistration("bradbury_sub", topic, false);
+
+        driver.removeRegistration(sender, subscriber.build());
+
+        assertRequest(subscriber.build(),
+                      xMsgConstants.REMOVE_SUBSCRIBER,
+                      xMsgConstants.REMOVE_REQUEST_TIMEOUT);
     }
 
 
     @Test
     public void sendHostRemoval() throws Exception {
-        driver.removeAllRegistration("10.2.9.1_node", "10.2.9.1");
+        driver.removeAllRegistration(sender, "10.2.9.1");
 
-        assertRequest("10.2.9.1_node",
-                "10.2.9.1",
-                xMsgConstants.REMOVE_ALL_REGISTRATION,
-                xMsgConstants.REMOVE_REQUEST_TIMEOUT);
+        assertRequest("10.2.9.1",
+                      xMsgConstants.REMOVE_ALL_REGISTRATION,
+                      xMsgConstants.REMOVE_REQUEST_TIMEOUT);
     }
 
 
     @Test
     public void sendPublisherFind() throws Exception {
-        xMsgRegistration.Builder data = createRegData("10.2.9.1_node", "bradbury:scifi:books");
+        Builder data = newRegistration("", topic, true);
 
-        driver.findRegistration(data.build(), true);
+        driver.findRegistration(sender, data.build());
 
-        assertRequest("10.2.9.1_node",
-                data.build(),
-                xMsgConstants.FIND_PUBLISHER,
-                xMsgConstants.FIND_REQUEST_TIMEOUT);
+        assertRequest(data.build(),
+                      xMsgConstants.FIND_PUBLISHER,
+                      xMsgConstants.FIND_REQUEST_TIMEOUT);
     }
 
 
     @Test
     public void sendSubscriberFind() throws Exception {
-        xMsgRegistration.Builder data = createRegData("10.2.9.1_node", "bradbury:scifi:books");
+        Builder data = newRegistration("", topic, false);
 
-        driver.findRegistration(data.build(), false);
+        driver.findRegistration(sender, data.build());
 
-        assertRequest("10.2.9.1_node",
-                data.build(),
-                xMsgConstants.FIND_SUBSCRIBER,
-                xMsgConstants.FIND_REQUEST_TIMEOUT);
+        assertRequest(data.build(),
+                      xMsgConstants.FIND_SUBSCRIBER,
+                      xMsgConstants.FIND_REQUEST_TIMEOUT);
     }
 
 
     @Test
     public void getRegistration() throws Exception {
-        xMsgRegistration.Builder data = createRegData("10.2.9.1_node", "bradbury:scifi:books");
-        setResponse(new xMsgRegResponse("", "", registration));
+        Builder data = newRegistration("", topic, true);
 
-        Set<xMsgRegistration> res = driver.findRegistration(data.build(), false);
+        Builder pub1 = newRegistration("bradbury1", topic, true);
+        Builder pub2 = newRegistration("bradbury2", topic, true);
+        Set<xMsgRegistration> regData = new HashSet<>(Arrays.asList(pub1.build(), pub2.build()));
 
-        assertThat(res, is(registration));
+        setResponse(new xMsgRegResponse("", "", regData));
+
+        Set<xMsgRegistration> regRes = driver.findRegistration(sender, data.build());
+
+        assertThat(regRes, is(regData));
     }
 
 
 
-    private void assertRequest(String name, xMsgRegistration data, String topic, int timeout)
+    private void assertRequest(xMsgRegistration data, String topic, int timeout)
             throws Exception {
-        xMsgRegRequest request = new xMsgRegRequest(topic, name, data);
+        xMsgRegRequest request = new xMsgRegRequest(topic, sender, data);
         verify(driver).request(request, timeout);
     }
 
 
-    private void assertRequest(String name, String data, String topic, int timeout)
+    private void assertRequest(String data, String topic, int timeout)
             throws Exception {
-        xMsgRegRequest request = new xMsgRegRequest(topic, name, data);
+        xMsgRegRequest request = new xMsgRegRequest(topic, sender, data);
         verify(driver).request(request, timeout);
     }
 
 
     private void setResponse(xMsgRegResponse response) throws Exception {
         doReturn(response).when(driver).request(any(xMsgRegRequest.class), anyInt());
-    }
-
-
-    private xMsgRegistration.Builder createRegData(String name, String topic) {
-        xMsgTopic xtopic = xMsgTopic.wrap(topic);
-        xMsgRegistration.Builder data = xMsgRegistration.newBuilder();
-        data.setName(name);
-        data.setHost(xMsgUtil.localhost());
-        data.setPort(xMsgConstants.DEFAULT_PORT);
-        data.setDomain(xtopic.domain());
-        data.setSubject(xtopic.subject());
-        data.setType(xtopic.type());
-        return data;
     }
 }
