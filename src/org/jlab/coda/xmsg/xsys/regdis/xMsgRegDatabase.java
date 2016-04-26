@@ -154,6 +154,41 @@ class xMsgRegDatabase {
 
 
     /**
+     * Returns a set with all actors whose topic matches the given topic.
+     * Empty if no actor is found.
+     * <p>
+     * The rules to match topics are the following.
+     * If we have actors registered to these topics:
+     * <ol>
+     * <li>{@code "DOMAIN:SUBJECT:TYPE"}
+     * <li>{@code "DOMAIN:SUBJECT"}
+     * <li>{@code "DOMAIN"}
+     * </ol>
+     * then this will be returned:
+     * <pre>
+     * find("DOMAIN", "*", "*")           -->  1
+     * find("DOMAIN", "SUBJECT", "*")     -->  1, 2
+     * find("DOMAIN", "SUBJECT", "TYPE")  -->  1, 2, 3
+     * </pre>
+     *
+     * @param domain the searched domain
+     * @param subject the searched type (it can be undefined)
+     * @param type the searched type (it can be undefined)
+     * @return the set of all actors that match the topic
+     */
+    public Set<xMsgRegistration> rfind(String domain, String subject, String type) {
+        Set<xMsgRegistration> result = new HashSet<>();
+        xMsgTopic searchedTopic = xMsgTopic.build(domain, subject, type);
+        for (xMsgTopic topic : db.keySet()) {
+            if (topic.isParent(searchedTopic)) {
+                result.addAll(db.get(topic));
+            }
+        }
+        return result;
+    }
+
+
+    /**
      * Returns all registered topics.
      *
      * @see #get
