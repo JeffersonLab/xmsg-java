@@ -368,6 +368,18 @@ public class xMsgMessage {
 
 
     /**
+     * Deserializes data from the given message as a Java Object.
+     *
+     * @param message the message that contains the required data
+     * @return the deserialized Object of the message
+     * @throws xMsgException if the message data is not a Java Object
+     */
+    public static Object parseData(xMsgMessage message) {
+        return parseData(message, Object.class);
+    }
+
+
+    /**
      * Creates a response to the given message, using the same data.
      * The message must contain the <i>replyTo</i> metadata field.
      *

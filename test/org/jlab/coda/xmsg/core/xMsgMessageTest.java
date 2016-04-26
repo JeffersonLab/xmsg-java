@@ -85,11 +85,16 @@ public class xMsgMessageTest {
     }
 
     @Test
+    @SuppressWarnings("unchecked")
     public void createFromJavaObject() throws Exception {
         List<String> orig = Arrays.asList("led zeppelin", "pink floyd", "black sabbath");
 
         xMsgMessage msg = xMsgMessage.createFrom(testTopic, orig);
+
         assertThat(msg.getData(), is(xMsgUtil.serializeToBytes(orig)));
+
+        List<String> data = (List<String>) xMsgMessage.parseData(msg);
+        assertThat(data, is(orig));
     }
 
     @Test
