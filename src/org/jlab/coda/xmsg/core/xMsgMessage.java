@@ -32,6 +32,7 @@ import org.zeromq.ZMsg;
 
 import java.io.IOException;
 import java.io.UncheckedIOException;
+import java.nio.ByteOrder;
 import java.util.Arrays;
 import java.util.List;
 
@@ -173,6 +174,32 @@ public class xMsgMessage {
      */
     public xMsgTopic getReplyTopic() {
         return xMsgTopic.wrap(metaData.getReplyTo());
+    }
+
+    /**
+     * Checks if the metadata contains byte order information.
+     */
+    public boolean hasDataOrder() {
+        return metaData.hasByteOrder();
+    }
+
+    /**
+     * Returns the byte order of the data, if set.
+     * If the byte order is not set in the metadata,
+     * the returned value is {@link ByteOrder#BIG_ENDIAN BIG_ENDIAN}.
+     */
+    public ByteOrder getDataOrder() {
+        if (!metaData.hasByteOrder()) {
+            return ByteOrder.BIG_ENDIAN;
+        }
+        switch (metaData.getByteOrder()) {
+            case Big:
+                return ByteOrder.BIG_ENDIAN;
+            case Little:
+                return ByteOrder.LITTLE_ENDIAN;
+            default:
+                throw new RuntimeException("Invalide byte order: " + metaData.getByteOrder());
+        }
     }
 
     /**

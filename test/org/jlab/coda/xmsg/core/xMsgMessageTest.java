@@ -26,6 +26,7 @@ import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.is;
 import static org.junit.Assert.assertFalse;
 
+import java.nio.ByteOrder;
 import java.util.Arrays;
 import java.util.List;
 
@@ -95,6 +96,31 @@ public class xMsgMessageTest {
 
         List<String> data = (List<String>) xMsgMessage.parseData(msg);
         assertThat(data, is(orig));
+    }
+
+    @Test
+    public void createWithoutByteOrder() throws Exception {
+        byte[] data = new byte[] { 0x0, 0x1, 0x2, 0x3, 0xa, 0xb };
+        xMsgMeta.Builder meta = xMsgMeta.newBuilder();
+        meta.setDataType("test/binary");
+
+        xMsgMessage msg = new xMsgMessage(testTopic, meta, data);
+
+        assertThat(msg.hasDataOrder(), is(false));
+        assertThat(msg.getDataOrder(), is(ByteOrder.BIG_ENDIAN));
+    }
+
+    @Test
+    public void createAndSetByteOrder() throws Exception {
+        byte[] data = new byte[] { 0x0, 0x1, 0x2, 0x3, 0xa, 0xb };
+        xMsgMeta.Builder meta = xMsgMeta.newBuilder();
+        meta.setByteOrder(xMsgMeta.Endian.Little);
+        meta.setDataType("test/binary");
+
+        xMsgMessage msg = new xMsgMessage(testTopic, meta, data);
+
+        assertThat(msg.hasDataOrder(), is(true));
+        assertThat(msg.getDataOrder(), is(ByteOrder.LITTLE_ENDIAN));
     }
 
     @Test
