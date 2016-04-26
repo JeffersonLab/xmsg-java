@@ -428,7 +428,7 @@ public class xMsg implements AutoCloseable {
             // wait for the response
             return syncPubListener.waitMessage(returnAddress, timeout);
         } finally {
-            msg.getMetaData().setReplyTo(xMsgConstants.UNDEFINED.toString());
+            msg.getMetaData().clearReplyTo();
         }
     }
 
