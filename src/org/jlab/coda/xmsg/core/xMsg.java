@@ -418,10 +418,10 @@ public class xMsg implements AutoCloseable {
         // set the return address as replyTo in the xMsgMessage
         msg.getMetaData().setReplyTo(returnAddress);
 
-        // subscribe to the returnAddress
-        syncPubListener.register(connection.getAddress());
-
         try {
+            // subscribe to the returnAddress
+            syncPubListener.register(connection.getAddress());
+
             // it must be the internal _publish, to keep the replyTo field
             _publish(connection, msg);
 
