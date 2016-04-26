@@ -22,7 +22,6 @@
 
 package org.jlab.coda.xmsg.xsys.regdis;
 
-import org.jlab.coda.xmsg.core.xMsgConstants;
 import org.jlab.coda.xmsg.core.xMsgTopic;
 import org.jlab.coda.xmsg.data.xMsgR.xMsgRegistration;
 
@@ -31,8 +30,7 @@ import org.jlab.coda.xmsg.data.xMsgR.xMsgRegistration;
  */
 public final class xMsgRegQuery {
 
-    private final xMsgTopic topic;
-    private final xMsgRegistration.OwnerType type;
+    private final xMsgRegistration.Builder data;
 
     /**
      * Creates a simple query to search publishers of the specified topic.
@@ -55,31 +53,24 @@ public final class xMsgRegQuery {
     }
 
     private xMsgRegQuery(xMsgRegistration.OwnerType type, xMsgTopic topic) {
-        this.type = type;
-        this.topic = topic;
+        data = xMsgRegFactory.newFilter(type);
+        data.setDomain(topic.domain());
+        data.setSubject(topic.subject());
+        data.setType(topic.type());
     }
 
     /**
      * Serializes the query into a protobuf object.
      */
     public xMsgRegistration.Builder data() {
-        xMsgRegistration.Builder regb = xMsgRegistration.newBuilder();
-        regb.setName(xMsgConstants.UNDEFINED);
-        regb.setHost(xMsgConstants.UNDEFINED);
-        regb.setPort(xMsgConstants.DEFAULT_PORT);
-        regb.setDomain(topic.domain());
-        regb.setSubject(topic.subject());
-        regb.setType(topic.type());
-        regb.setOwnerType(type);
-        return regb;
+        return data;
     }
 
     @Override
     public int hashCode() {
         final int prime = 31;
         int result = 1;
-        result = prime * result + topic.hashCode();
-        result = prime * result + type.hashCode();
+        result = prime * result + data.hashCode();
         return result;
     }
 
@@ -95,12 +86,6 @@ public final class xMsgRegQuery {
             return false;
         }
         xMsgRegQuery other = (xMsgRegQuery) obj;
-        if (!topic.equals(other.topic)) {
-            return false;
-        }
-        if (type != other.type) {
-            return false;
-        }
-        return true;
+        return data.equals(other.data);
     }
 }
