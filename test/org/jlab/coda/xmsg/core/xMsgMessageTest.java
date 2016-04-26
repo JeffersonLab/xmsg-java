@@ -62,6 +62,29 @@ public class xMsgMessageTest {
     }
 
     @Test
+    public void createFromArray() throws Exception {
+        xMsgMessage msg;
+
+        msg = xMsgMessage.createFrom(testTopic, new Integer[] { 3, 4, 5});
+        Integer[] ivalue = xMsgMessage.parseData(msg, Integer[].class);
+
+        assertThat(msg.getMimeType(), is(xMsgMimeType.ARRAY_SFIXED32));
+        assertThat(ivalue, is(new Integer[] { 3, 4, 5}));
+
+        msg = xMsgMessage.createFrom(testTopic, new Double[] { 300.2, 4000.7, 58.8});
+        Double[] dvalue = xMsgMessage.parseData(msg, Double[].class);
+
+        assertThat(msg.getMimeType(), is(xMsgMimeType.ARRAY_DOUBLE));
+        assertThat(dvalue, is(new Double[] { 300.2, 4000.7, 58.8}));
+
+        msg = xMsgMessage.createFrom(testTopic, new String[] { "test_data", "test_value" });
+        String[] svalue = xMsgMessage.parseData(msg, String[].class);
+
+        assertThat(msg.getMimeType(), is(xMsgMimeType.ARRAY_STRING));
+        assertThat(svalue, is(new String[] { "test_data", "test_value" }));
+    }
+
+    @Test
     public void createFromJavaObject() throws Exception {
         List<String> orig = Arrays.asList("led zeppelin", "pink floyd", "black sabbath");
 
