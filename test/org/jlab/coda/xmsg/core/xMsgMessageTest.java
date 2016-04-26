@@ -44,14 +44,20 @@ public class xMsgMessageTest {
 
         msg = xMsgMessage.createFrom(testTopic, 460);
         int ivalue = xMsgMessage.parseData(msg, Integer.class);
+
+        assertThat(msg.getMimeType(), is(xMsgMimeType.SFIXED32));
         assertThat(ivalue, is(460));
 
         msg = xMsgMessage.createFrom(testTopic, 2000.5);
         double dvalue = xMsgMessage.parseData(msg, Double.class);
+
+        assertThat(msg.getMimeType(), is(xMsgMimeType.DOUBLE));
         assertThat(dvalue, is(2000.5));
 
         msg = xMsgMessage.createFrom(testTopic, "test_data");
         String svalue = xMsgMessage.parseData(msg, String.class);
+
+        assertThat(msg.getMimeType(), is(xMsgMimeType.STRING));
         assertThat(svalue, is("test_data"));
     }
 
