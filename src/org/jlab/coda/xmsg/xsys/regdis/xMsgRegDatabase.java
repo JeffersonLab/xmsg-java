@@ -32,6 +32,7 @@ import java.util.Map.Entry;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
+import java.util.stream.Collectors;
 
 /**
  *    A registration database of xMsg actors.
@@ -212,6 +213,19 @@ class xMsgRegDatabase {
             filter.filter(entry.getKey(), entry.getValue());
         }
         return filter.result();
+    }
+
+
+    /**
+     * Returns all registered actors.
+     *
+     * @return the set of all actors
+     */
+    public Set<xMsgRegistration> all() {
+        return db.values()
+                 .stream()
+                 .flatMap(Set::stream)
+                 .collect(Collectors.toSet());
     }
 
 
