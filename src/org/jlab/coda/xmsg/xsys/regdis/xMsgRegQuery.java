@@ -39,7 +39,16 @@ public final class xMsgRegQuery {
      * @return a query object
      */
     public static xMsgRegQuery publishers(xMsgTopic topic) {
-        return new xMsgRegQuery(xMsgRegistration.OwnerType.PUBLISHER, topic);
+        return publishers().matching(topic);
+    }
+
+    /**
+     * Creates a factory of queries to search publishers.
+     *
+     * @return a queries factory
+     */
+    public static Factory publishers() {
+        return new Factory(xMsgRegistration.OwnerType.PUBLISHER);
     }
 
     /**
@@ -49,14 +58,44 @@ public final class xMsgRegQuery {
      * @return a query object
      */
     public static xMsgRegQuery subscribers(xMsgTopic topic) {
-        return new xMsgRegQuery(xMsgRegistration.OwnerType.SUBSCRIBER, topic);
+        return subscribers().matching(topic);
     }
 
-    private xMsgRegQuery(xMsgRegistration.OwnerType type, xMsgTopic topic) {
-        data = xMsgRegFactory.newFilter(type);
-        data.setDomain(topic.domain());
-        data.setSubject(topic.subject());
-        data.setType(topic.type());
+    /**
+     * Creates a factory of queries to search subscribers.
+     *
+     * @return a queries factory
+     */
+    public static Factory subscribers() {
+        return new Factory(xMsgRegistration.OwnerType.SUBSCRIBER);
+    }
+
+
+    /**
+     * Creates specific registration discovery queries.
+     */
+    public static final class Factory {
+
+        private final xMsgRegistration.Builder data;
+
+        private Factory(xMsgRegistration.OwnerType type) {
+            data = xMsgRegFactory.newFilter(type);
+        }
+
+        /**
+         * A query for registered actors matching the given topic.
+         */
+        public xMsgRegQuery matching(xMsgTopic topic) {
+            data.setDomain(topic.domain());
+            data.setSubject(topic.subject());
+            data.setType(topic.type());
+            return new xMsgRegQuery(data);
+        }
+    }
+
+
+    private xMsgRegQuery(xMsgRegistration.Builder data) {
+        this.data = data;
     }
 
     /**
