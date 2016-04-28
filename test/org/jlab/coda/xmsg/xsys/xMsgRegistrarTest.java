@@ -156,12 +156,12 @@ public class xMsgRegistrarTest {
 
 
     public void check() throws xMsgException {
-        check(OwnerType.PUBLISHER);
-        check(OwnerType.SUBSCRIBER);
+        checkActors(OwnerType.PUBLISHER);
+        checkActors(OwnerType.SUBSCRIBER);
     }
 
 
-    private void check(OwnerType regType) throws xMsgException {
+    private void checkActors(OwnerType regType) throws xMsgException {
         for (String topic : RegistrationDataFactory.testTopics) {
             Builder data = discoveryRequest(regType, topic);
             Predicate<xMsgRegistration> predicate = discoveryPredicate(regType, topic);
