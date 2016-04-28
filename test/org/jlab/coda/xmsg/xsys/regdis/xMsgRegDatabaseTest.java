@@ -314,11 +314,7 @@ public class xMsgRegDatabaseTest {
 
 
     private static Set<xMsgTopic> newTopicSet(String... topics) {
-        Set<xMsgTopic> set = new HashSet<xMsgTopic>();
-        for (String s : topics) {
-            set.add(xMsgTopic.wrap(s));
-        }
-        return set;
+        return Stream.of(topics).map(xMsgTopic::wrap).collect(Collectors.toSet());
     }
 
 
