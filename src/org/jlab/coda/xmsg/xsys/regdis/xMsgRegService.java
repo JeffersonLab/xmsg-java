@@ -202,6 +202,14 @@ public class xMsgRegService implements Runnable {
                 logFilter("subscribers", data);
                 registration = subscribers.filter(data);
 
+            } else if (topic.equals(xMsgConstants.ALL_PUBLISHER)) {
+                LOGGER.fine(() -> "get all publishers");
+                registration = publishers.all();
+
+            } else if (topic.equals(xMsgConstants.ALL_SUBSCRIBER)) {
+                LOGGER.fine(() -> "get all subscribers");
+                registration = subscribers.all();
+
             }  else {
                 LOGGER.warning("unknown registration request type: " + topic);
                 reply = new xMsgRegResponse(topic, sender, "unknown registration request");
