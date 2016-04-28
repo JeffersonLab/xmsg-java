@@ -645,7 +645,20 @@ public class xMsg implements AutoCloseable {
         xMsgRegDriver regDriver = connectionManager.getRegistrarConnection(address);
         try {
             xMsgRegistration.Builder reg = query.data();
-            Set<xMsgRegistration> result = regDriver.findRegistration(myName, reg.build(), timeout);
+            Set<xMsgRegistration> result;
+            switch (query.category()) {
+                case MATCHING:
+                    result = regDriver.findRegistration(myName, reg.build(), timeout);
+                    break;
+                case FILTER:
+                    result = regDriver.filterRegistration(myName, reg.build(), timeout);
+                    break;
+                case ALL:
+                    result = regDriver.allRegistration(myName, reg.build(), timeout);
+                    break;
+                default:
+                    throw new IllegalArgumentException("Illegal query type: " + query.category());
+            }
             connectionManager.releaseRegistrarConnection(regDriver);
 
             return result.stream().map(xMsgRegRecord::new).collect(Collectors.toSet());

@@ -125,6 +125,46 @@ public class xMsgTest {
     }
 
 
+    @Test
+    public void filterPublishers() throws Exception {
+        xMsgRegQuery query = xMsgRegQuery.publishers().withDomain("domain");
+
+        core.discover(query, regAddr, 2000);
+
+        verify(driver).filterRegistration(eq(name), eq(query.data().build()), eq(2000));
+    }
+
+
+    @Test
+    public void filterSubscribers() throws Exception {
+        xMsgRegQuery query = xMsgRegQuery.subscribers().withSubject("subject");
+
+        core.discover(query, regAddr, 2000);
+
+        verify(driver).filterRegistration(eq(name), eq(query.data().build()), eq(2000));
+    }
+
+
+    @Test
+    public void allPublishers() throws Exception {
+        xMsgRegQuery query = xMsgRegQuery.publishers().all();
+
+        core.discover(query, regAddr, 2000);
+
+        verify(driver).allRegistration(eq(name), eq(query.data().build()), eq(2000));
+    }
+
+
+    @Test
+    public void allSubscribers() throws Exception {
+        xMsgRegQuery query = xMsgRegQuery.subscribers().all();
+
+        core.discover(query, regAddr, 2000);
+
+        verify(driver).allRegistration(eq(name), eq(query.data().build()), eq(2000));
+    }
+
+
     private xMsgRegistration.Builder createRegistration(xMsgRegistration.OwnerType regType,
                                                         xMsgTopic topic) {
         return RegistrationDataFactory.newRegistration(name, regType, topic.toString());
