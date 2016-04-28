@@ -306,6 +306,44 @@ public class xMsgRegDriver {
     }
 
     /**
+     * Sends a request to the database to get all publishers or subscribers,
+     * and waits the response.
+     *
+     * @param sender the sender of the request
+     * @param data the registration data object
+     * @return set of publishers or subscribers to the required topic.
+     * @throws xMsgException
+     */
+    public Set<xMsgRegistration> allRegistration(String sender, xMsgRegistration data)
+            throws xMsgException {
+        return allRegistration(sender, data, xMsgConstants.FIND_REQUEST_TIMEOUT);
+    }
+
+    /**
+     * Sends a request to the database to get all publishers or subscribers,
+     * and waits the response.
+     *
+     * @param sender the sender of the request
+     * @param data the registration data object
+     * @param timeout the milliseconds to wait for a response
+     * @return set of publishers or subscribers to the required topic.
+     * @throws xMsgException
+     */
+    public Set<xMsgRegistration> allRegistration(String sender,
+                                                 xMsgRegistration data,
+                                                 int timeout)
+            throws xMsgException {
+        String topic = selectTopic(data.getOwnerType(),
+                                   xMsgConstants.ALL_PUBLISHER,
+                                   xMsgConstants.ALL_SUBSCRIBER);
+
+        xMsgRegRequest request = new xMsgRegRequest(topic, sender, data);
+        xMsgRegResponse response = request(request, timeout);
+        return response.data();
+    }
+
+
+    /**
      * Closes the connection to the registrar.
      */
     public void close() {

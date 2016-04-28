@@ -174,6 +174,30 @@ public class xMsgRegDriverTest {
 
 
     @Test
+    public void sendPublisherAll() throws Exception {
+        Builder data = emptyFilter(true);
+
+        driver.allRegistration(sender, data.build());
+
+        assertRequest(data.build(),
+                      xMsgConstants.ALL_PUBLISHER,
+                      xMsgConstants.FIND_REQUEST_TIMEOUT);
+    }
+
+
+    @Test
+    public void sendSubscriberAll() throws Exception {
+        Builder data = emptyFilter(false);
+
+        driver.allRegistration(sender, data.build());
+
+        assertRequest(data.build(),
+                      xMsgConstants.ALL_SUBSCRIBER,
+                      xMsgConstants.FIND_REQUEST_TIMEOUT);
+    }
+
+
+    @Test
     public void getRegistration() throws Exception {
         Builder data = newRegistration("", topic, true);
 
