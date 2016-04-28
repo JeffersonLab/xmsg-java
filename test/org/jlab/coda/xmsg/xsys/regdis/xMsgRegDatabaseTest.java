@@ -269,6 +269,8 @@ public class xMsgRegDatabaseTest {
 
         assertThat(db.find("writer", "adventure", "*"),
                    is(newRegSet(twain1, twain2, tolkien1)));
+        assertThat(db.find("actor", "drama", "*"),
+                   is(empty()));
     }
 
 
