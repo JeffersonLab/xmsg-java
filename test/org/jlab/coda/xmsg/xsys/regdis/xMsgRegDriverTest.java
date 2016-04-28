@@ -34,6 +34,7 @@ import java.util.Arrays;
 import java.util.HashSet;
 import java.util.Set;
 
+import static org.jlab.coda.xmsg.xsys.regdis.RegistrationDataFactory.emptyFilter;
 import static org.jlab.coda.xmsg.xsys.regdis.RegistrationDataFactory.newRegistration;
 
 import static org.hamcrest.MatcherAssert.assertThat;
@@ -143,6 +144,32 @@ public class xMsgRegDriverTest {
         assertRequest(data.build(),
                       xMsgConstants.FIND_SUBSCRIBER,
                       xMsgConstants.FIND_REQUEST_TIMEOUT);
+    }
+
+
+    @Test
+    public void sendPublisherFilter() throws Exception {
+        Builder data = emptyFilter(true);
+        data.setDomain("domain");
+
+        driver.filterRegistration(sender, data.build());
+
+        assertRequest(data.build(),
+                      xMsgConstants.FILTER_PUBLISHER,
+                      xMsgConstants.FILTER_REQUEST_TIMEOUT);
+    }
+
+
+    @Test
+    public void sendSubscriberFilter() throws Exception {
+        Builder data = emptyFilter(false);
+        data.setDomain("domain");
+
+        driver.filterRegistration(sender, data.build());
+
+        assertRequest(data.build(),
+                      xMsgConstants.FILTER_SUBSCRIBER,
+                      xMsgConstants.FILTER_REQUEST_TIMEOUT);
     }
 
 
