@@ -119,8 +119,8 @@ class xMsgRegDatabase {
 
 
     /**
-     * Returns a set with all actors registered to the given topic. Empty if no
-     * actor is found.
+     * Returns a set with all actors whose topic is matched by the given topic.
+     * Empty if no actor is found.
      * <p>
      * The rules to match topics are the following.
      * If we have actors registered to these topics:
@@ -139,7 +139,7 @@ class xMsgRegDatabase {
      * @param domain the searched domain
      * @param subject the searched type (it can be undefined)
      * @param type the searched type (it can be undefined)
-     * @return a set of all actors registered to the topic
+     * @return the set of all actors that are matched by the topic
      */
     public Set<xMsgRegistration> find(String domain, String subject, String type) {
         Set<xMsgRegistration> result = new HashSet<>();
