@@ -192,6 +192,16 @@ public class xMsgRegService implements Runnable {
                                                  data.getSubject(),
                                                  data.getType());
 
+            } else if (topic.equals(xMsgConstants.FILTER_PUBLISHER)) {
+                xMsgRegistration data = request.data();
+                logFilter("publishers ", data);
+                registration = publishers.filter(data);
+
+            } else if (topic.equals(xMsgConstants.FILTER_SUBSCRIBER)) {
+                xMsgRegistration data = request.data();
+                logFilter("subscribers", data);
+                registration = subscribers.filter(data);
+
             }  else {
                 LOGGER.warning("unknown registration request type: " + topic);
                 reply = new xMsgRegResponse(topic, sender, "unknown registration request");
@@ -224,6 +234,27 @@ public class xMsgRegService implements Runnable {
         LOGGER.fine(() -> {
             return String.format("search %s topic = %s:%s:%s",
                     type, data.getDomain(), data.getSubject(), data.getType());
+        });
+    }
+
+    private void logFilter(String type, xMsgRegistration data) {
+        LOGGER.fine(() -> {
+            StringBuilder sb = new StringBuilder();
+            sb.append("search ").append(type);
+            if (!data.getDomain().equals(xMsgConstants.ANY)) {
+                sb.append("  domain = ").append(data.getDomain());
+            }
+            if (!data.getSubject().equals(xMsgConstants.ANY)) {
+                sb.append("  subject = ").append(data.getSubject());
+            }
+            if (!data.getType().equals(xMsgConstants.ANY)) {
+                sb.append("  type = ").append(data.getType());
+            }
+            if (!data.getHost().equals(xMsgConstants.UNDEFINED)) {
+                sb.append("  address = ")
+                  .append(data.getHost()).append(':').append(data.getPort());
+            }
+            return sb.toString();
         });
     }
 }
