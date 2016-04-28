@@ -99,6 +99,22 @@ public final class RegistrationDataFactory {
     }
 
 
+    public static Builder emptyFilter(boolean isPublisher) {
+        xMsgRegistration.OwnerType dataType = isPublisher
+                ? xMsgRegistration.OwnerType.PUBLISHER
+                : xMsgRegistration.OwnerType.SUBSCRIBER;
+        xMsgRegistration.Builder filter = xMsgRegistration.newBuilder();
+        filter.setName(xMsgConstants.UNDEFINED);
+        filter.setHost(xMsgConstants.UNDEFINED);
+        filter.setPort(xMsgConstants.DEFAULT_PORT);
+        filter.setDomain(xMsgConstants.ANY);
+        filter.setSubject(xMsgConstants.ANY);
+        filter.setType(xMsgConstants.ANY);
+        filter.setOwnerType(dataType);
+        return filter;
+    }
+
+
     public static String random(String[] array) {
         int idx = rnd.nextInt(array.length);
         return array[idx];

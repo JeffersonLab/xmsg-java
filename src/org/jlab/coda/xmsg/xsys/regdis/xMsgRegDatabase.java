@@ -22,6 +22,7 @@
 
 package org.jlab.coda.xmsg.xsys.regdis;
 
+import org.jlab.coda.xmsg.core.xMsgConstants;
 import org.jlab.coda.xmsg.core.xMsgTopic;
 import org.jlab.coda.xmsg.data.xMsgR.xMsgRegistration;
 
@@ -187,6 +188,32 @@ class xMsgRegDatabase {
         return result;
     }
 
+    /**
+     * Returns a set with all actors whose registration exactly matches the
+     * given terms. Empty if no actor is found.
+     * <p>
+     * The search terms can be:
+     * <ul>
+     * <li>domain
+     * <li>subject
+     * <li>type
+     * <li>address
+     * </ul>
+     * Only defined terms will be used for matching actors.
+     * The topic parts are undefined if its value is {@link xMsgConstants#ANY}.
+     * The address is undefined if its value is {@link xMsgConstants#UNDEFINED}.
+     *
+     * @param data the searched terms
+     * @return the set of all actors that match the terms
+     */
+    public Set<xMsgRegistration> filter(xMsgRegistration data) {
+        Filter filter = new Filter(data);
+        for (Entry<xMsgTopic, Set<xMsgRegistration>> entry : db.entrySet()) {
+            filter.filter(entry.getKey(), entry.getValue());
+        }
+        return filter.result();
+    }
+
 
     /**
      * Returns all registered topics.
@@ -215,5 +242,82 @@ class xMsgRegDatabase {
      */
     public Set<xMsgRegistration> get(xMsgTopic topic) {
         return db.get(topic);
+    }
+
+
+
+    private final class Filter {
+
+        private final Set<xMsgRegistration> result = new HashSet<>();
+
+        private final TopicFilter domain;
+        private final TopicFilter subject;
+        private final TopicFilter type;
+        private final AddressFilter address;
+
+        /**
+         * Cache a topic term.
+         * Avoid checking if the value is any for every actor.
+         */
+        private final class TopicFilter {
+            private final boolean any;
+            private final String value;
+
+            private TopicFilter(String value) {
+                this.any = value.equals(xMsgConstants.ANY);
+                this.value = value;
+            }
+        }
+
+        /**
+         * Cache the address
+         * Avoid checking if the address is set for every actor.
+         */
+        private final class AddressFilter {
+            private final boolean filter;
+            private final String host;
+            private final int port;
+
+            private AddressFilter(xMsgRegistration data) {
+                this.host = data.getHost();
+                this.port = data.getPort();
+                this.filter = !host.equals(xMsgConstants.UNDEFINED);
+            }
+        }
+
+        private Filter(xMsgRegistration data) {
+            this.domain = new TopicFilter(data.getDomain());
+            this.subject = new TopicFilter(data.getSubject());
+            this.type = new TopicFilter(data.getType());
+            this.address = new AddressFilter(data);
+        }
+
+        public void filter(xMsgTopic topic, Set<xMsgRegistration> actors) {
+            if (matchTopic(topic)) {
+                if (filterAddress()) {
+                    actors.stream().filter(this::matchAddress).forEach(result::add);
+                } else {
+                    result.addAll(actors);
+                }
+            }
+        }
+
+        public Set<xMsgRegistration> result() {
+            return result;
+        }
+
+        private boolean matchTopic(xMsgTopic topic) {
+            return (domain.any  || topic.domain().equals(domain.value))
+                && (subject.any || topic.subject().equals(subject.value))
+                && (type.any    || topic.type().equals(type.value));
+        }
+
+        private boolean filterAddress() {
+            return address.filter;
+        }
+
+        private boolean matchAddress(xMsgRegistration actor) {
+            return actor.getHost().equals(address.host) && actor.getPort() == address.port;
+        }
     }
 }
