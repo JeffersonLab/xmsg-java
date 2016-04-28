@@ -22,8 +22,9 @@
 
 package org.jlab.coda.xmsg.xsys.regdis;
 
-import java.util.HashSet;
 import java.util.Set;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 import org.jlab.coda.xmsg.core.xMsgTopic;
 import org.jlab.coda.xmsg.data.xMsgR.xMsgRegistration;
@@ -86,7 +87,7 @@ public class xMsgRegDatabaseTest {
         db.register(asimov1.build());
 
         assertThat(db.topics(), is(newTopicSet("writer:scifi:books")));
-        assertThat(db.get("writer:scifi:books"), is(newRegSet(asimov1.build())));
+        assertThat(db.get("writer:scifi:books"), is(newRegSet(asimov1)));
     }
 
 
@@ -95,8 +96,7 @@ public class xMsgRegDatabaseTest {
         db.register(twain1.build());
         db.register(twain2.build());
 
-        assertThat(db.get("writer:adventure"),
-                   is(newRegSet(twain1.build(), twain2.build())));
+        assertThat(db.get("writer:adventure"), is(newRegSet(twain1, twain2)));
     }
 
 
@@ -112,14 +112,9 @@ public class xMsgRegDatabaseTest {
                                "writer:adventure",
                                "writer:adventure:tales")));
 
-        assertThat(db.get("writer:scifi:books"),
-                   is(newRegSet(asimov1.build(), bradbury1.build())));
-
-        assertThat(db.get("writer:adventure"),
-                   is(newRegSet(twain1.build())));
-
-        assertThat(db.get("writer:adventure:tales"),
-                   is(newRegSet(tolkien1.build())));
+        assertThat(db.get("writer:scifi:books"), is(newRegSet(asimov1, bradbury1)));
+        assertThat(db.get("writer:adventure"), is(newRegSet(twain1)));
+        assertThat(db.get("writer:adventure:tales"), is(newRegSet(tolkien1)));
     }
 
 
@@ -129,10 +124,8 @@ public class xMsgRegDatabaseTest {
         db.register(twain1.build());
         db.register(twain2.build());
 
-        assertThat(db.get("writer:scifi:books"),
-                   is(newRegSet(asimov1.build())));
-        assertThat(db.get("writer:adventure"),
-                   is(newRegSet(twain1.build(), twain2.build())));
+        assertThat(db.get("writer:scifi:books"), is(newRegSet(asimov1)));
+        assertThat(db.get("writer:adventure"), is(newRegSet(twain1, twain2)));
     }
 
 
@@ -142,8 +135,7 @@ public class xMsgRegDatabaseTest {
         db.register(bradbury1.build());
         db.register(bradbury1.build());
 
-        assertThat(db.get("writer:scifi:books"),
-                   is(newRegSet(asimov1.build(), bradbury1.build())));
+        assertThat(db.get("writer:scifi:books"), is(newRegSet(asimov1, bradbury1)));
     }
 
 
@@ -165,7 +157,7 @@ public class xMsgRegDatabaseTest {
         db.remove(asimov2.build());
 
         assertThat(db.find("writer", "scifi", "books"),
-                   is(newRegSet(asimov1.build(), bradbury1.build())));
+                   is(newRegSet(asimov1, bradbury1)));
     }
 
 
@@ -178,8 +170,7 @@ public class xMsgRegDatabaseTest {
         db.remove(asimov1.build());
 
         assertThat(db.topics(), is(newTopicSet("writer:adventure")));
-        assertThat(db.get("writer:adventure"),
-                   is(newRegSet(twain1.build(), twain2.build())));
+        assertThat(db.get("writer:adventure"), is(newRegSet(twain1, twain2)));
     }
 
 
@@ -193,10 +184,8 @@ public class xMsgRegDatabaseTest {
 
         db.remove(bradbury1.build());
 
-        assertThat(db.get("writer:scifi:books"),
-                   is(newRegSet(asimov1.build(), asimov2.build())));
-        assertThat(db.get("writer:adventure"),
-                   is(newRegSet(twain1.build(), twain2.build())));
+        assertThat(db.get("writer:scifi:books"), is(newRegSet(asimov1, asimov2)));
+        assertThat(db.get("writer:adventure"), is(newRegSet(twain1, twain2)));
     }
 
 
@@ -207,8 +196,7 @@ public class xMsgRegDatabaseTest {
 
         db.remove(bradbury1.build());
 
-        assertThat(db.get("writer:scifi:books"),
-                   is(newRegSet(asimov1.build(), asimov2.build())));
+        assertThat(db.get("writer:scifi:books"), is(newRegSet(asimov1, asimov2)));
     }
 
 
@@ -230,12 +218,9 @@ public class xMsgRegDatabaseTest {
                                   "writer:adventure",
                                   "writer:adventure:tales")));
 
-        assertThat(db.get("writer:scifi:books"),
-                   is(newRegSet(asimov1.build(), bradbury1.build())));
-        assertThat(db.get("writer:adventure"),
-                   is(newRegSet(twain1.build())));
-        assertThat(db.get("writer:adventure:tales"),
-                   is(newRegSet(tolkien1.build())));
+        assertThat(db.get("writer:scifi:books"), is(newRegSet(asimov1, bradbury1)));
+        assertThat(db.get("writer:adventure"), is(newRegSet(twain1)));
+        assertThat(db.get("writer:adventure:tales"), is(newRegSet(tolkien1)));
     }
 
 
@@ -267,9 +252,9 @@ public class xMsgRegDatabaseTest {
         db.register(tolkien1.build());
 
         assertThat(db.find("writer", "*", "*"),
-                   is(newRegSet(asimov1.build(), twain2.build(), tolkien1.build())));
+                   is(newRegSet(asimov1, twain2, tolkien1)));
         assertThat(db.find("actor", "*", "*"),
-                   is(newRegSet(brando2.build())));
+                   is(newRegSet(brando2)));
     }
 
 
@@ -283,7 +268,7 @@ public class xMsgRegDatabaseTest {
         db.register(tolkien1.build());
 
         assertThat(db.find("writer", "adventure", "*"),
-                   is(newRegSet(twain1.build(), twain2.build(), tolkien1.build())));
+                   is(newRegSet(twain1, twain2, tolkien1)));
     }
 
 
@@ -296,7 +281,7 @@ public class xMsgRegDatabaseTest {
         db.register(tolkien1.build());
 
         assertThat(db.find("writer", "scifi", "books"),
-                   is(newRegSet(asimov1.build(), bradbury2.build())));
+                   is(newRegSet(asimov1, bradbury2)));
         assertThat(db.find("actor", "drama", "movies"),
                    is(empty()));
     }
@@ -318,11 +303,7 @@ public class xMsgRegDatabaseTest {
     }
 
 
-    private static Set<xMsgRegistration> newRegSet(xMsgRegistration... regs) {
-        Set<xMsgRegistration> set = new HashSet<xMsgRegistration>();
-        for (xMsgRegistration r : regs) {
-            set.add(r);
-        }
-        return set;
+    private static Set<xMsgRegistration> newRegSet(xMsgRegistration.Builder... regs) {
+        return Stream.of(regs).map(r -> r.build()).collect(Collectors.toSet());
     }
 }
