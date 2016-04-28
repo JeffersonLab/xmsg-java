@@ -140,13 +140,7 @@ public class xMsgRegistrarTest {
 
     private void removeHost(String host) throws xMsgException {
         System.out.println("INFO: Removing host " + host);
-        Iterator<xMsgRegistration> it = registration.iterator();
-        while (it.hasNext()) {
-            xMsgRegistration reg = it.next();
-            if (reg.getHost().equals(host)) {
-                it.remove();
-            }
-        }
+        registration.removeIf(r -> r.getHost().equals(host));
         driver.removeAllRegistration("test", host);
     }
 
