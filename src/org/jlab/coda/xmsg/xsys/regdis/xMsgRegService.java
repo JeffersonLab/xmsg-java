@@ -188,9 +188,9 @@ public class xMsgRegService implements Runnable {
             } else if (topic.equals(xMsgConstants.FIND_SUBSCRIBER)) {
                 xMsgRegistration data = request.data();
                 logDiscovery("subscribers", data);
-                registration = subscribers.find(data.getDomain(),
-                                                data.getSubject(),
-                                                data.getType());
+                registration = subscribers.rfind(data.getDomain(),
+                                                 data.getSubject(),
+                                                 data.getType());
 
             }  else {
                 LOGGER.warning("unknown registration request type: " + topic);

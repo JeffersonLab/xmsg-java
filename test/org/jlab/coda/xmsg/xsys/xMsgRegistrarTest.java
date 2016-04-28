@@ -197,8 +197,14 @@ public class xMsgRegistrarTest {
                 continue;
             }
             xMsgTopic regTopic = xMsgTopic.build(reg.getDomain(), reg.getSubject(), reg.getType());
-            if (searchTopic.isParent(regTopic)) {
-                set.add(reg);
+            if (checkPublisher(reg)) {
+                if (searchTopic.isParent(regTopic)) {
+                    set.add(reg);
+                }
+            } else {
+                if (regTopic.isParent(searchTopic)) {
+                    set.add(reg);
+                }
             }
         }
         return set;
