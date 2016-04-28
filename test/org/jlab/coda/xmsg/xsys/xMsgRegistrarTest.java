@@ -92,6 +92,9 @@ public class xMsgRegistrarTest {
             removeRandom(2500);
             filter();
 
+            removeRandom(2500);
+            all();
+
             removeAll();
             check();
 
@@ -169,6 +172,12 @@ public class xMsgRegistrarTest {
     public void filter() throws xMsgException {
         filterActors(OwnerType.PUBLISHER);
         filterActors(OwnerType.SUBSCRIBER);
+    }
+
+
+    public void all() throws xMsgException {
+        allActors(OwnerType.PUBLISHER);
+        allActors(OwnerType.SUBSCRIBER);
     }
 
 
@@ -279,6 +288,25 @@ public class xMsgRegistrarTest {
             Set<xMsgRegistration> expected = find(regType, e -> e.getHost().equals(host));
 
             checker.assertThat(host, result, expected);
+        }
+    }
+
+
+    private void allActors(OwnerType regType) throws xMsgException {
+        Builder data = RegistrationDataFactory.newFilter(regType);
+        data.setOwnerType(regType);
+
+        Set<xMsgRegistration> result = driver.filterRegistration(name, data.build());
+        Set<xMsgRegistration> expected = find(regType, e -> true);
+
+        String owner = regType == OwnerType.PUBLISHER ? "publishers" : "subscribers";
+        if (result.equals(expected)) {
+            System.out.printf("Found %3d %s%n", result.size(), owner);
+        } else {
+            System.out.println("All: " + owner);
+            System.out.println("Result: " + result.size());
+            System.out.println("Expected: " + expected.size());
+            fail("Sets doesn't match!!!");
         }
     }
 
