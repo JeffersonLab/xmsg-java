@@ -23,6 +23,7 @@
 package org.jlab.coda.xmsg.xsys.regdis;
 
 import org.jlab.coda.xmsg.core.xMsgConstants;
+import org.jlab.coda.xmsg.core.xMsgTopic;
 import org.jlab.coda.xmsg.data.xMsgR.xMsgRegistration;
 import org.jlab.coda.xmsg.data.xMsgR.xMsgRegistration.Builder;
 import org.jlab.coda.xmsg.net.xMsgRegAddress;
@@ -34,7 +35,6 @@ import java.util.Arrays;
 import java.util.HashSet;
 import java.util.Set;
 
-import static org.jlab.coda.xmsg.xsys.regdis.RegistrationDataFactory.newFilter;
 import static org.jlab.coda.xmsg.xsys.regdis.RegistrationDataFactory.newRegistration;
 
 import static org.jlab.coda.xmsg.data.xMsgR.xMsgRegistration.OwnerType.PUBLISHER;
@@ -128,7 +128,7 @@ public class xMsgRegDriverTest {
 
     @Test
     public void sendPublisherFind() throws Exception {
-        Builder data = newRegistration("", PUBLISHER, topic);
+        Builder data = xMsgRegQuery.publishers().matching(xMsgTopic.wrap(topic)).data();
 
         driver.findRegistration(sender, data.build());
 
@@ -140,7 +140,7 @@ public class xMsgRegDriverTest {
 
     @Test
     public void sendSubscriberFind() throws Exception {
-        Builder data = newRegistration("", SUBSCRIBER, topic);
+        Builder data = xMsgRegQuery.subscribers().matching(xMsgTopic.wrap(topic)).data();
 
         driver.findRegistration(sender, data.build());
 
@@ -152,8 +152,7 @@ public class xMsgRegDriverTest {
 
     @Test
     public void sendPublisherFilter() throws Exception {
-        Builder data = newFilter(PUBLISHER);
-        data.setDomain("domain");
+        Builder data = xMsgRegQuery.publishers().withDomain("domain").data();
 
         driver.filterRegistration(sender, data.build());
 
@@ -165,8 +164,7 @@ public class xMsgRegDriverTest {
 
     @Test
     public void sendSubscriberFilter() throws Exception {
-        Builder data = newFilter(SUBSCRIBER);
-        data.setDomain("domain");
+        Builder data = xMsgRegQuery.subscribers().withDomain("domain").data();
 
         driver.filterRegistration(sender, data.build());
 
@@ -178,7 +176,7 @@ public class xMsgRegDriverTest {
 
     @Test
     public void sendPublisherAll() throws Exception {
-        Builder data = newFilter(PUBLISHER);
+        Builder data = xMsgRegQuery.publishers().all().data();
 
         driver.allRegistration(sender, data.build());
 
@@ -190,7 +188,7 @@ public class xMsgRegDriverTest {
 
     @Test
     public void sendSubscriberAll() throws Exception {
-        Builder data = newFilter(SUBSCRIBER);
+        Builder data = xMsgRegQuery.subscribers().all().data();
 
         driver.allRegistration(sender, data.build());
 
@@ -202,7 +200,7 @@ public class xMsgRegDriverTest {
 
     @Test
     public void getRegistration() throws Exception {
-        Builder data = newRegistration("", PUBLISHER, topic);
+        Builder data = xMsgRegQuery.publishers(xMsgTopic.wrap(topic)).data();
 
         Builder pub1 = newRegistration("bradbury1", PUBLISHER, topic);
         Builder pub2 = newRegistration("bradbury2", PUBLISHER, topic);

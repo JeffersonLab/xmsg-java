@@ -34,6 +34,7 @@ import org.jlab.coda.xmsg.net.xMsgRegAddress;
 import org.jlab.coda.xmsg.testing.IntegrationTest;
 import org.jlab.coda.xmsg.xsys.regdis.RegistrationDataFactory;
 import org.jlab.coda.xmsg.xsys.regdis.xMsgRegDriver;
+import org.jlab.coda.xmsg.xsys.regdis.xMsgRegQuery;
 import org.junit.Test;
 import org.junit.experimental.categories.Category;
 import org.zeromq.ZContext;
@@ -184,7 +185,7 @@ public class xMsgRegistrarTest {
     private void checkActors(OwnerType regType) throws xMsgException {
         ResultAssert checker = new ResultAssert("topic", regType);
         for (String topic : RegistrationDataFactory.testTopics) {
-            Builder data = discoveryRequest(regType, topic);
+            Builder data = getQuery(regType).matching(xMsgTopic.wrap(topic)).data();
             Predicate<xMsgRegistration> predicate = discoveryPredicate(regType, topic);
 
             Set<xMsgRegistration> result = driver.findRegistration(name, data.build());
@@ -192,11 +193,6 @@ public class xMsgRegistrarTest {
 
             checker.assertThat(topic, result, expected);
         }
-    }
-
-
-    private Builder discoveryRequest(OwnerType regType, String topic) {
-        return RegistrationDataFactory.newRegistration("", regType, topic);
     }
 
 
@@ -227,8 +223,7 @@ public class xMsgRegistrarTest {
 
         ResultAssert checker = new ResultAssert("domain", regType);
         for (String domain : domains) {
-            Builder data = RegistrationDataFactory.newFilter(regType);
-            data.setDomain(domain);
+            Builder data = getQuery(regType).withDomain(domain).data();
 
             Set<xMsgRegistration> result = driver.filterRegistration(name, data.build());
             Set<xMsgRegistration> expected = find(regType, e -> e.getDomain().equals(domain));
@@ -247,8 +242,7 @@ public class xMsgRegistrarTest {
 
         ResultAssert checker = new ResultAssert("subject", regType);
         for (String subject : subjects) {
-            Builder data = RegistrationDataFactory.newFilter(regType);
-            data.setSubject(subject);
+            Builder data = getQuery(regType).withSubject(subject).data();
 
             Set<xMsgRegistration> result = driver.filterRegistration(name, data.build());
             Set<xMsgRegistration> expected = find(regType, e -> e.getSubject().equals(subject));
@@ -267,8 +261,7 @@ public class xMsgRegistrarTest {
 
         ResultAssert checker = new ResultAssert("type", regType);
         for (String type : types) {
-            Builder data = RegistrationDataFactory.newFilter(regType);
-            data.setType(type);
+            Builder data = getQuery(regType).withType(type).data();
 
             Set<xMsgRegistration> result = driver.filterRegistration(name, data.build());
             Set<xMsgRegistration> expected = find(regType, e -> e.getType().equals(type));
@@ -281,8 +274,7 @@ public class xMsgRegistrarTest {
     private void filterByHost(OwnerType regType) throws xMsgException {
         ResultAssert checker = new ResultAssert("host", regType);
         for (String host : RegistrationDataFactory.testHosts) {
-            Builder data = RegistrationDataFactory.newFilter(regType);
-            data.setHost(host);
+            Builder data = getQuery(regType).withHost(host).data();
 
             Set<xMsgRegistration> result = driver.filterRegistration(name, data.build());
             Set<xMsgRegistration> expected = find(regType, e -> e.getHost().equals(host));
@@ -293,8 +285,7 @@ public class xMsgRegistrarTest {
 
 
     private void allActors(OwnerType regType) throws xMsgException {
-        Builder data = RegistrationDataFactory.newFilter(regType);
-        data.setOwnerType(regType);
+        Builder data = getQuery(regType).all().data();
 
         Set<xMsgRegistration> result = driver.filterRegistration(name, data.build());
         Set<xMsgRegistration> expected = find(regType, e -> true);
@@ -322,6 +313,15 @@ public class xMsgRegistrarTest {
 
     private xMsgTopic getTopic(xMsgRegistration reg) {
         return xMsgTopic.build(reg.getDomain(), reg.getSubject(), reg.getType());
+    }
+
+
+    private xMsgRegQuery.Factory getQuery(OwnerType regType) {
+        if (regType == OwnerType.PUBLISHER) {
+            return xMsgRegQuery.publishers();
+        } else {
+            return xMsgRegQuery.subscribers();
+        }
     }
 
 

@@ -107,36 +107,26 @@ public class xMsgTest {
 
     @Test
     public void findPublishers() throws Exception {
-        core.discover(xMsgRegQuery.publishers(topic), regAddr, 2000);
+        xMsgRegQuery query = xMsgRegQuery.publishers(topic);
 
-        xMsgRegistration.Builder expected = createQuery(PUBLISHER, topic);
+        core.discover(query, regAddr, 2000);
 
-        verify(driver).findRegistration(eq(name), eq(expected.build()), eq(2000));
+        verify(driver).findRegistration(eq(name), eq(query.data().build()), eq(2000));
     }
 
 
     @Test
     public void findSubscribers() throws Exception {
-        core.discover(xMsgRegQuery.subscribers(topic), regAddr, 2000);
+        xMsgRegQuery query = xMsgRegQuery.subscribers(topic);
 
-        xMsgRegistration.Builder expected = createQuery(SUBSCRIBER, topic);
+        core.discover(query, regAddr, 2000);
 
-        verify(driver).findRegistration(eq(name), eq(expected.build()), eq(2000));
+        verify(driver).findRegistration(eq(name), eq(query.data().build()), eq(2000));
     }
 
 
     private xMsgRegistration.Builder createRegistration(xMsgRegistration.OwnerType regType,
                                                         xMsgTopic topic) {
         return RegistrationDataFactory.newRegistration(name, regType, topic.toString());
-    }
-
-
-    private xMsgRegistration.Builder createQuery(xMsgRegistration.OwnerType regType,
-                                                 xMsgTopic topic) {
-        String udf = xMsgConstants.UNDEFINED;
-        xMsgRegistration.Builder regb =
-                RegistrationDataFactory.newRegistration(udf, regType, topic.toString());
-        regb.setHost(udf);
-        return regb;
     }
 }

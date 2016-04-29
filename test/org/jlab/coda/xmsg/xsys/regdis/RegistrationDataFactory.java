@@ -86,11 +86,6 @@ public final class RegistrationDataFactory {
     }
 
 
-    public static Builder newFilter(OwnerType type) {
-        return xMsgRegFactory.newFilter(type);
-    }
-
-
     public static String random(String[] array) {
         int idx = rnd.nextInt(array.length);
         return array[idx];
