@@ -162,6 +162,7 @@ public class xMsgRegistrarTest {
 
 
     private void checkActors(OwnerType regType) throws xMsgException {
+        ResultAssert checker = new ResultAssert("topic", regType);
         for (String topic : RegistrationDataFactory.testTopics) {
             Builder data = discoveryRequest(regType, topic);
             Predicate<xMsgRegistration> predicate = discoveryPredicate(regType, topic);
@@ -169,15 +170,7 @@ public class xMsgRegistrarTest {
             Set<xMsgRegistration> result = driver.findRegistration(name, data.build());
             Set<xMsgRegistration> expected = find(regType, predicate);
 
-            if (result.equals(expected)) {
-                String owner = regType == OwnerType.PUBLISHER ? "publishers" : "subscribers";
-                System.out.printf("Found %3d %s for %s%n", result.size(), owner, topic);
-            } else {
-                System.out.println("Topic: " + topic);
-                System.out.println("Result: " + result.size());
-                System.out.println("Expected: " + expected.size());
-                fail("Sets doesn't match!!!");
-            }
+            checker.assertThat(topic, result, expected);
         }
     }
 
@@ -208,5 +201,33 @@ public class xMsgRegistrarTest {
 
     private xMsgTopic getTopic(xMsgRegistration reg) {
         return xMsgTopic.build(reg.getDomain(), reg.getSubject(), reg.getType());
+    }
+
+
+    private static final class ResultAssert {
+
+        private final String valueName;
+        private final OwnerType regType;
+
+        private ResultAssert(String valueName, OwnerType regType) {
+            this.valueName = valueName;
+            this.regType = regType;
+        }
+
+        private void assertThat(String data,
+                                Set<xMsgRegistration> result,
+                                Set<xMsgRegistration> expected) {
+            if (result.equals(expected)) {
+                String owner = regType == OwnerType.PUBLISHER ? "publishers" : "subscribers";
+                System.out.printf("Found %3d %s with %s %s%n",
+                                  result.size(), owner, valueName, data);
+            } else {
+                String outName = valueName.substring(0, 1).toUpperCase() + valueName.substring(1);
+                System.out.println(outName + ": " + data);
+                System.out.println("Result: " + result.size());
+                System.out.println("Expected: " + expected.size());
+                fail("Sets doesn't match!!!");
+            }
+        }
     }
 }
