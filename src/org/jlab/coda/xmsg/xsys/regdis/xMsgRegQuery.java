@@ -23,6 +23,7 @@
 package org.jlab.coda.xmsg.xsys.regdis;
 
 import org.jlab.coda.xmsg.core.xMsgTopic;
+import org.jlab.coda.xmsg.core.xMsgUtil;
 import org.jlab.coda.xmsg.data.xMsgR.xMsgRegistration;
 
 /**
@@ -102,6 +103,38 @@ public final class xMsgRegQuery {
             data.setSubject(topic.subject());
             data.setType(topic.type());
             return new xMsgRegQuery(data, Category.MATCHING);
+        }
+
+        /**
+         * A query for registered actor with this exact domain.
+         */
+        public xMsgRegQuery withDomain(String domain) {
+            data.setDomain(domain);
+            return new xMsgRegQuery(data, Category.FILTER);
+        }
+
+        /**
+         * A query for registered actor with this exact subject.
+         */
+        public xMsgRegQuery withSubject(String subject) {
+            data.setSubject(subject);
+            return new xMsgRegQuery(data, Category.FILTER);
+        }
+
+        /**
+         * A query for registered actor with this exact type.
+         */
+        public xMsgRegQuery withType(String type) {
+            data.setType(type);
+            return new xMsgRegQuery(data, Category.FILTER);
+        }
+
+        /**
+         * A query for registered actor with this exact hostname.
+         */
+        public xMsgRegQuery withHost(String host) {
+            data.setHost(xMsgUtil.toHostAddress(host));
+            return new xMsgRegQuery(data, Category.FILTER);
         }
     }
 
