@@ -31,6 +31,7 @@ import org.jlab.coda.xmsg.data.xMsgR.xMsgRegistration;
 public final class xMsgRegQuery {
 
     private final xMsgRegistration.Builder data;
+    private final Category category;
 
     /**
      * Creates a simple query to search publishers of the specified topic.
@@ -72,6 +73,17 @@ public final class xMsgRegQuery {
 
 
     /**
+     * A classification of registration queries.
+     * Each category uses a different driver method.
+     */
+    public enum Category {
+        MATCHING,
+        FILTER,
+        ALL
+    }
+
+
+    /**
      * Creates specific registration discovery queries.
      */
     public static final class Factory {
@@ -89,13 +101,14 @@ public final class xMsgRegQuery {
             data.setDomain(topic.domain());
             data.setSubject(topic.subject());
             data.setType(topic.type());
-            return new xMsgRegQuery(data);
+            return new xMsgRegQuery(data, Category.MATCHING);
         }
     }
 
 
-    private xMsgRegQuery(xMsgRegistration.Builder data) {
+    private xMsgRegQuery(xMsgRegistration.Builder data, Category category) {
         this.data = data;
+        this.category = category;
     }
 
     /**
@@ -103,6 +116,13 @@ public final class xMsgRegQuery {
      */
     public xMsgRegistration.Builder data() {
         return data;
+    }
+
+    /**
+     * The category of the query.
+     */
+    public Category category() {
+        return category;
     }
 
     @Override
