@@ -83,19 +83,10 @@ public final class RegistrationDataFactory {
                                           String host,
                                           String topic,
                                           boolean isPublisher) {
-        xMsgTopic xtopic = xMsgTopic.wrap(topic);
         xMsgRegistration.OwnerType dataType = isPublisher
                 ? xMsgRegistration.OwnerType.PUBLISHER
                 : xMsgRegistration.OwnerType.SUBSCRIBER;
-        Builder data = xMsgRegistration.newBuilder();
-        data.setName(name);
-        data.setHost(host);
-        data.setPort(xMsgConstants.DEFAULT_PORT);
-        data.setDomain(xtopic.domain());
-        data.setSubject(xtopic.subject());
-        data.setType(xtopic.type());
-        data.setOwnerType(dataType);
-        return data;
+        return xMsgRegFactory.newRegistration(name, host, dataType, xMsgTopic.wrap(topic));
     }
 
 

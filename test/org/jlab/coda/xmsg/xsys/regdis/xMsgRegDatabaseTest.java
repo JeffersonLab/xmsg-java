@@ -31,13 +31,14 @@ import org.jlab.coda.xmsg.data.xMsgR.xMsgRegistration;
 import org.junit.Before;
 import org.junit.Test;
 
-import static org.jlab.coda.xmsg.xsys.regdis.RegistrationDataFactory.newRegistration;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.empty;
 import static org.hamcrest.Matchers.is;
 
 
 public class xMsgRegDatabaseTest {
+
+    private static final xMsgRegistration.OwnerType TYPE = xMsgRegistration.OwnerType.PUBLISHER;
 
     private final xMsgRegistration.Builder asimov1;
     private final xMsgRegistration.Builder bradbury1;
@@ -53,20 +54,20 @@ public class xMsgRegDatabaseTest {
     public xMsgRegDatabaseTest() {
 
         // first test topic, four actors on two hosts
-        asimov1 = newRegistration("asimov", "10.2.9.1", "writer:scifi:books", true);
-        asimov2 = newRegistration("asimov", "10.2.9.2", "writer:scifi:books", true);
-        bradbury1 = newRegistration("bradbury", "10.2.9.1", "writer:scifi:books", true);
-        bradbury2 = newRegistration("bradbury", "10.2.9.2", "writer:scifi:books", true);
+        asimov1 = newRegistration("asimov", "10.2.9.1", "writer:scifi:books");
+        asimov2 = newRegistration("asimov", "10.2.9.2", "writer:scifi:books");
+        bradbury1 = newRegistration("bradbury", "10.2.9.1", "writer:scifi:books");
+        bradbury2 = newRegistration("bradbury", "10.2.9.2", "writer:scifi:books");
 
         // second test topic, two actors on two hosts
-        twain1 = newRegistration("twain", "10.2.9.1", "writer:adventure", true);
-        twain2 = newRegistration("twain", "10.2.9.2", "writer:adventure", true);
+        twain1 = newRegistration("twain", "10.2.9.1", "writer:adventure");
+        twain2 = newRegistration("twain", "10.2.9.2", "writer:adventure");
 
         // third test topic, one actor on second host
-        brando2 = newRegistration("brando", "10.2.9.2", "actor", true);
+        brando2 = newRegistration("brando", "10.2.9.2", "actor");
 
         // fourth test topic, one actor on first host
-        tolkien1 = newRegistration("tolkien", "10.2.9.1", "writer:adventure:tales", true);
+        tolkien1 = newRegistration("tolkien", "10.2.9.1", "writer:adventure:tales");
     }
 
 
@@ -456,6 +457,13 @@ public class xMsgRegDatabaseTest {
                                           brando2,
                                           tolkien1
                                           )));
+    }
+
+
+    private static xMsgRegistration.Builder newRegistration(String name,
+                                                            String host,
+                                                            String topic) {
+        return xMsgRegFactory.newRegistration(name, host, TYPE, xMsgTopic.wrap(topic));
     }
 
 

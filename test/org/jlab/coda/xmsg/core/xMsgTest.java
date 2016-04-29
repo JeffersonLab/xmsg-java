@@ -129,6 +129,9 @@ public class xMsgTest {
 
     private xMsgRegistration.Builder createQuery(xMsgTopic topic, boolean isPublisher) {
         String udf = xMsgConstants.UNDEFINED;
-        return RegistrationDataFactory.newRegistration(udf, udf, topic.toString(), isPublisher);
+        xMsgRegistration.Builder regb =
+                RegistrationDataFactory.newRegistration(udf, topic.toString(), isPublisher);
+        regb.setHost(udf);
+        return regb;
     }
 }

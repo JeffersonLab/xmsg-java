@@ -31,6 +31,7 @@ import org.jlab.coda.xmsg.net.xMsgContext;
 import org.jlab.coda.xmsg.net.xMsgProxyAddress;
 import org.jlab.coda.xmsg.net.xMsgRegAddress;
 import org.jlab.coda.xmsg.xsys.regdis.xMsgRegDriver;
+import org.jlab.coda.xmsg.xsys.regdis.xMsgRegFactory;
 import org.jlab.coda.xmsg.xsys.regdis.xMsgRegInfo;
 import org.jlab.coda.xmsg.xsys.regdis.xMsgRegQuery;
 import org.jlab.coda.xmsg.xsys.regdis.xMsgRegRecord;
@@ -690,15 +691,7 @@ public class xMsg implements AutoCloseable {
     }
 
     private xMsgRegistration.Builder _createRegistration(xMsgRegInfo info) {
-        xMsgRegistration.Builder regb = xMsgRegistration.newBuilder();
-        regb.setName(myName);
-        regb.setHost(defaultProxyAddress.host());
-        regb.setPort(defaultProxyAddress.pubPort());
-        regb.setDomain(info.topic().domain());
-        regb.setSubject(info.topic().subject());
-        regb.setType(info.topic().type());
-        regb.setOwnerType(info.type());
-        return regb;
+        return xMsgRegFactory.newRegistration(myName, defaultProxyAddress, info);
     }
 
     private void _publish(xMsgConnection connection, xMsgMessage msg) throws xMsgException {
