@@ -136,6 +136,10 @@ public final class xMsgRegQuery {
             data.setHost(xMsgUtil.toHostAddress(host));
             return new xMsgRegQuery(data, Category.FILTER);
         }
+
+        public xMsgRegQuery all() {
+            return new xMsgRegQuery(data, Category.ALL);
+        }
     }
 
 
