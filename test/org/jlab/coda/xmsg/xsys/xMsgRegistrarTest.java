@@ -41,6 +41,8 @@ import java.util.HashSet;
 import java.util.Iterator;
 import java.util.Random;
 import java.util.Set;
+import java.util.function.Predicate;
+import java.util.stream.Collectors;
 
 import static org.junit.Assert.fail;
 
@@ -162,9 +164,10 @@ public class xMsgRegistrarTest {
     private void check(OwnerType regType) throws xMsgException {
         for (String topic : RegistrationDataFactory.testTopics) {
             Builder data = discoveryRequest(regType, topic);
+            Predicate<xMsgRegistration> predicate = discoveryPredicate(regType, topic);
 
             Set<xMsgRegistration> result = driver.findRegistration(name, data.build());
-            Set<xMsgRegistration> expected = find(regType, topic);
+            Set<xMsgRegistration> expected = find(regType, predicate);
 
             if (result.equals(expected)) {
                 String owner = regType == OwnerType.PUBLISHER ? "publishers" : "subscribers";
@@ -184,24 +187,26 @@ public class xMsgRegistrarTest {
     }
 
 
-    private Set<xMsgRegistration> find(OwnerType regType, String topic) {
-        Set<xMsgRegistration> set = new HashSet<>();
-        xMsgTopic searchTopic = xMsgTopic.wrap(topic);
-        for (xMsgRegistration reg : registration) {
-            if (reg.getOwnerType() != regType) {
-                continue;
-            }
-            xMsgTopic regTopic = xMsgTopic.build(reg.getDomain(), reg.getSubject(), reg.getType());
-            if (regType == OwnerType.PUBLISHER) {
-                if (searchTopic.isParent(regTopic)) {
-                    set.add(reg);
-                }
-            } else {
-                if (regTopic.isParent(searchTopic)) {
-                    set.add(reg);
-                }
-            }
+    private Predicate<xMsgRegistration> discoveryPredicate(OwnerType regType, String topic) {
+        final xMsgTopic searchTopic = xMsgTopic.wrap(topic);
+        if (regType == OwnerType.PUBLISHER) {
+            return r -> searchTopic.isParent(getTopic(r));
+        } else {
+            return r -> getTopic(r).isParent(searchTopic);
         }
-        return set;
+    }
+
+
+    private Set<xMsgRegistration> find(OwnerType regType,
+                                       Predicate<xMsgRegistration> predicate) {
+        return registration.stream()
+                           .filter(r -> r.getOwnerType() == regType)
+                           .filter(predicate)
+                           .collect(Collectors.toSet());
+    }
+
+
+    private xMsgTopic getTopic(xMsgRegistration reg) {
+        return xMsgTopic.build(reg.getDomain(), reg.getSubject(), reg.getType());
     }
 }
