@@ -22,11 +22,10 @@
 
 package org.jlab.coda.xmsg.xsys.regdis;
 
-import org.jlab.coda.xmsg.core.xMsgConstants;
 import org.jlab.coda.xmsg.core.xMsgTopic;
 import org.jlab.coda.xmsg.core.xMsgUtil;
-import org.jlab.coda.xmsg.data.xMsgR.xMsgRegistration;
 import org.jlab.coda.xmsg.data.xMsgR.xMsgRegistration.Builder;
+import org.jlab.coda.xmsg.data.xMsgR.xMsgRegistration.OwnerType;
 
 import java.util.Random;
 
@@ -74,28 +73,16 @@ public final class RegistrationDataFactory {
     }
 
 
-    public static Builder newRegistration(String name, String topic, boolean isPublisher) {
-        return newRegistration(name, xMsgUtil.localhost(), topic, isPublisher);
+    public static Builder newRegistration(String name, OwnerType type, String topic) {
+        return newRegistration(name, xMsgUtil.localhost(), type, topic);
     }
 
 
     public static Builder newRegistration(String name,
                                           String host,
-                                          String topic,
-                                          boolean isPublisher) {
-        xMsgTopic xtopic = xMsgTopic.wrap(topic);
-        xMsgRegistration.OwnerType dataType = isPublisher
-                ? xMsgRegistration.OwnerType.PUBLISHER
-                : xMsgRegistration.OwnerType.SUBSCRIBER;
-        Builder data = xMsgRegistration.newBuilder();
-        data.setName(name);
-        data.setHost(host);
-        data.setPort(xMsgConstants.DEFAULT_PORT);
-        data.setDomain(xtopic.domain());
-        data.setSubject(xtopic.subject());
-        data.setType(xtopic.type());
-        data.setOwnerType(dataType);
-        return data;
+                                          OwnerType type,
+                                          String topic) {
+        return xMsgRegFactory.newRegistration(name, host, type, xMsgTopic.wrap(topic));
     }
 
 
@@ -109,7 +96,7 @@ public final class RegistrationDataFactory {
         String name = random(testNames);
         String host = random(testHosts);
         String topic = random(testTopics);
-        boolean isPublisher = rnd.nextBoolean();
-        return newRegistration(name, host, topic, isPublisher);
+        OwnerType type = rnd.nextBoolean() ? OwnerType.PUBLISHER : OwnerType.SUBSCRIBER;
+        return newRegistration(name, host, type, topic);
     }
 }

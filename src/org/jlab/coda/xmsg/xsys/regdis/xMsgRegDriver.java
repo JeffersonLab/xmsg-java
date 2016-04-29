@@ -247,6 +247,103 @@ public class xMsgRegDriver {
     }
 
     /**
+     * Sends a request to the registrar server to search the database
+     * for publishers or subscribers matching specific terms, and waits the response.
+     * The search terms should be set in the given registration data. They can be:
+     * <ul>
+     * <li>domain
+     * <li>subject
+     * <li>type
+     * <li>address
+     * </ul>
+     * Only defined terms will be used for matching actors.
+     * To topic parts should be undefined with {@link xMsgConstants#ANY}.
+     * The address should be undefined with {@link xMsgConstants#UNDEFINED}.
+     * The name is ignored.
+     *
+     * @param sender the sender of the request
+     * @param data the registration data object
+     * @return set of publishers or subscribers that match the given terms.
+     * @throws xMsgException
+     */
+    public Set<xMsgRegistration> filterRegistration(String sender, xMsgRegistration data)
+            throws xMsgException {
+        return filterRegistration(sender, data, xMsgConstants.FILTER_REQUEST_TIMEOUT);
+    }
+
+    /**
+     * Sends a request to the registrar server to search the database
+     * for publishers or subscribers matching specific terms, and waits the response.
+     * The search terms should be set in the given registration data. They can be:
+     * <ul>
+     * <li>domain
+     * <li>subject
+     * <li>type
+     * <li>address
+     * </ul>
+     * Only defined terms will be used for matching actors.
+     * To topic parts should be undefined with {@link xMsgConstants#ANY}.
+     * The address should be undefined with {@link xMsgConstants#UNDEFINED}.
+     * The name is ignored.
+     *
+     * @param sender the sender of the request
+     * @param data the registration data object
+     * @param timeout the milliseconds to wait for a response
+     * @return set of publishers or subscribers that match the given terms.
+     * @throws xMsgException
+     */
+    public Set<xMsgRegistration> filterRegistration(String sender,
+                                                    xMsgRegistration data,
+                                                    int timeout)
+            throws xMsgException {
+        String topic = selectTopic(data.getOwnerType(),
+                                   xMsgConstants.FILTER_PUBLISHER,
+                                   xMsgConstants.FILTER_SUBSCRIBER);
+
+        xMsgRegRequest request = new xMsgRegRequest(topic, sender, data);
+        xMsgRegResponse response = request(request, timeout);
+        return response.data();
+    }
+
+    /**
+     * Sends a request to the database to get all publishers or subscribers,
+     * and waits the response.
+     *
+     * @param sender the sender of the request
+     * @param data the registration data object
+     * @return set of publishers or subscribers to the required topic.
+     * @throws xMsgException
+     */
+    public Set<xMsgRegistration> allRegistration(String sender, xMsgRegistration data)
+            throws xMsgException {
+        return allRegistration(sender, data, xMsgConstants.FIND_REQUEST_TIMEOUT);
+    }
+
+    /**
+     * Sends a request to the database to get all publishers or subscribers,
+     * and waits the response.
+     *
+     * @param sender the sender of the request
+     * @param data the registration data object
+     * @param timeout the milliseconds to wait for a response
+     * @return set of publishers or subscribers to the required topic.
+     * @throws xMsgException
+     */
+    public Set<xMsgRegistration> allRegistration(String sender,
+                                                 xMsgRegistration data,
+                                                 int timeout)
+            throws xMsgException {
+        String topic = selectTopic(data.getOwnerType(),
+                                   xMsgConstants.ALL_PUBLISHER,
+                                   xMsgConstants.ALL_SUBSCRIBER);
+
+        xMsgRegRequest request = new xMsgRegRequest(topic, sender, data);
+        xMsgRegResponse response = request(request, timeout);
+        return response.data();
+    }
+
+
+    /**
      * Closes the connection to the registrar.
      */
     public void close() {

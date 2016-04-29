@@ -59,6 +59,13 @@ public final class xMsgConstants {
     public static final String FIND_PUBLISHER = "findPublisher";
     public static final String FIND_SUBSCRIBER = "findSubscriber";
 
+    public static final int FILTER_REQUEST_TIMEOUT = 3000;
+    public static final String FILTER_PUBLISHER = "filterPublisher";
+    public static final String FILTER_SUBSCRIBER = "filterSubscriber";
+
+    public static final String ALL_PUBLISHER = "allPublisher";
+    public static final String ALL_SUBSCRIBER = "allSubscriber";
+
     public static final String INFO = "INFO";
     public static final String WARNING = "WARNING";
     public static final String ERROR = "ERROR";

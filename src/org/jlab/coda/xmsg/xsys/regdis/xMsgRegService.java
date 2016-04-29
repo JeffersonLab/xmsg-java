@@ -188,9 +188,27 @@ public class xMsgRegService implements Runnable {
             } else if (topic.equals(xMsgConstants.FIND_SUBSCRIBER)) {
                 xMsgRegistration data = request.data();
                 logDiscovery("subscribers", data);
-                registration = subscribers.find(data.getDomain(),
-                                                data.getSubject(),
-                                                data.getType());
+                registration = subscribers.rfind(data.getDomain(),
+                                                 data.getSubject(),
+                                                 data.getType());
+
+            } else if (topic.equals(xMsgConstants.FILTER_PUBLISHER)) {
+                xMsgRegistration data = request.data();
+                logFilter("publishers ", data);
+                registration = publishers.filter(data);
+
+            } else if (topic.equals(xMsgConstants.FILTER_SUBSCRIBER)) {
+                xMsgRegistration data = request.data();
+                logFilter("subscribers", data);
+                registration = subscribers.filter(data);
+
+            } else if (topic.equals(xMsgConstants.ALL_PUBLISHER)) {
+                LOGGER.fine(() -> "get all publishers");
+                registration = publishers.all();
+
+            } else if (topic.equals(xMsgConstants.ALL_SUBSCRIBER)) {
+                LOGGER.fine(() -> "get all subscribers");
+                registration = subscribers.all();
 
             }  else {
                 LOGGER.warning("unknown registration request type: " + topic);
@@ -224,6 +242,27 @@ public class xMsgRegService implements Runnable {
         LOGGER.fine(() -> {
             return String.format("search %s topic = %s:%s:%s",
                     type, data.getDomain(), data.getSubject(), data.getType());
+        });
+    }
+
+    private void logFilter(String type, xMsgRegistration data) {
+        LOGGER.fine(() -> {
+            StringBuilder sb = new StringBuilder();
+            sb.append("search ").append(type);
+            if (!data.getDomain().equals(xMsgConstants.ANY)) {
+                sb.append("  domain = ").append(data.getDomain());
+            }
+            if (!data.getSubject().equals(xMsgConstants.ANY)) {
+                sb.append("  subject = ").append(data.getSubject());
+            }
+            if (!data.getType().equals(xMsgConstants.ANY)) {
+                sb.append("  type = ").append(data.getType());
+            }
+            if (!data.getHost().equals(xMsgConstants.UNDEFINED)) {
+                sb.append("  address = ")
+                  .append(data.getHost()).append(':').append(data.getPort());
+            }
+            return sb.toString();
         });
     }
 }

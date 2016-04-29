@@ -49,8 +49,9 @@ public class xMsgRegResponseTest {
 
     @Before
     public void setup() {
-        data1 = newRegistration("asimov", "10.2.9.1", "writer.scifi:books", true);
-        data2 = newRegistration("bradbury", "10.2.9.1", "writer.scifi:books", true);
+        xMsgRegistration.OwnerType type = xMsgRegistration.OwnerType.SUBSCRIBER;
+        data1 = newRegistration("asimov", "10.2.9.1", type, "writer.scifi:books");
+        data2 = newRegistration("bradbury", "10.2.9.1", type, "writer.scifi:books");
     }
 
 

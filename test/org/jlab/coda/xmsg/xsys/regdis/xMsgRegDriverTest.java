@@ -23,6 +23,7 @@
 package org.jlab.coda.xmsg.xsys.regdis;
 
 import org.jlab.coda.xmsg.core.xMsgConstants;
+import org.jlab.coda.xmsg.core.xMsgTopic;
 import org.jlab.coda.xmsg.data.xMsgR.xMsgRegistration;
 import org.jlab.coda.xmsg.data.xMsgR.xMsgRegistration.Builder;
 import org.jlab.coda.xmsg.net.xMsgRegAddress;
@@ -35,6 +36,9 @@ import java.util.HashSet;
 import java.util.Set;
 
 import static org.jlab.coda.xmsg.xsys.regdis.RegistrationDataFactory.newRegistration;
+
+import static org.jlab.coda.xmsg.data.xMsgR.xMsgRegistration.OwnerType.PUBLISHER;
+import static org.jlab.coda.xmsg.data.xMsgR.xMsgRegistration.OwnerType.SUBSCRIBER;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.is;
@@ -64,7 +68,7 @@ public class xMsgRegDriverTest {
 
     @Test
     public void sendPublisherRegistration() throws Exception {
-        Builder publisher = newRegistration("bradbury_pub", topic, true);
+        Builder publisher = newRegistration("bradbury_pub", PUBLISHER, topic);
         publisher.setDescription("bradbury books");
 
         driver.addRegistration(sender, publisher.build());
@@ -77,7 +81,7 @@ public class xMsgRegDriverTest {
 
     @Test
     public void sendSubscriberRegistration() throws Exception {
-        Builder subscriber = newRegistration("bradbury_sub", topic, false);
+        Builder subscriber = newRegistration("bradbury_sub", SUBSCRIBER, topic);
         subscriber.setDescription("bradbury books");
 
         driver.addRegistration(sender, subscriber.build());
@@ -90,7 +94,7 @@ public class xMsgRegDriverTest {
 
     @Test
     public void sendPublisherRemoval() throws Exception {
-        Builder publisher = newRegistration("bradbury_pub", topic, true);
+        Builder publisher = newRegistration("bradbury_pub", PUBLISHER, topic);
 
         driver.removeRegistration(sender, publisher.build());
 
@@ -102,7 +106,7 @@ public class xMsgRegDriverTest {
 
     @Test
     public void sendSubscriberRemoval() throws Exception {
-        Builder subscriber = newRegistration("bradbury_sub", topic, false);
+        Builder subscriber = newRegistration("bradbury_sub", SUBSCRIBER, topic);
 
         driver.removeRegistration(sender, subscriber.build());
 
@@ -124,7 +128,7 @@ public class xMsgRegDriverTest {
 
     @Test
     public void sendPublisherFind() throws Exception {
-        Builder data = newRegistration("", topic, true);
+        Builder data = xMsgRegQuery.publishers().matching(xMsgTopic.wrap(topic)).data();
 
         driver.findRegistration(sender, data.build());
 
@@ -136,7 +140,7 @@ public class xMsgRegDriverTest {
 
     @Test
     public void sendSubscriberFind() throws Exception {
-        Builder data = newRegistration("", topic, false);
+        Builder data = xMsgRegQuery.subscribers().matching(xMsgTopic.wrap(topic)).data();
 
         driver.findRegistration(sender, data.build());
 
@@ -147,11 +151,59 @@ public class xMsgRegDriverTest {
 
 
     @Test
-    public void getRegistration() throws Exception {
-        Builder data = newRegistration("", topic, true);
+    public void sendPublisherFilter() throws Exception {
+        Builder data = xMsgRegQuery.publishers().withDomain("domain").data();
 
-        Builder pub1 = newRegistration("bradbury1", topic, true);
-        Builder pub2 = newRegistration("bradbury2", topic, true);
+        driver.filterRegistration(sender, data.build());
+
+        assertRequest(data.build(),
+                      xMsgConstants.FILTER_PUBLISHER,
+                      xMsgConstants.FILTER_REQUEST_TIMEOUT);
+    }
+
+
+    @Test
+    public void sendSubscriberFilter() throws Exception {
+        Builder data = xMsgRegQuery.subscribers().withDomain("domain").data();
+
+        driver.filterRegistration(sender, data.build());
+
+        assertRequest(data.build(),
+                      xMsgConstants.FILTER_SUBSCRIBER,
+                      xMsgConstants.FILTER_REQUEST_TIMEOUT);
+    }
+
+
+    @Test
+    public void sendPublisherAll() throws Exception {
+        Builder data = xMsgRegQuery.publishers().all().data();
+
+        driver.allRegistration(sender, data.build());
+
+        assertRequest(data.build(),
+                      xMsgConstants.ALL_PUBLISHER,
+                      xMsgConstants.FIND_REQUEST_TIMEOUT);
+    }
+
+
+    @Test
+    public void sendSubscriberAll() throws Exception {
+        Builder data = xMsgRegQuery.subscribers().all().data();
+
+        driver.allRegistration(sender, data.build());
+
+        assertRequest(data.build(),
+                      xMsgConstants.ALL_SUBSCRIBER,
+                      xMsgConstants.FIND_REQUEST_TIMEOUT);
+    }
+
+
+    @Test
+    public void getRegistration() throws Exception {
+        Builder data = xMsgRegQuery.publishers(xMsgTopic.wrap(topic)).data();
+
+        Builder pub1 = newRegistration("bradbury1", PUBLISHER, topic);
+        Builder pub2 = newRegistration("bradbury2", PUBLISHER, topic);
         Set<xMsgRegistration> regData = new HashSet<>(Arrays.asList(pub1.build(), pub2.build()));
 
         setResponse(new xMsgRegResponse("", "", regData));
