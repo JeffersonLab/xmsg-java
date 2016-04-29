@@ -22,6 +22,7 @@
 
 package org.jlab.coda.xmsg.xsys;
 
+import org.jlab.coda.xmsg.core.xMsgConstants;
 import org.jlab.coda.xmsg.core.xMsgTopic;
 import org.jlab.coda.xmsg.core.xMsgUtil;
 import org.jlab.coda.xmsg.data.xMsgR.xMsgRegistration;
@@ -43,6 +44,7 @@ import java.util.Random;
 import java.util.Set;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 import static org.junit.Assert.fail;
 
@@ -86,6 +88,9 @@ public class xMsgRegistrarTest {
 
             addRandom(1000);
             check();
+
+            removeRandom(2500);
+            filter();
 
             removeAll();
             check();
@@ -161,6 +166,12 @@ public class xMsgRegistrarTest {
     }
 
 
+    public void filter() throws xMsgException {
+        filterActors(OwnerType.PUBLISHER);
+        filterActors(OwnerType.SUBSCRIBER);
+    }
+
+
     private void checkActors(OwnerType regType) throws xMsgException {
         ResultAssert checker = new ResultAssert("topic", regType);
         for (String topic : RegistrationDataFactory.testTopics) {
@@ -186,6 +197,88 @@ public class xMsgRegistrarTest {
             return r -> searchTopic.isParent(getTopic(r));
         } else {
             return r -> getTopic(r).isParent(searchTopic);
+        }
+    }
+
+
+    private void filterActors(OwnerType regType) throws xMsgException {
+        filterByDomain(regType);
+        filterBySubject(regType);
+        filterByType(regType);
+        filterByHost(regType);
+    }
+
+
+    private void filterByDomain(OwnerType regType) throws xMsgException {
+        Set<String> domains = Stream.of(RegistrationDataFactory.testTopics)
+                                    .map(xMsgTopic::wrap)
+                                    .map(xMsgTopic::domain)
+                                    .filter(t -> !t.equals(xMsgConstants.ANY))
+                                    .collect(Collectors.toSet());
+
+        ResultAssert checker = new ResultAssert("domain", regType);
+        for (String domain : domains) {
+            Builder data = RegistrationDataFactory.newFilter(regType);
+            data.setDomain(domain);
+
+            Set<xMsgRegistration> result = driver.filterRegistration(name, data.build());
+            Set<xMsgRegistration> expected = find(regType, e -> e.getDomain().equals(domain));
+
+            checker.assertThat(domain, result, expected);
+        }
+    }
+
+
+    private void filterBySubject(OwnerType regType) throws xMsgException {
+        Set<String> subjects = Stream.of(RegistrationDataFactory.testTopics)
+                                      .map(xMsgTopic::wrap)
+                                      .map(xMsgTopic::subject)
+                                      .filter(t -> !t.equals(xMsgConstants.ANY))
+                                      .collect(Collectors.toSet());
+
+        ResultAssert checker = new ResultAssert("subject", regType);
+        for (String subject : subjects) {
+            Builder data = RegistrationDataFactory.newFilter(regType);
+            data.setSubject(subject);
+
+            Set<xMsgRegistration> result = driver.filterRegistration(name, data.build());
+            Set<xMsgRegistration> expected = find(regType, e -> e.getSubject().equals(subject));
+
+            checker.assertThat(subject, result, expected);
+        }
+    }
+
+
+    private void filterByType(OwnerType regType) throws xMsgException {
+        Set<String> types = Stream.of(RegistrationDataFactory.testTopics)
+                                  .map(xMsgTopic::wrap)
+                                  .map(xMsgTopic::type)
+                                  .filter(t -> !t.equals(xMsgConstants.ANY))
+                                  .collect(Collectors.toSet());
+
+        ResultAssert checker = new ResultAssert("type", regType);
+        for (String type : types) {
+            Builder data = RegistrationDataFactory.newFilter(regType);
+            data.setType(type);
+
+            Set<xMsgRegistration> result = driver.filterRegistration(name, data.build());
+            Set<xMsgRegistration> expected = find(regType, e -> e.getType().equals(type));
+
+            checker.assertThat(type, result, expected);
+        }
+    }
+
+
+    private void filterByHost(OwnerType regType) throws xMsgException {
+        ResultAssert checker = new ResultAssert("host", regType);
+        for (String host : RegistrationDataFactory.testHosts) {
+            Builder data = RegistrationDataFactory.newFilter(regType);
+            data.setHost(host);
+
+            Set<xMsgRegistration> result = driver.filterRegistration(name, data.build());
+            Set<xMsgRegistration> expected = find(regType, e -> e.getHost().equals(host));
+
+            checker.assertThat(host, result, expected);
         }
     }
 
