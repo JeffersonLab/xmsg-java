@@ -72,7 +72,7 @@ public final class SyncPublishTest {
         long endTime = 0;
 
         try (xMsg actor = new xMsg("sync_tester", regAddress)) {
-            xMsgRegQuery query = xMsgRegQuery.subscribers(xMsgTopic.wrap(TOPIC));
+            xMsgRegQuery query = xMsgRegQuery.subscribers().withDomain(TOPIC);
             Set<xMsgRegRecord> listeners = actor.discover(query);
             numListeners = listeners.size();
             if (numListeners == 0) {
