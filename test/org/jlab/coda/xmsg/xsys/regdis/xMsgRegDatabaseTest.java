@@ -468,7 +468,7 @@ public class xMsgRegDatabaseTest {
 
 
     private static xMsgRegistration.Builder emptyFilter() {
-        return RegistrationDataFactory.emptyFilter(true);
+        return xMsgRegFactory.newFilter(TYPE);
     }
 
 

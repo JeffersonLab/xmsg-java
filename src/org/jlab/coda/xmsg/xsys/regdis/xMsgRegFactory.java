@@ -22,6 +22,7 @@
 
 package org.jlab.coda.xmsg.xsys.regdis;
 
+import org.jlab.coda.xmsg.core.xMsgConstants;
 import org.jlab.coda.xmsg.core.xMsgTopic;
 import org.jlab.coda.xmsg.data.xMsgR.xMsgRegistration;
 import org.jlab.coda.xmsg.net.xMsgProxyAddress;
@@ -85,5 +86,24 @@ public final class xMsgRegFactory {
         regb.setType(topic.type());
         regb.setOwnerType(type);
         return regb;
+    }
+
+    /**
+     * Creates an empty filter request.
+     * The terms to filter the actors need to be set.
+     *
+     * @param type the type of the actor (publisher or subscriber)
+     * @return the registration data to filter actors
+     */
+    public static xMsgRegistration.Builder newFilter(xMsgRegistration.OwnerType type) {
+        xMsgRegistration.Builder filter = xMsgRegistration.newBuilder();
+        filter.setName(xMsgConstants.UNDEFINED);
+        filter.setHost(xMsgConstants.UNDEFINED);
+        filter.setPort(xMsgConstants.DEFAULT_PORT);
+        filter.setDomain(xMsgConstants.ANY);
+        filter.setSubject(xMsgConstants.ANY);
+        filter.setType(xMsgConstants.ANY);
+        filter.setOwnerType(type);
+        return filter;
     }
 }

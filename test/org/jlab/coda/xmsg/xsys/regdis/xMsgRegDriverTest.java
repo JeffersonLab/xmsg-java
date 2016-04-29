@@ -34,7 +34,7 @@ import java.util.Arrays;
 import java.util.HashSet;
 import java.util.Set;
 
-import static org.jlab.coda.xmsg.xsys.regdis.RegistrationDataFactory.emptyFilter;
+import static org.jlab.coda.xmsg.xsys.regdis.RegistrationDataFactory.newFilter;
 import static org.jlab.coda.xmsg.xsys.regdis.RegistrationDataFactory.newRegistration;
 
 import static org.hamcrest.MatcherAssert.assertThat;
@@ -149,7 +149,7 @@ public class xMsgRegDriverTest {
 
     @Test
     public void sendPublisherFilter() throws Exception {
-        Builder data = emptyFilter(true);
+        Builder data = newFilter(true);
         data.setDomain("domain");
 
         driver.filterRegistration(sender, data.build());
@@ -162,7 +162,7 @@ public class xMsgRegDriverTest {
 
     @Test
     public void sendSubscriberFilter() throws Exception {
-        Builder data = emptyFilter(false);
+        Builder data = newFilter(false);
         data.setDomain("domain");
 
         driver.filterRegistration(sender, data.build());
@@ -175,7 +175,7 @@ public class xMsgRegDriverTest {
 
     @Test
     public void sendPublisherAll() throws Exception {
-        Builder data = emptyFilter(true);
+        Builder data = newFilter(true);
 
         driver.allRegistration(sender, data.build());
 
@@ -187,7 +187,7 @@ public class xMsgRegDriverTest {
 
     @Test
     public void sendSubscriberAll() throws Exception {
-        Builder data = emptyFilter(false);
+        Builder data = newFilter(false);
 
         driver.allRegistration(sender, data.build());
 

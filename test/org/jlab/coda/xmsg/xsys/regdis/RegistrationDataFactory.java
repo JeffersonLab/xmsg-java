@@ -22,7 +22,6 @@
 
 package org.jlab.coda.xmsg.xsys.regdis;
 
-import org.jlab.coda.xmsg.core.xMsgConstants;
 import org.jlab.coda.xmsg.core.xMsgTopic;
 import org.jlab.coda.xmsg.core.xMsgUtil;
 import org.jlab.coda.xmsg.data.xMsgR.xMsgRegistration;
@@ -90,19 +89,11 @@ public final class RegistrationDataFactory {
     }
 
 
-    public static Builder emptyFilter(boolean isPublisher) {
+    public static Builder newFilter(boolean isPublisher) {
         xMsgRegistration.OwnerType dataType = isPublisher
                 ? xMsgRegistration.OwnerType.PUBLISHER
                 : xMsgRegistration.OwnerType.SUBSCRIBER;
-        xMsgRegistration.Builder filter = xMsgRegistration.newBuilder();
-        filter.setName(xMsgConstants.UNDEFINED);
-        filter.setHost(xMsgConstants.UNDEFINED);
-        filter.setPort(xMsgConstants.DEFAULT_PORT);
-        filter.setDomain(xMsgConstants.ANY);
-        filter.setSubject(xMsgConstants.ANY);
-        filter.setType(xMsgConstants.ANY);
-        filter.setOwnerType(dataType);
-        return filter;
+        return xMsgRegFactory.newFilter(dataType);
     }
 
 
