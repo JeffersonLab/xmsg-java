@@ -26,6 +26,7 @@ import org.jlab.coda.xmsg.core.xMsgTopic;
 import org.jlab.coda.xmsg.core.xMsgUtil;
 import org.jlab.coda.xmsg.data.xMsgR.xMsgRegistration;
 import org.jlab.coda.xmsg.data.xMsgR.xMsgRegistration.Builder;
+import org.jlab.coda.xmsg.data.xMsgR.xMsgRegistration.OwnerType;
 import org.jlab.coda.xmsg.excp.xMsgException;
 import org.jlab.coda.xmsg.net.xMsgConnectionFactory;
 import org.jlab.coda.xmsg.net.xMsgRegAddress;
@@ -159,20 +160,20 @@ public class xMsgRegistrarTest {
 
 
     public void check() throws xMsgException {
-        check(true);
-        check(false);
+        check(OwnerType.PUBLISHER);
+        check(OwnerType.SUBSCRIBER);
     }
 
 
-    private void check(boolean isPublisher) throws xMsgException {
+    private void check(OwnerType regType) throws xMsgException {
         for (String topic : RegistrationDataFactory.testTopics) {
-            Builder data = discoveryRequest(topic, isPublisher);
+            Builder data = discoveryRequest(regType, topic);
 
             Set<xMsgRegistration> result = driver.findRegistration(name, data.build());
-            Set<xMsgRegistration> expected = find(topic, isPublisher);
+            Set<xMsgRegistration> expected = find(regType, topic);
 
             if (result.equals(expected)) {
-                String owner = isPublisher ? "publishers" : "subscribers";
+                String owner = regType == OwnerType.PUBLISHER ? "publishers" : "subscribers";
                 System.out.printf("Found %3d %s for %s%n", result.size(), owner, topic);
             } else {
                 System.out.println("Topic: " + topic);
@@ -184,20 +185,20 @@ public class xMsgRegistrarTest {
     }
 
 
-    private Builder discoveryRequest(String topic, boolean isPublisher) {
-        return RegistrationDataFactory.newRegistration(name, "localhost", topic, isPublisher);
+    private Builder discoveryRequest(OwnerType regType, String topic) {
+        return RegistrationDataFactory.newRegistration("", regType, topic);
     }
 
 
-    private Set<xMsgRegistration> find(String topic, boolean isPublisher) {
+    private Set<xMsgRegistration> find(OwnerType regType, String topic) {
         Set<xMsgRegistration> set = new HashSet<>();
         xMsgTopic searchTopic = xMsgTopic.wrap(topic);
         for (xMsgRegistration reg : registration) {
-            if (isPublisher != checkPublisher(reg)) {
+            if (reg.getOwnerType() != regType) {
                 continue;
             }
             xMsgTopic regTopic = xMsgTopic.build(reg.getDomain(), reg.getSubject(), reg.getType());
-            if (checkPublisher(reg)) {
+            if (regType == OwnerType.PUBLISHER) {
                 if (searchTopic.isParent(regTopic)) {
                     set.add(reg);
                 }
@@ -208,10 +209,5 @@ public class xMsgRegistrarTest {
             }
         }
         return set;
-    }
-
-
-    private boolean checkPublisher(xMsgRegistration reg) {
-        return reg.getOwnerType() == xMsgRegistration.OwnerType.PUBLISHER;
     }
 }

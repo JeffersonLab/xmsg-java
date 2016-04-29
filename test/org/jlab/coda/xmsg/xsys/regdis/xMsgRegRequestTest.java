@@ -41,7 +41,8 @@ public class xMsgRegRequestTest {
 
     @Before
     public void setup() {
-        data = newRegistration("asimov", "10.2.9.1", "writer.scifi:books", true);
+        xMsgRegistration.OwnerType type = xMsgRegistration.OwnerType.SUBSCRIBER;
+        data = newRegistration("asimov", "10.2.9.1", type, "writer.scifi:books");
     }
 
 

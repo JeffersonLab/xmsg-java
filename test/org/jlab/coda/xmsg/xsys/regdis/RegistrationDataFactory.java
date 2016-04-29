@@ -24,8 +24,8 @@ package org.jlab.coda.xmsg.xsys.regdis;
 
 import org.jlab.coda.xmsg.core.xMsgTopic;
 import org.jlab.coda.xmsg.core.xMsgUtil;
-import org.jlab.coda.xmsg.data.xMsgR.xMsgRegistration;
 import org.jlab.coda.xmsg.data.xMsgR.xMsgRegistration.Builder;
+import org.jlab.coda.xmsg.data.xMsgR.xMsgRegistration.OwnerType;
 
 import java.util.Random;
 
@@ -73,27 +73,21 @@ public final class RegistrationDataFactory {
     }
 
 
-    public static Builder newRegistration(String name, String topic, boolean isPublisher) {
-        return newRegistration(name, xMsgUtil.localhost(), topic, isPublisher);
+    public static Builder newRegistration(String name, OwnerType type, String topic) {
+        return newRegistration(name, xMsgUtil.localhost(), type, topic);
     }
 
 
     public static Builder newRegistration(String name,
                                           String host,
-                                          String topic,
-                                          boolean isPublisher) {
-        xMsgRegistration.OwnerType dataType = isPublisher
-                ? xMsgRegistration.OwnerType.PUBLISHER
-                : xMsgRegistration.OwnerType.SUBSCRIBER;
-        return xMsgRegFactory.newRegistration(name, host, dataType, xMsgTopic.wrap(topic));
+                                          OwnerType type,
+                                          String topic) {
+        return xMsgRegFactory.newRegistration(name, host, type, xMsgTopic.wrap(topic));
     }
 
 
-    public static Builder newFilter(boolean isPublisher) {
-        xMsgRegistration.OwnerType dataType = isPublisher
-                ? xMsgRegistration.OwnerType.PUBLISHER
-                : xMsgRegistration.OwnerType.SUBSCRIBER;
-        return xMsgRegFactory.newFilter(dataType);
+    public static Builder newFilter(OwnerType type) {
+        return xMsgRegFactory.newFilter(type);
     }
 
 
@@ -107,7 +101,7 @@ public final class RegistrationDataFactory {
         String name = random(testNames);
         String host = random(testHosts);
         String topic = random(testTopics);
-        boolean isPublisher = rnd.nextBoolean();
-        return newRegistration(name, host, topic, isPublisher);
+        OwnerType type = rnd.nextBoolean() ? OwnerType.PUBLISHER : OwnerType.SUBSCRIBER;
+        return newRegistration(name, host, type, topic);
     }
 }
