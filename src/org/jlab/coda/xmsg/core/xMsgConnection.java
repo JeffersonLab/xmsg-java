@@ -20,7 +20,10 @@
  *    Department of Experimental Nuclear Physics, Jefferson Lab.
  */
 
-package org.jlab.coda.xmsg.net;
+package org.jlab.coda.xmsg.core;
+
+import org.jlab.coda.xmsg.net.xMsgProxyAddress;
+import org.jlab.coda.xmsg.net.xMsgProxyDriver;
 
 /**
  * The standard connection to xMsg nodes.
@@ -29,7 +32,7 @@ public class xMsgConnection {
 
     private xMsgProxyDriver connection;
 
-    public xMsgConnection(xMsgProxyDriver connection) {
+    xMsgConnection(xMsgProxyDriver connection) {
         this.connection = connection;
     }
 
