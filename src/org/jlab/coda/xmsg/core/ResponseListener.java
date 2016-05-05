@@ -1,11 +1,11 @@
 package org.jlab.coda.xmsg.core;
 
 import org.jlab.coda.xmsg.excp.xMsgException;
-import org.jlab.coda.xmsg.net.xMsgConnection;
 import org.jlab.coda.xmsg.net.xMsgConnectionFactory;
 import org.jlab.coda.xmsg.net.xMsgConnectionSetup;
 import org.jlab.coda.xmsg.net.xMsgListener;
 import org.jlab.coda.xmsg.net.xMsgProxyAddress;
+import org.jlab.coda.xmsg.net.xMsgProxyDriver;
 import org.zeromq.ZMsg;
 
 import java.util.concurrent.ConcurrentHashMap;
@@ -29,13 +29,13 @@ class ResponseListener extends xMsgListener {
     public void register(xMsgProxyAddress address) throws xMsgException {
         if (items.get(address) == null) {
             xMsgConnectionSetup setup = new xMsgConnectionSetup() { };
-            xMsgConnection connection = factory.createProxyConnection(address, setup);
+            xMsgProxyDriver connection = factory.createProxyConnection(address, setup);
             connection.subscribe(topic);
             if (!connection.checkSubscription(topic.toString())) {
                 connection.close();
                 throw new xMsgException("could not subscribe to " + topic);
             }
-            xMsgConnection value = items.putIfAbsent(address, connection);
+            xMsgProxyDriver value = items.putIfAbsent(address, connection);
             if (value != null) {
                 connection.unsubscribe(topic);
                 connection.close();

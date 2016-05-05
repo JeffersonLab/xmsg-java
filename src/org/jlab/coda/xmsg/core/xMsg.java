@@ -297,7 +297,7 @@ public class xMsg implements AutoCloseable {
      * @throws xMsgException if the connection could not be created
      */
     public xMsgConnection createConnection(xMsgProxyAddress address) throws xMsgException {
-        return connectionManager.createProxyConnection(address);
+        return new xMsgConnection(connectionManager.createProxyConnection(address));
     }
 
     /**
@@ -309,8 +309,7 @@ public class xMsg implements AutoCloseable {
      * @throws xMsgException if the connection could not be created
      */
     public xMsgConnection createConnection(String proxyHost) throws xMsgException {
-        xMsgProxyAddress address = new xMsgProxyAddress(proxyHost);
-        return connectionManager.createProxyConnection(address);
+        return createConnection(new xMsgProxyAddress(proxyHost));
     }
 
     /**
@@ -320,7 +319,7 @@ public class xMsg implements AutoCloseable {
      * @throws xMsgException if the connection could not be created
      */
     public xMsgConnection createConnection() throws xMsgException {
-        return connectionManager.createProxyConnection(defaultProxyAddress);
+        return createConnection(defaultProxyAddress);
     }
 
     /**
@@ -332,7 +331,7 @@ public class xMsg implements AutoCloseable {
      * @throws xMsgException if a new connection could not be created
      */
     public xMsgConnection getConnection(xMsgProxyAddress address) throws xMsgException {
-        return connectionManager.getProxyConnection(address);
+        return new xMsgConnection(connectionManager.getProxyConnection(address));
     }
 
     /**
@@ -345,8 +344,7 @@ public class xMsg implements AutoCloseable {
      * @throws xMsgException if a new connection could not be created
      */
     public xMsgConnection getConnection(String proxyHost) throws xMsgException {
-        xMsgProxyAddress address = new xMsgProxyAddress(proxyHost);
-        return connectionManager.getProxyConnection(address);
+        return getConnection(new xMsgProxyAddress(proxyHost));
     }
 
     /**
@@ -357,7 +355,7 @@ public class xMsg implements AutoCloseable {
      * @throws xMsgException if a new connection could not be created
      */
     public xMsgConnection getConnection() throws xMsgException {
-        return connectionManager.getProxyConnection(defaultProxyAddress);
+        return getConnection(defaultProxyAddress);
     }
 
     /**
@@ -366,7 +364,7 @@ public class xMsg implements AutoCloseable {
      * @param connection the returned connection
      */
     public void releaseConnection(xMsgConnection connection) {
-        connectionManager.releaseProxyConnection(connection);
+        connectionManager.releaseProxyConnection(connection.delegate());
     }
 
     /**
@@ -709,7 +707,7 @@ public class xMsg implements AutoCloseable {
 
     private void _publish(xMsgConnection connection, xMsgMessage msg) throws xMsgException {
         try {
-            connection.send(msg.serialize());
+            connection.delegate().send(msg.serialize());
         } catch (ZMQException e) {
             throw new xMsgException("Publishing failed: " + e.getMessage());
         }

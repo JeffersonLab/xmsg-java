@@ -25,6 +25,7 @@ package org.jlab.coda.xmsg.core;
 import org.jlab.coda.xmsg.excp.xMsgException;
 import org.jlab.coda.xmsg.net.xMsgConnection;
 import org.jlab.coda.xmsg.net.xMsgPoller;
+import org.jlab.coda.xmsg.net.xMsgProxyDriver;
 import org.zeromq.ZMQ;
 import org.zeromq.ZMQException;
 import org.zeromq.ZMsg;
@@ -50,7 +51,7 @@ import org.zeromq.ZMsg;
 public abstract class xMsgSubscription {
 
     private final String name;
-    private final xMsgConnection connection;
+    private final xMsgProxyDriver connection;
     private final String topic;
 
     private final Thread thread;
@@ -63,7 +64,7 @@ public abstract class xMsgSubscription {
      */
     xMsgSubscription(String name, xMsgConnection connection, xMsgTopic topic) {
         this.name = name;
-        this.connection = connection;
+        this.connection = connection.delegate();
         this.topic = topic.toString();
         this.thread = xMsgUtil.newThread(name, new Handler());
     }
@@ -125,8 +126,8 @@ public abstract class xMsgSubscription {
      * @throws xMsgException if subscription could not be started
      */
     void start() throws xMsgException {
-        this.connection.subscribe(topic.toString());
-        if (!this.connection.checkSubscription(topic.toString())) {
+        connection.subscribe(topic.toString());
+        if (!connection.checkSubscription(topic.toString())) {
             connection.unsubscribe(topic);
             throw new xMsgException("could not subscribe to " + topic);
         }

@@ -35,7 +35,7 @@ public abstract class xMsgListener implements Runnable {
 
     private static final int TIMEOUT = 100;
 
-    protected final ConcurrentMap<xMsgProxyAddress, xMsgConnection> items;
+    protected final ConcurrentMap<xMsgProxyAddress, xMsgProxyDriver> items;
 
     private final Thread pollingThread;
     private volatile boolean isRunning = false;
@@ -57,7 +57,7 @@ public abstract class xMsgListener implements Runnable {
         } catch (InterruptedException e) {
             e.printStackTrace();
         }
-        for (xMsgConnection connection : items.values()) {
+        for (xMsgProxyDriver connection : items.values()) {
             connection.close();
         }
     }
@@ -68,7 +68,7 @@ public abstract class xMsgListener implements Runnable {
     public void run() {
         while (isRunning) {
             ZMQ.Poller poller = new ZMQ.Poller(items.size());
-            for (xMsgConnection connection : items.values()) {
+            for (xMsgProxyDriver connection : items.values()) {
                 poller.register(connection.getSubSock(), Poller.POLLIN);
             }
             int rc = poller.poll(TIMEOUT);
