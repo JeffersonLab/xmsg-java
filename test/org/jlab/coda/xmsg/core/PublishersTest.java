@@ -184,9 +184,7 @@ public class PublishersTest {
 
         @Override
         void publish(xMsg actor, xMsgMessage msg, Check check) throws Exception {
-            try (xMsgConnection connection = actor.getConnection()) {
-                actor.publish(connection, msg);
-            }
+            actor.publish(msg);
         }
     }
 
@@ -199,19 +197,14 @@ public class PublishersTest {
 
         @Override
         void receive(xMsg actor, xMsgMessage msg, Check check) throws Exception {
-            try (xMsgConnection connection = actor.getConnection()) {
-                xMsgMessage res = xMsgMessage.createResponse(msg);
-                actor.publish(connection, res);
-            }
+            actor.publish(xMsgMessage.createResponse(msg));
         }
 
         @Override
         void publish(xMsg actor, xMsgMessage msg, Check check) throws Exception {
-            try (xMsgConnection connection = actor.getConnection()) {
-                xMsgMessage res = actor.syncPublish(connection, msg, 1000);
-                Integer r = xMsgMessage.parseData(res, Integer.class);
-                check.increment(r);
-            }
+            xMsgMessage res = actor.syncPublish(msg, 1000);
+            Integer r = xMsgMessage.parseData(res, Integer.class);
+            check.increment(r);
         }
     }
 

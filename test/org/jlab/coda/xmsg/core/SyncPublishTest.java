@@ -33,9 +33,8 @@ public final class SyncPublishTest {
             actor.register(xMsgRegInfo.subscriber(topic, "test subscriber"));
             System.out.printf("Registered with %s%n", regAddress);
             actor.subscribe(topic, msg -> {
-                try (xMsgConnection repCon = actor.getConnection()) {
-                    xMsgMessage res = xMsgMessage.createResponse(msg);
-                    actor.publish(repCon, res);
+                try {
+                    actor.publish(xMsgMessage.createResponse(msg));
                 } catch (xMsgException e) {
                     e.printStackTrace();
                 }

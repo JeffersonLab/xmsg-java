@@ -139,9 +139,8 @@ public class SubscriptionsTest {
                  xMsg pubActor = new xMsg("test_publisher")) {
                 xMsgTopic subTopic = xMsgTopic.wrap("test_topic");
                 subActor.subscribe(subTopic, msg -> {
-                    try (xMsgConnection repCon = subActor.getConnection()) {
-                        xMsgMessage response = xMsgMessage.createResponse(msg);
-                        subActor.publish(repCon, response);
+                    try {
+                        subActor.publish(xMsgMessage.createResponse(msg));
                     } catch (xMsgException e) {
                         e.printStackTrace();
                     }
@@ -183,20 +182,19 @@ public class SubscriptionsTest {
                  xMsg pubActor = new xMsg("test_publisher")) {
                 xMsgTopic subTopic = xMsgTopic.wrap("test_topic");
                 xMsgSubscription sub = subActor.subscribe(subTopic, msg -> {
-                    try (xMsgConnection repCon = subActor.getConnection()) {
+                    try {
                         check.received = true;
                         xMsgUtil.sleep(1500);
-                        xMsgMessage response = xMsgMessage.createResponse(msg);
-                        subActor.publish(repCon, response);
+                        subActor.publish(xMsgMessage.createResponse(msg));
                     } catch (xMsgException e) {
                         e.printStackTrace();
                     }
                 });
                 xMsgUtil.sleep(100);
-                try (xMsgConnection pubCon = pubActor.getConnection()) {
+                try {
                     xMsgTopic pubTopic = xMsgTopic.wrap("test_topic");
                     xMsgMessage msg = xMsgMessage.createFrom(pubTopic, 1);
-                    pubActor.syncPublish(pubCon, msg, 1000);
+                    pubActor.syncPublish(msg, 1000);
                 } catch (TimeoutException e) {
                     check.timeout = true;
                 }

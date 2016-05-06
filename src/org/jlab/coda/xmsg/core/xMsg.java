@@ -334,6 +334,18 @@ public class xMsg implements AutoCloseable {
     }
 
     /**
+     * Publishes a message through the default proxy connection.
+     *
+     * @param msg the message to be published
+     * @throws xMsgException if the request failed
+     */
+    public void publish(xMsgMessage msg) throws xMsgException {
+        try (xMsgConnection connection = getConnection()) {
+            publish(connection, msg);
+        }
+    }
+
+    /**
      * Publishes a message through the specified proxy connection.
      *
      * @param connection the connection to the proxy
@@ -346,6 +358,29 @@ public class xMsg implements AutoCloseable {
         msg.getMetaData().clearReplyTo();
 
         _publish(connection, msg);
+    }
+
+    /**
+     * Publishes a message through the default proxy connection and blocks
+     * waiting for a response.
+     *
+     * The subscriber must publish the response to the topic given by the
+     * {@code replyto} metadata field, through the same proxy.
+     *
+     * This method will throw if a response is not received before the timeout
+     * expires.
+     *
+     * @param msg the message to be published
+     * @param timeout the length of time to wait a response, in milliseconds
+     * @return the response message
+     * @throws xMsgException
+     * @throws TimeoutException
+     */
+    public xMsgMessage syncPublish(xMsgMessage msg, int timeout)
+            throws xMsgException, TimeoutException {
+        try (xMsgConnection connection = getConnection()) {
+            return syncPublish(connection, msg, timeout);
+        }
     }
 
     /**
@@ -365,9 +400,8 @@ public class xMsg implements AutoCloseable {
      * @throws xMsgException
      * @throws TimeoutException
      */
-    public xMsgMessage syncPublish(xMsgConnection connection,
-                                   xMsgMessage msg,
-                                   int timeout) throws xMsgException, TimeoutException {
+    public xMsgMessage syncPublish(xMsgConnection connection, xMsgMessage msg, int timeout)
+            throws xMsgException, TimeoutException {
         // address/topic where the subscriber should send the result
         String returnAddress = xMsgUtil.getUniqueReplyTo(myId);
 

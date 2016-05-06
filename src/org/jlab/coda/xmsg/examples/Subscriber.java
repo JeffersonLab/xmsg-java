@@ -25,7 +25,6 @@ package org.jlab.coda.xmsg.examples;
 import com.google.protobuf.InvalidProtocolBufferException;
 import org.jlab.coda.xmsg.core.xMsg;
 import org.jlab.coda.xmsg.core.xMsgCallBack;
-import org.jlab.coda.xmsg.core.xMsgConnection;
 import org.jlab.coda.xmsg.core.xMsgMessage;
 import org.jlab.coda.xmsg.core.xMsgTopic;
 import org.jlab.coda.xmsg.core.xMsgUtil;
@@ -48,7 +47,6 @@ import java.util.List;
  */
 public class Subscriber extends xMsg {
 
-    xMsgConnection con;
     xMsgTopic topic;
 
     /**
@@ -58,9 +56,6 @@ public class Subscriber extends xMsg {
      */
     public Subscriber() throws xMsgException {
         super("test_subscriber", 1);
-
-        // connect to default proxy (local host, default proxy port)
-        con = getConnection();
 
         // build the subscribing topic (hard codded)
         final String domain = "test_domain";
@@ -94,7 +89,7 @@ public class Subscriber extends xMsg {
      */
     public void respondBack(xMsgMessage msg, Object data) {
         try {
-            publish(con, xMsgMessage.createResponse(msg, data));
+            publish(xMsgMessage.createResponse(msg, data));
         } catch (xMsgException e) {
             e.printStackTrace();
         }
