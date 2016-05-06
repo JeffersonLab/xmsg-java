@@ -35,14 +35,9 @@ public final class SyncPublishTest {
                 actor.register(xMsgRegInfo.subscriber(topic, "test subscriber"));
                 System.out.printf("Registered with %s%n", regAddress);
                 actor.subscribe(subCon, topic, (msg) -> {
-                    try {
-                        xMsgConnection repCon = actor.getConnection();
-                        try {
-                            xMsgMessage res = xMsgMessage.createResponse(msg);
-                            actor.publish(repCon, res);
-                        } finally {
-                            actor.releaseConnection(repCon);
-                        }
+                    try (xMsgConnection repCon = actor.getConnection()) {
+                        xMsgMessage res = xMsgMessage.createResponse(msg);
+                        actor.publish(repCon, res);
                     } catch (xMsgException e) {
                         e.printStackTrace();
                     }
@@ -93,16 +88,13 @@ public final class SyncPublishTest {
                     try {
                         for (int j = start; j < end; j++) {
                             for (xMsgRegRecord reg : listeners) {
-                                xMsgMessage data = xMsgMessage.createFrom(reg.topic(), j);
-                                xMsgConnection pubCon = actor.getConnection(reg.address());
-                                try {
+                                try (xMsgConnection pubCon = actor.getConnection(reg.address())) {
+                                    xMsgMessage data = xMsgMessage.createFrom(reg.topic(), j);
                                     xMsgMessage res = actor.syncPublish(pubCon, data, TIME_OUT);
                                     int value = xMsgMessage.parseData(res, Integer.class);
                                     resSum.addAndGet(value);
                                 } catch (TimeoutException e) {
                                     e.printStackTrace();
-                                } finally {
-                                    actor.releaseConnection(pubCon);
                                 }
                             }
                         }

@@ -288,39 +288,6 @@ public class xMsg implements AutoCloseable {
     }
 
     /**
-     * Creates a new connection to the specified proxy.
-     *
-     * @param address the address of the proxy
-     * @return a connection to the proxy
-     * @throws xMsgException if the connection could not be created
-     */
-    public xMsgConnection createConnection(xMsgProxyAddress address) throws xMsgException {
-        return new xMsgConnection(connectionManager.createProxyConnection(address));
-    }
-
-    /**
-     * Creates a new connection to the specified proxy host and
-     * {@link org.jlab.coda.xmsg.core.xMsgConstants#DEFAULT_PORT default port}.
-     *
-     * @param proxyHost the host name of the proxy
-     * @return a connection to the proxy
-     * @throws xMsgException if the connection could not be created
-     */
-    public xMsgConnection createConnection(String proxyHost) throws xMsgException {
-        return createConnection(new xMsgProxyAddress(proxyHost));
-    }
-
-    /**
-     * Creates a new connection to the default proxy.
-     *
-     * @return a connection to the proxy
-     * @throws xMsgException if the connection could not be created
-     */
-    public xMsgConnection createConnection() throws xMsgException {
-        return createConnection(defaultProxyAddress);
-    }
-
-    /**
      * Obtains a connection to the specified proxy.
      * If there is no available connection, a new one will be created.
      *
@@ -329,7 +296,8 @@ public class xMsg implements AutoCloseable {
      * @throws xMsgException if a new connection could not be created
      */
     public xMsgConnection getConnection(xMsgProxyAddress address) throws xMsgException {
-        return new xMsgConnection(connectionManager.getProxyConnection(address));
+        return new xMsgConnection(connectionManager,
+                                  connectionManager.getProxyConnection(address));
     }
 
     /**
@@ -357,21 +325,12 @@ public class xMsg implements AutoCloseable {
     }
 
     /**
-     * Returns the given connection into the pool of available connections.
-     *
-     * @param connection the returned connection
-     */
-    public void releaseConnection(xMsgConnection connection) {
-        connectionManager.releaseProxyConnection(connection.delegate());
-    }
-
-    /**
      * Destroys the given connection.
      *
      * @param connection the connection to be destroyed
      */
     public void destroyConnection(xMsgConnection connection) {
-        connection.close();
+        connection.destroy();
     }
 
     /**

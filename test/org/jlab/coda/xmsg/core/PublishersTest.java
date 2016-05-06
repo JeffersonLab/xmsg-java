@@ -91,7 +91,7 @@ public class PublishersTest {
 
             Thread subThread = xMsgUtil.newThread("sub-thread", () -> {
                 try (xMsg actor = new xMsg("test_subscriber")) {
-                    xMsgConnection connection = actor.createConnection();
+                    xMsgConnection connection = actor.getConnection();
                     xMsgTopic topic = xMsgTopic.wrap(rawTopic);
                     xMsgSubscription sub = actor.subscribe(connection, topic, msg -> {
                         try {
@@ -185,11 +185,8 @@ public class PublishersTest {
 
         @Override
         void publish(xMsg actor, xMsgMessage msg, Check check) throws Exception {
-            xMsgConnection connection = actor.getConnection();
-            try {
+            try (xMsgConnection connection = actor.getConnection()) {
                 actor.publish(connection, msg);
-            } finally {
-                actor.releaseConnection(connection);
             }
         }
     }
@@ -203,24 +200,18 @@ public class PublishersTest {
 
         @Override
         void receive(xMsg actor, xMsgMessage msg, Check check) throws Exception {
-            xMsgConnection connection = actor.getConnection();
-            try {
+            try (xMsgConnection connection = actor.getConnection()) {
                 xMsgMessage res = xMsgMessage.createResponse(msg);
                 actor.publish(connection, res);
-            } finally {
-                actor.releaseConnection(connection);
             }
         }
 
         @Override
         void publish(xMsg actor, xMsgMessage msg, Check check) throws Exception {
-            xMsgConnection connection = actor.getConnection();
-            try {
+            try (xMsgConnection connection = actor.getConnection()) {
                 xMsgMessage res = actor.syncPublish(connection, msg, 1000);
                 Integer r = xMsgMessage.parseData(res, Integer.class);
                 check.increment(r);
-            } finally {
-                actor.releaseConnection(connection);
             }
         }
     }

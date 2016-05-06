@@ -43,15 +43,14 @@ public final class RemoteThroughput {
         final int messageSize = Integer.parseInt(argv[1]);
         final long messageCount = Long.valueOf(argv[2]);
 
-        try (xMsg publisher = new xMsg("thr_publisher")) {
-            xMsgConnection con = publisher.createConnection(bindTo);
+        try (xMsg publisher = new xMsg("thr_publisher");
+             xMsgConnection con = publisher.getConnection(bindTo)) {
             xMsgTopic topic = xMsgTopic.wrap("thr_topic");
             byte[] data = new byte[messageSize];
             for (int i = 0; i < messageCount; i++) {
                 xMsgMessage msg = new xMsgMessage(topic, "data/binary", data);
                 publisher.publish(con, msg);
             }
-            publisher.destroyConnection(con);
         } catch (xMsgException e) {
             e.printStackTrace();
             System.exit(1);

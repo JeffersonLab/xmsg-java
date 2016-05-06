@@ -56,7 +56,7 @@ public final class LocalThroughput {
 
         try (xMsg subscriber = new xMsg("throughput_subscriber", 1)) {
 
-            xMsgConnection con = subscriber.createConnection(bindTo);
+            xMsgConnection con = subscriber.getConnection(bindTo);
             xMsgTopic topic = xMsgTopic.wrap("thr_topic");
 
             xMsgSubscription sub = subscriber.subscribe(con, topic, msg -> {

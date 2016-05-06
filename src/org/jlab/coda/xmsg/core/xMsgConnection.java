@@ -25,18 +25,30 @@ package org.jlab.coda.xmsg.core;
 import org.jlab.coda.xmsg.net.xMsgProxyAddress;
 import org.jlab.coda.xmsg.net.xMsgProxyDriver;
 
+import java.io.Closeable;
+
 /**
  * The standard connection to xMsg nodes.
  */
-public class xMsgConnection {
+public class xMsgConnection implements Closeable {
 
+    private final ConnectionManager pool;
     private xMsgProxyDriver connection;
 
-    xMsgConnection(xMsgProxyDriver connection) {
+    xMsgConnection(ConnectionManager pool, xMsgProxyDriver connection) {
+        this.pool = pool;
         this.connection = connection;
     }
 
+    @Override
     public void close() {
+        if (connection != null) {
+            pool.releaseProxyConnection(connection);
+            connection = null;
+        }
+    }
+
+    void destroy() {
         if (connection != null) {
             connection.close();
             connection = null;
