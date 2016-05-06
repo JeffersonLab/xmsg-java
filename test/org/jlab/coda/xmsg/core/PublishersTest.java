@@ -91,9 +91,8 @@ public class PublishersTest {
 
             Thread subThread = xMsgUtil.newThread("sub-thread", () -> {
                 try (xMsg actor = new xMsg("test_subscriber")) {
-                    xMsgConnection connection = actor.getConnection();
                     xMsgTopic topic = xMsgTopic.wrap(rawTopic);
-                    xMsgSubscription sub = actor.subscribe(connection, topic, msg -> {
+                    xMsgSubscription sub = actor.subscribe(topic, msg -> {
                         try {
                             receive(actor, msg, check);
                         } catch (Exception e) {

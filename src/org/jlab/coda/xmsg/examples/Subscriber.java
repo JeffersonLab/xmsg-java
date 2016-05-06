@@ -72,10 +72,9 @@ public class Subscriber extends xMsg {
         // Register this subscriber
         register(xMsgRegInfo.subscriber(topic, description));
 
-        // Subscribe by passing a callback to the subscription
-        subscribe(con, topic, new MyCallBack());
+        // Subscribe to default proxy
+        subscribe(topic, new MyCallBack());
         System.out.printf("Subscribed to = %s%n", topic);
-
     }
 
     public static void main(String[] args) {

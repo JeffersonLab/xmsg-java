@@ -30,24 +30,18 @@ public final class SyncPublishTest {
         String name = xMsgUtil.localhost();
         xMsgTopic topic = xMsgTopic.build(TOPIC, name);
         try (xMsg actor = new xMsg(name, regAddress, poolSize)) {
-            xMsgConnection subCon = actor.getConnection();
-            try {
-                actor.register(xMsgRegInfo.subscriber(topic, "test subscriber"));
-                System.out.printf("Registered with %s%n", regAddress);
-                actor.subscribe(subCon, topic, (msg) -> {
-                    try (xMsgConnection repCon = actor.getConnection()) {
-                        xMsgMessage res = xMsgMessage.createResponse(msg);
-                        actor.publish(repCon, res);
-                    } catch (xMsgException e) {
-                        e.printStackTrace();
-                    }
-                });
-                System.out.printf("Using %d cores to reply requests...%n", poolSize);
-                xMsgUtil.keepAlive();
-            } catch (xMsgException e) {
-                actor.destroyConnection(subCon);
-                throw e;
-            }
+            actor.register(xMsgRegInfo.subscriber(topic, "test subscriber"));
+            System.out.printf("Registered with %s%n", regAddress);
+            actor.subscribe(topic, msg -> {
+                try (xMsgConnection repCon = actor.getConnection()) {
+                    xMsgMessage res = xMsgMessage.createResponse(msg);
+                    actor.publish(repCon, res);
+                } catch (xMsgException e) {
+                    e.printStackTrace();
+                }
+            });
+            System.out.printf("Using %d cores to reply requests...%n", poolSize);
+            xMsgUtil.keepAlive();
         } catch (xMsgException e) {
             e.printStackTrace();
         }

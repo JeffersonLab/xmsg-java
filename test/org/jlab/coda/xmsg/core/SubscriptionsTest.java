@@ -60,9 +60,7 @@ public class SubscriptionsTest {
     @Test
     public void unsuscribeStopsThread() throws Exception {
         try (xMsg actor = new xMsg("test")) {
-            xMsgConnection con = actor.getConnection();
-
-            xMsgSubscription subscription = actor.subscribe(con, xMsgTopic.wrap("topic"), null);
+            xMsgSubscription subscription = actor.subscribe(xMsgTopic.wrap("topic"), null);
             xMsgUtil.sleep(1000);
             actor.unsubscribe(subscription);
 
@@ -84,9 +82,8 @@ public class SubscriptionsTest {
 
         Thread subThread = xMsgUtil.newThread("sub-thread", () -> {
             try (xMsg actor = new xMsg("test_subscriber")) {
-                xMsgConnection con = actor.getConnection();
                 xMsgTopic topic = xMsgTopic.wrap("test_topic");
-                xMsgSubscription sub = actor.subscribe(con, topic, msg -> {
+                xMsgSubscription sub = actor.subscribe(topic, msg -> {
                     int i = xMsgMessage.parseData(msg, Integer.class);
                     check.counter.incrementAndGet();
                     check.sum.addAndGet(i);
@@ -140,9 +137,8 @@ public class SubscriptionsTest {
         Thread pubThread = xMsgUtil.newThread("syncpub-thread", () -> {
             try (xMsg subActor = new xMsg("test_subscriber");
                  xMsg pubActor = new xMsg("test_publisher")) {
-                xMsgConnection subCon = subActor.getConnection();
                 xMsgTopic subTopic = xMsgTopic.wrap("test_topic");
-                subActor.subscribe(subCon, subTopic, msg -> {
+                subActor.subscribe(subTopic, msg -> {
                     try (xMsgConnection repCon = subActor.getConnection()) {
                         xMsgMessage response = xMsgMessage.createResponse(msg);
                         subActor.publish(repCon, response);
@@ -185,9 +181,8 @@ public class SubscriptionsTest {
         Thread pubThread = xMsgUtil.newThread("syncpub-thread", () -> {
             try (xMsg subActor = new xMsg("test_subscriber");
                  xMsg pubActor = new xMsg("test_publisher")) {
-                xMsgConnection subCon = subActor.getConnection();
                 xMsgTopic subTopic = xMsgTopic.wrap("test_topic");
-                xMsgSubscription sub = subActor.subscribe(subCon, subTopic, msg -> {
+                xMsgSubscription sub = subActor.subscribe(subTopic, msg -> {
                     try (xMsgConnection repCon = subActor.getConnection()) {
                         check.received = true;
                         xMsgUtil.sleep(1500);

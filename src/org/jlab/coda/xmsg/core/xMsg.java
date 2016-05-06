@@ -389,6 +389,20 @@ public class xMsg implements AutoCloseable {
     }
 
     /**
+     * Subscribes to a topic of interest through the default proxy
+     * connection.
+     * A background thread will be started to receive the messages.
+     *
+     * @param topic the topic to select messages
+     * @param callback the user action to run when a message is received
+     * @throws xMsgException
+     */
+    public xMsgSubscription subscribe(xMsgTopic topic,
+                                      xMsgCallBack callback) throws xMsgException {
+        return subscribe(getConnection(), topic, callback);
+    }
+
+    /**
      * Subscribes to a topic of interest through the specified proxy
      * connection.
      * A background thread will be started to receive the messages.
