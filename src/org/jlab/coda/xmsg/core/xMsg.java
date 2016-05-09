@@ -27,6 +27,7 @@ import org.jlab.coda.xmsg.excp.xMsgException;
 import org.jlab.coda.xmsg.net.xMsgConnectionFactory;
 import org.jlab.coda.xmsg.net.xMsgContext;
 import org.jlab.coda.xmsg.net.xMsgProxyAddress;
+import org.jlab.coda.xmsg.net.xMsgProxyDriver;
 import org.jlab.coda.xmsg.net.xMsgRegAddress;
 import org.jlab.coda.xmsg.xsys.regdis.xMsgRegDriver;
 import org.jlab.coda.xmsg.xsys.regdis.xMsgRegFactory;
@@ -423,8 +424,7 @@ public class xMsg implements AutoCloseable {
     }
 
     /**
-     * Subscribes to a topic of interest through the default proxy
-     * connection.
+     * Subscribes to a topic of interest through the default proxy.
      * A background thread will be started to receive the messages.
      *
      * @param topic the topic to select messages
@@ -433,22 +433,24 @@ public class xMsg implements AutoCloseable {
      */
     public xMsgSubscription subscribe(xMsgTopic topic,
                                       xMsgCallBack callback) throws xMsgException {
-        return subscribe(getConnection(), topic, callback);
+        return subscribe(defaultProxyAddress, topic, callback);
     }
 
     /**
-     * Subscribes to a topic of interest through the specified proxy
-     * connection.
+     * Subscribes to a topic of interest through the specified proxy.
      * A background thread will be started to receive the messages.
      *
-     * @param connection the connection to the proxy
+     * @param address the address to the proxy
      * @param topic the topic to select messages
      * @param callback the user action to run when a message is received
      * @throws xMsgException
      */
-    public xMsgSubscription subscribe(xMsgConnection connection,
+    public xMsgSubscription subscribe(xMsgProxyAddress address,
                                       xMsgTopic topic,
                                       xMsgCallBack callback) throws xMsgException {
+        // get a connection to the proxy
+        xMsgProxyDriver connection = connectionManager.getProxyConnection(address);
+
         // define a unique name for the subscription
         String name = "sub-" + myName + "-" + connection.getAddress() + "-" + topic;
 

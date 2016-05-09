@@ -25,11 +25,11 @@ package perf;
 import java.util.concurrent.CountDownLatch;
 
 import org.jlab.coda.xmsg.core.xMsg;
-import org.jlab.coda.xmsg.core.xMsgConnection;
 import org.jlab.coda.xmsg.core.xMsgSubscription;
 import org.jlab.coda.xmsg.core.xMsgTopic;
 
 import org.jlab.coda.xmsg.excp.xMsgException;
+import org.jlab.coda.xmsg.net.xMsgProxyAddress;
 
 public final class LocalThroughput {
 
@@ -56,10 +56,10 @@ public final class LocalThroughput {
 
         try (xMsg subscriber = new xMsg("throughput_subscriber", 1)) {
 
-            xMsgConnection con = subscriber.getConnection(bindTo);
+            xMsgProxyAddress address = new xMsgProxyAddress(bindTo);
             xMsgTopic topic = xMsgTopic.wrap("thr_topic");
 
-            xMsgSubscription sub = subscriber.subscribe(con, topic, msg -> {
+            xMsgSubscription sub = subscriber.subscribe(address, topic, msg -> {
                 int size = msg.getDataSize();
                 if (size != messageSize) {
                     printf("message of incorrect size received " + size);

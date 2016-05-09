@@ -61,9 +61,9 @@ public abstract class xMsgSubscription {
      *
      * @see xMsg#subscribe
      */
-    xMsgSubscription(String name, xMsgConnection connection, xMsgTopic topic) {
+    xMsgSubscription(String name, xMsgProxyDriver connection, xMsgTopic topic) {
         this.name = name;
-        this.connection = connection.delegate();
+        this.connection = connection;
         this.topic = topic.toString();
         this.thread = xMsgUtil.newThread(name, new Handler());
     }
