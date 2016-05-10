@@ -300,19 +300,6 @@ public class xMsg implements AutoCloseable {
     }
 
     /**
-     * Obtains a connection to the specified proxy host and
-     * {@link org.jlab.coda.xmsg.core.xMsgConstants#DEFAULT_PORT default port}.
-     * If there is no available connection, a new one will be created.
-     *
-     * @param proxyHost the host name of the proxy
-     * @return a connection to the proxy
-     * @throws xMsgException if a new connection could not be created
-     */
-    public xMsgConnection getConnection(String proxyHost) throws xMsgException {
-        return getConnection(new xMsgProxyAddress(proxyHost));
-    }
-
-    /**
      * Obtains a connection to the specified proxy.
      * If there is no available connection, a new one will be created.
      *
