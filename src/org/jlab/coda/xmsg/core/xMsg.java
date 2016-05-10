@@ -288,16 +288,14 @@ public class xMsg implements AutoCloseable {
     }
 
     /**
-     * Obtains a connection to the specified proxy.
+     * Obtains a connection to the default proxy.
      * If there is no available connection, a new one will be created.
      *
-     * @param address the address of the proxy
      * @return a connection to the proxy
      * @throws xMsgException if a new connection could not be created
      */
-    public xMsgConnection getConnection(xMsgProxyAddress address) throws xMsgException {
-        return new xMsgConnection(connectionManager,
-                                  connectionManager.getProxyConnection(address));
+    public xMsgConnection getConnection() throws xMsgException {
+        return getConnection(defaultProxyAddress);
     }
 
     /**
@@ -314,14 +312,16 @@ public class xMsg implements AutoCloseable {
     }
 
     /**
-     * Obtains a connection to the default proxy.
+     * Obtains a connection to the specified proxy.
      * If there is no available connection, a new one will be created.
      *
+     * @param address the address of the proxy
      * @return a connection to the proxy
      * @throws xMsgException if a new connection could not be created
      */
-    public xMsgConnection getConnection() throws xMsgException {
-        return getConnection(defaultProxyAddress);
+    public xMsgConnection getConnection(xMsgProxyAddress address) throws xMsgException {
+        return new xMsgConnection(connectionManager,
+                                  connectionManager.getProxyConnection(address));
     }
 
     /**
