@@ -347,6 +347,19 @@ public class xMsg implements AutoCloseable {
     }
 
     /**
+     * Publishes a message through the specified proxy.
+     *
+     * @param address the address to the proxy
+     * @param msg the message to be published
+     * @throws xMsgException if the request failed
+     */
+    public void publish(xMsgProxyAddress address, xMsgMessage msg) throws xMsgException {
+        try (xMsgConnection connection = getConnection(address)) {
+            publish(connection, msg);
+        }
+    }
+
+    /**
      * Publishes a message through the specified proxy connection.
      *
      * @param connection the connection to the proxy
@@ -380,6 +393,30 @@ public class xMsg implements AutoCloseable {
     public xMsgMessage syncPublish(xMsgMessage msg, int timeout)
             throws xMsgException, TimeoutException {
         try (xMsgConnection connection = getConnection()) {
+            return syncPublish(connection, msg, timeout);
+        }
+    }
+
+    /**
+     * Publishes a message through the specified proxy and blocks
+     * waiting for a response.
+     *
+     * The subscriber must publish the response to the topic given by the
+     * {@code replyto} metadata field, through the same proxy.
+     *
+     * This method will throw if a response is not received before the timeout
+     * expires.
+     *
+     * @param address the address to the proxy
+     * @param msg the message to be published
+     * @param timeout the length of time to wait a response, in milliseconds
+     * @return the response message
+     * @throws xMsgException
+     * @throws TimeoutException
+     */
+    public xMsgMessage syncPublish(xMsgProxyAddress address, xMsgMessage msg, int timeout)
+            throws xMsgException, TimeoutException {
+        try (xMsgConnection connection = getConnection(address)) {
             return syncPublish(connection, msg, timeout);
         }
     }
