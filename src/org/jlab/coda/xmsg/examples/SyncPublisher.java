@@ -23,11 +23,11 @@
 package org.jlab.coda.xmsg.examples;
 
 import org.jlab.coda.xmsg.core.xMsg;
+import org.jlab.coda.xmsg.core.xMsgConnection;
 import org.jlab.coda.xmsg.core.xMsgMessage;
 import org.jlab.coda.xmsg.core.xMsgTopic;
 import org.jlab.coda.xmsg.core.xMsgUtil;
 import org.jlab.coda.xmsg.excp.xMsgException;
-import org.jlab.coda.xmsg.net.xMsgConnection;
 import org.jlab.coda.xmsg.xsys.regdis.xMsgRegInfo;
 
 import java.util.concurrent.TimeoutException;
@@ -59,7 +59,7 @@ public class SyncPublisher extends xMsg {
         super("test_sync_publisher");
 
         // connect to default proxy (local host, default proxy port)
-        con = createConnection();
+        con = getConnection();
 
         // build the publishing topic (hard codded)
         final String domain = "test_domain";

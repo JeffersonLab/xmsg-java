@@ -29,10 +29,9 @@ import java.util.concurrent.ConcurrentLinkedQueue;
 import java.util.function.Consumer;
 
 import org.jlab.coda.xmsg.excp.xMsgException;
-import org.jlab.coda.xmsg.net.xMsgConnection;
 import org.jlab.coda.xmsg.net.xMsgConnectionFactory;
-import org.jlab.coda.xmsg.net.xMsgConnectionSetup;
 import org.jlab.coda.xmsg.net.xMsgProxyAddress;
+import org.jlab.coda.xmsg.net.xMsgProxyDriver;
 import org.jlab.coda.xmsg.net.xMsgRegAddress;
 import org.jlab.coda.xmsg.xsys.regdis.xMsgRegDriver;
 
@@ -42,7 +41,7 @@ class ConnectionManager {
     private final xMsgConnectionFactory factory;
 
     // pool of proxy connections
-    private final ConnectionPool<xMsgProxyAddress, xMsgConnection> proxyConnections;
+    private final ConnectionPool<xMsgProxyAddress, xMsgProxyDriver> proxyConnections;
 
     // pool of registrar connections
     private final ConnectionPool<xMsgRegAddress, xMsgRegDriver> registrarConnections;
@@ -59,29 +58,29 @@ class ConnectionManager {
         defaultConnectionOption = new xMsgConnectionSetup() { };
     }
 
-    xMsgConnection createProxyConnection(xMsgProxyAddress address) throws xMsgException {
+    xMsgProxyDriver createProxyConnection(xMsgProxyAddress address) throws xMsgException {
         return createProxyConnection(address, defaultConnectionOption);
     }
 
-    xMsgConnection createProxyConnection(xMsgProxyAddress address,
+    xMsgProxyDriver createProxyConnection(xMsgProxyAddress address,
                                       xMsgConnectionSetup setup) throws xMsgException {
         return factory.createProxyConnection(address, setup);
     }
 
-    xMsgConnection getProxyConnection(xMsgProxyAddress address) throws xMsgException {
+    xMsgProxyDriver getProxyConnection(xMsgProxyAddress address) throws xMsgException {
         return getProxyConnection(address, defaultConnectionOption);
     }
 
-    xMsgConnection getProxyConnection(xMsgProxyAddress address,
+    xMsgProxyDriver getProxyConnection(xMsgProxyAddress address,
                                       xMsgConnectionSetup setup) throws xMsgException {
-        xMsgConnection cachedConnection = proxyConnections.getConnection(address);
+        xMsgProxyDriver cachedConnection = proxyConnections.getConnection(address);
         if (cachedConnection != null) {
             return cachedConnection;
         }
         return factory.createProxyConnection(address, setup);
     }
 
-    void releaseProxyConnection(xMsgConnection connection) {
+    void releaseProxyConnection(xMsgProxyDriver connection) {
         proxyConnections.setConnection(connection.getAddress(), connection);
     }
 

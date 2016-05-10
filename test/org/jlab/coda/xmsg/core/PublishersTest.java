@@ -29,7 +29,6 @@ import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.atomic.AtomicLong;
 
 import org.jlab.coda.xmsg.excp.xMsgException;
-import org.jlab.coda.xmsg.net.xMsgConnection;
 import org.jlab.coda.xmsg.testing.IntegrationTest;
 import org.junit.Test;
 import org.junit.experimental.categories.Category;
@@ -92,9 +91,8 @@ public class PublishersTest {
 
             Thread subThread = xMsgUtil.newThread("sub-thread", () -> {
                 try (xMsg actor = new xMsg("test_subscriber")) {
-                    xMsgConnection connection = actor.createConnection();
                     xMsgTopic topic = xMsgTopic.wrap(rawTopic);
-                    xMsgSubscription sub = actor.subscribe(connection, topic, msg -> {
+                    xMsgSubscription sub = actor.subscribe(topic, msg -> {
                         try {
                             receive(actor, msg, check);
                         } catch (Exception e) {
@@ -186,12 +184,7 @@ public class PublishersTest {
 
         @Override
         void publish(xMsg actor, xMsgMessage msg, Check check) throws Exception {
-            xMsgConnection connection = actor.getConnection();
-            try {
-                actor.publish(connection, msg);
-            } finally {
-                actor.releaseConnection(connection);
-            }
+            actor.publish(msg);
         }
     }
 
@@ -204,25 +197,14 @@ public class PublishersTest {
 
         @Override
         void receive(xMsg actor, xMsgMessage msg, Check check) throws Exception {
-            xMsgConnection connection = actor.getConnection();
-            try {
-                xMsgMessage res = xMsgMessage.createResponse(msg);
-                actor.publish(connection, res);
-            } finally {
-                actor.releaseConnection(connection);
-            }
+            actor.publish(xMsgMessage.createResponse(msg));
         }
 
         @Override
         void publish(xMsg actor, xMsgMessage msg, Check check) throws Exception {
-            xMsgConnection connection = actor.getConnection();
-            try {
-                xMsgMessage res = actor.syncPublish(connection, msg, 1000);
-                Integer r = xMsgMessage.parseData(res, Integer.class);
-                check.increment(r);
-            } finally {
-                actor.releaseConnection(connection);
-            }
+            xMsgMessage res = actor.syncPublish(msg, 1000);
+            Integer r = xMsgMessage.parseData(res, Integer.class);
+            check.increment(r);
         }
     }
 

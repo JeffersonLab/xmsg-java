@@ -32,7 +32,6 @@ import org.jlab.coda.xmsg.data.xMsgD.xMsgData;
 import org.jlab.coda.xmsg.data.xMsgM;
 import org.jlab.coda.xmsg.data.xMsgMimeType;
 import org.jlab.coda.xmsg.excp.xMsgException;
-import org.jlab.coda.xmsg.net.xMsgConnection;
 import org.jlab.coda.xmsg.xsys.regdis.xMsgRegInfo;
 
 import java.util.List;
@@ -48,7 +47,6 @@ import java.util.List;
  */
 public class Subscriber extends xMsg {
 
-    xMsgConnection con;
     xMsgTopic topic;
 
     /**
@@ -58,9 +56,6 @@ public class Subscriber extends xMsg {
      */
     public Subscriber() throws xMsgException {
         super("test_subscriber", 1);
-
-        // connect to default proxy (local host, default proxy port)
-        con = createConnection();
 
         // build the subscribing topic (hard codded)
         final String domain = "test_domain";
@@ -72,10 +67,9 @@ public class Subscriber extends xMsg {
         // Register this subscriber
         register(xMsgRegInfo.subscriber(topic, description));
 
-        // Subscribe by passing a callback to the subscription
-        subscribe(con, topic, new MyCallBack());
+        // Subscribe to default proxy
+        subscribe(topic, new MyCallBack());
         System.out.printf("Subscribed to = %s%n", topic);
-
     }
 
     public static void main(String[] args) {
@@ -95,7 +89,7 @@ public class Subscriber extends xMsg {
      */
     public void respondBack(xMsgMessage msg, Object data) {
         try {
-            publish(con, xMsgMessage.createResponse(msg, data));
+            publish(xMsgMessage.createResponse(msg, data));
         } catch (xMsgException e) {
             e.printStackTrace();
         }

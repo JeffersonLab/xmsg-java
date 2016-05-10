@@ -31,7 +31,7 @@ public class xMsgPoller {
     final Socket subSocket;
     final Poller items;
 
-    public xMsgPoller(xMsgConnection connection) {
+    public xMsgPoller(xMsgProxyDriver connection) {
         this.subSocket = connection.getSubSock();
         this.items = new Poller(1);
         this.items.register(subSocket, Poller.POLLIN);

@@ -24,11 +24,10 @@ package org.jlab.coda.xmsg.core;
 
 import org.jlab.coda.xmsg.data.xMsgR.xMsgRegistration;
 import org.jlab.coda.xmsg.excp.xMsgException;
-import org.jlab.coda.xmsg.net.xMsgConnection;
 import org.jlab.coda.xmsg.net.xMsgConnectionFactory;
-import org.jlab.coda.xmsg.net.xMsgConnectionSetup;
 import org.jlab.coda.xmsg.net.xMsgContext;
 import org.jlab.coda.xmsg.net.xMsgProxyAddress;
+import org.jlab.coda.xmsg.net.xMsgProxyDriver;
 import org.jlab.coda.xmsg.net.xMsgRegAddress;
 import org.jlab.coda.xmsg.xsys.regdis.xMsgRegDriver;
 import org.jlab.coda.xmsg.xsys.regdis.xMsgRegFactory;
@@ -290,37 +289,14 @@ public class xMsg implements AutoCloseable {
     }
 
     /**
-     * Creates a new connection to the specified proxy.
-     *
-     * @param address the address of the proxy
-     * @return a connection to the proxy
-     * @throws xMsgException if the connection could not be created
-     */
-    public xMsgConnection createConnection(xMsgProxyAddress address) throws xMsgException {
-        return connectionManager.createProxyConnection(address);
-    }
-
-    /**
-     * Creates a new connection to the specified proxy host and
-     * {@link org.jlab.coda.xmsg.core.xMsgConstants#DEFAULT_PORT default port}.
-     *
-     * @param proxyHost the host name of the proxy
-     * @return a connection to the proxy
-     * @throws xMsgException if the connection could not be created
-     */
-    public xMsgConnection createConnection(String proxyHost) throws xMsgException {
-        xMsgProxyAddress address = new xMsgProxyAddress(proxyHost);
-        return connectionManager.createProxyConnection(address);
-    }
-
-    /**
-     * Creates a new connection to the default proxy.
+     * Obtains a connection to the default proxy.
+     * If there is no available connection, a new one will be created.
      *
      * @return a connection to the proxy
-     * @throws xMsgException if the connection could not be created
+     * @throws xMsgException if a new connection could not be created
      */
-    public xMsgConnection createConnection() throws xMsgException {
-        return connectionManager.createProxyConnection(defaultProxyAddress);
+    public xMsgConnection getConnection() throws xMsgException {
+        return getConnection(defaultProxyAddress);
     }
 
     /**
@@ -332,41 +308,8 @@ public class xMsg implements AutoCloseable {
      * @throws xMsgException if a new connection could not be created
      */
     public xMsgConnection getConnection(xMsgProxyAddress address) throws xMsgException {
-        return connectionManager.getProxyConnection(address);
-    }
-
-    /**
-     * Obtains a connection to the specified proxy host and
-     * {@link org.jlab.coda.xmsg.core.xMsgConstants#DEFAULT_PORT default port}.
-     * If there is no available connection, a new one will be created.
-     *
-     * @param proxyHost the host name of the proxy
-     * @return a connection to the proxy
-     * @throws xMsgException if a new connection could not be created
-     */
-    public xMsgConnection getConnection(String proxyHost) throws xMsgException {
-        xMsgProxyAddress address = new xMsgProxyAddress(proxyHost);
-        return connectionManager.getProxyConnection(address);
-    }
-
-    /**
-     * Obtains a connection to the default proxy.
-     * If there is no available connection, a new one will be created.
-     *
-     * @return a connection to the proxy
-     * @throws xMsgException if a new connection could not be created
-     */
-    public xMsgConnection getConnection() throws xMsgException {
-        return connectionManager.getProxyConnection(defaultProxyAddress);
-    }
-
-    /**
-     * Returns the given connection into the pool of available connections.
-     *
-     * @param connection the returned connection
-     */
-    public void releaseConnection(xMsgConnection connection) {
-        connectionManager.releaseProxyConnection(connection);
+        return new xMsgConnection(connectionManager,
+                                  connectionManager.getProxyConnection(address));
     }
 
     /**
@@ -375,7 +318,32 @@ public class xMsg implements AutoCloseable {
      * @param connection the connection to be destroyed
      */
     public void destroyConnection(xMsgConnection connection) {
-        connection.close();
+        connection.destroy();
+    }
+
+    /**
+     * Publishes a message through the default proxy connection.
+     *
+     * @param msg the message to be published
+     * @throws xMsgException if the request failed
+     */
+    public void publish(xMsgMessage msg) throws xMsgException {
+        try (xMsgConnection connection = getConnection()) {
+            publish(connection, msg);
+        }
+    }
+
+    /**
+     * Publishes a message through the specified proxy.
+     *
+     * @param address the address to the proxy
+     * @param msg the message to be published
+     * @throws xMsgException if the request failed
+     */
+    public void publish(xMsgProxyAddress address, xMsgMessage msg) throws xMsgException {
+        try (xMsgConnection connection = getConnection(address)) {
+            publish(connection, msg);
+        }
     }
 
     /**
@@ -390,7 +358,54 @@ public class xMsg implements AutoCloseable {
         // need this in case we reuse messages.
         msg.getMetaData().clearReplyTo();
 
-        _publish(connection, msg);
+        connection.publish(msg);
+    }
+
+    /**
+     * Publishes a message through the default proxy connection and blocks
+     * waiting for a response.
+     *
+     * The subscriber must publish the response to the topic given by the
+     * {@code replyto} metadata field, through the same proxy.
+     *
+     * This method will throw if a response is not received before the timeout
+     * expires.
+     *
+     * @param msg the message to be published
+     * @param timeout the length of time to wait a response, in milliseconds
+     * @return the response message
+     * @throws xMsgException
+     * @throws TimeoutException
+     */
+    public xMsgMessage syncPublish(xMsgMessage msg, int timeout)
+            throws xMsgException, TimeoutException {
+        try (xMsgConnection connection = getConnection()) {
+            return syncPublish(connection, msg, timeout);
+        }
+    }
+
+    /**
+     * Publishes a message through the specified proxy and blocks
+     * waiting for a response.
+     *
+     * The subscriber must publish the response to the topic given by the
+     * {@code replyto} metadata field, through the same proxy.
+     *
+     * This method will throw if a response is not received before the timeout
+     * expires.
+     *
+     * @param address the address to the proxy
+     * @param msg the message to be published
+     * @param timeout the length of time to wait a response, in milliseconds
+     * @return the response message
+     * @throws xMsgException
+     * @throws TimeoutException
+     */
+    public xMsgMessage syncPublish(xMsgProxyAddress address, xMsgMessage msg, int timeout)
+            throws xMsgException, TimeoutException {
+        try (xMsgConnection connection = getConnection(address)) {
+            return syncPublish(connection, msg, timeout);
+        }
     }
 
     /**
@@ -410,9 +425,8 @@ public class xMsg implements AutoCloseable {
      * @throws xMsgException
      * @throws TimeoutException
      */
-    public xMsgMessage syncPublish(xMsgConnection connection,
-                                   xMsgMessage msg,
-                                   int timeout) throws xMsgException, TimeoutException {
+    public xMsgMessage syncPublish(xMsgConnection connection, xMsgMessage msg, int timeout)
+            throws xMsgException, TimeoutException {
         // address/topic where the subscriber should send the result
         String returnAddress = xMsgUtil.getUniqueReplyTo(myId);
 
@@ -423,8 +437,8 @@ public class xMsg implements AutoCloseable {
             // subscribe to the returnAddress
             syncPubListener.register(connection.getAddress());
 
-            // it must be the internal _publish, to keep the replyTo field
-            _publish(connection, msg);
+            // it must be the internal publish, to keep the replyTo field
+            connection.publish(msg);
 
             // wait for the response
             return syncPubListener.waitMessage(returnAddress, timeout);
@@ -434,36 +448,56 @@ public class xMsg implements AutoCloseable {
     }
 
     /**
-     * Subscribes to a topic of interest through the specified proxy
-     * connection.
+     * Subscribes to a topic of interest through the default proxy.
      * A background thread will be started to receive the messages.
      *
-     * @param connection the connection to the proxy
      * @param topic the topic to select messages
      * @param callback the user action to run when a message is received
      * @throws xMsgException
      */
-    public xMsgSubscription subscribe(xMsgConnection connection,
+    public xMsgSubscription subscribe(xMsgTopic topic,
+                                      xMsgCallBack callback) throws xMsgException {
+        return subscribe(defaultProxyAddress, topic, callback);
+    }
+
+    /**
+     * Subscribes to a topic of interest through the specified proxy.
+     * A background thread will be started to receive the messages.
+     *
+     * @param address the address to the proxy
+     * @param topic the topic to select messages
+     * @param callback the user action to run when a message is received
+     * @throws xMsgException
+     */
+    public xMsgSubscription subscribe(xMsgProxyAddress address,
                                       xMsgTopic topic,
                                       xMsgCallBack callback) throws xMsgException {
-        // define a unique name for the subscription
-        String name = "sub-" + myName + "-" + connection.getAddress() + "-" + topic;
+        // get a connection to the proxy
+        xMsgProxyDriver connection = connectionManager.getProxyConnection(address);
+        try {
+            // define a unique name for the subscription
+            String name = "sub-" + myName + "-" + connection.getAddress() + "-" + topic;
 
-        xMsgSubscription sHandle = mySubscriptions.get(name);
-        if (sHandle == null) {
-            sHandle = new xMsgSubscription(name, connection, topic) {
-                @Override
-                public void handle(xMsgMessage inputMsg) throws xMsgException {
-                    threadPool.submit(() -> callback.callback(inputMsg));
+            // start the subscription, if it does not exist yet
+            xMsgSubscription sHandle = mySubscriptions.get(name);
+            if (sHandle == null) {
+                sHandle = new xMsgSubscription(name, connection, topic) {
+                    @Override
+                    public void handle(xMsgMessage inputMsg) throws xMsgException {
+                        threadPool.submit(() -> callback.callback(inputMsg));
+                    }
+                };
+                xMsgSubscription result = mySubscriptions.putIfAbsent(name, sHandle);
+                if (result == null) {
+                    sHandle.start();
+                    return sHandle;
                 }
-            };
-            xMsgSubscription result = mySubscriptions.putIfAbsent(name, sHandle);
-            if (result == null) {
-                sHandle.start();
-                return sHandle;
             }
+            throw new IllegalStateException("subscription already exists");
+        } catch (Exception e) {
+            connection.close();
+            throw e;
         }
-        throw new IllegalStateException("subscription already exists");
     }
 
     /**
@@ -705,13 +739,5 @@ public class xMsg implements AutoCloseable {
 
     private xMsgRegistration.Builder _createRegistration(xMsgRegInfo info) {
         return xMsgRegFactory.newRegistration(myName, defaultProxyAddress, info);
-    }
-
-    private void _publish(xMsgConnection connection, xMsgMessage msg) throws xMsgException {
-        try {
-            connection.send(msg.serialize());
-        } catch (ZMQException e) {
-            throw new xMsgException("Publishing failed: " + e.getMessage());
-        }
     }
 }

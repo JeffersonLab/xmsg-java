@@ -22,6 +22,7 @@
 
 package org.jlab.coda.xmsg.net;
 
+import org.jlab.coda.xmsg.core.xMsgConnectionSetup;
 import org.jlab.coda.xmsg.excp.xMsgException;
 import org.jlab.coda.xmsg.xsys.regdis.xMsgRegDriver;
 import org.zeromq.ZContext;
@@ -35,10 +36,10 @@ public class xMsgConnectionFactory {
         this.factory = new xMsgSocketFactory(context.getContext());
     }
 
-    public xMsgConnection createProxyConnection(xMsgProxyAddress address,
-                                                xMsgConnectionSetup setup) throws xMsgException {
+    public xMsgProxyDriver createProxyConnection(xMsgProxyAddress address,
+                                                 xMsgConnectionSetup setup) throws xMsgException {
 
-        xMsgConnection connection = new xMsgConnection(address, factory);
+        xMsgProxyDriver connection = new xMsgProxyDriver(address, factory);
         try {
             setup.preConnection(connection.getPubSock());
             setup.preConnection(connection.getSubSock());

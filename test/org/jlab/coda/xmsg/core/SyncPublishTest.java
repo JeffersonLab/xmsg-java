@@ -1,7 +1,6 @@
 package org.jlab.coda.xmsg.core;
 
 import org.jlab.coda.xmsg.excp.xMsgException;
-import org.jlab.coda.xmsg.net.xMsgConnection;
 import org.jlab.coda.xmsg.net.xMsgRegAddress;
 import org.jlab.coda.xmsg.xsys.regdis.xMsgRegInfo;
 import org.jlab.coda.xmsg.xsys.regdis.xMsgRegQuery;
@@ -31,29 +30,17 @@ public final class SyncPublishTest {
         String name = xMsgUtil.localhost();
         xMsgTopic topic = xMsgTopic.build(TOPIC, name);
         try (xMsg actor = new xMsg(name, regAddress, poolSize)) {
-            xMsgConnection subCon = actor.getConnection();
-            try {
-                actor.register(xMsgRegInfo.subscriber(topic, "test subscriber"));
-                System.out.printf("Registered with %s%n", regAddress);
-                actor.subscribe(subCon, topic, (msg) -> {
-                    try {
-                        xMsgConnection repCon = actor.getConnection();
-                        try {
-                            xMsgMessage res = xMsgMessage.createResponse(msg);
-                            actor.publish(repCon, res);
-                        } finally {
-                            actor.releaseConnection(repCon);
-                        }
-                    } catch (xMsgException e) {
-                        e.printStackTrace();
-                    }
-                });
-                System.out.printf("Using %d cores to reply requests...%n", poolSize);
-                xMsgUtil.keepAlive();
-            } catch (xMsgException e) {
-                actor.destroyConnection(subCon);
-                throw e;
-            }
+            actor.register(xMsgRegInfo.subscriber(topic, "test subscriber"));
+            System.out.printf("Registered with %s%n", regAddress);
+            actor.subscribe(topic, msg -> {
+                try {
+                    actor.publish(xMsgMessage.createResponse(msg));
+                } catch (xMsgException e) {
+                    e.printStackTrace();
+                }
+            });
+            System.out.printf("Using %d cores to reply requests...%n", poolSize);
+            xMsgUtil.keepAlive();
         } catch (xMsgException e) {
             e.printStackTrace();
         }
@@ -94,16 +81,13 @@ public final class SyncPublishTest {
                     try {
                         for (int j = start; j < end; j++) {
                             for (xMsgRegRecord reg : listeners) {
-                                xMsgMessage data = xMsgMessage.createFrom(reg.topic(), j);
-                                xMsgConnection pubCon = actor.getConnection(reg.address());
-                                try {
+                                try (xMsgConnection pubCon = actor.getConnection(reg.address())) {
+                                    xMsgMessage data = xMsgMessage.createFrom(reg.topic(), j);
                                     xMsgMessage res = actor.syncPublish(pubCon, data, TIME_OUT);
                                     int value = xMsgMessage.parseData(res, Integer.class);
                                     resSum.addAndGet(value);
                                 } catch (TimeoutException e) {
                                     e.printStackTrace();
-                                } finally {
-                                    actor.releaseConnection(pubCon);
                                 }
                             }
                         }

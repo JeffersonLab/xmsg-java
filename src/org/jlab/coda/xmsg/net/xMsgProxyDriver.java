@@ -39,7 +39,7 @@ import org.zeromq.ZMsg;
  * @author gurjyan
  * @since 2.x
  */
-public class xMsgConnection {
+public class xMsgProxyDriver {
 
     private final xMsgProxyAddress address;
     private final String identity;
@@ -49,8 +49,8 @@ public class xMsgConnection {
 
     private final xMsgSocketFactory factory;
 
-    xMsgConnection(xMsgProxyAddress address,
-                   xMsgSocketFactory factory) throws xMsgException {
+    xMsgProxyDriver(xMsgProxyAddress address,
+                    xMsgSocketFactory factory) throws xMsgException {
         this.address = address;
         this.identity = IdentityGenerator.getCtrlId();
 
@@ -201,19 +201,19 @@ public class xMsgConnection {
         return address;
     }
 
-    public String getIdentity() {
+    String getIdentity() {
         return identity;
     }
 
-    public Socket getPubSock() {
+    Socket getPubSock() {
         return pubSocket;
     }
 
-    public Socket getSubSock() {
+    Socket getSubSock() {
         return subSocket;
     }
 
-    public Socket getControlSock() {
+    Socket getControlSock() {
         return ctrlSocket;
     }
 }

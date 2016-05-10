@@ -23,9 +23,9 @@
 package org.jlab.coda.xmsg.core;
 
 import org.jlab.coda.xmsg.excp.xMsgException;
-import org.jlab.coda.xmsg.net.xMsgConnection;
 import org.jlab.coda.xmsg.net.xMsgConnectionFactory;
 import org.jlab.coda.xmsg.net.xMsgProxyAddress;
+import org.jlab.coda.xmsg.net.xMsgProxyDriver;
 import org.jlab.coda.xmsg.net.xMsgRegAddress;
 import org.jlab.coda.xmsg.xsys.regdis.xMsgRegDriver;
 import org.junit.Before;
@@ -54,7 +54,7 @@ public class ConnectionManagerTest {
         when(factory.createProxyConnection(any(), any()))
                 .thenAnswer(invocation -> {
                     xMsgProxyAddress a = (xMsgProxyAddress) invocation.getArguments()[0];
-                    xMsgConnection c = mock(xMsgConnection.class);
+                    xMsgProxyDriver c = mock(xMsgProxyDriver.class);
                     when(c.getAddress()).thenReturn(a);
                     return c;
                 });
@@ -77,7 +77,7 @@ public class ConnectionManagerTest {
     public void createProxyConnections() throws Exception {
         createConnections(xMsgProxyAddress::new,
                           manager::getProxyConnection,
-                          xMsgConnection::getAddress);
+                          xMsgProxyDriver::getAddress);
     }
 
     @Test
