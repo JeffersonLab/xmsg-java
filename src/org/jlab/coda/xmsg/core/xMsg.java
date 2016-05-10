@@ -474,25 +474,30 @@ public class xMsg implements AutoCloseable {
                                       xMsgCallBack callback) throws xMsgException {
         // get a connection to the proxy
         xMsgProxyDriver connection = connectionManager.getProxyConnection(address);
+        try {
+            // define a unique name for the subscription
+            String name = "sub-" + myName + "-" + connection.getAddress() + "-" + topic;
 
-        // define a unique name for the subscription
-        String name = "sub-" + myName + "-" + connection.getAddress() + "-" + topic;
-
-        xMsgSubscription sHandle = mySubscriptions.get(name);
-        if (sHandle == null) {
-            sHandle = new xMsgSubscription(name, connection, topic) {
-                @Override
-                public void handle(xMsgMessage inputMsg) throws xMsgException {
-                    threadPool.submit(() -> callback.callback(inputMsg));
+            // start the subscription, if it does not exist yet
+            xMsgSubscription sHandle = mySubscriptions.get(name);
+            if (sHandle == null) {
+                sHandle = new xMsgSubscription(name, connection, topic) {
+                    @Override
+                    public void handle(xMsgMessage inputMsg) throws xMsgException {
+                        threadPool.submit(() -> callback.callback(inputMsg));
+                    }
+                };
+                xMsgSubscription result = mySubscriptions.putIfAbsent(name, sHandle);
+                if (result == null) {
+                    sHandle.start();
+                    return sHandle;
                 }
-            };
-            xMsgSubscription result = mySubscriptions.putIfAbsent(name, sHandle);
-            if (result == null) {
-                sHandle.start();
-                return sHandle;
             }
+            throw new IllegalStateException("subscription already exists");
+        } catch (Exception e) {
+            connection.close();
+            throw e;
         }
-        throw new IllegalStateException("subscription already exists");
     }
 
     /**
