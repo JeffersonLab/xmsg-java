@@ -358,7 +358,7 @@ public class xMsg implements AutoCloseable {
         // need this in case we reuse messages.
         msg.getMetaData().clearReplyTo();
 
-        _publish(connection, msg);
+        connection.publish(msg);
     }
 
     /**
@@ -437,8 +437,8 @@ public class xMsg implements AutoCloseable {
             // subscribe to the returnAddress
             syncPubListener.register(connection.getAddress());
 
-            // it must be the internal _publish, to keep the replyTo field
-            _publish(connection, msg);
+            // it must be the internal publish, to keep the replyTo field
+            connection.publish(msg);
 
             // wait for the response
             return syncPubListener.waitMessage(returnAddress, timeout);
@@ -739,13 +739,5 @@ public class xMsg implements AutoCloseable {
 
     private xMsgRegistration.Builder _createRegistration(xMsgRegInfo info) {
         return xMsgRegFactory.newRegistration(myName, defaultProxyAddress, info);
-    }
-
-    private void _publish(xMsgConnection connection, xMsgMessage msg) throws xMsgException {
-        try {
-            connection.delegate().send(msg.serialize());
-        } catch (ZMQException e) {
-            throw new xMsgException("Publishing failed: " + e.getMessage());
-        }
     }
 }

@@ -22,8 +22,10 @@
 
 package org.jlab.coda.xmsg.core;
 
+import org.jlab.coda.xmsg.excp.xMsgException;
 import org.jlab.coda.xmsg.net.xMsgProxyAddress;
 import org.jlab.coda.xmsg.net.xMsgProxyDriver;
+import org.zeromq.ZMQException;
 
 import java.io.Closeable;
 
@@ -55,11 +57,16 @@ public class xMsgConnection implements Closeable {
         }
     }
 
-    public xMsgProxyDriver delegate() {
+    void publish(xMsgMessage msg) throws xMsgException {
         if (connection == null) {
             throw new IllegalStateException("Connection is closed");
         }
-        return connection;
+        try {
+            connection.send(msg.serialize());
+        } catch (ZMQException e) {
+            destroy();
+            throw new xMsgException("Could not publish message", e);
+        }
     }
 
     public xMsgProxyAddress getAddress() {
