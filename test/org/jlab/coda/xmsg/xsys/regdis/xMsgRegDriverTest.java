@@ -24,6 +24,7 @@ package org.jlab.coda.xmsg.xsys.regdis;
 
 import org.jlab.coda.xmsg.core.xMsgConstants;
 import org.jlab.coda.xmsg.core.xMsgTopic;
+import org.jlab.coda.xmsg.data.xMsgRegQuery;
 import org.jlab.coda.xmsg.data.xMsgR.xMsgRegistration;
 import org.jlab.coda.xmsg.data.xMsgR.xMsgRegistration.Builder;
 import org.jlab.coda.xmsg.net.xMsgRegAddress;

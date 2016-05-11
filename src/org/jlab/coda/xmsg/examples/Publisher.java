@@ -26,8 +26,8 @@ import org.jlab.coda.xmsg.core.xMsg;
 import org.jlab.coda.xmsg.core.xMsgConnection;
 import org.jlab.coda.xmsg.core.xMsgMessage;
 import org.jlab.coda.xmsg.core.xMsgTopic;
+import org.jlab.coda.xmsg.data.xMsgRegInfo;
 import org.jlab.coda.xmsg.excp.xMsgException;
-import org.jlab.coda.xmsg.xsys.regdis.xMsgRegInfo;
 
 /**
  * An example of a publisher that publishes data for ever.

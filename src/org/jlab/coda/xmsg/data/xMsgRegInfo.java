@@ -20,7 +20,7 @@
  *    Department of Experimental Nuclear Physics, Jefferson Lab.
  */
 
-package org.jlab.coda.xmsg.xsys.regdis;
+package org.jlab.coda.xmsg.data;
 
 import org.jlab.coda.xmsg.core.xMsgTopic;
 import org.jlab.coda.xmsg.data.xMsgR.xMsgRegistration;
@@ -70,7 +70,6 @@ public final class xMsgRegInfo {
      * Describes a subscription to the given topic.
      *
      * @param topic the topic of the subscription
-     * @param description general description of the subscription
      * @return the information required to (de)register an xMsg actor as a subscriber
      */
     public static xMsgRegInfo subscriber(xMsgTopic topic) {
