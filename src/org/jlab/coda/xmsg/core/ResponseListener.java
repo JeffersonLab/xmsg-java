@@ -2,9 +2,9 @@ package org.jlab.coda.xmsg.core;
 
 import org.jlab.coda.xmsg.excp.xMsgException;
 import org.jlab.coda.xmsg.net.xMsgConnectionFactory;
-import org.jlab.coda.xmsg.net.xMsgListener;
 import org.jlab.coda.xmsg.net.xMsgProxyAddress;
-import org.jlab.coda.xmsg.net.xMsgProxyDriver;
+import org.jlab.coda.xmsg.sys.pubsub.xMsgListener;
+import org.jlab.coda.xmsg.sys.pubsub.xMsgProxyDriver;
 import org.zeromq.ZMsg;
 
 import java.util.concurrent.ConcurrentHashMap;
