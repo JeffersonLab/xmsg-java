@@ -20,7 +20,7 @@
  *    Department of Experimental Nuclear Physics, Jefferson Lab.
  */
 
-package org.jlab.coda.xmsg.xsys;
+package org.jlab.coda.xmsg.sys;
 
 import org.jlab.coda.xmsg.core.xMsgConstants;
 import org.jlab.coda.xmsg.core.xMsgTopic;
@@ -32,9 +32,9 @@ import org.jlab.coda.xmsg.data.xMsgR.xMsgRegistration.OwnerType;
 import org.jlab.coda.xmsg.excp.xMsgException;
 import org.jlab.coda.xmsg.net.xMsgConnectionFactory;
 import org.jlab.coda.xmsg.net.xMsgRegAddress;
+import org.jlab.coda.xmsg.sys.regdis.RegistrationDataFactory;
+import org.jlab.coda.xmsg.sys.regdis.xMsgRegDriver;
 import org.jlab.coda.xmsg.testing.IntegrationTest;
-import org.jlab.coda.xmsg.xsys.regdis.RegistrationDataFactory;
-import org.jlab.coda.xmsg.xsys.regdis.xMsgRegDriver;
 import org.junit.Test;
 import org.junit.experimental.categories.Category;
 import org.zeromq.ZContext;

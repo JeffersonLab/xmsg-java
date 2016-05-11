@@ -23,7 +23,7 @@
 package org.jlab.coda.xmsg.core;
 
 import org.jlab.coda.xmsg.excp.xMsgException;
-import org.jlab.coda.xmsg.xsys.xMsgProxy;
+import org.jlab.coda.xmsg.sys.xMsgProxy;
 import org.zeromq.ZContext;
 
 class ProxyThread {

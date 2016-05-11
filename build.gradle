@@ -76,7 +76,7 @@ javadoc {
     options.docEncoding = "utf8"
     options.links("http://docs.oracle.com/javase/8/docs/api/")
     exclude 'org/jlab/coda/xmsg/examples/**'
-    exclude 'org/jlab/coda/xmsg/xsys/regdis/**'
+    exclude 'org/jlab/coda/xmsg/sys/regdis/**'
 }
 
 task javadocJar(type: Jar) {

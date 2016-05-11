@@ -27,7 +27,7 @@ import org.jlab.coda.xmsg.net.xMsgConnectionFactory;
 import org.jlab.coda.xmsg.net.xMsgProxyAddress;
 import org.jlab.coda.xmsg.net.xMsgProxyDriver;
 import org.jlab.coda.xmsg.net.xMsgRegAddress;
-import org.jlab.coda.xmsg.xsys.regdis.xMsgRegDriver;
+import org.jlab.coda.xmsg.sys.regdis.xMsgRegDriver;
 import org.junit.Before;
 import org.junit.Test;
 

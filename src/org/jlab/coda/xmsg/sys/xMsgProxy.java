@@ -20,7 +20,7 @@
  *    Department of Experimental Nuclear Physics, Jefferson Lab.
  */
 
-package org.jlab.coda.xmsg.xsys;
+package org.jlab.coda.xmsg.sys;
 
 import static java.util.Arrays.asList;
 
@@ -34,7 +34,7 @@ import org.jlab.coda.xmsg.excp.xMsgException;
 import org.jlab.coda.xmsg.net.xMsgContext;
 import org.jlab.coda.xmsg.net.xMsgProxyAddress;
 import org.jlab.coda.xmsg.net.xMsgSocketFactory;
-import org.jlab.coda.xmsg.xsys.util.LogUtils;
+import org.jlab.coda.xmsg.sys.util.LogUtils;
 import org.zeromq.ZContext;
 import org.zeromq.ZFrame;
 import org.zeromq.ZMQ;

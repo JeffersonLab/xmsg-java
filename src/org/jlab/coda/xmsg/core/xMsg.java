@@ -32,8 +32,8 @@ import org.jlab.coda.xmsg.net.xMsgContext;
 import org.jlab.coda.xmsg.net.xMsgProxyAddress;
 import org.jlab.coda.xmsg.net.xMsgProxyDriver;
 import org.jlab.coda.xmsg.net.xMsgRegAddress;
-import org.jlab.coda.xmsg.xsys.regdis.xMsgRegDriver;
-import org.jlab.coda.xmsg.xsys.regdis.xMsgRegFactory;
+import org.jlab.coda.xmsg.sys.regdis.xMsgRegDriver;
+import org.jlab.coda.xmsg.sys.regdis.xMsgRegFactory;
 import org.zeromq.ZMQException;
 
 import java.util.Set;
