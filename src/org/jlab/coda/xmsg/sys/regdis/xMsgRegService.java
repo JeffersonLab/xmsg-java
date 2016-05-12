@@ -142,7 +142,7 @@ public class xMsgRegService implements Runnable {
         // the fact that registration is done using client-server type communication,
         // and are always synchronous.
         String topic = xMsgConstants.UNDEFINED;
-        String sender = regAddress.host() + ":" + xMsgConstants.REGISTRAR;
+        String sender = regAddress.host() + ":registrar";
 
         // response message
         xMsgRegResponse reply;

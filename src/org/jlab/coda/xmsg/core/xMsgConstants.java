@@ -44,8 +44,6 @@ public final class xMsgConstants {
     public static final String CTRL_SUBSCRIBE = "sub";
     public static final String CTRL_REPLY = "rep";
 
-    public static final String REGISTRAR = "xMsg_Registrar";
-
     public static final String REGISTER_PUBLISHER = "registerPublisher";
     public static final String REGISTER_SUBSCRIBER = "registerSubscriber";
     public static final int REGISTER_REQUEST_TIMEOUT = 3000;
@@ -71,11 +69,6 @@ public final class xMsgConstants {
     public static final String ERROR = "ERROR";
     public static final String DONE = "done";
     public static final String DATA = "data";
-
-    public static final String NO_RESULT = "none";
-
-    public static final String BIND = "bind";
-    public static final String CONNECT = "connect";
 
     public static final int DEFAULT_PORT = 7771;
     public static final int REGISTRAR_PORT = 8888;
