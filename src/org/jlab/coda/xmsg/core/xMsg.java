@@ -260,11 +260,17 @@ public class xMsg implements AutoCloseable {
             unsubscribe(sh);
         }
         syncPubListener.stop();
+        threadPool.shutdown();
         try {
+            if (!threadPool.awaitTermination(30, TimeUnit.SECONDS)) {
+                threadPool.shutdownNow();
+                if (!threadPool.awaitTermination(30, TimeUnit.SECONDS)) {
+                    System.err.println("callback pool did not terminate");
+                }
+            }
+        } catch (InterruptedException ie) {
             threadPool.shutdownNow();
-            threadPool.awaitTermination(30, TimeUnit.SECONDS);
-        } catch (InterruptedException e) {
-            System.err.println("Interrupted when shutting down subscription thread-pool.");
+            Thread.currentThread().interrupt();
         }
         connectionManager.destroy(linger);
     }
