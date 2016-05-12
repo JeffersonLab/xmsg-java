@@ -62,7 +62,7 @@ public final class LocalThroughput {
             xMsgSubscription sub = subscriber.subscribe(address, topic, msg -> {
                 int size = msg.getDataSize();
                 if (size != messageSize) {
-                    printf("message of incorrect size received " + size);
+                    printf("Message of incorrect size received " + size);
                     System.exit(1);
                 }
                 int nr = ++timer.nr;
@@ -74,6 +74,7 @@ public final class LocalThroughput {
                 }
             });
 
+            System.out.println("Waiting for messages...");
             finished.await();
 
             if (timer.elapsed == 0) {
@@ -84,12 +85,12 @@ public final class LocalThroughput {
             double megabits = (double) (throughput * messageSize * 8) / 1000000;
             double latency = (double) timer.elapsed / (messageCount);
 
-            printf("message elapsed: %.3f [s]%n", (double) timer.elapsed / 1000000L);
-            printf("message size: %d [B]%n", messageSize);
-            printf("message count: %d%n", (int) messageCount);
-            printf("mean transfer time: %.3f [us]%n", latency);
-            printf("mean transfer rate: %d [msg/s]%n", (int) throughput);
-            printf("mean throughput: %.3f [Mb/s]%n", megabits);
+            printf("Message elapsed: %.3f [s]%n", (double) timer.elapsed / 1000000L);
+            printf("Message size: %d [B]%n", messageSize);
+            printf("Message count: %d%n", (int) messageCount);
+            printf("Mean transfer time: %.3f [us]%n", latency);
+            printf("Mean transfer rate: %d [msg/s]%n", (int) throughput);
+            printf("Mean throughput: %.3f [Mb/s]%n", megabits);
 
             subscriber.unsubscribe(sub);
 

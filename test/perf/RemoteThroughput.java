@@ -48,6 +48,7 @@ public final class RemoteThroughput {
 
         try (xMsg publisher = new xMsg("thr_publisher");
              xMsgConnection con = publisher.getConnection(address)) {
+            System.out.println("Publishing messages...");
             xMsgTopic topic = xMsgTopic.wrap("thr_topic");
             byte[] data = new byte[messageSize];
             for (int i = 0; i < messageCount; i++) {
@@ -61,6 +62,7 @@ public final class RemoteThroughput {
 
         // wait until all messages are published
         xMsgContext.destroyContext();
+        System.out.println("Done!");
     }
 
 
