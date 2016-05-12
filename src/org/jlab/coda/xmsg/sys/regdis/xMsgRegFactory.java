@@ -53,7 +53,7 @@ public final class xMsgRegFactory {
      * Creates the data for a registration request.
      *
      * @param name the name of the actor
-     * @param address the address of the actor
+     * @param host the host of the actor
      * @param type the type of the actor (publisher or subscriber)
      * @param topic the topic to be registered
      * @return the registration data

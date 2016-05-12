@@ -56,7 +56,7 @@ public class xMsgRegDriver {
      * Creates a driver to the registrar running in the given address.
      *
      * @param address registrar service address
-     * @param socket registrar connection socket
+     * @param factory factory for the ZMQ socket
      * @throws xMsgException
      */
     public xMsgRegDriver(xMsgRegAddress address, xMsgSocketFactory factory) throws xMsgException {
