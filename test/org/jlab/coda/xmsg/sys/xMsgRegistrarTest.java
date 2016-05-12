@@ -103,7 +103,7 @@ public class xMsgRegistrarTest {
             System.out.println("Total time: " + (end - start) / 1000.0);
         } finally {
             driver.close();
-            context.destroy();
+            context.close();
             if (registrar != null) {
                 registrar.shutdown();
             }

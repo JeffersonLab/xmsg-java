@@ -69,6 +69,7 @@ public class PublishersTest {
     }
 
 
+    @SuppressWarnings("resource")
     private abstract static class TestRunner implements AutoCloseable {
 
         final ProxyThread proxyThread = new ProxyThread();
