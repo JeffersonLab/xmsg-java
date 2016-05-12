@@ -35,9 +35,6 @@ public final class xMsgConstants {
     public static final String ANY = "*";
 
     public static final String TOPIC_SEP = ":";
-    public static final String DATA_SEP = "?";
-    public static final String LANG_SEP = "_";
-    public static final String PRXHOSTPORT_SEP = "%";
 
     public static final String CTRL_TOPIC = "xmsg:control";
     public static final String CTRL_CONNECT = "pub";
@@ -63,12 +60,6 @@ public final class xMsgConstants {
 
     public static final String ALL_PUBLISHER = "allPublisher";
     public static final String ALL_SUBSCRIBER = "allSubscriber";
-
-    public static final String INFO = "INFO";
-    public static final String WARNING = "WARNING";
-    public static final String ERROR = "ERROR";
-    public static final String DONE = "done";
-    public static final String DATA = "data";
 
     public static final int DEFAULT_PORT = 7771;
     public static final int REGISTRAR_PORT = 8888;
