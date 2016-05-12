@@ -20,11 +20,12 @@
  *    Department of Experimental Nuclear Physics, Jefferson Lab.
  */
 
-package org.jlab.coda.xmsg.xsys.regdis;
+package org.jlab.coda.xmsg.data;
 
 import org.jlab.coda.xmsg.core.xMsgTopic;
 import org.jlab.coda.xmsg.core.xMsgUtil;
 import org.jlab.coda.xmsg.data.xMsgR.xMsgRegistration;
+import org.jlab.coda.xmsg.sys.regdis.xMsgRegFactory;
 
 /**
  * Defines the parameters to search actors in the registrar service.

@@ -27,8 +27,8 @@ import org.jlab.coda.xmsg.core.xMsgConnection;
 import org.jlab.coda.xmsg.core.xMsgMessage;
 import org.jlab.coda.xmsg.core.xMsgTopic;
 import org.jlab.coda.xmsg.core.xMsgUtil;
+import org.jlab.coda.xmsg.data.xMsgRegInfo;
 import org.jlab.coda.xmsg.excp.xMsgException;
-import org.jlab.coda.xmsg.xsys.regdis.xMsgRegInfo;
 
 import java.util.concurrent.TimeoutException;
 

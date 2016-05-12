@@ -1,4 +1,4 @@
 #!/bin/sh
 
 CLASSPATH=$(gradle -q printClasspath)
-java -cp "$CLASSPATH" org.jlab.coda.xmsg.xsys.xMsgProxy "$@"
+java -cp "$CLASSPATH" org.jlab.coda.xmsg.sys.xMsgProxy "$@"

@@ -1,10 +1,10 @@
 package org.jlab.coda.xmsg.core;
 
+import org.jlab.coda.xmsg.data.xMsgRegInfo;
+import org.jlab.coda.xmsg.data.xMsgRegQuery;
+import org.jlab.coda.xmsg.data.xMsgRegRecord;
 import org.jlab.coda.xmsg.excp.xMsgException;
 import org.jlab.coda.xmsg.net.xMsgRegAddress;
-import org.jlab.coda.xmsg.xsys.regdis.xMsgRegInfo;
-import org.jlab.coda.xmsg.xsys.regdis.xMsgRegQuery;
-import org.jlab.coda.xmsg.xsys.regdis.xMsgRegRecord;
 
 import java.util.Set;
 import java.util.concurrent.ThreadPoolExecutor;

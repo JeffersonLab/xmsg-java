@@ -20,7 +20,7 @@
  *    Department of Experimental Nuclear Physics, Jefferson Lab.
  */
 
-package org.jlab.coda.xmsg.xsys.regdis;
+package org.jlab.coda.xmsg.sys.regdis;
 
 import com.google.protobuf.InvalidProtocolBufferException;
 import org.jlab.coda.xmsg.data.xMsgR.xMsgRegistration;
@@ -33,7 +33,7 @@ import java.util.Arrays;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.is;
-import static org.jlab.coda.xmsg.xsys.regdis.RegistrationDataFactory.newRegistration;
+import static org.jlab.coda.xmsg.sys.regdis.RegistrationDataFactory.newRegistration;
 
 public class xMsgRegRequestTest {
 

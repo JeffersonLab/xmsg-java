@@ -20,7 +20,7 @@
  *    Department of Experimental Nuclear Physics, Jefferson Lab.
  */
 
-package org.jlab.coda.xmsg.net;
+package org.jlab.coda.xmsg.sys.pubsub;
 
 import org.zeromq.ZMQ.Poller;
 import org.zeromq.ZMQ.Socket;

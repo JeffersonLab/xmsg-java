@@ -22,14 +22,14 @@
 
 package org.jlab.coda.xmsg.core;
 
+import org.jlab.coda.xmsg.data.xMsgRegInfo;
+import org.jlab.coda.xmsg.data.xMsgRegQuery;
 import org.jlab.coda.xmsg.data.xMsgR.xMsgRegistration;
 import org.jlab.coda.xmsg.net.xMsgConnectionFactory;
 import org.jlab.coda.xmsg.net.xMsgProxyAddress;
 import org.jlab.coda.xmsg.net.xMsgRegAddress;
-import org.jlab.coda.xmsg.xsys.regdis.RegistrationDataFactory;
-import org.jlab.coda.xmsg.xsys.regdis.xMsgRegDriver;
-import org.jlab.coda.xmsg.xsys.regdis.xMsgRegInfo;
-import org.jlab.coda.xmsg.xsys.regdis.xMsgRegQuery;
+import org.jlab.coda.xmsg.sys.regdis.xMsgRegDriver;
+import org.jlab.coda.xmsg.sys.regdis.RegistrationDataFactory;
 import org.junit.Before;
 import org.junit.Test;
 

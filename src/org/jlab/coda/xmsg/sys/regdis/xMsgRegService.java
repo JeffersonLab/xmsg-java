@@ -20,7 +20,7 @@
  *    Department of Experimental Nuclear Physics, Jefferson Lab.
  */
 
-package org.jlab.coda.xmsg.xsys.regdis;
+package org.jlab.coda.xmsg.sys.regdis;
 
 import com.google.protobuf.InvalidProtocolBufferException;
 import org.jlab.coda.xmsg.core.xMsgConstants;
@@ -28,7 +28,7 @@ import org.jlab.coda.xmsg.data.xMsgR.xMsgRegistration;
 import org.jlab.coda.xmsg.excp.xMsgException;
 import org.jlab.coda.xmsg.net.xMsgRegAddress;
 import org.jlab.coda.xmsg.net.xMsgSocketFactory;
-import org.jlab.coda.xmsg.xsys.util.LogUtils;
+import org.jlab.coda.xmsg.sys.util.LogUtils;
 import org.zeromq.ZContext;
 import org.zeromq.ZMQ;
 import org.zeromq.ZMQ.Socket;

@@ -1,4 +1,4 @@
-package org.jlab.coda.xmsg.net;
+package org.jlab.coda.xmsg.sys.pubsub;
 
 import org.jlab.coda.xmsg.core.xMsgUtil;
 

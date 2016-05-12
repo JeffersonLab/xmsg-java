@@ -4,4 +4,4 @@ if [ -n "$CLARA_HOME" ]; then
     export CLASSPATH="$CLARA_HOME/lib/*:$CLARA_HOME/services/*"
 fi
 
-java -XX:+UseNUMA -XX:+UseBiasedLocking org.jlab.coda.xmsg.xsys.xMsgRegistrar "$@"
+java -XX:+UseNUMA -XX:+UseBiasedLocking org.jlab.coda.xmsg.sys.xMsgRegistrar "$@"

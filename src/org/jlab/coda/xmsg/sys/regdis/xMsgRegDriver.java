@@ -20,7 +20,7 @@
  *    Department of Experimental Nuclear Physics, Jefferson Lab.
  */
 
-package org.jlab.coda.xmsg.xsys.regdis;
+package org.jlab.coda.xmsg.sys.regdis;
 
 import org.jlab.coda.xmsg.core.xMsgConstants;
 import org.jlab.coda.xmsg.data.xMsgR.xMsgRegistration;
@@ -40,7 +40,7 @@ import java.util.Set;
  *
  * Provides methods for registration and discovery of xMsg actors (i.e.
  * publishers and subscribers) on the specified
- * {@link org.jlab.coda.xmsg.xsys.regdis.xMsgRegService xMsg registrar service},
+ * {@link org.jlab.coda.xmsg.sys.regdis.xMsgRegService xMsg registrar service},
  * using a 0MQ REQ socket.
  *
  * @author gurjyan

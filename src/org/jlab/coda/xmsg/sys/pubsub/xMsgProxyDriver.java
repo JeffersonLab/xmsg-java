@@ -20,10 +20,12 @@
  *    Department of Experimental Nuclear Physics, Jefferson Lab.
  */
 
-package org.jlab.coda.xmsg.net;
+package org.jlab.coda.xmsg.sys.pubsub;
 
 import org.jlab.coda.xmsg.core.xMsgConstants;
 import org.jlab.coda.xmsg.excp.xMsgException;
+import org.jlab.coda.xmsg.net.xMsgProxyAddress;
+import org.jlab.coda.xmsg.net.xMsgSocketFactory;
 import org.zeromq.ZFrame;
 import org.zeromq.ZMQ;
 import org.zeromq.ZMQ.Poller;
@@ -49,7 +51,7 @@ public class xMsgProxyDriver {
 
     private final xMsgSocketFactory factory;
 
-    xMsgProxyDriver(xMsgProxyAddress address,
+    public xMsgProxyDriver(xMsgProxyAddress address,
                     xMsgSocketFactory factory) throws xMsgException {
         this.address = address;
         this.identity = IdentityGenerator.getCtrlId();
@@ -201,19 +203,19 @@ public class xMsgProxyDriver {
         return address;
     }
 
-    String getIdentity() {
+    public String getIdentity() {
         return identity;
     }
 
-    Socket getPubSock() {
+    public Socket getPubSock() {
         return pubSocket;
     }
 
-    Socket getSubSock() {
+    public Socket getSubSock() {
         return subSocket;
     }
 
-    Socket getControlSock() {
+    public Socket getControlSock() {
         return ctrlSocket;
     }
 }
