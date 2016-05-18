@@ -175,8 +175,6 @@ public class xMsgProxy {
 
     /**
      * Starts the proxy.
-     *
-     * @throws xMsgException if the proxy could not be started
      */
     public void start() {
         proxy.start();

@@ -302,7 +302,6 @@ public class xMsgMessage {
      * @param message the message that contains the required data
      * @param dataType the type of the required data
      * @return the deserialized data of the message
-     * @throws xMsgException if the message data is not of the given type
      */
     public static <T> T parseData(xMsgMessage message, Class<T> dataType) {
         try {
@@ -399,7 +398,6 @@ public class xMsgMessage {
      *
      * @param message the message that contains the required data
      * @return the deserialized Object of the message
-     * @throws xMsgException if the message data is not a Java Object
      */
     public static Object parseData(xMsgMessage message) {
         return parseData(message, Object.class);
