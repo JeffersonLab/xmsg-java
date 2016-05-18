@@ -30,7 +30,7 @@ class ResponseListener extends xMsgListener {
             xMsgConnectionSetup setup = new xMsgConnectionSetup() { };
             xMsgProxyDriver connection = factory.createProxyConnection(address, setup);
             connection.subscribe(topic);
-            if (!connection.checkSubscription(topic.toString())) {
+            if (!connection.checkSubscription(topic)) {
                 connection.close();
                 throw new xMsgException("could not subscribe to " + topic);
             }

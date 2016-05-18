@@ -42,8 +42,8 @@ import org.jlab.coda.xmsg.excp.xMsgException;
  */
 public class Publisher extends xMsg {
 
-    public xMsgConnection con;
-    public xMsgTopic topic;
+    private xMsgConnection con;
+    private xMsgTopic topic;
 
     /**
      * Calls the parent constructor, connects to the

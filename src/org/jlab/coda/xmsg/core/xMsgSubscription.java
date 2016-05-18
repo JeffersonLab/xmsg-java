@@ -125,8 +125,8 @@ public abstract class xMsgSubscription {
      * @throws xMsgException if subscription could not be started
      */
     void start() throws xMsgException {
-        connection.subscribe(topic.toString());
-        if (!connection.checkSubscription(topic.toString())) {
+        connection.subscribe(topic);
+        if (!connection.checkSubscription(topic)) {
             connection.unsubscribe(topic);
             throw new xMsgException("could not subscribe to " + topic);
         }

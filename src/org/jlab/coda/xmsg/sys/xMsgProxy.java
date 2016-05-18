@@ -242,7 +242,6 @@ public class xMsgProxy {
             try {
                 LOGGER.info("running on host = " + addr.host() + "  port = " + addr.pubPort());
                 if (LOGGER.isLoggable(Level.FINE)) {
-                    @SuppressWarnings("resource")
                     Socket listener = ZThread.fork(ctx, new Listener());
                     ZMQ.proxy(in, out, listener);
                 } else {

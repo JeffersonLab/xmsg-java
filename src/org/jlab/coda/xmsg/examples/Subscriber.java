@@ -47,8 +47,6 @@ import java.util.List;
  */
 public class Subscriber extends xMsg {
 
-    xMsgTopic topic;
-
     /**
      * Calls the parent constructor.
      * Registers with a local registrar.
@@ -62,7 +60,7 @@ public class Subscriber extends xMsg {
         final String subject = "test_subject";
         final String type = "test_type";
         final String description = "test_description";
-        topic = xMsgTopic.build(domain, subject, type);
+        xMsgTopic topic = xMsgTopic.build(domain, subject, type);
 
         // Register this subscriber
         register(xMsgRegInfo.subscriber(topic, description));
@@ -87,7 +85,7 @@ public class Subscriber extends xMsg {
      *
      * @param msg {@link org.jlab.coda.xmsg.core.xMsgMessage} object
      */
-    public void respondBack(xMsgMessage msg, Object data) {
+    private void respondBack(xMsgMessage msg, Object data) {
         try {
             publish(xMsgMessage.createResponse(msg, data));
         } catch (xMsgException e) {
