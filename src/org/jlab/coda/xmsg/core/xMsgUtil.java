@@ -377,7 +377,7 @@ public final class xMsgUtil {
     public static ThreadPoolExecutor newFixedThreadPool(int nThreads, String namePrefix) {
         return newFixedThreadPool(nThreads,
                                   namePrefix,
-                                  new LinkedBlockingQueue<Runnable>());
+                                  new LinkedBlockingQueue<>());
     }
 
     /**

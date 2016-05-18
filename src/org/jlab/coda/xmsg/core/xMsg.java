@@ -510,7 +510,6 @@ public class xMsg implements AutoCloseable {
      * Stops the given subscription.
      *
      * @param handle an active subscription
-     * @throws xMsgException
      */
     public void unsubscribe(xMsgSubscription handle) {
         handle.stop();

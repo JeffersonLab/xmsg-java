@@ -35,6 +35,7 @@ import org.zeromq.ZContext;
 public final class xMsgContext {
 
     private static xMsgContext ourInstance = new xMsgContext();
+    private static final Object lock = new Object();
 
     private final ZContext context;
 
@@ -72,7 +73,7 @@ public final class xMsgContext {
      * All connections and actors must be closed otherwise this will hang.
      */
     public static void destroyContext() {
-        synchronized (ourInstance) {
+        synchronized (lock) {
             ourInstance.context.destroy();
         }
     }

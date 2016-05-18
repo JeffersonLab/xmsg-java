@@ -47,8 +47,8 @@ import java.util.concurrent.TimeoutException;
  */
 public class SyncPublisher extends xMsg {
 
-    public xMsgConnection con;
-    public xMsgTopic topic;
+    private xMsgConnection con;
+    private xMsgTopic topic;
 
     /**
      * Calls the parent constructor, connects to the

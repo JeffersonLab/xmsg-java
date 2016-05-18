@@ -66,7 +66,6 @@ public class xMsgProxyDriver {
         } catch (Exception e) {
             factory.closeQuietly(pub);
             factory.closeQuietly(sub);
-            factory.closeQuietly(ctrl);
             throw e;
         }
         this.pubSocket = pub;
