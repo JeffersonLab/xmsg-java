@@ -107,7 +107,7 @@ class ConnectionManager {
 
 
     static class ConnectionPool<A, C> {
-        private Map<A, Queue<C>> connections = new ConcurrentHashMap<>();
+        private final Map<A, Queue<C>> connections = new ConcurrentHashMap<>();
 
         public C getConnection(A address) {
             Queue<C> cache = connections.get(address);
