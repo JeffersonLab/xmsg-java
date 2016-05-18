@@ -131,7 +131,7 @@ class ConnectionManager {
 
         public void destroyAll(Consumer<C> destroy) {
             for (Map.Entry<A, Queue<C>> cache : connections.entrySet()) {
-                cache.getValue().forEach(destroy::accept);
+                cache.getValue().forEach(destroy);
             }
         }
     }
