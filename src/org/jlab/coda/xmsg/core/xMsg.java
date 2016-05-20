@@ -508,7 +508,9 @@ public class xMsg implements AutoCloseable {
     }
 
     /**
-     * Stops the given subscription.
+     * Stops the given subscription. This will not cancel the callbacks of the
+     * subscription that are still pending or running in the internal
+     * threadpool.
      *
      * @param handle an active subscription
      */
