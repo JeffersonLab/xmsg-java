@@ -257,9 +257,7 @@ public class xMsg implements AutoCloseable {
      * @see <a href="http://api.zeromq.org/3-2:zmq-setsockopt">ZMQ_LINGER</a>
      */
     public void destroy(int linger) {
-        for (xMsgSubscription sh : mySubscriptions.values()) {
-            unsubscribe(sh);
-        }
+        unsubscribeAll();
         syncPubListener.stop();
         threadPool.shutdown();
         try {
@@ -517,6 +515,20 @@ public class xMsg implements AutoCloseable {
     public void unsubscribe(xMsgSubscription handle) {
         handle.stop();
         mySubscriptions.remove(handle.getName());
+    }
+
+    /**
+     * Stops all subscriptions. This will not stop the callbacks that are still
+     * pending or running in the internal threadpool.
+     * <p>
+     * Usually, {@link #close()} takes cares of stopping all running
+     * subscriptions and callbacks. Use this method when you want to run some
+     * actions between stopping the subscriptions and closing the actor
+     * (like publishing a shutdown report). Otherwise just use {@link #close()}.
+     */
+    protected final void unsubscribeAll() {
+        mySubscriptions.values().forEach(xMsgSubscription::stop);
+        mySubscriptions.clear();
     }
 
     /**
