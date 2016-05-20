@@ -241,8 +241,8 @@ public class xMsg implements AutoCloseable {
     }
 
     /**
-     * Unsubscribes all previous subscriptions,
-     * shuts down thread pool and closes all connections.
+     * Unsubscribes all running subscriptions,
+     * terminates all running callbacks and closes all connections.
      */
     public void destroy() {
         final int infiniteLinger = -1;
@@ -250,10 +250,11 @@ public class xMsg implements AutoCloseable {
     }
 
     /**
-     * Unsubscribes all previous subscriptions,
-     * shuts down thread pool and closes all connections.
+     * Unsubscribes all running subscriptions,
+     * terminates all running callbacks and closes all connections.
      *
-     * @param linger linger period for closing the 0MQ context
+     * @param linger the ZMQ linger period when closing the sockets
+     * @see <a href="http://api.zeromq.org/3-2:zmq-setsockopt">ZMQ_LINGER</a>
      */
     public void destroy(int linger) {
         for (xMsgSubscription sh : mySubscriptions.values()) {
@@ -276,8 +277,8 @@ public class xMsg implements AutoCloseable {
     }
 
     /**
-     * Unsubscribes all previous subscriptions,
-     * shuts down thread pool and closes all connections.
+     * Unsubscribes all running subscriptions,
+     * terminates all running callbacks and closes all connections.
      */
     @Override
     public void close() {
