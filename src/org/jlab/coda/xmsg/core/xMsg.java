@@ -258,8 +258,8 @@ public class xMsg implements AutoCloseable {
      */
     public void destroy(int linger) {
         unsubscribeAll();
-        syncPubListener.stop();
         terminateCallbacks();
+        syncPubListener.stop();
         connectionManager.destroy(linger);
     }
 
