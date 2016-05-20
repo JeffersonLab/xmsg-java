@@ -259,18 +259,7 @@ public class xMsg implements AutoCloseable {
     public void destroy(int linger) {
         unsubscribeAll();
         syncPubListener.stop();
-        threadPool.shutdown();
-        try {
-            if (!threadPool.awaitTermination(30, TimeUnit.SECONDS)) {
-                threadPool.shutdownNow();
-                if (!threadPool.awaitTermination(30, TimeUnit.SECONDS)) {
-                    System.err.println("callback pool did not terminate");
-                }
-            }
-        } catch (InterruptedException ie) {
-            threadPool.shutdownNow();
-            Thread.currentThread().interrupt();
-        }
+        terminateCallbacks();
         connectionManager.destroy(linger);
     }
 
@@ -529,6 +518,36 @@ public class xMsg implements AutoCloseable {
     protected final void unsubscribeAll() {
         mySubscriptions.values().forEach(xMsgSubscription::stop);
         mySubscriptions.clear();
+    }
+
+    /**
+     * Finishes all running and pending callbacks, and rejects all new ones.
+     * Blocks until the callbacks have been completed, or a timeout occurs, or
+     * the current thread is interrupted, whichever happens first.
+     * <p>
+     * This will not stop the subscriptions, but they will not be able to
+     * execute new callbacks. To terminate all subscriptions, use {@link
+     * #unsubscribeAll}.
+     * <p>
+     * Usually, {@link #close()} takes cares of stopping all running
+     * subscriptions and terminating callbacks. Use this method when you want to
+     * run some actions between finishing the callbacks and closing the actor,
+     * (like publishing a shutdown report).
+     * Otherwise just use {@link #close()}.
+     */
+    protected final void terminateCallbacks() {
+        threadPool.shutdown();
+        try {
+            if (!threadPool.awaitTermination(30, TimeUnit.SECONDS)) {
+                threadPool.shutdownNow();
+                if (!threadPool.awaitTermination(30, TimeUnit.SECONDS)) {
+                    System.err.println("callback pool did not terminate");
+                }
+            }
+        } catch (InterruptedException ie) {
+            threadPool.shutdownNow();
+            Thread.currentThread().interrupt();
+        }
     }
 
     /**
