@@ -44,7 +44,7 @@ ext {
 sourceSets {
     main {
         proto {
-            srcDir 'src/org/jlab/coda/xmsg/data'
+            srcDir 'src'
         }
         java {
             srcDir 'src'
