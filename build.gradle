@@ -101,6 +101,7 @@ if (JavaVersion.current().isJava8Compatible()) {
 task sourcesJar(type: Jar, dependsOn:classes) {
     classifier = 'sources'
     from sourceSets.main.allJava
+    from (generatedProtoDir)
 }
 
 
