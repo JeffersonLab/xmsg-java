@@ -100,7 +100,7 @@ if (JavaVersion.current().isJava8Compatible()) {
 
 task sourcesJar(type: Jar, dependsOn:classes) {
     classifier = 'sources'
-    from sourceSets.main.allSource
+    from sourceSets.main.allJava
 }
 
 
