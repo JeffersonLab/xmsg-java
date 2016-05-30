@@ -36,6 +36,10 @@ protobuf {
   }
 }
 
+ext {
+    generatedProtoDir = "${protobuf.generatedFilesBaseDir}/main/java"
+}
+
 
 sourceSets {
     main {
@@ -215,9 +219,6 @@ gradle.taskGraph.whenReady { taskGraph ->
 }
 
 
-
-def buildDirName = buildDir.name
-def generatedProtoDir = "${buildDirName}/generated/source/proto/main/java"
 
 eclipse {
     classpath {
