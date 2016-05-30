@@ -142,7 +142,7 @@ def deploySpec = copySpec {
         from "${jar.archivePath}"
     }
 
-    from ("${project.rootDir}/scripts/unix") {
+    from ("${projectDir}/scripts/unix") {
         include "jx_*"
         into 'bin'
         fileMode 0755
@@ -173,7 +173,7 @@ task printClasspath << {
 
 checkstyle {
     toolVersion = "6.14"
-    configFile = new File(rootDir, "config/quality/checkstyle.xml")
+    configFile = new File(projectDir, "config/quality/checkstyle.xml")
 }
 
 findbugs {
@@ -181,12 +181,12 @@ findbugs {
     ignoreFailures = true
     effort = "default"
     reportLevel = "medium"
-    excludeFilter = new File(rootDir, "config/quality/findbugs-exclude.xml")
+    excludeFilter = new File(projectDir, "config/quality/findbugs-exclude.xml")
 }
 
 task checkstyleHtml << {
     ant.xslt(in: checkstyleMain.reports.xml.destination,
-             style: new File(rootDir, 'config/quality/checkstyle-noframes-sorted.xsl'),
+             style: new File(projectDir, 'config/quality/checkstyle-noframes-sorted.xsl'),
              out: new File(checkstyleMain.reports.xml.destination.parent, 'main.html'))
 }
 
