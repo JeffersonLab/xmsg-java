@@ -281,7 +281,12 @@ public final class xMsgUtil {
 
     static String encodeIdentity(String address, String name) {
         String id = address + "#" + name + "#" + randomGenerator.nextInt(100);
-        return Integer.toHexString(id.hashCode());
+        int idHash = id.hashCode() & Integer.MAX_VALUE;
+        int minValue = 0x1000_0000;
+        if (idHash < minValue) {
+            idHash += minValue;
+        }
+        return Integer.toHexString(idHash);
     }
 
     /**
