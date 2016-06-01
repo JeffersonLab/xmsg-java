@@ -32,6 +32,7 @@ import org.zeromq.ZContext;
  * @author gurjyan
  * @since 2.x
  */
+// CHECKSTYLE.OFF: ConstantName
 public final class xMsgContext {
 
     private static xMsgContext ourInstance = new xMsgContext();
