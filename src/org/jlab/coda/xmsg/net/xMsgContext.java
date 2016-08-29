@@ -58,7 +58,7 @@ public final class xMsgContext {
     /**
      * Set the size of the 0MQ thread pool to handle I/O operations.
      */
-    public static void setMaxThreads(int ioThreads) {
+    public static void setIOThreads(int ioThreads) {
         ourInstance.context.getContext().setIOThreads(ioThreads);
     }
 
