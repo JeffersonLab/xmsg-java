@@ -170,7 +170,7 @@ task printClasspath << {
 
 
 checkstyle {
-    toolVersion = '6.14'
+    toolVersion = '6.19'
     configFile = file('config/quality/checkstyle.xml')
 }
 
