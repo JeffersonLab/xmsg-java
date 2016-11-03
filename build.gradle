@@ -37,7 +37,7 @@ protobuf {
 }
 
 ext {
-    generatedProtoDir = "${protobuf.generatedFilesBaseDir}/main/java"
+    generatedProtoDir = "${buildDir.name}/generated/source/proto/main/java"
 }
 
 
