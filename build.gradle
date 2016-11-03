@@ -130,6 +130,10 @@ task integrationTest(type: Test) {
     useJUnit {
         includeCategories 'org.jlab.coda.xmsg.testing.IntegrationTest'
     }
+    testLogging {
+        showStandardStreams = true
+        events 'started', 'passed', 'failed'
+    }
     outputs.upToDateWhen { false }
 }
 
