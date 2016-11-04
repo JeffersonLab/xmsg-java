@@ -1,0 +1,12 @@
+#!/bin/sh
+
+if [ -n "${JAVA_HOME}" ]; then
+    java_bin="${JAVA_HOME}/bin/java"
+else
+    java_bin=java
+fi
+
+class_path="$(./gradlew printClasspath)"
+
+
+"${java_bin}" -cp "${class_path}" "$@"

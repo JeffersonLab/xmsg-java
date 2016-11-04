@@ -1,4 +1,3 @@
 #!/bin/sh
 
-CLASSPATH=$(gradle -q printClasspath)
-java -cp "$CLASSPATH" perf.LocalThroughput "$@"
+./scripts/exec-class perf.LocalThroughput "$@"
