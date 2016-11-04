@@ -5,6 +5,8 @@
 /.idea
 /.*DS_Store
 /*.iml
+/*.ipr
+/*.iws
 /build/
 /bin/
 /doc/
