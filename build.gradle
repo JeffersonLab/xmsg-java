@@ -167,9 +167,29 @@ task deploy(type: Copy, overwrite: true, dependsOn: install) {
 }
 
 
-task printClasspath << {
-    println sourceSets.test.runtimeClasspath.asPath
+
+ext.classPathCache = file("${buildDir}/tmp/classpath")
+ext.testClassPathCache = file("${buildDir}/tmp/test_classpath")
+
+task cacheClasspath << {
+    if (!classPathCache.isFile()) {
+        classPathCache.parentFile.mkdirs()
+        classPathCache.createNewFile()
+    }
+    classPathCache.write sourceSets.main.runtimeClasspath.asPath
+    testClassPathCache.write sourceSets.test.runtimeClasspath.asPath
 }
+cacheClasspath.inputs.files sourceSets.main.runtimeClasspath
+cacheClasspath.inputs.files sourceSets.test.runtimeClasspath
+cacheClasspath.outputs.files classPathCache
+cacheClasspath.outputs.files testClassPathCache
+
+task printClasspath << {
+    println classPathCache.text
+}
+
+build.dependsOn cacheClasspath
+printClasspath.dependsOn cacheClasspath
 
 
 

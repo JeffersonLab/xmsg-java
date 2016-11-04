@@ -6,7 +6,14 @@ else
     java_bin=java
 fi
 
-class_path="$(./gradlew printClasspath)"
+if [ "$1" = "-t" ]; then
+    shift
+    cache_file=./build/tmp/test_classpath
+else
+    cache_file=./build/tmp/classpath
+fi
+
+class_path=$(cat "${cache_file}")
 
 
 "${java_bin}" -cp "${class_path}" "$@"
