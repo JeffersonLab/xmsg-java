@@ -316,21 +316,21 @@ class xMsgRegDatabase {
             }
         }
 
+        private boolean filterAddress() {
+            return address.filter;
+        }
+
         public Set<xMsgRegistration> result() {
             return result;
         }
 
-        private boolean matchTopic(xMsgTopic topic) {
+        public boolean matchTopic(xMsgTopic topic) {
             return (domain.any  || topic.domain().equals(domain.value))
                 && (subject.any || topic.subject().equals(subject.value))
                 && (type.any    || topic.type().equals(type.value));
         }
 
-        private boolean filterAddress() {
-            return address.filter;
-        }
-
-        private boolean matchAddress(xMsgRegistration actor) {
+        public boolean matchAddress(xMsgRegistration actor) {
             return actor.getHost().equals(address.host) && actor.getPort() == address.port;
         }
     }
