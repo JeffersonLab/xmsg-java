@@ -168,9 +168,9 @@ class xMsgRegDatabase {
      * </ol>
      * then this will be returned:
      * <pre>
-     * find("DOMAIN", "*", "*")           -->  1
-     * find("DOMAIN", "SUBJECT", "*")     -->  1, 2
-     * find("DOMAIN", "SUBJECT", "TYPE")  -->  1, 2, 3
+     * find("DOMAIN", "*", "*")           -->  3
+     * find("DOMAIN", "SUBJECT", "*")     -->  3, 2
+     * find("DOMAIN", "SUBJECT", "TYPE")  -->  3, 2, 1
      * </pre>
      *
      * @param domain the searched domain
