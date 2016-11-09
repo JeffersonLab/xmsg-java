@@ -107,7 +107,7 @@ public final class xMsgRegQuery {
         }
 
         /**
-         * A query for registered actor with this exact domain.
+         * A query for registered actors with this exact domain.
          */
         public xMsgRegQuery withDomain(String domain) {
             data.setDomain(domain);
@@ -115,7 +115,7 @@ public final class xMsgRegQuery {
         }
 
         /**
-         * A query for registered actor with this exact subject.
+         * A query for registered actors with this exact subject.
          */
         public xMsgRegQuery withSubject(String subject) {
             data.setSubject(subject);
@@ -131,13 +131,16 @@ public final class xMsgRegQuery {
         }
 
         /**
-         * A query for registered actor with this exact hostname.
+         * A query for registered actors with this exact hostname.
          */
         public xMsgRegQuery withHost(String host) {
             data.setHost(xMsgUtil.toHostAddress(host));
             return new xMsgRegQuery(data, Category.FILTER);
         }
 
+        /**
+         * A query to get all registered actors.
+         */
         public xMsgRegQuery all() {
             return new xMsgRegQuery(data, Category.ALL);
         }
