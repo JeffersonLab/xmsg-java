@@ -93,6 +93,9 @@ public class xMsgRegistrarTest {
             removeRandom(2500);
             filter();
 
+            addRandom(1000);
+            same();
+
             removeRandom(2500);
             all();
 
@@ -173,6 +176,12 @@ public class xMsgRegistrarTest {
     public void filter() throws xMsgException {
         filterActors(OwnerType.PUBLISHER);
         filterActors(OwnerType.SUBSCRIBER);
+    }
+
+
+    public void same() throws xMsgException {
+        compareActors(OwnerType.PUBLISHER);
+        compareActors(OwnerType.SUBSCRIBER);
     }
 
 
@@ -280,6 +289,20 @@ public class xMsgRegistrarTest {
             Set<xMsgRegistration> expected = find(regType, e -> e.getHost().equals(host));
 
             checker.assertThat(host, result, expected);
+        }
+    }
+
+
+    private void compareActors(OwnerType regType) throws xMsgException {
+        ResultAssert checker = new ResultAssert("topic", regType);
+        for (String topic : RegistrationDataFactory.testTopics) {
+            xMsgTopic searchTopic = xMsgTopic.wrap(topic);
+            Builder data = getQuery(regType).withSame(searchTopic).data();
+
+            Set<xMsgRegistration> result = driver.sameRegistration(name, data.build());
+            Set<xMsgRegistration> expected = find(regType, r -> getTopic(r).equals(searchTopic));
+
+            checker.assertThat(topic, result, expected);
         }
     }
 

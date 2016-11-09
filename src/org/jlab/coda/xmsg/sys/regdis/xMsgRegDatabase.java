@@ -240,6 +240,45 @@ class xMsgRegDatabase {
 
 
     /**
+     * Returns a set with all actors whose topic is the same as the given topic.
+     * Empty if no actor is found.
+     * <p>
+     * The topics must be equals. No prefix matching is done.
+     * If we have actors registered to these topics:
+     * <ol>
+     * <li>{@code "DOMAIN:SUBJECT:TYPE"}
+     * <li>{@code "DOMAIN:SUBJECT"}
+     * <li>{@code "DOMAIN"}
+     * </ol>
+     * then this will be returned:
+     * <pre>
+     * find("DOMAIN", "*", "*")           -->  3
+     * find("DOMAIN", "SUBJECT", "*")     -->  2
+     * find("DOMAIN", "SUBJECT", "TYPE")  -->  1
+     * </pre>
+     *
+     * @param domain the searched domain
+     * @param subject the searched type (it can be undefined)
+     * @param type the searched type (it can be undefined)
+     * @return the set of all actors that have the same topic
+     */
+    public Set<xMsgRegistration> same(String domain, String subject, String type) {
+        Set<xMsgRegistration> result = new HashSet<>();
+        ConcurrentMap<xMsgTopic, Set<xMsgRegistration>> map = db.get(domain);
+        if (map == null) {
+            return result;
+        }
+        xMsgTopic searchedTopic = xMsgTopic.build(domain, subject, type);
+        for (xMsgTopic topic : map.keySet()) {
+            if (searchedTopic.equals(topic)) {
+                result.addAll(map.get(topic));
+            }
+        }
+        return result;
+    }
+
+
+    /**
      * Returns all registered actors.
      *
      * @return the set of all actors

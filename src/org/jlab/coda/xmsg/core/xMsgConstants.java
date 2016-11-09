@@ -58,6 +58,9 @@ public final class xMsgConstants {
     public static final String FILTER_PUBLISHER = "filterPublisher";
     public static final String FILTER_SUBSCRIBER = "filterSubscriber";
 
+    public static final String EXACT_PUBLISHER = "exactPublisher";
+    public static final String EXACT_SUBSCRIBER = "exactSubscriber";
+
     public static final String ALL_PUBLISHER = "allPublisher";
     public static final String ALL_SUBSCRIBER = "allSubscriber";
 

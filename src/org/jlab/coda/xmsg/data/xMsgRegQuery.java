@@ -81,6 +81,7 @@ public final class xMsgRegQuery {
     public enum Category {
         MATCHING,
         FILTER,
+        EXACT,
         ALL
     }
 
@@ -128,6 +129,16 @@ public final class xMsgRegQuery {
         public xMsgRegQuery withType(String type) {
             data.setType(type);
             return new xMsgRegQuery(data, Category.FILTER);
+        }
+
+        /**
+         * A query for registered actors with this exact topic.
+         */
+        public xMsgRegQuery withSame(xMsgTopic topic) {
+            data.setDomain(topic.domain());
+            data.setSubject(topic.subject());
+            data.setType(topic.type());
+            return new xMsgRegQuery(data, Category.EXACT);
         }
 
         /**

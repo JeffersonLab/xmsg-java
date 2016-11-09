@@ -202,6 +202,20 @@ public class xMsgRegService implements Runnable {
                 logFilter("subscribers", data);
                 registration = subscribers.filter(data);
 
+            } else if (topic.equals(xMsgConstants.EXACT_PUBLISHER)) {
+                xMsgRegistration data = request.data();
+                logFilter("publishers with exact topic ", data);
+                registration = publishers.same(data.getDomain(),
+                                               data.getSubject(),
+                                               data.getType());
+
+            } else if (topic.equals(xMsgConstants.EXACT_SUBSCRIBER)) {
+                xMsgRegistration data = request.data();
+                logFilter("subscribers with exact topic ", data);
+                registration = subscribers.same(data.getDomain(),
+                                                data.getSubject(),
+                                                data.getType());
+
             } else if (topic.equals(xMsgConstants.ALL_PUBLISHER)) {
                 LOGGER.fine(() -> "get all publishers");
                 registration = publishers.all();

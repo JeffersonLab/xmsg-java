@@ -306,6 +306,64 @@ public class xMsgRegDriver {
     }
 
     /**
+     * Sends a request to the registrar server to search the database
+     * for publishers or subscribers with exactly the same specific topic,
+     * and waits the response.
+     * <p>
+     * This method finds actors with the same topic, instead of doing prefix
+     * matching like {@link #findRegistration} or comparing individual topic
+     * parts like {@link #filterRegistration}. If the requested topic is {@code A:B},
+     * this method will only return actors with topic {@code A:B}, while the
+     * filter and find methods will also return actors with matching topics,
+     * like {@code A:B:C}.
+     * <p>
+     * The topic of interest is defined within the given registration data.
+     *
+     * @param sender the sender of the request
+     * @param data the registration data object
+     * @return set of publishers or subscribers that have the exact same topic.
+     * @throws xMsgException
+     */
+    public Set<xMsgRegistration> sameRegistration(String sender,
+                                                  xMsgRegistration data)
+            throws xMsgException {
+        return sameRegistration(sender, data, xMsgConstants.FIND_REQUEST_TIMEOUT);
+    }
+
+    /**
+     * Sends a request to the registrar server to search the database
+     * for publishers or subscribers with exactly the same specific topic,
+     * and waits the response.
+     * <p>
+     * This method finds actors with the same topic, instead of doing prefix
+     * matching like {@link #findRegistration} or comparing individual topic
+     * parts like {@link #filterRegistration}. If the requested topic is {@code A:B},
+     * this method will only return actors with topic {@code A:B}, while the
+     * filter and find methods will also return actors with matching topics,
+     * like {@code A:B:C}.
+     * <p>
+     * The topic of interest is defined within the given registration data.
+     *
+     * @param sender the sender of the request
+     * @param data the registration data object
+     * @param timeout the milliseconds to wait for a response
+     * @return set of publishers or subscribers that have the exact same topic.
+     * @throws xMsgException
+     */
+    public Set<xMsgRegistration> sameRegistration(String sender,
+                                                  xMsgRegistration data,
+                                                  int timeout)
+            throws xMsgException {
+        String topic = selectTopic(data.getOwnerType(),
+                                   xMsgConstants.EXACT_PUBLISHER,
+                                   xMsgConstants.EXACT_SUBSCRIBER);
+
+        xMsgRegRequest request = new xMsgRegRequest(topic, sender, data);
+        xMsgRegResponse response = request(request, timeout);
+        return response.data();
+    }
+
+    /**
      * Sends a request to the database to get all publishers or subscribers,
      * and waits the response.
      *

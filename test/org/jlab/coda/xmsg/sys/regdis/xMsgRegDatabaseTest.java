@@ -441,6 +441,18 @@ public class xMsgRegDatabaseTest {
 
 
     @Test
+    public void getSame() throws Exception {
+        db.register(asimov1.build());
+        db.register(brando2.build());
+        db.register(twain1.build());
+        db.register(twain2.build());
+        db.register(tolkien1.build());
+
+        assertThat(db.same("writer", "adventure", "*"), is(newRegSet(twain1, twain2)));
+    }
+
+
+    @Test
     public void getAll() throws Exception {
         db.register(asimov1.build());
         db.register(asimov2.build());
