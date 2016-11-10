@@ -481,11 +481,12 @@ public class xMsg implements AutoCloseable {
                         threadPool.submit(() -> callback.callback(inputMsg));
                     }
                 };
+                sHandle.start();
                 xMsgSubscription result = mySubscriptions.putIfAbsent(name, sHandle);
                 if (result == null) {
-                    sHandle.start();
                     return sHandle;
                 }
+                sHandle.stop();
             }
             throw new IllegalStateException("subscription already exists");
         } catch (Exception e) {
