@@ -105,7 +105,9 @@ public class xMsgRegistrarTest {
             long end = System.currentTimeMillis();
             System.out.println("Total time: " + (end - start) / 1000.0);
         } finally {
-            driver.close();
+            if (driver != null) {
+                driver.close();
+            }
             context.close();
             if (registrar != null) {
                 registrar.shutdown();
@@ -203,7 +205,6 @@ public class xMsgRegistrarTest {
             checker.assertThat(topic, result, expected);
         }
     }
-
 
     private Predicate<xMsgRegistration> discoveryPredicate(OwnerType regType, String topic) {
         final xMsgTopic searchTopic = xMsgTopic.wrap(topic);
