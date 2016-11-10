@@ -36,6 +36,8 @@ import org.jlab.coda.xmsg.sys.regdis.xMsgRegDriver;
 import org.jlab.coda.xmsg.sys.regdis.xMsgRegFactory;
 import org.zeromq.ZMQException;
 
+import java.util.Arrays;
+import java.util.HashSet;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
@@ -455,6 +457,19 @@ public class xMsg implements AutoCloseable {
     }
 
     /**
+     * Subscribes to a set of topics of interest through the default proxy.
+     * A background thread will be started to receive the messages.
+     *
+     * @param topics the topics to select messages
+     * @param callback the user action to run when a message is received
+     * @throws xMsgException
+     */
+    public xMsgSubscription subscribe(Set<xMsgTopic> topics,
+                                      xMsgCallBack callback) throws xMsgException {
+        return subscribe(defaultProxyAddress, topics, callback);
+    }
+
+    /**
      * Subscribes to a topic of interest through the specified proxy.
      * A background thread will be started to receive the messages.
      *
@@ -466,16 +481,31 @@ public class xMsg implements AutoCloseable {
     public xMsgSubscription subscribe(xMsgProxyAddress address,
                                       xMsgTopic topic,
                                       xMsgCallBack callback) throws xMsgException {
+        return subscribe(defaultProxyAddress, new HashSet<>(Arrays.asList(topic)), callback);
+    }
+
+    /**
+     * Subscribes to a set of topics of interest through the specified proxy.
+     * A background thread will be started to receive the messages.
+     *
+     * @param address the address to the proxy
+     * @param topics the topics to select messages
+     * @param callback the user action to run when a message is received
+     * @throws xMsgException
+     */
+    public xMsgSubscription subscribe(xMsgProxyAddress address,
+                                      Set<xMsgTopic> topics,
+                                      xMsgCallBack callback) throws xMsgException {
         // get a connection to the proxy
         xMsgProxyDriver connection = connectionManager.getProxyConnection(address);
         try {
             // define a unique name for the subscription
-            String name = "sub-" + myName + "-" + connection.getAddress() + "-" + topic;
+            String name = "sub-" + myName + "-" + connection.getAddress() + "-" + topics.hashCode();
 
             // start the subscription, if it does not exist yet
             xMsgSubscription sHandle = mySubscriptions.get(name);
             if (sHandle == null) {
-                sHandle = new xMsgSubscription(name, connection, topic) {
+                sHandle = new xMsgSubscription(name, connection, topics) {
                     @Override
                     public void handle(xMsgMessage inputMsg) throws xMsgException {
                         threadPool.submit(() -> callback.callback(inputMsg));

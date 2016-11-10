@@ -29,6 +29,8 @@ import org.junit.Before;
 import org.junit.Test;
 import org.junit.experimental.categories.Category;
 
+import java.util.HashSet;
+import java.util.Set;
 import java.util.concurrent.TimeoutException;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.atomic.AtomicLong;
@@ -208,5 +210,62 @@ public class SubscriptionsTest {
 
         assertTrue("not received", check.received);
         assertTrue("no timeout", check.timeout);
+    }
+
+    @Test
+    public void multiTopicSubscriptionReceivesAllMessages() throws Exception {
+        class Check {
+            static final int N = 10000;
+            static final long SUM_N = 49995000L;
+            AtomicInteger counter = new AtomicInteger();
+            AtomicLong sum = new AtomicLong();
+        }
+
+        final Check check = new Check();
+
+        Thread subThread = xMsgUtil.newThread("sub-thread", () -> {
+            try (xMsg actor = new xMsg("test_subscriber")) {
+                Set<xMsgTopic> topics = new HashSet<>();
+                topics.add(xMsgTopic.wrap("1_test_topic"));
+                topics.add(xMsgTopic.wrap("2_test_topic"));
+                xMsgSubscription sub = actor.subscribe(topics, msg -> {
+                    int i = xMsgMessage.parseData(msg, Integer.class);
+                    check.counter.incrementAndGet();
+                    check.sum.addAndGet(i);
+                });
+                int shutdownCounter = 0;
+                while (check.counter.get() < Check.N && shutdownCounter < 100) {
+                    shutdownCounter++;
+                    xMsgUtil.sleep(100);
+                }
+                actor.unsubscribe(sub);
+            } catch (xMsgException e) {
+                e.printStackTrace();
+            }
+        });
+        subThread.start();
+        xMsgUtil.sleep(100);
+
+        Thread pubThread = xMsgUtil.newThread("pub-thread", () -> {
+            try (xMsg actor = new xMsg("test_publisher");
+                 xMsgConnection con = actor.getConnection()) {
+                xMsgTopic[] topics = new xMsgTopic[] {
+                        xMsgTopic.wrap("1_test_topic"), xMsgTopic.wrap("2_test_topic")
+                };
+                for (int i = 0; i < Check.N; i++) {
+                    xMsgMessage msg = xMsgMessage.createFrom(topics[i % 2], i);
+                    actor.publish(con, msg);
+                }
+            } catch (xMsgException e) {
+                e.printStackTrace();
+            }
+        });
+        pubThread.start();
+
+        subThread.join();
+        pubThread.join();
+
+        assertThat(check.counter.get(), is(Check.N));
+        assertThat(check.sum.get(), is(Check.SUM_N));
     }
 }

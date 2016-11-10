@@ -29,6 +29,10 @@ import org.zeromq.ZMQ;
 import org.zeromq.ZMQException;
 import org.zeromq.ZMsg;
 
+import java.util.List;
+import java.util.Set;
+import java.util.stream.Collectors;
+
 /**
  * A subscription object uses a {@link xMsgConnection connection} to receive
  * {@link xMsgMessage messages} of the interested {@link xMsgTopic topic},
@@ -51,7 +55,7 @@ public abstract class xMsgSubscription {
 
     private final String name;
     private final xMsgProxyDriver connection;
-    private final String topic;
+    private final List<String> topics;
 
     private final Thread thread;
     private volatile boolean isRunning = false;
@@ -61,10 +65,10 @@ public abstract class xMsgSubscription {
      *
      * @see xMsg#subscribe
      */
-    xMsgSubscription(String name, xMsgProxyDriver connection, xMsgTopic topic) {
+    xMsgSubscription(String name, xMsgProxyDriver connection, Set<xMsgTopic> topics) {
         this.name = name;
         this.connection = connection;
-        this.topic = topic.toString();
+        this.topics = topics.stream().map(xMsgTopic::toString).collect(Collectors.toList());
         this.thread = xMsgUtil.newThread(name, new Handler());
     }
 
@@ -114,7 +118,7 @@ public abstract class xMsgSubscription {
                     e.printStackTrace();
                 }
             }
-            connection.unsubscribe(topic);
+            topics.forEach(t -> connection.unsubscribe(t));
             connection.close();
         }
     }
@@ -125,9 +129,9 @@ public abstract class xMsgSubscription {
      * @throws xMsgException if subscription could not be started
      */
     void start() throws xMsgException {
-        connection.subscribe(topic);
-        if (!connection.checkSubscription(topic)) {
-            connection.unsubscribe(topic);
+        topics.forEach(t -> connection.subscribe(t));
+        if (!connection.checkSubscription(topics.get(0))) {
+            topics.forEach(t -> connection.unsubscribe(t));
             throw new xMsgException(subscriptionError());
         }
         xMsgUtil.sleep(10);
@@ -152,7 +156,10 @@ public abstract class xMsgSubscription {
         StringBuilder sb = new StringBuilder();
         sb.append("could not subscribe with ").append(connection.getAddress());
         sb.append(" [");
-        sb.append(topic);
+        sb.append(topics.get(0));
+        if (size > 1) {
+            sb.append(" and ").append(size).append(" others");
+        }
         sb.append("]");
         return sb.toString();
     }
