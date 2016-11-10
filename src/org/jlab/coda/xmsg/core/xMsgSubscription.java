@@ -128,7 +128,7 @@ public abstract class xMsgSubscription {
         connection.subscribe(topic);
         if (!connection.checkSubscription(topic)) {
             connection.unsubscribe(topic);
-            throw new xMsgException("could not subscribe to " + topic);
+            throw new xMsgException(subscriptionError());
         }
         xMsgUtil.sleep(10);
         isRunning = true;
@@ -145,6 +145,16 @@ public abstract class xMsgSubscription {
         } catch (InterruptedException e) {
             Thread.currentThread().interrupt();
         }
+    }
+
+    private String subscriptionError() {
+        int size = topics.size();
+        StringBuilder sb = new StringBuilder();
+        sb.append("could not subscribe with ").append(connection.getAddress());
+        sb.append(" [");
+        sb.append(topic);
+        sb.append("]");
+        return sb.toString();
     }
 
     /**
