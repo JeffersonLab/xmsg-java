@@ -44,6 +44,7 @@ import java.util.concurrent.ConcurrentMap;
 import java.util.concurrent.ThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
+import java.util.concurrent.atomic.AtomicReference;
 import java.util.stream.Collectors;
 
 /**
@@ -125,6 +126,7 @@ public class xMsg implements AutoCloseable {
 
     // map of active subscriptions
     private final ConcurrentMap<String, xMsgSubscription> mySubscriptions;
+    private final AtomicReference<xMsgCallbackMode> callbackMode;
 
     private ResponseListener syncPubListener;
 
@@ -240,6 +242,7 @@ public class xMsg implements AutoCloseable {
 
         // create the map of running subscriptions
         this.mySubscriptions = new ConcurrentHashMap<>();
+        this.callbackMode = new AtomicReference<>(xMsgCallbackMode.MULTI_THREAD);
     }
 
     /**
@@ -282,6 +285,16 @@ public class xMsg implements AutoCloseable {
      */
     public void setConnectionSetup(xMsgConnectionSetup setup) {
         connectionManager.setDefaultConnectionSetup(setup);
+    }
+
+    /**
+     * Overwrites the default mode for all new subscriptions.
+     * This setup will be applied every time a new subscription is started.
+     *
+     * @param mode the new default subscription mode
+     */
+    public void setSubscriptionMode(xMsgCallbackMode mode) {
+        callbackMode.set(mode);
     }
 
     /**
@@ -505,12 +518,7 @@ public class xMsg implements AutoCloseable {
             // start the subscription, if it does not exist yet
             xMsgSubscription sHandle = mySubscriptions.get(name);
             if (sHandle == null) {
-                sHandle = new xMsgSubscription(name, connection, topics) {
-                    @Override
-                    public void handle(xMsgMessage inputMsg) throws xMsgException {
-                        threadPool.submit(() -> callback.callback(inputMsg));
-                    }
-                };
+                sHandle = createSubscription(name, connection, topics, callback);
                 sHandle.start();
                 xMsgSubscription result = mySubscriptions.putIfAbsent(name, sHandle);
                 if (result == null) {
@@ -522,6 +530,33 @@ public class xMsg implements AutoCloseable {
         } catch (Exception e) {
             connection.close();
             throw e;
+        }
+    }
+
+    private xMsgSubscription createSubscription(String name,
+                                                xMsgProxyDriver connection,
+                                                Set<xMsgTopic> topics,
+                                                xMsgCallBack callback) {
+        xMsgCallbackMode mode = callbackMode.get();
+        switch (mode) {
+            case MULTI_THREAD:
+                return new xMsgSubscription(name, connection, topics) {
+                    @Override
+                    public void handle(xMsgMessage inputMsg) throws xMsgException {
+                        threadPool.submit(() -> callback.callback(inputMsg));
+                    }
+                };
+
+            case SINGLE_THREAD:
+                return new xMsgSubscription(name, connection, topics) {
+                    @Override
+                    public void handle(xMsgMessage inputMsg) throws xMsgException {
+                        callback.callback(inputMsg);
+                    }
+                };
+
+            default:
+                throw new IllegalArgumentException("Invalid callback mode: " + mode);
         }
     }
 
