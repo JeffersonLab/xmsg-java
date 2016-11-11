@@ -30,15 +30,18 @@ import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.io.UncheckedIOException;
+import java.net.Inet4Address;
 import java.net.InetAddress;
 import java.net.NetworkInterface;
 import java.text.DateFormat;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.Enumeration;
+import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Objects;
 import java.util.Random;
+import java.util.Set;
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.CancellationException;
 import java.util.concurrent.ExecutionException;
@@ -150,8 +153,11 @@ public final class xMsgUtil {
     }
 
     /**
-     * Returns the localhost IP.
+     * Returns the localhost IPv4.
      *
+     * In case of multiple network cards, this method will return the first one
+     * in the list of addresses of all network cards, with {@code
+     * InetAddress.getLocalHost()} being preferred.
      * @throws UncheckedIOException if an I/O error occurs.
      */
     public static String localhost() {
@@ -159,12 +165,12 @@ public final class xMsgUtil {
     }
 
     /**
-     * Returns the list of IP addresses of the local node.
-     * Useful when the host can have multiple network cards, i.e. IP addresses.
+     * Returns the list of IPv4 addresses of the local node.
+     * Useful when the host has multiple network cards.
      * <p>
-     * This method skip loop-back (127.xxx), ink-local (169.254.xxx),
-     * multicast (224.xxx through 238.xxx) and
-     * broadcast (255.255.255.255) addresses.
+     * The address returned by {@code InetAddress.getLocalHost()} goes first.
+     * Then all non-loopback site-local addresses, and finally all other
+     * non-loopback addresses.
      *
      * @return list of IP addresses
      * @throws UncheckedIOException if an I/O error occurs.
@@ -177,45 +183,69 @@ public final class xMsgUtil {
     }
 
     /**
-     * Updates the list of IP addresses of the local node.
+     * Updates the list of IPv4 addresses of the local node.
      * <p>
-     * This method skip loop-back (127.xxx), ink-local (169.254.xxx),
-     * multicast (224.xxx through 238.xxx) and
-     * broadcast (255.255.255.255) addresses.
+     * The address returned by {@code InetAddress.getLocalHost()} goes first.
+     * Then all non-loopback site-local addresses, and finally all other
+     * non-loopback addresses.
      *
      * @throws UncheckedIOException if an I/O error occurs.
      */
     public static void updateLocalHostIps() {
+        Set<String> ips = new LinkedHashSet<>();
+
         try {
-            List<String> out = new ArrayList<>();
-            Enumeration<NetworkInterface> e = NetworkInterface.getNetworkInterfaces();
-            while (e.hasMoreElements()) {
-                NetworkInterface n = e.nextElement();
-                Enumeration<InetAddress> ee = n.getInetAddresses();
-                while (ee.hasMoreElements()) {
-                    InetAddress i = ee.nextElement();
-                    String address = i.getHostAddress();
-                    if (!(address.startsWith("127") || address.contains(":"))) {
-                        out.add(address);
+            // prefer address returned by getLocalHost first, if any
+            InetAddress local = InetAddress.getLocalHost();
+            if (local != null && local instanceof Inet4Address && !local.isLoopbackAddress()) {
+                ips.add(local.getHostAddress());
+            }
+        } catch (IOException e) {
+            // ignore errors to try all network interfaces for an address
+        }
+
+        try {
+            Set<String> localIps = new LinkedHashSet<>();
+            Set<String> nonLocalIps = new LinkedHashSet<>();
+
+            Enumeration<NetworkInterface> allIfaces = NetworkInterface.getNetworkInterfaces();
+            while (allIfaces.hasMoreElements()) {
+                NetworkInterface iface = allIfaces.nextElement();
+                if (!iface.isUp()) {
+                    continue;
+                }
+                Enumeration<InetAddress> allAddr = iface.getInetAddresses();
+                while (allAddr.hasMoreElements()) {
+                    InetAddress addr = allAddr.nextElement();
+                    if (addr instanceof Inet4Address && !addr.isLoopbackAddress()) {
+                        if (addr.isSiteLocalAddress()) {
+                            localIps.add(addr.getHostAddress());
+                        } else {
+                            nonLocalIps.add(addr.getHostAddress());
+                        }
                     }
                 }
             }
-            localHostIps = out;
+
+            ips.addAll(localIps);
+            ips.addAll(nonLocalIps);
+
+            localHostIps = new ArrayList<>(ips);
         } catch (IOException e) {
             throw new UncheckedIOException(e);
         }
     }
 
     /**
-     * Returns the IP address of the specified host.
-     * Limitation: in case of multiple network cards
-     *             this method will return the first
-     *             IP address of from the list of IP
-     *             addresses of all network cards.
+     * Determines the IP address of the specified host.
+     *
+     * In case of multiple network cards in the local host, this method will
+     * return the first one in the list of addresses of all network cards,
+     * with {@code InetAddress.getLocalHost()} being preferred.
      *
      * @param hostName The name of the host (accepts "localhost")
-     * @return dotted notation of the IP address
-     * @throws UncheckedIOException if the IP could not be resolved
+     * @return dotted notation of the IPv4 address
+     * @throws UncheckedIOException if the hostname could not be resolved
      */
     public static String toHostAddress(String hostName) {
         if (isIP(hostName)) {
