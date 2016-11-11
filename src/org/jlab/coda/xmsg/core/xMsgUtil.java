@@ -158,6 +158,9 @@ public final class xMsgUtil {
      * In case of multiple network cards, this method will return the first one
      * in the list of addresses of all network cards, with {@code
      * InetAddress.getLocalHost()} being preferred.
+     * <p>
+     * Fallbacks to the loopback address if no other address was found.
+     *
      * @throws UncheckedIOException if an I/O error occurs.
      */
     public static String localhost() {
@@ -171,6 +174,8 @@ public final class xMsgUtil {
      * The address returned by {@code InetAddress.getLocalHost()} goes first.
      * Then all non-loopback site-local addresses, and finally all other
      * non-loopback addresses.
+     * <p>
+     * Fallbacks to the loopback address if no other address was found.
      *
      * @return list of IP addresses
      * @throws UncheckedIOException if an I/O error occurs.
@@ -188,6 +193,8 @@ public final class xMsgUtil {
      * The address returned by {@code InetAddress.getLocalHost()} goes first.
      * Then all non-loopback site-local addresses, and finally all other
      * non-loopback addresses.
+     * <p>
+     * Fallbacks to the loopback address if no other address was found.
      *
      * @throws UncheckedIOException if an I/O error occurs.
      */
@@ -229,6 +236,20 @@ public final class xMsgUtil {
 
             ips.addAll(localIps);
             ips.addAll(nonLocalIps);
+
+            // no non-loopback addresses found, default to getLocalHost or throw an error
+            if (ips.isEmpty()) {
+                InetAddress local = InetAddress.getLocalHost();
+                if (local != null) {
+                    if (local instanceof Inet4Address) {
+                        ips.add(local.getHostAddress());
+                    } else {
+                        throw new IOException("No IPv4 address found");
+                    }
+                } else {
+                    throw new IOException("InetAddress.getLocalHost() returned null");
+                }
+            }
 
             localHostIps = new ArrayList<>(ips);
         } catch (IOException e) {
