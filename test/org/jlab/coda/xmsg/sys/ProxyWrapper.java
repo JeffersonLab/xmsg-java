@@ -20,33 +20,29 @@
  *    Department of Experimental Nuclear Physics, Jefferson Lab.
  */
 
-package org.jlab.coda.xmsg.core;
+package org.jlab.coda.xmsg.sys;
 
+import org.jlab.coda.xmsg.core.xMsgUtil;
 import org.jlab.coda.xmsg.excp.xMsgException;
-import org.jlab.coda.xmsg.sys.xMsgProxy;
 import org.zeromq.ZContext;
 
-class ProxyThread {
+public class ProxyWrapper implements AutoCloseable {
 
     private ZContext context = new ZContext();
     private xMsgProxy proxy = null;
 
-    ProxyThread() {
+    public ProxyWrapper() {
         try {
             proxy = new xMsgProxy(context);
+            proxy.start();
+            xMsgUtil.sleep(100);
         } catch (xMsgException e) {
             System.err.println(e.getMessage());
         }
     }
 
-    public void start() {
-        if (proxy != null) {
-            proxy.start();
-            xMsgUtil.sleep(100);
-        }
-    }
-
-    public void stop() {
+    @Override
+    public void close() {
         context.destroy();
         if (proxy != null) {
             proxy.shutdown();

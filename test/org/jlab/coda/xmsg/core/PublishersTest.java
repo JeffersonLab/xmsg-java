@@ -29,6 +29,7 @@ import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.atomic.AtomicLong;
 
 import org.jlab.coda.xmsg.excp.xMsgException;
+import org.jlab.coda.xmsg.sys.ProxyWrapper;
 import org.jlab.coda.xmsg.testing.IntegrationTest;
 import org.junit.Test;
 import org.junit.experimental.categories.Category;
@@ -71,13 +72,13 @@ public class PublishersTest {
 
     private abstract static class TestRunner implements AutoCloseable {
 
-        final ProxyThread proxyThread = new ProxyThread();
         final String rawTopic = "test_topic";
+        final ProxyWrapper proxyThread;
         final xMsg pubActor;
 
         TestRunner(boolean singlePubActor) {
+            this.proxyThread = new ProxyWrapper();
             this.pubActor = singlePubActor ? new xMsg("test_publisher") : null;
-            this.proxyThread.start();
         }
 
         abstract void receive(xMsg actor, xMsgMessage msg, Check check) throws Exception;
@@ -162,7 +163,7 @@ public class PublishersTest {
                 if (pubActor != null) {
                     pubActor.destroy();
                 }
-                proxyThread.stop();
+                proxyThread.close();
             } catch (Exception e) {
                 e.printStackTrace();
             }

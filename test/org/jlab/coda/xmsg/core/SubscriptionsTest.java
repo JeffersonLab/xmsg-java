@@ -23,6 +23,7 @@
 package org.jlab.coda.xmsg.core;
 
 import org.jlab.coda.xmsg.excp.xMsgException;
+import org.jlab.coda.xmsg.sys.ProxyWrapper;
 import org.jlab.coda.xmsg.testing.IntegrationTest;
 import org.junit.After;
 import org.junit.Before;
@@ -44,18 +45,17 @@ import static org.junit.Assert.assertTrue;
 @Category(IntegrationTest.class)
 public class SubscriptionsTest {
 
-    private ProxyThread proxyThread;
+    private ProxyWrapper proxyThread;
 
     @Before
     public void setup() {
-        proxyThread = new ProxyThread();
-        proxyThread.start();
+        proxyThread = new ProxyWrapper();
     }
 
 
     @After
     public void teardown() {
-        proxyThread.stop();
+        proxyThread.close();
     }
 
 
