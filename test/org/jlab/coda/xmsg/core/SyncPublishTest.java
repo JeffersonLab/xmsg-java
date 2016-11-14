@@ -5,6 +5,11 @@ import org.jlab.coda.xmsg.data.xMsgRegQuery;
 import org.jlab.coda.xmsg.data.xMsgRegRecord;
 import org.jlab.coda.xmsg.excp.xMsgException;
 import org.jlab.coda.xmsg.net.xMsgRegAddress;
+import org.jlab.coda.xmsg.sys.ProxyWrapper;
+import org.jlab.coda.xmsg.sys.RegistrarWrapper;
+import org.jlab.coda.xmsg.testing.IntegrationTest;
+import org.junit.Test;
+import org.junit.experimental.categories.Category;
 
 import java.util.Set;
 import java.util.concurrent.ThreadPoolExecutor;
@@ -12,6 +17,11 @@ import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
 import java.util.concurrent.atomic.AtomicLong;
 
+import static org.hamcrest.Matchers.is;
+import static org.hamcrest.MatcherAssert.assertThat;
+
+
+@Category(IntegrationTest.class)
 public final class SyncPublishTest {
 
     private static final String TOPIC = "sync_pub_test";
@@ -19,12 +29,19 @@ public final class SyncPublishTest {
 
     private final xMsgRegAddress regAddress;
 
+    public SyncPublishTest() {
+        this(xMsgUtil.localhost());
+    }
+
     private SyncPublishTest(String feHost) {
         regAddress = new xMsgRegAddress(feHost);
     }
 
     private xMsg listener(int poolSize) throws xMsgException {
-        String name = xMsgUtil.localhost();
+        return listener(poolSize, xMsgUtil.localhost());
+    }
+
+    private xMsg listener(int poolSize, String name) throws xMsgException {
         xMsgTopic topic = xMsgTopic.build(TOPIC, name);
         xMsg actor = new xMsg(name, regAddress, poolSize);
         try {
@@ -151,6 +168,19 @@ public final class SyncPublishTest {
             } else {
                 System.out.printf("ERROR: expected = %d  received = %d%n", totalSum, sum.get());
                 System.exit(1);
+            }
+        }
+    }
+
+    @Test
+    public void run() throws Exception {
+        try (RegistrarWrapper registrar = new RegistrarWrapper();
+             ProxyWrapper proxy = new ProxyWrapper()) {
+            try (xMsg list1 = listener(1, "foo");
+                 xMsg list2 = listener(1, "bar")) {
+                xMsgUtil.sleep(100);
+                Result results = publisher(1, 1000);
+                assertThat(results.sum.get(), is(results.totalSum));
             }
         }
     }
