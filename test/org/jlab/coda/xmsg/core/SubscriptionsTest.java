@@ -60,7 +60,7 @@ public class SubscriptionsTest {
 
 
     @Test
-    public void unsuscribeStopsThread() throws Exception {
+    public void unsubscribeStopsThread() throws Exception {
         try (xMsg actor = new xMsg("test")) {
             xMsgSubscription subscription = actor.subscribe(xMsgTopic.wrap("topic"), null);
             xMsgUtil.sleep(1000);
@@ -72,7 +72,7 @@ public class SubscriptionsTest {
 
 
     @Test
-    public void suscribeReceivesAllMessages() throws Exception {
+    public void subscribeReceivesAllMessages() throws Exception {
         class Check {
             static final int N = 10000;
             static final long SUM_N = 49995000L;
