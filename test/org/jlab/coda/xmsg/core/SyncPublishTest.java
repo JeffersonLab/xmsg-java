@@ -23,15 +23,13 @@ public final class SyncPublishTest {
         regAddress = new xMsgRegAddress(feHost);
     }
 
-    /**
-     * Replies back any received message.
-     */
-    private void listener(int poolSize) {
+    private xMsg listener(int poolSize) throws xMsgException {
         String name = xMsgUtil.localhost();
         xMsgTopic topic = xMsgTopic.build(TOPIC, name);
-        try (xMsg actor = new xMsg(name, regAddress, poolSize)) {
+        xMsg actor = new xMsg(name, regAddress, poolSize);
+        try {
             actor.register(xMsgRegInfo.subscriber(topic, "test subscriber"));
-            System.out.printf("Registered with %s%n", regAddress);
+            System.out.printf("Registered %s with %s%n", topic, regAddress);
             actor.subscribe(topic, msg -> {
                 try {
                     actor.publish(xMsgMessage.createResponse(msg));
@@ -40,43 +38,35 @@ public final class SyncPublishTest {
                 }
             });
             System.out.printf("Using %d cores to reply requests...%n", poolSize);
-            xMsgUtil.keepAlive();
+            return actor;
         } catch (xMsgException e) {
-            e.printStackTrace();
+            actor.close();
+            throw e;
         }
     }
 
-    private void publisher(int cores, int numMessages) {
-        int chunkSize = numMessages / cores;
-        int totalMessages = chunkSize * cores;
-        long totalSum = getTotalSum(totalMessages);
-
-        AtomicLong resSum = new AtomicLong();
+    private Result publisher(int cores, int numMessages) throws Exception {
         ThreadPoolExecutor pool = xMsgUtil.newFixedThreadPool(cores, "sync-pub-");
-
-        int numListeners = 0;
-        long startTime = 0;
-        long endTime = 0;
 
         try (xMsg actor = new xMsg("sync_tester", regAddress)) {
             xMsgRegQuery query = xMsgRegQuery.subscribers().withDomain(TOPIC);
             Set<xMsgRegRecord> listeners = actor.discover(query);
-            numListeners = listeners.size();
+            int numListeners = listeners.size();
             if (numListeners == 0) {
-                System.out.printf("No subscribers registered on %s%n", regAddress);
-                System.out.println("Exiting...");
-                return;
+                throw new RuntimeException("No subscribers registered on" + regAddress);
             }
 
-            System.out.printf("Found %d subscribers registered on %s%n",
-                              listeners.size(), regAddress);
-            System.out.printf("Using %d cores to send %d messages to every subscriber...%n",
-                               cores, totalMessages);
+            Result results = new Result(cores, numListeners, numMessages);
 
-            startTime = System.currentTimeMillis();
+            System.out.printf("Found %d subscribers registered on %s%n",
+                              numListeners, regAddress);
+            System.out.printf("Using %d cores to send %d messages to every subscriber...%n",
+                              cores, results.totalMessages);
+
+            results.startClock();
             for (int i = 0; i < cores; i++) {
-                final int start = i * chunkSize;
-                final int end = start + chunkSize;
+                final int start = i * results.chunkSize;
+                final int end = start + results.chunkSize;
                 pool.submit(() -> {
                     try {
                         for (int j = start; j < end; j++) {
@@ -85,7 +75,7 @@ public final class SyncPublishTest {
                                     xMsgMessage data = xMsgMessage.createFrom(reg.topic(), j);
                                     xMsgMessage res = actor.syncPublish(pubCon, data, TIME_OUT);
                                     int value = xMsgMessage.parseData(res, Integer.class);
-                                    resSum.addAndGet(value);
+                                    results.add(value);
                                 } catch (TimeoutException e) {
                                     e.printStackTrace();
                                 }
@@ -99,36 +89,70 @@ public final class SyncPublishTest {
 
             pool.shutdown();
             if (!pool.awaitTermination(5, TimeUnit.MINUTES)) {
-                System.err.println("execution pool did not terminate");
+                throw new RuntimeException("execution pool did not terminate");
             } else {
-                endTime = System.currentTimeMillis();
+                results.stopClock();
             }
+
+            return results;
         } catch (xMsgException | InterruptedException e) {
-            e.printStackTrace();
-        }
-
-        totalSum *= numListeners;
-
-        if (resSum.get() == totalSum) {
-            System.out.println("OK: all messages received.");
-            System.out.println("Total messages: " + totalMessages * numListeners);
-
-            double duration = (endTime - startTime) / 1000.0;
-            double average = 1.0 * (endTime - startTime) / (totalMessages * numListeners);
-            System.out.printf("Total time: %.2f [s]%n", duration);
-            System.out.printf("Average time: %.2f [ms]%n", average);
-        } else {
-            System.out.printf("ERROR: expected = %d  received = %d%n", totalSum, resSum.get());
-            System.exit(1);
+            throw e;
         }
     }
 
-    private long getTotalSum(int numMessages) {
-        long sum = 0;
-        for (int i = 0; i < numMessages; i++) {
-            sum += i;
+    private static final class Result {
+
+        final int numListeners;
+        final int chunkSize;
+        final int totalMessages;
+        final long totalSum;
+
+        long startTime;
+        long endTime;
+
+        final AtomicLong sum = new AtomicLong();
+
+        private Result(int cores, int numListeners, int numMessages) {
+            this.numListeners = numListeners;
+            this.chunkSize = numMessages / cores;
+            this.totalMessages = chunkSize * cores;
+            this.totalSum = getTotalSum(totalMessages) * numListeners;
         }
-        return sum;
+
+        private long getTotalSum(int numMessages) {
+            long sum = 0;
+            for (int i = 0; i < numMessages; i++) {
+                sum += i;
+            }
+            return sum;
+        }
+
+        public void startClock() {
+            startTime = System.currentTimeMillis();
+        }
+
+        public void stopClock() {
+            endTime = System.currentTimeMillis();
+        }
+
+        public void add(int value) {
+            sum.addAndGet(value);
+        }
+
+        public void check() {
+            if (sum.get() == totalSum) {
+                System.out.println("OK: all messages received.");
+                System.out.println("Total messages: " + totalMessages * numListeners);
+
+                double duration = (endTime - startTime) / 1000.0;
+                double average = 1.0 * (endTime - startTime) / (totalMessages * numListeners);
+                System.out.printf("Total time: %.2f [s]%n", duration);
+                System.out.printf("Average time: %.2f [ms]%n", average);
+            } else {
+                System.out.printf("ERROR: expected = %d  received = %d%n", totalSum, sum.get());
+                System.exit(1);
+            }
+        }
     }
 
     public static void main(String[] args) throws Exception {
@@ -143,14 +167,20 @@ public final class SyncPublishTest {
         String cores = args[1];
         String command = args[2];
 
-        SyncPublishTest test = new SyncPublishTest(frontEnd);
-        if (command.equals("listener")) {
-            int poolSize = Integer.parseInt(cores);
-            test.listener(poolSize);
-        } else {
-            int pubThreads = Integer.parseInt(cores);
-            int totalMessages = Integer.parseInt(command);
-            test.publisher(pubThreads, totalMessages);
+        try {
+            SyncPublishTest test = new SyncPublishTest(frontEnd);
+            if (command.equals("listener")) {
+                int poolSize = Integer.parseInt(cores);
+                try (xMsg sub = test.listener(poolSize)) {
+                    xMsgUtil.keepAlive();
+                }
+            } else {
+                int pubThreads = Integer.parseInt(cores);
+                int totalMessages = Integer.parseInt(command);
+                test.publisher(pubThreads, totalMessages).check();
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
         }
     }
 }
