@@ -42,6 +42,17 @@ import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 
 
+/**
+ * Simple pub-sub integration tests. Ensure that the subscription is running,
+ * that a publisher can communicate with a subscriber through the same proxy,
+ * and that all messages are published and received.
+ * <p>
+ * When counting published messages, each one contains an integer from a unique
+ * sequence of integers, and their sum is used to check that all messages were
+ * delivered.
+ * <p>
+ * For more complex cases see {@link PublishersTest} and {@link SyncPublishTest}.
+ */
 @Category(IntegrationTest.class)
 public class SubscriptionsTest {
 

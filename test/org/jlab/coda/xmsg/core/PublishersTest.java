@@ -38,6 +38,19 @@ import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.is;
 
 
+/**
+ * Tests multithread publication of messages to a single subscriber.
+ * Uses N cores to concurrently send a total of M messages.
+ * <p>
+ * It can be a single actor using N threads in parallel, or N parallel actors
+ * using one thread each. Each thread will be sending a subset of M/N messages.
+ * The subscriber must receive all M messages.
+ * <p>
+ * The messages are a unique sequence of integers from 0 to M-1.
+ * Their sum is used to check that all messages were delivered.
+ *
+ * @see SubscriptionsTest
+ */
 @Category(IntegrationTest.class)
 public class PublishersTest {
 

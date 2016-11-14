@@ -21,6 +21,21 @@ import static org.hamcrest.Matchers.is;
 import static org.hamcrest.MatcherAssert.assertThat;
 
 
+/**
+ * Tests multithread sync-publication of messages to multiple registered
+ * subscribers, distributed on multiple nodes (when running from command-line).
+ * Uses N cores to concurrently send M messages to each subscriber.
+ * <p>
+ * The number of subscribers will be obtained from the registration database.
+ * The publisher will use N threads in parallel, and each thread will be sending
+ * a subset of M/N messages to each subscriber. A subscriber must received and
+ * respond all M messages.
+ * <p>
+ * The messages are a unique sequence of integers from 0 to M-1.
+ * Their sum is used to check that all messages were delivered.
+ *
+ * @see SubscriptionsTest
+ */
 @Category(IntegrationTest.class)
 public final class SyncPublishTest {
 
