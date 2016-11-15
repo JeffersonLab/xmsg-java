@@ -215,6 +215,8 @@ public final class xMsgUtil {
             Set<String> localIps = new LinkedHashSet<>();
             Set<String> nonLocalIps = new LinkedHashSet<>();
 
+            InetAddress loopback = null;
+
             // get all non-loopback addresses, if any
             Enumeration<NetworkInterface> allIfaces = NetworkInterface.getNetworkInterfaces();
             while (allIfaces.hasMoreElements()) {
@@ -225,7 +227,13 @@ public final class xMsgUtil {
                 Enumeration<InetAddress> allAddr = iface.getInetAddresses();
                 while (allAddr.hasMoreElements()) {
                     InetAddress addr = allAddr.nextElement();
-                    if (addr instanceof Inet4Address && !addr.isLoopbackAddress()) {
+                    if (addr instanceof Inet4Address) {
+                        if (addr.isLoopbackAddress()) {
+                            if (loopback == null) {
+                                loopback = addr;
+                            }
+                            continue;
+                        }
                         if (addr.isSiteLocalAddress()) {
                             localIps.add(addr.getHostAddress());
                         } else {
@@ -238,17 +246,12 @@ public final class xMsgUtil {
             ips.addAll(localIps);
             ips.addAll(nonLocalIps);
 
-            // no non-loopback addresses found, default to getLocalHost or throw an error
+            // no non-loopback addresses found, default to loopback or throw an error
             if (ips.isEmpty()) {
-                InetAddress local = InetAddress.getLocalHost();
-                if (local != null) {
-                    if (local instanceof Inet4Address) {
-                        ips.add(local.getHostAddress());
-                    } else {
-                        throw new IOException("No IPv4 address found");
-                    }
+                if (loopback != null) {
+                    ips.add(loopback.getHostAddress());
                 } else {
-                    throw new IOException("InetAddress.getLocalHost() returned null");
+                    throw new IOException("No IPv4 address found");
                 }
             }
 
