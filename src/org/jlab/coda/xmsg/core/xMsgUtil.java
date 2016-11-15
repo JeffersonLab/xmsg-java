@@ -215,6 +215,7 @@ public final class xMsgUtil {
             Set<String> localIps = new LinkedHashSet<>();
             Set<String> nonLocalIps = new LinkedHashSet<>();
 
+            // get all non-loopback addresses, if any
             Enumeration<NetworkInterface> allIfaces = NetworkInterface.getNetworkInterfaces();
             while (allIfaces.hasMoreElements()) {
                 NetworkInterface iface = allIfaces.nextElement();
