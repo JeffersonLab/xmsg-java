@@ -43,7 +43,7 @@ import org.jlab.coda.xmsg.data.xMsgRegInfo;
  */
 public class SyncPublisher extends xMsg {
 
-    public SyncPublisher() {
+    SyncPublisher() {
         super("test_sync_publisher");
     }
 

@@ -26,6 +26,8 @@ import org.jlab.coda.xmsg.core.xMsgUtil;
 import org.jlab.coda.xmsg.excp.xMsgException;
 import org.zeromq.ZContext;
 
+// CHECKSTYLE.OFF: JavadocType
+// CHECKSTYLE.OFF: JavadocMethod
 public class RegistrarWrapper implements AutoCloseable {
 
     private ZContext context = new ZContext();

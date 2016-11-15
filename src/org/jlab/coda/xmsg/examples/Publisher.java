@@ -40,7 +40,7 @@ import org.jlab.coda.xmsg.data.xMsgRegInfo;
  */
 public class Publisher extends xMsg {
 
-    public Publisher() {
+    Publisher() {
         super("test_publisher");
     }
 
