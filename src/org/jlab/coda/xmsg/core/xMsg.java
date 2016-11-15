@@ -494,7 +494,7 @@ public class xMsg implements AutoCloseable {
     public xMsgSubscription subscribe(xMsgProxyAddress address,
                                       xMsgTopic topic,
                                       xMsgCallBack callback) throws xMsgException {
-        return subscribe(defaultProxyAddress, new HashSet<>(Arrays.asList(topic)), callback);
+        return subscribe(address, new HashSet<>(Arrays.asList(topic)), callback);
     }
 
     /**
