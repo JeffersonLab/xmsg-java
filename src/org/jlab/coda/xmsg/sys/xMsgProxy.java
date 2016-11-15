@@ -285,7 +285,7 @@ public class xMsgProxy {
                 factory.connectSocket(control, addr.host(), addr.subPort());
                 factory.connectSocket(publisher, addr.host(), addr.pubPort());
 
-                router.setRouterHandlover(true);
+                router.setRouterHandover(true);
                 factory.bindSocket(router, addr.pubPort() + 2);
 
                 control.subscribe(xMsgConstants.CTRL_TOPIC.getBytes());

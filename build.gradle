@@ -64,7 +64,7 @@ repositories {
 
 
 dependencies {
-    compile 'org.zeromq:jeromq:0.3.5'
+    compile 'org.zeromq:jeromq:0.3.6'
     compile 'com.google.protobuf:protobuf-java:2.6.1'
     compile 'net.sf.jopt-simple:jopt-simple:4.9'
     testCompile 'junit:junit:4.12'
