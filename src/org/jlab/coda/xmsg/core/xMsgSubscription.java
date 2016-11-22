@@ -118,8 +118,6 @@ public abstract class xMsgSubscription {
                     e.printStackTrace();
                 }
             }
-            topics.forEach(t -> connection.unsubscribe(t));
-            connection.close();
         }
     }
 
@@ -148,6 +146,9 @@ public abstract class xMsgSubscription {
             thread.join();
         } catch (InterruptedException e) {
             Thread.currentThread().interrupt();
+        } finally {
+            topics.forEach(t -> connection.unsubscribe(t));
+            connection.close();
         }
     }
 
