@@ -47,7 +47,7 @@ class ConnectionManager {
     private final ConnectionPool<xMsgRegAddress, xMsgRegDriver> registrarConnections;
 
     // default connection option
-    private xMsgConnectionSetup proxySetup;
+    private volatile xMsgConnectionSetup proxySetup;
 
     ConnectionManager(xMsgConnectionFactory factory) {
         this.factory = factory;
