@@ -284,7 +284,7 @@ public class xMsg implements AutoCloseable {
      * @param setup the new default setup
      */
     public void setConnectionSetup(xMsgConnectionSetup setup) {
-        connectionManager.setDefaultConnectionSetup(setup);
+        connectionManager.setProxyConnectionSetup(setup);
     }
 
     /**

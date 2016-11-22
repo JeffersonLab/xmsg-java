@@ -47,7 +47,7 @@ class ConnectionManager {
     private final ConnectionPool<xMsgRegAddress, xMsgRegDriver> registrarConnections;
 
     // default connection option
-    private xMsgConnectionSetup defaultConnectionOption;
+    private xMsgConnectionSetup proxySetup;
 
     ConnectionManager(xMsgConnectionFactory factory) {
         this.factory = factory;
@@ -55,20 +55,15 @@ class ConnectionManager {
         this.registrarConnections = new ConnectionPool<>();
 
         // default pub/sub socket options
-        defaultConnectionOption = new xMsgConnectionSetup() { };
+        proxySetup = new xMsgConnectionSetup() { };
     }
 
     xMsgProxyDriver getProxyConnection(xMsgProxyAddress address) throws xMsgException {
-        return getProxyConnection(address, defaultConnectionOption);
-    }
-
-    xMsgProxyDriver getProxyConnection(xMsgProxyAddress address,
-                                      xMsgConnectionSetup setup) throws xMsgException {
         xMsgProxyDriver cachedConnection = proxyConnections.getConnection(address);
         if (cachedConnection != null) {
             return cachedConnection;
         }
-        return factory.createProxyConnection(address, setup);
+        return factory.createProxyConnection(address, proxySetup);
     }
 
     void releaseProxyConnection(xMsgProxyDriver connection) {
@@ -87,8 +82,8 @@ class ConnectionManager {
         registrarConnections.setConnection(connection.getAddress(), connection);
     }
 
-    void setDefaultConnectionSetup(xMsgConnectionSetup setup) {
-        defaultConnectionOption = setup;
+    void setProxyConnectionSetup(xMsgConnectionSetup setup) {
+        proxySetup = setup;
     }
 
     void destroy(int linger) {
