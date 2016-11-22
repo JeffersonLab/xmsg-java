@@ -58,15 +58,6 @@ class ConnectionManager {
         defaultConnectionOption = new xMsgConnectionSetup() { };
     }
 
-    xMsgProxyDriver createProxyConnection(xMsgProxyAddress address) throws xMsgException {
-        return createProxyConnection(address, defaultConnectionOption);
-    }
-
-    xMsgProxyDriver createProxyConnection(xMsgProxyAddress address,
-                                      xMsgConnectionSetup setup) throws xMsgException {
-        return factory.createProxyConnection(address, setup);
-    }
-
     xMsgProxyDriver getProxyConnection(xMsgProxyAddress address) throws xMsgException {
         return getProxyConnection(address, defaultConnectionOption);
     }
