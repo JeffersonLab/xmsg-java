@@ -51,7 +51,7 @@ class ResponseListener extends xMsgListener {
     public void register(xMsgProxyAddress address) throws xMsgException {
         if (items.get(address) == null) {
             xMsgConnectionSetup setup = xMsgConnectionSetup.newBuilder().build();
-            xMsgProxyDriver connection = factory.createProxyConnection(address, setup);
+            xMsgProxyDriver connection = factory.createSubscriberConnection(address, setup);
             connection.subscribe(topic);
             if (!connection.checkSubscription(topic, setup.subscriptionTimeout())) {
                 connection.close();

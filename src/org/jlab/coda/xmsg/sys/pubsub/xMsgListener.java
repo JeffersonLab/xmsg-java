@@ -70,7 +70,7 @@ public abstract class xMsgListener implements Runnable {
         while (isRunning) {
             ZMQ.Poller poller = new ZMQ.Poller(items.size());
             for (xMsgProxyDriver connection : items.values()) {
-                poller.register(connection.getSubSock(), Poller.POLLIN);
+                poller.register(connection.getSocket(), Poller.POLLIN);
             }
             int rc = poller.poll(TIMEOUT);
             if (rc == 0) {

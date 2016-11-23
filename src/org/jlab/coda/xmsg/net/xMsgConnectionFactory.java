@@ -22,6 +22,7 @@
 
 package org.jlab.coda.xmsg.net;
 
+import org.jlab.coda.xmsg.core.xMsgUtil;
 import org.jlab.coda.xmsg.excp.xMsgException;
 import org.jlab.coda.xmsg.sys.pubsub.xMsgProxyDriver;
 import org.jlab.coda.xmsg.sys.regdis.xMsgRegDriver;
@@ -36,22 +37,32 @@ public class xMsgConnectionFactory {
         this.factory = new xMsgSocketFactory(context.getContext());
     }
 
-    public xMsgProxyDriver createProxyConnection(xMsgProxyAddress address,
-                                                 xMsgConnectionSetup setup) throws xMsgException {
+    public xMsgProxyDriver createSubscriberConnection(xMsgProxyAddress address,
+                                                      xMsgConnectionSetup setup)
+            throws xMsgException {
+        xMsgProxyDriver connection = xMsgProxyDriver.subscriber(address, factory);
+        prepareProxyConnection(connection, setup);
+        return connection;
+    }
 
-        xMsgProxyDriver connection = new xMsgProxyDriver(address, factory);
+    public xMsgProxyDriver createPublisherConnection(xMsgProxyAddress address,
+                                                     xMsgConnectionSetup setup)
+            throws xMsgException {
+        xMsgProxyDriver connection = xMsgProxyDriver.publisher(address, factory);
+        prepareProxyConnection(connection, setup);
+        return connection;
+    }
+
+    private void prepareProxyConnection(xMsgProxyDriver connection, xMsgConnectionSetup setup)
+            throws xMsgException {
         try {
-            setup.preConnection(connection.getPubSock());
-            setup.preConnection(connection.getSubSock());
-
+            setup.preConnection(connection.getSocket());
             connection.connect();
+            xMsgUtil.sleep(10);
             if (setup.checkConnection() && !connection.checkConnection(setup.connectionTimeout())) {
-                throw new xMsgException("could not connect to " + address);
+                throw new xMsgException("could not connect to " + connection.getAddress());
             }
             setup.postConnection();
-
-            return connection;
-
         } catch (ZMQException | xMsgException e) {
             connection.close();
             throw e;

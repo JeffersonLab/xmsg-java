@@ -128,7 +128,7 @@ public abstract class xMsgSubscription {
      * @throws xMsgException if subscription could not be started
      */
     void start(xMsgConnectionSetup setup) throws xMsgException {
-        setup.preSubscription(connection.getSubSock());
+        setup.preSubscription(connection.getSocket());
         topics.forEach(t -> connection.subscribe(t));
         if (setup.checkSubscription() &&
                 !connection.checkSubscription(topics.get(0), setup.subscriptionTimeout())) {

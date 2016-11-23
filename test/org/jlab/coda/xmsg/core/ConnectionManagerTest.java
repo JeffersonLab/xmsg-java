@@ -51,7 +51,7 @@ public class ConnectionManagerTest {
     public ConnectionManagerTest() throws Exception {
         factory = mock(xMsgConnectionFactory.class);
 
-        when(factory.createProxyConnection(any(), any()))
+        when(factory.createPublisherConnection(any(), any()))
                 .thenAnswer(invocation -> {
                     xMsgProxyAddress a = (xMsgProxyAddress) invocation.getArguments()[0];
                     xMsgProxyDriver c = mock(xMsgProxyDriver.class);

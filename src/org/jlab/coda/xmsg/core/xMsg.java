@@ -493,7 +493,7 @@ public class xMsg implements AutoCloseable {
                                       Set<xMsgTopic> topics,
                                       xMsgCallBack callback) throws xMsgException {
         // get a connection to the proxy
-        xMsgProxyDriver connection = connectionManager.getProxyConnection(address);
+        xMsgProxyDriver connection = connectionManager.createProxySubscriber(address);
         try {
             // define a unique name for the subscription
             String name = "sub-" + myName + "-" + connection.getAddress() + "-" + topics.hashCode();
