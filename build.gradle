@@ -1,12 +1,15 @@
-apply plugin: 'java'
-apply plugin: 'maven'
-apply plugin: 'com.google.protobuf'
+plugins {
+    id 'java'
+    id 'maven'
 
-apply plugin: 'checkstyle'
-apply plugin: 'findbugs'
+    id 'com.google.protobuf' version '0.7.7'
 
-apply plugin: 'eclipse'
-apply plugin: 'idea'
+    id 'checkstyle'
+    id 'findbugs'
+
+    id 'eclipse'
+    id 'idea'
+}
 
 
 group = 'org.jlab.coda'
@@ -15,19 +18,10 @@ version = '2.3-SNAPSHOT'
 
 defaultTasks 'build'
 
+
 compileJava {
     sourceCompatibility = 1.8
     targetCompatibility = 1.8
-}
-
-
-buildscript {
-    repositories {
-        mavenCentral()
-    }
-    dependencies {
-        classpath 'com.google.protobuf:protobuf-gradle-plugin:0.7.7'
-    }
 }
 
 protobuf {
