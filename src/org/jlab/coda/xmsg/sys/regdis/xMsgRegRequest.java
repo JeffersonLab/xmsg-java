@@ -84,14 +84,9 @@ class xMsgRegRequest {
         ZFrame senderFrame = msg.pop();
         ZFrame dataFrame = msg.pop();
 
-        try {
-            topic = new String(topicFrame.getData());
-            sender = new String(senderFrame.getData());
-            data = dataFrame.getData();
-        } finally {
-            senderFrame.destroy();
-            topicFrame.destroy();
-        }
+        topic = new String(topicFrame.getData());
+        sender = new String(senderFrame.getData());
+        data = dataFrame.getData();
     }
 
     /**

@@ -91,8 +91,6 @@ public abstract class xMsgListener implements Runnable {
                         handle(rawMsg);
                     } catch (Exception e) {
                         e.printStackTrace();
-                    } finally {
-                        rawMsg.destroy();
                     }
                 }
             }

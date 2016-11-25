@@ -330,43 +330,37 @@ public class xMsgProxy {
         }
 
         private void processRequet(ZMsg msg) {
-            ZFrame topicFrame = msg.pop();
+            /* ZFrame topicFrame = */ msg.pop();
             ZFrame typeFrame = msg.pop();
             ZFrame idFrame = msg.pop();
-            try {
-                String type = new String(typeFrame.getData());
-                String id = new String(idFrame.getData());
 
-                switch (type) {
-                    case xMsgConstants.CTRL_CONNECT: {
-                        ZMsg ack = new ZMsg();
-                        ack.add(id);
-                        ack.add(type);
-                        ack.send(router);
-                        break;
-                    }
-                    case xMsgConstants.CTRL_SUBSCRIBE: {
-                        ZMsg ack = new ZMsg();
-                        ack.add(id);
-                        ack.add(type);
-                        ack.send(publisher);
-                        break;
-                    }
-                    case xMsgConstants.CTRL_REPLY: {
-                        ZMsg ack = new ZMsg();
-                        ack.add(id);
-                        ack.add(type);
-                        ack.send(router);
-                        break;
-                    }
-                    default:
-                        LOGGER.warning("unexpected request: " + type);
+            String type = new String(typeFrame.getData());
+            String id = new String(idFrame.getData());
+
+            switch (type) {
+                case xMsgConstants.CTRL_CONNECT: {
+                    ZMsg ack = new ZMsg();
+                    ack.add(id);
+                    ack.add(type);
+                    ack.send(router);
+                    break;
                 }
-            } finally {
-                topicFrame.destroy();
-                idFrame.destroy();
-                typeFrame.destroy();
-                msg.destroy();
+                case xMsgConstants.CTRL_SUBSCRIBE: {
+                    ZMsg ack = new ZMsg();
+                    ack.add(id);
+                    ack.add(type);
+                    ack.send(publisher);
+                    break;
+                }
+                case xMsgConstants.CTRL_REPLY: {
+                    ZMsg ack = new ZMsg();
+                    ack.add(id);
+                    ack.add(type);
+                    ack.send(router);
+                    break;
+                }
+                default:
+                    LOGGER.warning("unexpected request: " + type);
             }
         }
 
@@ -403,7 +397,6 @@ public class xMsgProxy {
                     } else {
                         LOGGER.fine("received topic = " + frame.toString());
                     }
-                    frame.destroy();
                 } catch (ZMQException e) {
                     if (e.getErrorCode() == ZMQ.Error.ETERM.getCode()) {
                         break;

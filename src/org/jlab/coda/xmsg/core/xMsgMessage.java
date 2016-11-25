@@ -118,10 +118,6 @@ public class xMsgMessage {
             this.data = dataFrame.getData();
         } catch (InvalidProtocolBufferException e) {
             throw new xMsgException("xMsg-Error: Could not parse metadata", e);
-        } finally {
-            topicFrame.destroy();
-            metaDataFrame.destroy();
-            dataFrame.destroy();
         }
     }
 

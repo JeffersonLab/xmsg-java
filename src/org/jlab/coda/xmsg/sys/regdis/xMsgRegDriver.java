@@ -90,24 +90,17 @@ public class xMsgRegDriver {
         } catch (ZMQException e) {
             throw new xMsgException("xMsg-Error: sending registration message. " +
                     e.getMessage(), e.getCause());
-        } finally {
-            requestMsg.destroy();
         }
 
         ZMQ.PollItem[] items = {new ZMQ.PollItem(socket, ZMQ.Poller.POLLIN)};
         int rc = ZMQ.poll(items, timeout);
         if (rc != -1 && items[0].isReadable()) {
-            ZMsg responseMsg = ZMsg.recvMsg(socket);
-            try {
-                xMsgRegResponse response = new xMsgRegResponse(responseMsg);
-                String status = response.status();
-                if (!status.equals(xMsgConstants.SUCCESS)) {
-                    throw new xMsgException("xMsg-Error: unsuccessful registration: " + status);
-                }
-                return response;
-            } finally {
-                responseMsg.destroy();
+            xMsgRegResponse response = new xMsgRegResponse(ZMsg.recvMsg(socket));
+            String status = response.status();
+            if (!status.equals(xMsgConstants.SUCCESS)) {
+                throw new xMsgException("xMsg-Error: unsuccessful registration: " + status);
             }
+            return response;
         } else {
             throw new xMsgException("xMsg-Error: Actor registration timeout");
         }

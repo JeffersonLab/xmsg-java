@@ -85,20 +85,12 @@ public abstract class xMsgProxyDriver {
                     items.poll(pollTimeout);
                     if (items.pollin(0)) {
                         ZMsg replyMsg = ZMsg.recvMsg(ctrlSocket);
-                        try {
-                            if (replyMsg.size() == 1) {
-                                ZFrame typeFrame = replyMsg.pop();
-                                try {
-                                    String type = new String(typeFrame.getData());
-                                    if (type.equals(xMsgConstants.CTRL_CONNECT)) {
-                                        return true;
-                                    }
-                                } finally {
-                                    typeFrame.destroy();
-                                }
+                        if (replyMsg.size() == 1) {
+                            ZFrame typeFrame = replyMsg.pop();
+                            String type = new String(typeFrame.getData());
+                            if (type.equals(xMsgConstants.CTRL_CONNECT)) {
+                                return true;
                             }
-                        } finally {
-                            replyMsg.destroy();
                         }
                     }
                     totalTime += pollTimeout;
@@ -135,23 +127,15 @@ public abstract class xMsgProxyDriver {
                     items.poll(pollTimeout);
                     if (items.pollin(0)) {
                         ZMsg replyMsg = ZMsg.recvMsg(getSocket());
-                        try {
-                            if (replyMsg.size() == 2) {
-                                ZFrame idFrame = replyMsg.pop();
-                                ZFrame typeFrame = replyMsg.pop();
-                                try {
-                                    String id = new String(idFrame.getData());
-                                    String type = new String(typeFrame.getData());
-                                    if (id.equals(topic) && type.equals(xMsgConstants.CTRL_SUBSCRIBE)) {
-                                        return true;
-                                    }
-                                } finally {
-                                    idFrame.destroy();
-                                    typeFrame.destroy();
-                                }
+                        if (replyMsg.size() == 2) {
+                            ZFrame idFrame = replyMsg.pop();
+                            ZFrame typeFrame = replyMsg.pop();
+
+                            String id = new String(idFrame.getData());
+                            String type = new String(typeFrame.getData());
+                            if (id.equals(topic) && type.equals(xMsgConstants.CTRL_SUBSCRIBE)) {
+                                return true;
                             }
-                        } finally {
-                            replyMsg.destroy();
                         }
                     }
                     totalTime += pollTimeout;

@@ -235,8 +235,6 @@ public class xMsgRegService implements Runnable {
         } catch (xMsgException | InvalidProtocolBufferException e) {
             LOGGER.warning(LogUtils.exceptionReporter(e));
             reply = new xMsgRegResponse(topic, sender, e.getMessage());
-        } finally {
-            requestMsg.destroy();
         }
 
         return reply.msg();

@@ -108,8 +108,6 @@ public abstract class xMsgSubscription {
                             handle(new xMsgMessage(msg));
                         } catch (xMsgException e) {
                             e.printStackTrace();
-                        } finally {
-                            msg.destroy();
                         }
                     }
                 } catch (ZMQException e) {

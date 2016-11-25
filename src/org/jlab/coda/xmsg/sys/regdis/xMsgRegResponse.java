@@ -122,28 +122,22 @@ public class xMsgRegResponse {
         ZFrame senderFrame = msg.pop();
         ZFrame statusFrame = msg.pop();
 
-        try {
-            topic = new String(topicFrame.getData());
-            sender = new String(senderFrame.getData());
-            status = new String(statusFrame.getData());
-            if (!status.equals(xMsgConstants.SUCCESS)) {
-                throw new xMsgException("xMsg-Error: unsuccessful registration: " + status);
-            }
+        topic = new String(topicFrame.getData());
+        sender = new String(senderFrame.getData());
+        status = new String(statusFrame.getData());
+        if (!status.equals(xMsgConstants.SUCCESS)) {
+            throw new xMsgException("xMsg-Error: unsuccessful registration: " + status);
+        }
 
-            data = new HashSet<>();
-            while (!msg.isEmpty()) {
-                ZFrame dataFrame = msg.pop();
-                try {
-                    data.add(xMsgRegistration.parseFrom(dataFrame.getData()));
-                } catch (InvalidProtocolBufferException e) {
-                    throw new xMsgException("xMsg-Error: Could not deserialize protobuf data.",
-                                            e.getCause());
-                }
+        data = new HashSet<>();
+        while (!msg.isEmpty()) {
+            ZFrame dataFrame = msg.pop();
+            try {
+                data.add(xMsgRegistration.parseFrom(dataFrame.getData()));
+            } catch (InvalidProtocolBufferException e) {
+                throw new xMsgException("xMsg-Error: Could not deserialize protobuf data.",
+                                        e.getCause());
             }
-        } finally {
-            statusFrame.destroy();
-            senderFrame.destroy();
-            topicFrame.destroy();
         }
     }
 
