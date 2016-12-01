@@ -26,7 +26,6 @@ import org.jlab.coda.xmsg.data.xMsgRegInfo;
 import org.jlab.coda.xmsg.data.xMsgRegQuery;
 import org.jlab.coda.xmsg.data.xMsgR.xMsgRegistration;
 import org.jlab.coda.xmsg.net.xMsgConnectionFactory;
-import org.jlab.coda.xmsg.net.xMsgProxyAddress;
 import org.jlab.coda.xmsg.net.xMsgRegAddress;
 import org.jlab.coda.xmsg.sys.regdis.xMsgRegDriver;
 import org.jlab.coda.xmsg.sys.regdis.RegistrationDataFactory;
@@ -54,9 +53,13 @@ public class xMsgTest {
     @Before
     public void setup() throws Exception {
         xMsgConnectionFactory factory = mock(xMsgConnectionFactory.class);
+        xMsgSetup setup = xMsgSetup.newBuilder()
+                                   .withRegistrar(regAddr)
+                                   .withPoolSize(1)
+                                   .build();
 
         driver = mock(xMsgRegDriver.class);
-        core = new xMsg(name, new xMsgProxyAddress(), regAddr, factory, 1);
+        core = new xMsg(name, setup, factory);
 
         doReturn(new xMsgRegAddress()).when(driver).getAddress();
         doReturn(driver).when(factory).createRegistrarConnection(any(xMsgRegAddress.class));

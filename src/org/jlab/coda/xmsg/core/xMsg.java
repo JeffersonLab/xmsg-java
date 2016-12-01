@@ -113,14 +113,11 @@ public class xMsg implements AutoCloseable {
     /** The generated unique ID of this actor. */
     protected final String myId;
 
+    // actor setup
+    private final xMsgSetup setup;
+
     // thread pool
     private final ThreadPoolExecutor threadPool;
-
-    // default proxy address
-    private final xMsgProxyAddress defaultProxyAddress;
-
-    // default registrar address where registrar and
-    private final xMsgRegAddress defaultRegistrarAddress;
 
     private final ConnectionManager connectionManager;
 
@@ -208,30 +205,36 @@ public class xMsg implements AutoCloseable {
                 xMsgProxyAddress defaultProxy,
                 xMsgRegAddress defaultRegistrar,
                 int poolSize) {
-        this(name,
-             defaultProxy,
-             defaultRegistrar,
-             new xMsgConnectionFactory(xMsgContext.getContext()),
-             poolSize);
+        this(name, xMsgSetup.newBuilder()
+                            .withProxy(defaultProxy)
+                            .withRegistrar(defaultRegistrar)
+                            .withPoolSize(poolSize)
+                            .build());
+    }
+
+    /**
+     * Creates an actor with the given setup.
+     *
+     * @param name the name of this actor
+     * @param setup the setup of this actor
+     */
+    public xMsg(String name, xMsgSetup setup) {
+        this(name, setup, new xMsgConnectionFactory(xMsgContext.getContext()));
     }
 
     /**
      * Full constructor.
      */
     protected xMsg(String name,
-                   xMsgProxyAddress defaultProxy,
-                   xMsgRegAddress defaultRegistrar,
-                   xMsgConnectionFactory factory,
-                   int poolSize) {
+                   xMsgSetup setup,
+                   xMsgConnectionFactory factory) {
         // We need to have a name for an actor
         this.myName = name;
-        this.myId = xMsgUtil.encodeIdentity(defaultRegistrar.toString(), name);
-
-        this.defaultProxyAddress = defaultProxy;
-        this.defaultRegistrarAddress = defaultRegistrar;
+        this.myId = xMsgUtil.encodeIdentity(setup.registrarAddress().toString(), name);
+        this.setup = setup;
 
         // create fixed size thread pool
-        this.threadPool = xMsgUtil.newFixedThreadPool(poolSize, name);
+        this.threadPool = xMsgUtil.newFixedThreadPool(setup.poolSize(), name);
 
         // create the connection pool
         this.connectionManager = new ConnectionManager(factory);
@@ -242,7 +245,7 @@ public class xMsg implements AutoCloseable {
 
         // create the map of running subscriptions
         this.mySubscriptions = new ConcurrentHashMap<>();
-        this.callbackMode = new AtomicReference<>(xMsgCallbackMode.MULTI_THREAD);
+        this.callbackMode = new AtomicReference<>(setup.subscriptionMode());
     }
 
     /**
@@ -288,16 +291,6 @@ public class xMsg implements AutoCloseable {
     }
 
     /**
-     * Overwrites the default mode for all new subscriptions.
-     * This setup will be applied every time a new subscription is started.
-     *
-     * @param mode the new default subscription mode
-     */
-    public void setSubscriptionMode(xMsgCallbackMode mode) {
-        callbackMode.set(mode);
-    }
-
-    /**
      * Obtains a connection to the default proxy.
      * If there is no available connection, a new one will be created.
      *
@@ -305,7 +298,7 @@ public class xMsg implements AutoCloseable {
      * @throws xMsgException if a new connection could not be created
      */
     public xMsgConnection getConnection() throws xMsgException {
-        return getConnection(defaultProxyAddress);
+        return getConnection(setup.proxyAddress());
     }
 
     /**
@@ -466,7 +459,7 @@ public class xMsg implements AutoCloseable {
      */
     public xMsgSubscription subscribe(xMsgTopic topic,
                                       xMsgCallBack callback) throws xMsgException {
-        return subscribe(defaultProxyAddress, topic, callback);
+        return subscribe(setup.proxyAddress(), topic, callback);
     }
 
     /**
@@ -479,7 +472,7 @@ public class xMsg implements AutoCloseable {
      */
     public xMsgSubscription subscribe(Set<xMsgTopic> topics,
                                       xMsgCallBack callback) throws xMsgException {
-        return subscribe(defaultProxyAddress, topics, callback);
+        return subscribe(setup.proxyAddress(), topics, callback);
     }
 
     /**
@@ -628,7 +621,7 @@ public class xMsg implements AutoCloseable {
      * @throws xMsgException if the registration failed
      */
     public void register(xMsgRegInfo info) throws xMsgException {
-        register(info, defaultRegistrarAddress);
+        register(info, setup.registrarAddress());
     }
 
     /**
@@ -685,7 +678,7 @@ public class xMsg implements AutoCloseable {
      * @throws xMsgException if the request failed
      */
     public void deregister(xMsgRegInfo info) throws xMsgException {
-        deregister(info, defaultRegistrarAddress);
+        deregister(info, setup.registrarAddress());
     }
 
     /**
@@ -743,7 +736,7 @@ public class xMsg implements AutoCloseable {
      * @throws xMsgException if the request failed
      */
     public Set<xMsgRegRecord> discover(xMsgRegQuery query) throws xMsgException {
-        return discover(query, defaultRegistrarAddress);
+        return discover(query, setup.registrarAddress());
     }
 
     /**
@@ -818,14 +811,14 @@ public class xMsg implements AutoCloseable {
      * Returns the address of the default proxy used by this actor.
      */
     public xMsgProxyAddress getDefaultProxyAddress() {
-        return defaultProxyAddress;
+        return setup.proxyAddress();
     }
 
     /**
      * Returns the address of the default registrar used by this actor.
      */
     public xMsgRegAddress getDefaultRegistrarAddress() {
-        return defaultRegistrarAddress;
+        return setup.registrarAddress();
     }
 
     /**
@@ -836,6 +829,6 @@ public class xMsg implements AutoCloseable {
     }
 
     private xMsgRegistration.Builder _createRegistration(xMsgRegInfo info) {
-        return xMsgRegFactory.newRegistration(myName, defaultProxyAddress, info);
+        return xMsgRegFactory.newRegistration(myName, setup.proxyAddress(), info);
     }
 }
