@@ -22,6 +22,7 @@
 
 package org.jlab.coda.xmsg.core;
 
+import org.jlab.coda.xmsg.net.xMsgConnectionSetup;
 import org.jlab.coda.xmsg.net.xMsgProxyAddress;
 import org.jlab.coda.xmsg.net.xMsgRegAddress;
 
@@ -102,6 +103,7 @@ public final class xMsgSetup extends ConnectionSetup {
             return new xMsgSetup(proxyAddress,
                                  registrarAddress,
                                  subscriptionMode,
+                                 conSetup.build(),
                                  poolSize);
         }
 
@@ -119,8 +121,9 @@ public final class xMsgSetup extends ConnectionSetup {
     private xMsgSetup(xMsgProxyAddress proxyAddress,
                       xMsgRegAddress registrarAddress,
                       xMsgCallbackMode subscriptionMode,
+                      xMsgConnectionSetup connectionSetup,
                       int poolSize) {
-        super(proxyAddress);
+        super(proxyAddress, connectionSetup);
         this.registrarAddress = registrarAddress;
         this.subscriptionMode = subscriptionMode;
         this.poolSize = poolSize;

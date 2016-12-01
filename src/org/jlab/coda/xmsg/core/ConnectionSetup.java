@@ -22,6 +22,7 @@
 
 package org.jlab.coda.xmsg.core;
 
+import org.jlab.coda.xmsg.net.xMsgConnectionSetup;
 import org.jlab.coda.xmsg.net.xMsgProxyAddress;
 
 import java.util.Objects;
@@ -31,6 +32,7 @@ abstract class ConnectionSetup {
     abstract static class Builder<T extends Builder<T>> {
 
         protected xMsgProxyAddress proxyAddress = new xMsgProxyAddress();
+        protected xMsgConnectionSetup.Builder conSetup = xMsgConnectionSetup.newBuilder();
 
         /**
          * Sets the address of the default proxy.
@@ -51,9 +53,12 @@ abstract class ConnectionSetup {
 
 
     private final xMsgProxyAddress proxyAddress;
+    private final xMsgConnectionSetup connectionSetup;
 
-    protected ConnectionSetup(xMsgProxyAddress proxyAddress) {
+    protected ConnectionSetup(xMsgProxyAddress proxyAddress,
+                              xMsgConnectionSetup connectionSetup) {
         this.proxyAddress = proxyAddress;
+        this.connectionSetup = connectionSetup;
     }
 
     /**
@@ -63,5 +68,14 @@ abstract class ConnectionSetup {
      */
     public xMsgProxyAddress proxyAddress() {
         return proxyAddress;
+    }
+
+    /**
+     * Gets the setup for new connections.
+     *
+     * @return the connection setup
+     */
+    xMsgConnectionSetup connectionSetup() {
+        return connectionSetup;
     }
 }
