@@ -22,6 +22,7 @@
 
 package org.jlab.coda.xmsg.net;
 
+import org.jlab.coda.xmsg.core.xMsgConstants;
 import org.jlab.coda.xmsg.core.xMsgUtil;
 import org.zeromq.ZMQ.Socket;
 
@@ -41,6 +42,9 @@ public final class xMsgConnectionSetup {
 
         private Consumer<Socket> preSubscription = (s) -> { };
         private Runnable postSubscription = () -> xMsgUtil.sleep(10);
+
+        private long connectionTimeout = xMsgConstants.CONNECTION_TIMEOUT;
+        private long subscriptionTimeout = xMsgConstants.SUBSCRIPTION_TIMEOUT;
 
         public Builder withPreConnection(Consumer<Socket> preConnection) {
             Objects.requireNonNull(preConnection, "null pre-connection setup");
@@ -66,11 +70,29 @@ public final class xMsgConnectionSetup {
             return this;
         }
 
+        public Builder withConnectionTimeout(long timeout) {
+            if (timeout <= 0) {
+                throw new IllegalArgumentException("invalid timeout: " + timeout);
+            }
+            this.subscriptionTimeout = timeout;
+            return this;
+        }
+
+        public Builder withSubscriptionTimeout(long timeout) {
+            if (timeout <= 0) {
+                throw new IllegalArgumentException("invalid timeout: " + timeout);
+            }
+            this.connectionTimeout = timeout;
+            return this;
+        }
+
         public xMsgConnectionSetup build() {
             return new xMsgConnectionSetup(preConnection,
                                            postConnection,
                                            preSubscription,
-                                           postSubscription);
+                                           postSubscription,
+                                           connectionTimeout,
+                                           subscriptionTimeout);
         }
     }
 
@@ -81,14 +103,21 @@ public final class xMsgConnectionSetup {
     private final Consumer<Socket> preSubscription;
     private final Runnable postSubscription;
 
+    private long connectionTimeout;
+    private long subscriptionTimeout;
+
     private xMsgConnectionSetup(Consumer<Socket> preConnection,
                                 Runnable postConnection,
                                 Consumer<Socket> preSubscription,
-                                Runnable postSubscription) {
+                                Runnable postSubscription,
+                                long connectionTimeout,
+                                long subscriptionTimeout) {
         this.preConnection = preConnection;
         this.postConnection = postConnection;
         this.preSubscription = preSubscription;
         this.postSubscription = postSubscription;
+        this.connectionTimeout = connectionTimeout;
+        this.subscriptionTimeout = subscriptionTimeout;
     }
 
     public void preConnection(Socket socket) {
@@ -105,5 +134,13 @@ public final class xMsgConnectionSetup {
 
     public void postSubscription() {
         postSubscription.run();
+    }
+
+    public long connectionTimeout() {
+        return connectionTimeout;
+    }
+
+    public long subscriptionTimeout() {
+        return subscriptionTimeout;
     }
 }

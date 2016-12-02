@@ -69,5 +69,8 @@ public final class xMsgConstants {
 
     public static final int DEFAULT_POOL_SIZE = 2;
 
+    public static final int CONNECTION_TIMEOUT = 1000;
+    public static final int SUBSCRIPTION_TIMEOUT = 1000;
+
     private xMsgConstants() { }
 }

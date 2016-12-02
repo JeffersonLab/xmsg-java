@@ -86,20 +86,21 @@ public class xMsgProxyDriver {
         factory.connectSocket(ctrlSocket, address.host(), ctrlPort);
     }
 
-    public boolean checkConnection() {
+    public boolean checkConnection(long timeout) {
         Poller items = new Poller(1);
         items.register(ctrlSocket, Poller.POLLIN);
-        int retry = 0;
-        while (retry < 10) {
+
+        long pollTimeout = timeout < 100 ? timeout : 100;
+        long totalTime = 0;
+        while (totalTime < timeout) {
             try {
-                retry++;
                 ZMsg ctrlMsg = new ZMsg();
                 ctrlMsg.add(xMsgConstants.CTRL_TOPIC + ":con");
                 ctrlMsg.add(xMsgConstants.CTRL_CONNECT);
                 ctrlMsg.add(identity);
                 ctrlMsg.send(pubSocket);
 
-                items.poll(100);
+                items.poll(pollTimeout);
                 if (items.pollin(0)) {
                     ZMsg replyMsg = ZMsg.recvMsg(ctrlSocket);
                     try {
@@ -118,6 +119,7 @@ public class xMsgProxyDriver {
                         replyMsg.destroy();
                     }
                 }
+                totalTime += pollTimeout;
             } catch (ZMQException e) {
                 e.printStackTrace();
             }
@@ -129,20 +131,21 @@ public class xMsgProxyDriver {
         subSocket.subscribe(topic.getBytes());
     }
 
-    public boolean checkSubscription(String topic) {
+    public boolean checkSubscription(String topic, long timeout) {
         Poller items = new Poller(1);
         items.register(subSocket, Poller.POLLIN);
-        int retry = 0;
-        while (retry < 10) {
+
+        long pollTimeout = timeout < 100 ? timeout : 100;
+        long totalTime = 0;
+        while (totalTime < timeout) {
             try {
-                retry++;
                 ZMsg ctrlMsg = new ZMsg();
                 ctrlMsg.add(xMsgConstants.CTRL_TOPIC + ":sub");
                 ctrlMsg.add(xMsgConstants.CTRL_SUBSCRIBE);
                 ctrlMsg.add(topic);
                 ctrlMsg.send(pubSocket);
 
-                items.poll(100);
+                items.poll(pollTimeout);
                 if (items.pollin(0)) {
                     ZMsg replyMsg = ZMsg.recvMsg(subSocket);
                     try {
@@ -164,6 +167,7 @@ public class xMsgProxyDriver {
                         replyMsg.destroy();
                     }
                 }
+                totalTime += pollTimeout;
             } catch (ZMQException e) {
                 e.printStackTrace();
             }

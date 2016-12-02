@@ -106,6 +106,28 @@ abstract class ConnectionSetup {
             return getThis();
         }
 
+        /**
+         * Sets the timeout for checking a new connection.
+         *
+         * @param timeout the check connection timeout
+         * @return this builder
+         */
+        public T withConnectionTimeout(long timeout) {
+            this.conSetup.withConnectionTimeout(timeout);
+            return getThis();
+        }
+
+        /**
+         * Sets the timeout for checking a new subscription.
+         *
+         * @param timeout the check subscription timeout
+         * @return this builder
+         */
+        public T withSubscriptionTimeout(long timeout) {
+            this.conSetup.withSubscriptionTimeout(timeout);
+            return getThis();
+        }
+
         abstract T getThis();
     }
 
