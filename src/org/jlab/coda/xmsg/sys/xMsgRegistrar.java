@@ -30,6 +30,7 @@ import org.jlab.coda.xmsg.excp.xMsgException;
 import org.jlab.coda.xmsg.net.xMsgContext;
 import org.jlab.coda.xmsg.net.xMsgRegAddress;
 import org.jlab.coda.xmsg.sys.regdis.xMsgRegService;
+import org.jlab.coda.xmsg.sys.util.Environment;
 import org.jlab.coda.xmsg.sys.util.LogUtils;
 import org.zeromq.ZContext;
 
@@ -70,15 +71,14 @@ public class xMsgRegistrar {
                 System.exit(0);
             }
 
+            LOGGER.setLevel(Level.INFO);
+
             int port = options.valueOf(portSpec);
             xMsgRegAddress address = new xMsgRegAddress("localhost", port);
 
             xMsgRegistrar registrar = new xMsgRegistrar(xMsgContext.getContext(), address);
-
             if (options.has("verbose")) {
                 registrar.verbose();
-            } else {
-                LOGGER.setLevel(Level.INFO);
             }
 
             Runtime.getRuntime().addShutdownHook(new Thread() {
@@ -126,6 +126,10 @@ public class xMsgRegistrar {
         addr = address;
         registrar = xMsgUtil.newThread("registration-service",
                                        new xMsgRegService(context, address));
+
+        if (Environment.isDefined("XMSG_REGISTRAR_DEBUG")) {
+            verbose();
+        }
     }
 
     /**

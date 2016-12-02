@@ -34,6 +34,7 @@ import org.jlab.coda.xmsg.excp.xMsgException;
 import org.jlab.coda.xmsg.net.xMsgContext;
 import org.jlab.coda.xmsg.net.xMsgProxyAddress;
 import org.jlab.coda.xmsg.net.xMsgSocketFactory;
+import org.jlab.coda.xmsg.sys.util.Environment;
 import org.jlab.coda.xmsg.sys.util.LogUtils;
 import org.zeromq.ZContext;
 import org.zeromq.ZFrame;
@@ -89,6 +90,8 @@ public class xMsgProxy {
                 System.exit(0);
             }
 
+            LOGGER.setLevel(Level.INFO);
+
             String host = options.valueOf(hostSpec);
             int port = options.valueOf(portSpec);
             xMsgProxyAddress address = new xMsgProxyAddress(host, port);
@@ -96,8 +99,6 @@ public class xMsgProxy {
             xMsgProxy proxy = new xMsgProxy(xMsgContext.getContext(), address);
             if (options.has("verbose")) {
                 proxy.verbose();
-            } else {
-                LOGGER.setLevel(Level.INFO);
             }
 
             Runtime.getRuntime().addShutdownHook(new Thread() {
@@ -163,6 +164,10 @@ public class xMsgProxy {
                 controllerTask.close();
             }
             throw e;
+        }
+
+        if (Environment.isDefined("XMSG_PROXY_DEBUG")) {
+            verbose();
         }
     }
 

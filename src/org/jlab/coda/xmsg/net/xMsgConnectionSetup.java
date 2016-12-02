@@ -24,6 +24,7 @@ package org.jlab.coda.xmsg.net;
 
 import org.jlab.coda.xmsg.core.xMsgConstants;
 import org.jlab.coda.xmsg.core.xMsgUtil;
+import org.jlab.coda.xmsg.sys.util.Environment;
 import org.zeromq.ZMQ.Socket;
 
 import java.util.Objects;
@@ -35,19 +36,39 @@ public final class xMsgConnectionSetup {
         return new Builder();
     }
 
-    public static class Builder {
 
-        private Consumer<Socket> preConnection = (s) -> { };
-        private Runnable postConnection = () -> { };
+    public static final class Builder {
 
-        private Consumer<Socket> preSubscription = (s) -> { };
-        private Runnable postSubscription = () -> xMsgUtil.sleep(10);
+        private Consumer<Socket> preConnection;
+        private Runnable postConnection;
 
-        private long connectionTimeout = xMsgConstants.CONNECTION_TIMEOUT;
-        private long subscriptionTimeout = xMsgConstants.SUBSCRIPTION_TIMEOUT;
+        private Consumer<Socket> preSubscription;
+        private Runnable postSubscription;
 
-        private boolean checkConnection = true;
-        private boolean checkSubscription = true;
+        private long connectionTimeout;
+        private long subscriptionTimeout;
+
+        private boolean checkConnection;
+        private boolean checkSubscription;
+
+        private Builder() {
+            final int postConSleep = Environment.getInteger("XMSG_POST_CONNECTION_SLEEP", 0);
+            final int postSubSleep = Environment.getInteger("XMSG_POST_SUBSCRIPTION_SLEEP", 10);
+
+            preConnection = (s) -> { };
+            postConnection = () -> xMsgUtil.sleep(postConSleep);
+
+            preSubscription = (s) -> { };
+            postSubscription = () -> xMsgUtil.sleep(postSubSleep);
+
+            connectionTimeout = Environment.getInteger("XMSG_CONNECTION_TIMEOUT",
+                                                       xMsgConstants.CONNECTION_TIMEOUT);
+            subscriptionTimeout = Environment.getInteger("XMSG_SUBSCRIPTION_TIMEOUT",
+                                                         xMsgConstants.SUBSCRIPTION_TIMEOUT);
+
+            checkConnection = !Environment.isDefined("XMSG_NO_CHECK_CONNECTION");
+            checkSubscription = !Environment.isDefined("XMSG_NO_CHECK_SUBSCRIPTION");
+        }
 
         public Builder withPreConnection(Consumer<Socket> preConnection) {
             Objects.requireNonNull(preConnection, "null pre-connection setup");
