@@ -45,7 +45,7 @@ public class xMsgConnectionFactory {
             setup.preConnection(connection.getSubSock());
 
             connection.connect();
-            if (!connection.checkConnection(setup.connectionTimeout())) {
+            if (setup.checkConnection() && !connection.checkConnection(setup.connectionTimeout())) {
                 throw new xMsgException("could not connect to " + address);
             }
             setup.postConnection();

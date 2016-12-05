@@ -130,7 +130,8 @@ public abstract class xMsgSubscription {
     void start(xMsgConnectionSetup setup) throws xMsgException {
         setup.preSubscription(connection.getSubSock());
         topics.forEach(t -> connection.subscribe(t));
-        if (!connection.checkSubscription(topics.get(0), setup.subscriptionTimeout())) {
+        if (setup.checkConnection() &&
+                !connection.checkSubscription(topics.get(0), setup.subscriptionTimeout())) {
             topics.forEach(t -> connection.unsubscribe(t));
             throw new xMsgException(subscriptionError());
         }

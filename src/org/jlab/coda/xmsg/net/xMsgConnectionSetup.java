@@ -46,6 +46,9 @@ public final class xMsgConnectionSetup {
         private long connectionTimeout = xMsgConstants.CONNECTION_TIMEOUT;
         private long subscriptionTimeout = xMsgConstants.SUBSCRIPTION_TIMEOUT;
 
+        private boolean checkConnection = true;
+        private boolean checkSubscription = true;
+
         public Builder withPreConnection(Consumer<Socket> preConnection) {
             Objects.requireNonNull(preConnection, "null pre-connection setup");
             this.preConnection = preConnection;
@@ -86,13 +89,25 @@ public final class xMsgConnectionSetup {
             return this;
         }
 
+        public Builder checkConnection(boolean flag) {
+            this.checkConnection = flag;
+            return this;
+        }
+
+        public Builder checkSubscription(boolean flag) {
+            this.checkSubscription = flag;
+            return this;
+        }
+
         public xMsgConnectionSetup build() {
             return new xMsgConnectionSetup(preConnection,
                                            postConnection,
                                            preSubscription,
                                            postSubscription,
                                            connectionTimeout,
-                                           subscriptionTimeout);
+                                           subscriptionTimeout,
+                                           checkConnection,
+                                           checkSubscription);
         }
     }
 
@@ -103,22 +118,32 @@ public final class xMsgConnectionSetup {
     private final Consumer<Socket> preSubscription;
     private final Runnable postSubscription;
 
-    private long connectionTimeout;
-    private long subscriptionTimeout;
+    private final long connectionTimeout;
+    private final long subscriptionTimeout;
 
+    private final boolean checkConnection;
+    private final boolean checkSubscription;
+
+
+    // CHECKSTYLE.OFF: ParameterNumber
     private xMsgConnectionSetup(Consumer<Socket> preConnection,
                                 Runnable postConnection,
                                 Consumer<Socket> preSubscription,
                                 Runnable postSubscription,
                                 long connectionTimeout,
-                                long subscriptionTimeout) {
+                                long subscriptionTimeout,
+                                boolean checkConnection,
+                                boolean checkSubscription) {
         this.preConnection = preConnection;
         this.postConnection = postConnection;
         this.preSubscription = preSubscription;
         this.postSubscription = postSubscription;
         this.connectionTimeout = connectionTimeout;
         this.subscriptionTimeout = subscriptionTimeout;
+        this.checkConnection = checkConnection;
+        this.checkSubscription = checkSubscription;
     }
+    // CHECKSTYLE.ON: ParameterNumber
 
     public void preConnection(Socket socket) {
         preConnection.accept(socket);
@@ -142,5 +167,13 @@ public final class xMsgConnectionSetup {
 
     public long subscriptionTimeout() {
         return subscriptionTimeout;
+    }
+
+    public boolean checkConnection() {
+        return checkConnection;
+    }
+
+    public boolean checkSubscription() {
+        return checkSubscription;
     }
 }

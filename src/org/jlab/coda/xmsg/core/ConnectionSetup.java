@@ -128,6 +128,30 @@ abstract class ConnectionSetup {
             return getThis();
         }
 
+        /**
+         * Sets if created connections must be checked by sending control
+         * messages to the proxy.
+         *
+         * @param flag true to use control messages to check a new connection
+         * @return this builder
+         */
+        public T checkConnection(boolean flag) {
+            this.conSetup.checkConnection(flag);
+            return getThis();
+        }
+
+        /**
+         * Sets if started subscriptions must be checked by sending control
+         * messages to the proxy.
+         *
+         * @param flag true to use control messages to check a new subscription
+         * @return this builder
+         */
+        public T checkSubscription(boolean flag) {
+            this.conSetup.checkSubscription(flag);
+            return getThis();
+        }
+
         abstract T getThis();
     }
 
