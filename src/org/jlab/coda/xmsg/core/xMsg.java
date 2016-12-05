@@ -829,13 +829,6 @@ public class xMsg implements AutoCloseable {
     }
 
     /**
-     * Changes the size of the callback thread-pool.
-     */
-    public void setPoolSize(int poolSize) {
-        threadPool.setCorePoolSize(poolSize);
-    }
-
-    /**
      * Returns the size of the callback thread pool.
      */
     public int getPoolSize() {
