@@ -502,7 +502,7 @@ public class xMsg implements AutoCloseable {
             xMsgSubscription sHandle = mySubscriptions.get(name);
             if (sHandle == null) {
                 sHandle = createSubscription(name, connection, topics, callback);
-                sHandle.start();
+                sHandle.start(setup.connectionSetup());
                 xMsgSubscription result = mySubscriptions.putIfAbsent(name, sHandle);
                 if (result == null) {
                     return sHandle;

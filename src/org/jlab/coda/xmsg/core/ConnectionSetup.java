@@ -79,6 +79,33 @@ abstract class ConnectionSetup {
             return getThis();
         }
 
+        /**
+         * Sets the user-setup function to run before subscribing with a proxy.
+         * This function can be used to configure a SUB socket before it is
+         * subscribed.
+         *
+         * @param setup the pre-subscription setup function
+         * @return this builder
+         */
+        public T withPreSubscriptionSetup(Consumer<Socket> setup) {
+            this.conSetup.withPreSubscription(setup);
+            return getThis();
+        }
+
+        /**
+         * Sets the user-setup function to run after subscribing with a proxy.
+         * This function can be used to run some action after a SUB socket has
+         * been subscribed. For example, sleep a while to give time to the
+         * subscription to propagate to the publishers.
+         *
+         * @param setup the post-subscription setup function
+         * @return this builder
+         */
+        public T withPostSubscriptionSetup(Runnable setup) {
+            this.conSetup.withPostSubscription(setup);
+            return getThis();
+        }
+
         abstract T getThis();
     }
 

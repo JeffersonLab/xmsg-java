@@ -22,6 +22,7 @@
 
 package org.jlab.coda.xmsg.net;
 
+import org.jlab.coda.xmsg.core.xMsgUtil;
 import org.zeromq.ZMQ.Socket;
 
 import java.util.Objects;
@@ -38,6 +39,9 @@ public final class xMsgConnectionSetup {
         private Consumer<Socket> preConnection = (s) -> { };
         private Runnable postConnection = () -> { };
 
+        private Consumer<Socket> preSubscription = (s) -> { };
+        private Runnable postSubscription = () -> xMsgUtil.sleep(10);
+
         public Builder withPreConnection(Consumer<Socket> preConnection) {
             Objects.requireNonNull(preConnection, "null pre-connection setup");
             this.preConnection = preConnection;
@@ -50,9 +54,23 @@ public final class xMsgConnectionSetup {
             return this;
         }
 
+        public Builder withPreSubscription(Consumer<Socket> preSubscription) {
+            Objects.requireNonNull(preSubscription, "null pre-subscription setup");
+            this.preSubscription = preSubscription;
+            return this;
+        }
+
+        public Builder withPostSubscription(Runnable postSubscription) {
+            Objects.requireNonNull(postSubscription, "null post-subscription setup");
+            this.postSubscription = postSubscription;
+            return this;
+        }
+
         public xMsgConnectionSetup build() {
             return new xMsgConnectionSetup(preConnection,
-                                           postConnection);
+                                           postConnection,
+                                           preSubscription,
+                                           postSubscription);
         }
     }
 
@@ -60,10 +78,17 @@ public final class xMsgConnectionSetup {
     private final Consumer<Socket> preConnection;
     private final Runnable postConnection;
 
+    private final Consumer<Socket> preSubscription;
+    private final Runnable postSubscription;
+
     private xMsgConnectionSetup(Consumer<Socket> preConnection,
-                                Runnable postConnection) {
+                                Runnable postConnection,
+                                Consumer<Socket> preSubscription,
+                                Runnable postSubscription) {
         this.preConnection = preConnection;
         this.postConnection = postConnection;
+        this.preSubscription = preSubscription;
+        this.postSubscription = postSubscription;
     }
 
     public void preConnection(Socket socket) {
@@ -72,5 +97,13 @@ public final class xMsgConnectionSetup {
 
     public void postConnection() {
         postConnection.run();
+    }
+
+    public void preSubscription(Socket socket) {
+        preSubscription.accept(socket);
+    }
+
+    public void postSubscription() {
+        postSubscription.run();
     }
 }

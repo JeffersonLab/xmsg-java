@@ -23,6 +23,7 @@
 package org.jlab.coda.xmsg.core;
 
 import org.jlab.coda.xmsg.excp.xMsgException;
+import org.jlab.coda.xmsg.net.xMsgConnectionSetup;
 import org.jlab.coda.xmsg.sys.pubsub.xMsgPoller;
 import org.jlab.coda.xmsg.sys.pubsub.xMsgProxyDriver;
 import org.zeromq.ZMQ;
@@ -126,13 +127,14 @@ public abstract class xMsgSubscription {
      *
      * @throws xMsgException if subscription could not be started
      */
-    void start() throws xMsgException {
+    void start(xMsgConnectionSetup setup) throws xMsgException {
+        setup.preSubscription(connection.getSubSock());
         topics.forEach(t -> connection.subscribe(t));
         if (!connection.checkSubscription(topics.get(0))) {
             topics.forEach(t -> connection.unsubscribe(t));
             throw new xMsgException(subscriptionError());
         }
-        xMsgUtil.sleep(10);
+        setup.postSubscription();
         isRunning = true;
         thread.start();
     }
