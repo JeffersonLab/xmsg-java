@@ -29,7 +29,7 @@ import org.zeromq.ZMQ.Socket;
 import java.util.Objects;
 import java.util.function.Consumer;
 
-abstract class ConnectionSetup {
+class ConnectionSetup {
 
     abstract static class Builder<T extends Builder<T>> {
 
