@@ -24,6 +24,7 @@ package org.jlab.coda.xmsg.core;
 
 import org.jlab.coda.xmsg.excp.xMsgException;
 import org.jlab.coda.xmsg.net.xMsgConnectionFactory;
+import org.jlab.coda.xmsg.net.xMsgConnectionSetup;
 import org.jlab.coda.xmsg.net.xMsgProxyAddress;
 import org.jlab.coda.xmsg.sys.pubsub.xMsgListener;
 import org.jlab.coda.xmsg.sys.pubsub.xMsgProxyDriver;
@@ -49,7 +50,7 @@ class ResponseListener extends xMsgListener {
 
     public void register(xMsgProxyAddress address) throws xMsgException {
         if (items.get(address) == null) {
-            xMsgConnectionSetup setup = new xMsgConnectionSetup() { };
+            xMsgConnectionSetup setup = xMsgConnectionSetup.newBuilder().build();
             xMsgProxyDriver connection = factory.createProxyConnection(address, setup);
             connection.subscribe(topic);
             if (!connection.checkSubscription(topic)) {

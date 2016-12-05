@@ -237,7 +237,7 @@ public class xMsg implements AutoCloseable {
         this.threadPool = xMsgUtil.newFixedThreadPool(setup.poolSize(), name);
 
         // create the connection pool
-        this.connectionManager = new ConnectionManager(factory);
+        this.connectionManager = new ConnectionManager(factory, setup.connectionSetup());
 
         // create the responses listener
         this.syncPubListener = new ResponseListener(myId, factory);
@@ -278,16 +278,6 @@ public class xMsg implements AutoCloseable {
     @Override
     public void close() {
         destroy();
-    }
-
-    /**
-     * Overwrites the default setup for all created connection.
-     * This setup will be applied every time a new connection is created.
-     *
-     * @param setup the new default setup
-     */
-    public void setConnectionSetup(xMsgConnectionSetup setup) {
-        connectionManager.setProxyConnectionSetup(setup);
     }
 
     /**

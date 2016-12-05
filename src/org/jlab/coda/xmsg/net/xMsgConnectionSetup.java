@@ -22,6 +22,11 @@
 
 package org.jlab.coda.xmsg.net;
 
+import org.zeromq.ZMQ.Socket;
+
+import java.util.Objects;
+import java.util.function.Consumer;
+
 public final class xMsgConnectionSetup {
 
     public static Builder newBuilder() {
@@ -30,13 +35,42 @@ public final class xMsgConnectionSetup {
 
     public static class Builder {
 
+        private Consumer<Socket> preConnection = (s) -> { };
+        private Runnable postConnection = () -> { };
+
+        public Builder withPreConnection(Consumer<Socket> preConnection) {
+            Objects.requireNonNull(preConnection, "null pre-connection setup");
+            this.preConnection = preConnection;
+            return this;
+        }
+
+        public Builder withPostConnection(Runnable postConnection) {
+            Objects.requireNonNull(postConnection, "null post-connection setup");
+            this.postConnection = postConnection;
+            return this;
+        }
+
         public xMsgConnectionSetup build() {
-            return new xMsgConnectionSetup();
+            return new xMsgConnectionSetup(preConnection,
+                                           postConnection);
         }
     }
 
 
-    private xMsgConnectionSetup() {
-        // nothing
+    private final Consumer<Socket> preConnection;
+    private final Runnable postConnection;
+
+    private xMsgConnectionSetup(Consumer<Socket> preConnection,
+                                Runnable postConnection) {
+        this.preConnection = preConnection;
+        this.postConnection = postConnection;
+    }
+
+    public void preConnection(Socket socket) {
+        preConnection.accept(socket);
+    }
+
+    public void postConnection() {
+        postConnection.run();
     }
 }

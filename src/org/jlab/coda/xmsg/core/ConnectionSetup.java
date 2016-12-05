@@ -24,8 +24,10 @@ package org.jlab.coda.xmsg.core;
 
 import org.jlab.coda.xmsg.net.xMsgConnectionSetup;
 import org.jlab.coda.xmsg.net.xMsgProxyAddress;
+import org.zeromq.ZMQ.Socket;
 
 import java.util.Objects;
+import java.util.function.Consumer;
 
 abstract class ConnectionSetup {
 
@@ -45,6 +47,35 @@ abstract class ConnectionSetup {
         public T withProxy(xMsgProxyAddress address) {
             Objects.requireNonNull(address, "null proxy address");
             this.proxyAddress = address;
+            return getThis();
+        }
+
+        /**
+         * Sets the user-setup function to run before connecting with a proxy.
+         * This function can be used to configure the socket before it is
+         * connected. It will be called for both pub/sub sockets. It should be
+         * used to set options on the socket.
+         *
+         * @param setup the pre-connection setup function
+         * @return this builder
+         * @see <a href="http://api.zeromq.org/3-2:zmq-setsockopt">zmq-setsockopt</a>
+         */
+        public T withPreConnectionSetup(Consumer<Socket> setup) {
+            this.conSetup.withPreConnection(setup);
+            return getThis();
+        }
+
+        /**
+         * Sets the user-setup function to run after connecting with a proxy.
+         * This function can be used to run some action after the socket has
+         * been connected. For example, sleep a while to give time to the
+         * sockets to be actually connected internally.
+         *
+         * @param setup the post-connection setup function
+         * @return this builder
+         */
+        public T withPostConnectionSetup(Runnable setup) {
+            this.conSetup.withPostConnection(setup);
             return getThis();
         }
 

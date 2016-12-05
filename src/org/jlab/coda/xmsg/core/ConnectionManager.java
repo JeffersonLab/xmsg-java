@@ -30,6 +30,7 @@ import java.util.function.Consumer;
 
 import org.jlab.coda.xmsg.excp.xMsgException;
 import org.jlab.coda.xmsg.net.xMsgConnectionFactory;
+import org.jlab.coda.xmsg.net.xMsgConnectionSetup;
 import org.jlab.coda.xmsg.net.xMsgProxyAddress;
 import org.jlab.coda.xmsg.net.xMsgRegAddress;
 import org.jlab.coda.xmsg.sys.pubsub.xMsgProxyDriver;
@@ -50,12 +51,14 @@ class ConnectionManager {
     private volatile xMsgConnectionSetup proxySetup;
 
     ConnectionManager(xMsgConnectionFactory factory) {
+        this(factory, xMsgConnectionSetup.newBuilder().build());
+    }
+
+    ConnectionManager(xMsgConnectionFactory factory, xMsgConnectionSetup setup) {
         this.factory = factory;
         this.proxyConnections = new ConnectionPool<>();
         this.registrarConnections = new ConnectionPool<>();
-
-        // default pub/sub socket options
-        proxySetup = new xMsgConnectionSetup() { };
+        this.proxySetup = setup;
     }
 
     xMsgProxyDriver getProxyConnection(xMsgProxyAddress address) throws xMsgException {
@@ -80,10 +83,6 @@ class ConnectionManager {
 
     void releaseRegistrarConnection(xMsgRegDriver connection) {
         registrarConnections.setConnection(connection.getAddress(), connection);
-    }
-
-    void setProxyConnectionSetup(xMsgConnectionSetup setup) {
-        proxySetup = setup;
     }
 
     void destroy(int linger) {
