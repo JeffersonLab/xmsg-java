@@ -23,7 +23,9 @@ compileJava {
 
 buildscript {
     repositories {
-        mavenCentral()
+        maven {
+            url "http://repo1.maven.org/maven2"
+        }
     }
     dependencies {
         classpath 'com.google.protobuf:protobuf-gradle-plugin:0.7.7'
@@ -59,7 +61,9 @@ sourceSets {
 
 
 repositories {
-    mavenCentral()
+    maven {
+        url "http://repo1.maven.org/maven2"
+    }
 }
 
 
