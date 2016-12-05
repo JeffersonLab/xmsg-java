@@ -38,6 +38,14 @@ protobuf {
     }
 }
 
+if (hasProperty('protocPath')) {
+    protobuf {
+        protoc {
+            path = protocPath
+        }
+    }
+}
+
 ext {
     generatedProtoDir = "${buildDir.name}/generated/source/proto/main/java"
 }
