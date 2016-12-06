@@ -29,7 +29,6 @@ import org.jlab.coda.xmsg.core.xMsgMessage;
 import org.jlab.coda.xmsg.core.xMsgTopic;
 import org.jlab.coda.xmsg.core.xMsgUtil;
 import org.jlab.coda.xmsg.data.xMsgD.xMsgData;
-import org.jlab.coda.xmsg.data.xMsgM;
 import org.jlab.coda.xmsg.data.xMsgMimeType;
 import org.jlab.coda.xmsg.data.xMsgRegInfo;
 import org.jlab.coda.xmsg.excp.xMsgException;
@@ -138,15 +137,15 @@ public class Subscriber extends xMsg {
          * @return data of the message, otherwise null
          */
         private List<Integer> parseData(xMsgMessage msg) {
-            try {
-                xMsgM.xMsgMeta.Builder metadata = msg.getMetaData();
-                if (metadata.getDataType().equals(xMsgMimeType.ARRAY_SFIXED32)) {
-                    xMsgData data = xMsgData.parseFrom(msg.getData());
-                    return data.getFLSINT32AList();
-                }
-            } catch (InvalidProtocolBufferException e) {
-                e.printStackTrace();
-            }
+//            try {
+//                xMsgM.xMsgMeta.Builder metadata = msg.getMetaData();
+//                if (metadata.getDataType().equals(xMsgMimeType.ARRAY_SFIXED32)) {
+//                    xMsgData data = xMsgData.parseFrom(msg.getData());
+//                    return data.getFLSINT32AList();
+//                }
+//            } catch (InvalidProtocolBufferException e) {
+//                e.printStackTrace();
+//            }
             return null;
         }
     }
