@@ -76,46 +76,49 @@ public abstract class xMsgProxyDriver {
             return false;
         }
 
-        Poller items = new Poller(1);
-        items.register(ctrlSocket, Poller.POLLIN);
+        try {
+            Poller items = new Poller(1);
+            items.register(ctrlSocket, Poller.POLLIN);
 
-        long pollTimeout = timeout < 100 ? timeout : 100;
-        long totalTime = 0;
-        while (totalTime < timeout) {
-            try {
-                ZMsg ctrlMsg = new ZMsg();
-                ctrlMsg.add(xMsgConstants.CTRL_TOPIC + ":con");
-                ctrlMsg.add(xMsgConstants.CTRL_CONNECT);
-                ctrlMsg.add(identity);
-                ctrlMsg.send(getSocket());
+            long pollTimeout = timeout < 100 ? timeout : 100;
+            long totalTime = 0;
+            while (totalTime < timeout) {
+                try {
+                    ZMsg ctrlMsg = new ZMsg();
+                    ctrlMsg.add(xMsgConstants.CTRL_TOPIC + ":con");
+                    ctrlMsg.add(xMsgConstants.CTRL_CONNECT);
+                    ctrlMsg.add(identity);
+                    ctrlMsg.send(getSocket());
 
-                items.poll(pollTimeout);
-                if (items.pollin(0)) {
-                    ZMsg replyMsg = ZMsg.recvMsg(ctrlSocket);
-                    try {
-                        if (replyMsg.size() == 1) {
-                            ZFrame typeFrame = replyMsg.pop();
-                            try {
-                                String type = new String(typeFrame.getData());
-                                if (type.equals(xMsgConstants.CTRL_CONNECT)) {
-                                    factory.closeQuietly(ctrlSocket);
-                                    return true;
+                    items.poll(pollTimeout);
+                    if (items.pollin(0)) {
+                        ZMsg replyMsg = ZMsg.recvMsg(ctrlSocket);
+                        try {
+                            if (replyMsg.size() == 1) {
+                                ZFrame typeFrame = replyMsg.pop();
+                                try {
+                                    String type = new String(typeFrame.getData());
+                                    if (type.equals(xMsgConstants.CTRL_CONNECT)) {
+                                        factory.closeQuietly(ctrlSocket);
+                                        return true;
+                                    }
+                                } finally {
+                                    typeFrame.destroy();
                                 }
-                            } finally {
-                                typeFrame.destroy();
                             }
+                        } finally {
+                            replyMsg.destroy();
                         }
-                    } finally {
-                        replyMsg.destroy();
                     }
+                    totalTime += pollTimeout;
+                } catch (ZMQException e) {
+                    e.printStackTrace();
                 }
-                totalTime += pollTimeout;
-            } catch (ZMQException e) {
-                e.printStackTrace();
             }
+            factory.closeQuietly(ctrlSocket);
+            return false;
+        } finally {
         }
-        factory.closeQuietly(ctrlSocket);
-        return false;
     }
 
     public void subscribe(String topic) {
@@ -131,49 +134,52 @@ public abstract class xMsgProxyDriver {
             return false;
         }
 
-        Poller items = new Poller(1);
-        items.register(getSocket(), Poller.POLLIN);
+        try {
+            Poller items = new Poller(1);
+            items.register(getSocket(), Poller.POLLIN);
 
-        long pollTimeout = timeout < 100 ? timeout : 100;
-        long totalTime = 0;
-        while (totalTime < timeout) {
-            try {
-                ZMsg ctrlMsg = new ZMsg();
-                ctrlMsg.add(xMsgConstants.CTRL_TOPIC + ":sub");
-                ctrlMsg.add(xMsgConstants.CTRL_SUBSCRIBE);
-                ctrlMsg.add(topic);
-                ctrlMsg.send(pubSocket);
+            long pollTimeout = timeout < 100 ? timeout : 100;
+            long totalTime = 0;
+            while (totalTime < timeout) {
+                try {
+                    ZMsg ctrlMsg = new ZMsg();
+                    ctrlMsg.add(xMsgConstants.CTRL_TOPIC + ":sub");
+                    ctrlMsg.add(xMsgConstants.CTRL_SUBSCRIBE);
+                    ctrlMsg.add(topic);
+                    ctrlMsg.send(pubSocket);
 
-                items.poll(pollTimeout);
-                if (items.pollin(0)) {
-                    ZMsg replyMsg = ZMsg.recvMsg(getSocket());
-                    try {
-                        if (replyMsg.size() == 2) {
-                            ZFrame idFrame = replyMsg.pop();
-                            ZFrame typeFrame = replyMsg.pop();
-                            try {
-                                String id = new String(idFrame.getData());
-                                String type = new String(typeFrame.getData());
-                                if (id.equals(topic) && type.equals(xMsgConstants.CTRL_SUBSCRIBE)) {
-                                    factory.closeQuietly(pubSocket);
-                                    return true;
+                    items.poll(pollTimeout);
+                    if (items.pollin(0)) {
+                        ZMsg replyMsg = ZMsg.recvMsg(getSocket());
+                        try {
+                            if (replyMsg.size() == 2) {
+                                ZFrame idFrame = replyMsg.pop();
+                                ZFrame typeFrame = replyMsg.pop();
+                                try {
+                                    String id = new String(idFrame.getData());
+                                    String type = new String(typeFrame.getData());
+                                    if (id.equals(topic) && type.equals(xMsgConstants.CTRL_SUBSCRIBE)) {
+                                        factory.closeQuietly(pubSocket);
+                                        return true;
+                                    }
+                                } finally {
+                                    idFrame.destroy();
+                                    typeFrame.destroy();
                                 }
-                            } finally {
-                                idFrame.destroy();
-                                typeFrame.destroy();
                             }
+                        } finally {
+                            replyMsg.destroy();
                         }
-                    } finally {
-                        replyMsg.destroy();
                     }
+                    totalTime += pollTimeout;
+                } catch (ZMQException e) {
+                    e.printStackTrace();
                 }
-                totalTime += pollTimeout;
-            } catch (ZMQException e) {
-                e.printStackTrace();
             }
+            factory.closeQuietly(pubSocket);
+            return false;
+        } finally {
         }
-        factory.closeQuietly(pubSocket);
-        return false;
     }
 
     public void unsubscribe(String topic) {
