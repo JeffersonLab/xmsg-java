@@ -65,17 +65,9 @@ public abstract class xMsgProxyDriver {
 
     abstract int getPort();
 
-    public boolean checkConnection(long timeout) {
+    public boolean checkConnection(long timeout) throws xMsgException {
         String identity = IdentityGenerator.getCtrlId();
-        Socket ctrlSocket;
-        try {
-            ctrlSocket = factory.createSocket(ZMQ.DEALER);
-            ctrlSocket.setIdentity(identity.getBytes());
-            factory.connectSocket(ctrlSocket, address.host(), address.pubPort() + 2);
-        } catch (Exception e) {
-            return false;
-        }
-
+        Socket ctrlSocket = createControlSocket(identity);
         try {
             Poller items = new Poller(1);
             items.register(ctrlSocket, Poller.POLLIN);
@@ -99,7 +91,6 @@ public abstract class xMsgProxyDriver {
                                 try {
                                     String type = new String(typeFrame.getData());
                                     if (type.equals(xMsgConstants.CTRL_CONNECT)) {
-                                        factory.closeQuietly(ctrlSocket);
                                         return true;
                                     }
                                 } finally {
@@ -115,9 +106,9 @@ public abstract class xMsgProxyDriver {
                     e.printStackTrace();
                 }
             }
-            factory.closeQuietly(ctrlSocket);
             return false;
         } finally {
+            factory.closeQuietly(ctrlSocket);
         }
     }
 
@@ -125,15 +116,8 @@ public abstract class xMsgProxyDriver {
         socket.subscribe(topic.getBytes());
     }
 
-    public boolean checkSubscription(String topic, long timeout) {
-        Socket pubSocket;
-        try {
-            pubSocket = factory.createSocket(ZMQ.PUB);
-            factory.connectSocket(pubSocket, address.host(), address.pubPort());
-        } catch (Exception e) {
-            return false;
-        }
-
+    public boolean checkSubscription(String topic, long timeout) throws xMsgException {
+        Socket pubSocket = createPubSocket();
         try {
             Poller items = new Poller(1);
             items.register(getSocket(), Poller.POLLIN);
@@ -159,7 +143,6 @@ public abstract class xMsgProxyDriver {
                                     String id = new String(idFrame.getData());
                                     String type = new String(typeFrame.getData());
                                     if (id.equals(topic) && type.equals(xMsgConstants.CTRL_SUBSCRIBE)) {
-                                        factory.closeQuietly(pubSocket);
                                         return true;
                                     }
                                 } finally {
@@ -176,9 +159,9 @@ public abstract class xMsgProxyDriver {
                     e.printStackTrace();
                 }
             }
-            factory.closeQuietly(pubSocket);
             return false;
         } finally {
+            factory.closeQuietly(pubSocket);
         }
     }
 
@@ -244,6 +227,30 @@ public abstract class xMsgProxyDriver {
         @Override
         public boolean checkConnection(long timeout) {
             return true;
+        }
+    }
+
+
+    private Socket createControlSocket(String identity) throws xMsgException {
+        Socket socket = factory.createSocket(ZMQ.DEALER);
+        try {
+            socket.setIdentity(identity.getBytes());
+            factory.connectSocket(socket, address.host(), address.pubPort() + 2);
+            return socket;
+        } catch (Exception e) {
+            factory.closeQuietly(socket);
+            throw e;
+        }
+    }
+
+    private Socket createPubSocket() throws xMsgException {
+        Socket socket = factory.createSocket(ZMQ.PUB);
+        try {
+            factory.connectSocket(socket, address.host(), address.pubPort());
+            return socket;
+        } catch (Exception e) {
+            factory.closeQuietly(socket);
+            throw e;
         }
     }
 }
