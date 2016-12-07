@@ -36,7 +36,6 @@ import org.zeromq.ZMsg;
 public abstract class xMsgProxyDriver {
 
     protected final xMsgProxyAddress address;
-    protected final String identity;
     protected final Socket socket;
 
     private final xMsgSocketFactory factory;
@@ -56,7 +55,6 @@ public abstract class xMsgProxyDriver {
     private xMsgProxyDriver(int type, xMsgProxyAddress address, xMsgSocketFactory factory)
             throws xMsgException {
         this.address = address;
-        this.identity = IdentityGenerator.getCtrlId();
         this.socket = factory.createSocket(type);
         this.factory = factory;
     }
@@ -68,6 +66,7 @@ public abstract class xMsgProxyDriver {
     abstract int getPort();
 
     public boolean checkConnection(long timeout) {
+        String identity = IdentityGenerator.getCtrlId();
         Socket ctrlSocket;
         try {
             ctrlSocket = factory.createSocket(ZMQ.DEALER);
@@ -200,10 +199,6 @@ public abstract class xMsgProxyDriver {
 
     public xMsgProxyAddress getAddress() {
         return address;
-    }
-
-    public String getIdentity() {
-        return identity;
     }
 
     public Socket getSocket() {
