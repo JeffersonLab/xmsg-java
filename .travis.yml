@@ -17,6 +17,3 @@ matrix:
 script:
   - ./gradlew check
   - ./gradlew integration
-
-notifications:
-  email: false
