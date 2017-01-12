@@ -28,71 +28,59 @@ import org.jlab.coda.xmsg.core.xMsgMessage;
 import org.jlab.coda.xmsg.core.xMsgTopic;
 import org.jlab.coda.xmsg.core.xMsgUtil;
 import org.jlab.coda.xmsg.data.xMsgRegInfo;
-import org.jlab.coda.xmsg.excp.xMsgException;
-
-import java.util.concurrent.TimeoutException;
 
 /**
- * An example of a publisher that publishes in sync data for ever.
+ * An example of a publisher that sync publishes data for ever.
  * It does not matter who is subscribing to the messages, but subscriber
- * should be able to find out if the received message is sync request
- * amd respond back.
- * This publisher uses the  proxy, running
- * on a localhost, with the default poxy port to publish data.
- * <p/>
- * Published data is hard codded int = 111.
+ * should be able to detect that the received message is a sync request and
+ * respond back.
+ * This publisher uses the default proxy running on localhost.
+ *
+ * Published data is a hard-coded integer.
  *
  * @author gurjyan
  * @version 2.x
  */
 public class SyncPublisher extends xMsg {
 
-    private xMsgConnection con;
-    private xMsgTopic topic;
-
-    /**
-     * Calls the parent constructor, connects to the
-     * local proxy and creates a topic of conversation,
-     * as well as registers with the local registrar.
-     */
-    public SyncPublisher() throws xMsgException {
+    public SyncPublisher() {
         super("test_sync_publisher");
-
-        // connect to default proxy (local host, default proxy port)
-        con = getConnection();
-
-        // build the publishing topic (hard codded)
-        final String domain = "test_domain";
-        final String subject = "test_subject";
-        final String type = "test_type";
-        final String description = "test_description";
-        topic = xMsgTopic.build(domain, subject, type);
-
-        // Register this publisher
-        register(xMsgRegInfo.publisher(topic, description));
-
     }
 
     public static void main(String[] args) {
         try (SyncPublisher publisher = new SyncPublisher()) {
 
-            xMsgMessage msg = xMsgMessage.createFrom(publisher.topic, 111);
+            // build the publishing topic (hard-coded)
+            final String domain = "test_domain";
+            final String subject = "test_subject";
+            final String type = "test_type";
+            final String description = "test_description";
+            xMsgTopic topic = xMsgTopic.build(domain, subject, type);
 
-            int counter = 1;
-            while (true) {
-                System.out.println("Publishing " + counter);
-                long t1 = System.nanoTime();
+            // register this publisher
+            publisher.register(xMsgRegInfo.publisher(topic, description));
 
-                //sync publish data. Note this will block for up to 5sec for data to arrive.
-                /* xMsgMessage recData = */ publisher.syncPublish(publisher.con, msg, 5000);
+            // create a simple message
+            xMsgMessage msg = xMsgMessage.createFrom(topic, 111);
 
-                long t2 = System.nanoTime();
-                double delta = (t2 - t1) / 1000000.0;
-                System.out.printf("Received response in %.3f ms%n", delta);
-                counter++;
-                xMsgUtil.sleep(100);
+            // connect to the local proxy
+            try (xMsgConnection con = publisher.getConnection()) {
+                int counter = 1;
+                while (true) {
+                    System.out.println("Publishing " + counter);
+                    long t1 = System.nanoTime();
+
+                    //sync publish data. Note this will block for up to 5sec for data to arrive.
+                    /* xMsgMessage recData = */ publisher.syncPublish(con, msg, 5000);
+
+                    long t2 = System.nanoTime();
+                    double delta = (t2 - t1) / 1000000.0;
+                    System.out.printf("Received response in %.3f ms%n", delta);
+                    counter++;
+                    xMsgUtil.sleep(100);
+                }
             }
-        } catch (xMsgException | TimeoutException e) {
+        } catch (Exception e) {
             e.printStackTrace();
         }
     }

@@ -27,77 +27,67 @@ import org.jlab.coda.xmsg.core.xMsgConnection;
 import org.jlab.coda.xmsg.core.xMsgMessage;
 import org.jlab.coda.xmsg.core.xMsgTopic;
 import org.jlab.coda.xmsg.data.xMsgRegInfo;
-import org.jlab.coda.xmsg.excp.xMsgException;
 
 /**
  * An example of a publisher that publishes data for ever.
  * It does not matter who is subscribing to the messages.
- * This publisher uses the  proxy, running
- * on a localhost, with the default poxy port to publish data.
+ * This publisher uses the default proxy running on localhost.
  *
- * Published data is a int[] with a specified size.
+ * Published data is a byte array with a specified size.
  *
  * @author gurjyan
  * @version 2.x
  */
 public class Publisher extends xMsg {
 
-    private xMsgConnection con;
-    private xMsgTopic topic;
-
-    /**
-     * Calls the parent constructor, connects to the
-     * local proxy and creates a topic of conversation,
-     * as well as registers with the local registrar.
-     */
-    public Publisher() throws xMsgException {
+    public Publisher() {
         super("test_publisher");
-
-        // connect to default proxy (local host, default proxy port)
-        con = getConnection();
-
-        // build the publishing topic (hard codded)
-        final String domain = "test_domain";
-        final String subject = "test_subject";
-        final String type = "test_type";
-        final String description = "test_description";
-        topic = xMsgTopic.build(domain, subject, type);
-
-        // Register this publisher
-        register(xMsgRegInfo.publisher(topic, description));
-
     }
 
     public static void main(String[] args) {
+
         if (args.length != 1) {
-            System.err.println("Usage: Publisher <data_size in bytes>");
+            System.err.println("Usage: publisher <data_size_bytes>");
             System.exit(1);
         }
 
         // create a publisher object
         try (Publisher publisher = new Publisher()) {
+
+            // build the publishing topic (hard-coded)
+            String domain = "test_domain";
+            String subject = "test_subject";
+            String type = "test_type";
+            String description = "test_description";
+            xMsgTopic topic = xMsgTopic.build(domain, subject, type);
+
+            // register this publisher
+            publisher.register(xMsgRegInfo.publisher(topic, description));
+
             // get the data size to be sent periodically
             int dataSize = Integer.parseInt(args[0]);
-            System.out.println("Byte array size = " + dataSize);
+            System.out.printf("Byte array size = %d%n", dataSize);
 
             // create a byte array the required size and set it in a new message
             byte[] b = new byte[dataSize];
 
-            // note that this constructor will create a metadata automatically
-            // based on the type of passed object. In this case since data
-            // is of the int[] object, the metadata will be created with
-            // data type = xMsgConstants.ARRAY_SFIXED32
-            xMsgMessage msg = new xMsgMessage(publisher.topic, "data/binary", b);
+            // create the data message to the specified topic
+            xMsgMessage msg = new xMsgMessage(topic, "data/binary", b);
 
-            // Async publish data for ever
-            while (true) {
-                publisher.publish(publisher.con, msg);
+            System.out.printf("Publishing to = %s%n", topic);
+
+            // connect to the local proxy
+            try (xMsgConnection con = publisher.getConnection()) {
+                // publish data for ever
+                while (true) {
+                    publisher.publish(con, msg);
+                }
             }
-        } catch (xMsgException e) {
-            e.printStackTrace();
-            System.exit(1);
         } catch (NumberFormatException e) {
             System.err.println("Parameter must be an integer (the data size in bytes)!!");
+            System.exit(1);
+        } catch (Exception e) {
+            e.printStackTrace();
             System.exit(1);
         }
     }

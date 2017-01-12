@@ -47,33 +47,36 @@ import java.util.List;
  */
 public class Subscriber extends xMsg {
 
-    /**
-     * Calls the parent constructor.
-     * Registers with a local registrar.
-     * subscribes to a hardcoded topic.
-     */
-    public Subscriber() throws xMsgException {
+    public Subscriber() {
         super("test_subscriber", 1);
+    }
 
-        // build the subscribing topic (hard codded)
-        final String domain = "test_domain";
-        final String subject = "test_subject";
-        final String type = "test_type";
-        final String description = "test_description";
+    /**
+     * Subscribes to a hard-coded topic on the local proxy,
+     * and registers with the local registrar.
+     */
+    public void start() throws xMsgException  {
+        // build the subscribing topic (hard-coded)
+        String domain = "test_domain";
+        String subject = "test_subject";
+        String type = "test_type";
+        String description = "test_description";
         xMsgTopic topic = xMsgTopic.build(domain, subject, type);
 
-        // Register this subscriber
+        // subscribe to default local proxy
+        subscribe(topic, new MyCallBack());
+
+        // register with the local registrar
         register(xMsgRegInfo.subscriber(topic, description));
 
-        // Subscribe to default proxy
-        subscribe(topic, new MyCallBack());
         System.out.printf("Subscribed to = %s%n", topic);
     }
 
     public static void main(String[] args) {
-        try (Subscriber subscriber = new Subscriber()) {
+        try (Subscriber sub = new Subscriber()) {
+            sub.start();
             xMsgUtil.keepAlive();
-        } catch (xMsgException e) {
+        } catch (Exception e) {
             e.printStackTrace();
         }
     }
@@ -83,7 +86,7 @@ public class Subscriber extends xMsg {
      * This method is used in case the request (the publisher)
      * publishes data in sync ( required a response back).
      *
-     * @param msg {@link org.jlab.coda.xmsg.core.xMsgMessage} object
+     * @param msg a received message
      */
     private void respondBack(xMsgMessage msg, Object data) {
         try {
@@ -134,7 +137,7 @@ public class Subscriber extends xMsg {
          * De-serializes received message and retrieves List of integers
          * Note this method is not checking the metadata for the mimeType.
          *
-         * @param msg {@link org.jlab.coda.xmsg.core.xMsgMessage} object
+         * @param msg a received message
          * @return data of the message, otherwise null
          */
         private List<Integer> parseData(xMsgMessage msg) {
@@ -151,4 +154,3 @@ public class Subscriber extends xMsg {
         }
     }
 }
-
