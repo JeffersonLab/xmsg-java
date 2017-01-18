@@ -65,7 +65,7 @@ class ResponseListener extends xMsgListener {
         }
     }
 
-    public xMsgMessage waitMessage(String topic, int timeout) throws TimeoutException {
+    public xMsgMessage waitMessage(String topic, long timeout) throws TimeoutException {
         int t = 0;
         while (t < timeout) {
             xMsgMessage repMsg = responses.remove(topic);

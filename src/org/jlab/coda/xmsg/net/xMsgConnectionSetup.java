@@ -52,8 +52,8 @@ public final class xMsgConnectionSetup {
         private boolean checkSubscription;
 
         private Builder() {
-            final int postConSleep = Environment.getInteger("XMSG_POST_CONNECTION_SLEEP", 0);
-            final int postSubSleep = Environment.getInteger("XMSG_POST_SUBSCRIPTION_SLEEP", 10);
+            final long postConSleep = Environment.getLong("XMSG_POST_CONNECTION_SLEEP", 0);
+            final long postSubSleep = Environment.getLong("XMSG_POST_SUBSCRIPTION_SLEEP", 10);
 
             preConnection = (s) -> { };
             postConnection = () -> xMsgUtil.sleep(postConSleep);
@@ -61,10 +61,10 @@ public final class xMsgConnectionSetup {
             preSubscription = (s) -> { };
             postSubscription = () -> xMsgUtil.sleep(postSubSleep);
 
-            connectionTimeout = Environment.getInteger("XMSG_CONNECTION_TIMEOUT",
-                                                       xMsgConstants.CONNECTION_TIMEOUT);
-            subscriptionTimeout = Environment.getInteger("XMSG_SUBSCRIPTION_TIMEOUT",
-                                                         xMsgConstants.SUBSCRIPTION_TIMEOUT);
+            connectionTimeout = Environment.getLong("XMSG_CONNECTION_TIMEOUT",
+                                                    xMsgConstants.CONNECTION_TIMEOUT);
+            subscriptionTimeout = Environment.getLong("XMSG_SUBSCRIPTION_TIMEOUT",
+                                                      xMsgConstants.SUBSCRIPTION_TIMEOUT);
 
             checkConnection = !Environment.isDefined("XMSG_NO_CHECK_CONNECTION");
             checkSubscription = !Environment.isDefined("XMSG_NO_CHECK_SUBSCRIPTION");

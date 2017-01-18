@@ -73,7 +73,7 @@ public class xMsgTest {
         xMsgRegistration.Builder expected = createRegistration(PUBLISHER, topic);
         expected.setDescription("test pub");
 
-        verify(driver).addRegistration(eq(name), eq(expected.build()), eq(1000));
+        verify(driver).addRegistration(eq(name), eq(expected.build()), eq(1000L));
     }
 
 
@@ -84,7 +84,7 @@ public class xMsgTest {
         xMsgRegistration.Builder expected = createRegistration(SUBSCRIBER, topic);
         expected.setDescription("test sub");
 
-        verify(driver).addRegistration(eq(name), eq(expected.build()), eq(1000));
+        verify(driver).addRegistration(eq(name), eq(expected.build()), eq(1000L));
     }
 
 
@@ -94,7 +94,7 @@ public class xMsgTest {
 
         xMsgRegistration.Builder expected = createRegistration(PUBLISHER, topic);
 
-        verify(driver).removeRegistration(eq(name), eq(expected.build()), eq(1500));
+        verify(driver).removeRegistration(eq(name), eq(expected.build()), eq(1500L));
     }
 
 
@@ -104,7 +104,7 @@ public class xMsgTest {
 
         xMsgRegistration.Builder expected = createRegistration(SUBSCRIBER, topic);
 
-        verify(driver).removeRegistration(eq(name), eq(expected.build()), eq(1500));
+        verify(driver).removeRegistration(eq(name), eq(expected.build()), eq(1500L));
     }
 
 
@@ -114,7 +114,7 @@ public class xMsgTest {
 
         core.discover(query, regAddr, 2000);
 
-        verify(driver).findRegistration(eq(name), eq(query.data().build()), eq(2000));
+        verify(driver).findRegistration(eq(name), eq(query.data().build()), eq(2000L));
     }
 
 
@@ -124,7 +124,7 @@ public class xMsgTest {
 
         core.discover(query, regAddr, 2000);
 
-        verify(driver).findRegistration(eq(name), eq(query.data().build()), eq(2000));
+        verify(driver).findRegistration(eq(name), eq(query.data().build()), eq(2000L));
     }
 
 
@@ -134,7 +134,7 @@ public class xMsgTest {
 
         core.discover(query, regAddr, 2000);
 
-        verify(driver).filterRegistration(eq(name), eq(query.data().build()), eq(2000));
+        verify(driver).filterRegistration(eq(name), eq(query.data().build()), eq(2000L));
     }
 
 
@@ -144,7 +144,7 @@ public class xMsgTest {
 
         core.discover(query, regAddr, 2000);
 
-        verify(driver).filterRegistration(eq(name), eq(query.data().build()), eq(2000));
+        verify(driver).filterRegistration(eq(name), eq(query.data().build()), eq(2000L));
     }
 
 
@@ -154,7 +154,7 @@ public class xMsgTest {
 
         core.discover(query, regAddr, 2000);
 
-        verify(driver).allRegistration(eq(name), eq(query.data().build()), eq(2000));
+        verify(driver).allRegistration(eq(name), eq(query.data().build()), eq(2000L));
     }
 
 
@@ -164,7 +164,7 @@ public class xMsgTest {
 
         core.discover(query, regAddr, 2000);
 
-        verify(driver).allRegistration(eq(name), eq(query.data().build()), eq(2000));
+        verify(driver).allRegistration(eq(name), eq(query.data().build()), eq(2000L));
     }
 
 

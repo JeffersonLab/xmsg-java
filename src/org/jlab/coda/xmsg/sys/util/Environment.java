@@ -27,13 +27,13 @@ public final class Environment {
     private Environment() { }
 
 
-    public static int getInteger(String var, int def) {
+    public static long getLong(String var, long def) {
         String value = System.getenv(var);
         if (value == null) {
             value = String.valueOf(def);
         }
         try {
-            int timeout = Integer.parseInt(value);
+            long timeout = Long.parseLong(value);
             if (timeout < 0) {
                 throw new IllegalArgumentException("Invalid value " + var + "=" + value);
             }

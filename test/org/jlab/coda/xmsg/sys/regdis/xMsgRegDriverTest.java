@@ -216,14 +216,14 @@ public class xMsgRegDriverTest {
 
 
 
-    private void assertRequest(xMsgRegistration data, String topic, int timeout)
+    private void assertRequest(xMsgRegistration data, String topic, long timeout)
             throws Exception {
         xMsgRegRequest request = new xMsgRegRequest(topic, sender, data);
         verify(driver).request(request, timeout);
     }
 
 
-    private void assertRequest(String data, String topic, int timeout)
+    private void assertRequest(String data, String topic, long timeout)
             throws Exception {
         xMsgRegRequest request = new xMsgRegRequest(topic, sender, data);
         verify(driver).request(request, timeout);

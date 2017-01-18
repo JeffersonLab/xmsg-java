@@ -37,7 +37,7 @@ public class xMsgPoller {
         this.items.register(subSocket, Poller.POLLIN);
     }
 
-    public boolean poll(int timeout) {
+    public boolean poll(long timeout) {
         int rc = items.poll(timeout);
         if (rc < 0) {
             throw new ZMQException("error polling subscription", subSocket.base().errno());

@@ -34,7 +34,7 @@ import java.util.concurrent.ConcurrentMap;
 
 public abstract class xMsgListener implements Runnable {
 
-    private static final int TIMEOUT = 100;
+    private static final long TIMEOUT = 100;
 
     protected final ConcurrentMap<xMsgProxyAddress, xMsgProxyDriver> items;
 

@@ -369,7 +369,7 @@ public class xMsg implements AutoCloseable {
      * @throws xMsgException
      * @throws TimeoutException
      */
-    public xMsgMessage syncPublish(xMsgMessage msg, int timeout)
+    public xMsgMessage syncPublish(xMsgMessage msg, long timeout)
             throws xMsgException, TimeoutException {
         try (xMsgConnection connection = getConnection()) {
             return syncPublish(connection, msg, timeout);
@@ -393,7 +393,7 @@ public class xMsg implements AutoCloseable {
      * @throws xMsgException
      * @throws TimeoutException
      */
-    public xMsgMessage syncPublish(xMsgProxyAddress address, xMsgMessage msg, int timeout)
+    public xMsgMessage syncPublish(xMsgProxyAddress address, xMsgMessage msg, long timeout)
             throws xMsgException, TimeoutException {
         try (xMsgConnection connection = getConnection(address)) {
             return syncPublish(connection, msg, timeout);
@@ -417,7 +417,7 @@ public class xMsg implements AutoCloseable {
      * @throws xMsgException
      * @throws TimeoutException
      */
-    public xMsgMessage syncPublish(xMsgConnection connection, xMsgMessage msg, int timeout)
+    public xMsgMessage syncPublish(xMsgConnection connection, xMsgMessage msg, long timeout)
             throws xMsgException, TimeoutException {
         // address/topic where the subscriber should send the result
         String returnAddress = xMsgUtil.getUniqueReplyTo(myId);
@@ -642,7 +642,7 @@ public class xMsg implements AutoCloseable {
      * @param timeout milliseconds to wait for a response
      * @throws xMsgException if the registration failed
      */
-    public void register(xMsgRegInfo info, xMsgRegAddress address, int timeout)
+    public void register(xMsgRegInfo info, xMsgRegAddress address, long timeout)
             throws xMsgException {
         xMsgRegDriver regDriver = connectionManager.getRegistrarConnection(address);
         try {
@@ -699,7 +699,7 @@ public class xMsg implements AutoCloseable {
      * @param timeout milliseconds to wait for a response
      * @throws xMsgException if the request failed
      */
-    public void deregister(xMsgRegInfo info, xMsgRegAddress address, int timeout)
+    public void deregister(xMsgRegInfo info, xMsgRegAddress address, long timeout)
             throws xMsgException {
         xMsgRegDriver regDriver = connectionManager.getRegistrarConnection(address);
         try {
@@ -762,7 +762,7 @@ public class xMsg implements AutoCloseable {
      * @return a set with the registration data of the matching actors, if any
      * @throws xMsgException if the request failed
      */
-    public Set<xMsgRegRecord> discover(xMsgRegQuery query, xMsgRegAddress address, int timeout)
+    public Set<xMsgRegRecord> discover(xMsgRegQuery query, xMsgRegAddress address, long timeout)
             throws xMsgException {
         xMsgRegDriver regDriver = connectionManager.getRegistrarConnection(address);
         try {

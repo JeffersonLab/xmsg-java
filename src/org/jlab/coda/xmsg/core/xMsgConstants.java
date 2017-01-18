@@ -43,18 +43,18 @@ public final class xMsgConstants {
 
     public static final String REGISTER_PUBLISHER = "registerPublisher";
     public static final String REGISTER_SUBSCRIBER = "registerSubscriber";
-    public static final int REGISTER_REQUEST_TIMEOUT = 3000;
+    public static final long REGISTER_REQUEST_TIMEOUT = 3000;
 
     public static final String REMOVE_PUBLISHER = "removePublisherRegistration";
     public static final String REMOVE_SUBSCRIBER = "removeSubscriberRegistration";
     public static final String REMOVE_ALL_REGISTRATION = "removeAllRegistration";
-    public static final int REMOVE_REQUEST_TIMEOUT = 3000;
+    public static final long REMOVE_REQUEST_TIMEOUT = 3000;
 
-    public static final int FIND_REQUEST_TIMEOUT = 3000;
+    public static final long FIND_REQUEST_TIMEOUT = 3000;
     public static final String FIND_PUBLISHER = "findPublisher";
     public static final String FIND_SUBSCRIBER = "findSubscriber";
 
-    public static final int FILTER_REQUEST_TIMEOUT = 3000;
+    public static final long FILTER_REQUEST_TIMEOUT = 3000;
     public static final String FILTER_PUBLISHER = "filterPublisher";
     public static final String FILTER_SUBSCRIBER = "filterSubscriber";
 
