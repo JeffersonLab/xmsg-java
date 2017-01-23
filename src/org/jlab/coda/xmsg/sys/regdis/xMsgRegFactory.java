@@ -100,7 +100,7 @@ public final class xMsgRegFactory {
         xMsgRegistration.Builder filter = xMsgRegistration.newBuilder();
         filter.setName(xMsgConstants.UNDEFINED);
         filter.setHost(xMsgConstants.UNDEFINED);
-        filter.setPort(xMsgConstants.DEFAULT_PORT);
+        filter.setPort(0);
         filter.setDomain(xMsgConstants.ANY);
         filter.setSubject(xMsgConstants.ANY);
         filter.setType(xMsgConstants.ANY);

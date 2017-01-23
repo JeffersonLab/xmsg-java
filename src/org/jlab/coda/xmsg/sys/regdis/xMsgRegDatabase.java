@@ -409,7 +409,8 @@ class xMsgRegDatabase {
         }
 
         public boolean matchAddress(xMsgRegistration actor) {
-            return actor.getHost().equals(address.host) && actor.getPort() == address.port;
+            return actor.getHost().equals(address.host)
+                    && (address.port == 0 || actor.getPort() == address.port);
         }
     }
 }
