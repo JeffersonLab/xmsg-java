@@ -775,6 +775,9 @@ public class xMsg implements AutoCloseable {
                 case FILTER:
                     result = regDriver.filterRegistration(myName, reg.build(), timeout);
                     break;
+                case EXACT:
+                    result = regDriver.sameRegistration(myName, reg.build(), timeout);
+                    break;
                 case ALL:
                     result = regDriver.allRegistration(myName, reg.build(), timeout);
                     break;
