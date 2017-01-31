@@ -132,6 +132,9 @@ uploadArchives {
 
 
 test {
+    testLogging {
+        exceptionFormat = 'full'
+    }
     useJUnit {
         excludeCategories 'org.jlab.coda.xmsg.testing.IntegrationTest'
     }
