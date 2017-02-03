@@ -24,7 +24,7 @@ compileJava {
 buildscript {
     repositories {
         maven {
-            url "http://repo1.maven.org/maven2"
+            url 'http://repo1.maven.org/maven2'
         }
     }
     dependencies {
@@ -70,7 +70,7 @@ sourceSets {
 
 repositories {
     maven {
-        url "http://repo1.maven.org/maven2"
+        url 'http://repo1.maven.org/maven2'
     }
 }
 
@@ -104,7 +104,7 @@ task javadocJar(type: Jar) {
 }
 
 
-task sourcesJar(type: Jar, dependsOn:classes) {
+task sourcesJar(type: Jar, dependsOn: classes) {
     classifier = 'sources'
     from sourceSets.main.allJava
     from generatedProtoDir
@@ -128,7 +128,6 @@ uploadArchives {
         }
     }
 }
-
 
 
 test {
