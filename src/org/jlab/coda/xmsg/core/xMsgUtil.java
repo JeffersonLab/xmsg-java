@@ -65,12 +65,15 @@ public final class xMsgUtil {
 
     private static List<String> localHostIps = new ArrayList<>();
 
-    // CHECKSTYLE.OFF: ConstantName
-    private static final Random randomGenerator = new Random();
-    private static final int replyToSequenceSize = 1000000;
-    private static final int replyToSeed = randomGenerator.nextInt(replyToSequenceSize);
-    private static final AtomicInteger replyToGenerator = new AtomicInteger(replyToSeed);
-    // CHECKSTYLE.ON: ConstantName
+    private static final int REPLY_TO_SEQUENCE_SIZE = 1000000;
+
+    private static final Random randomGenerator; // NOT CONSTANT
+    private static final AtomicInteger replyToGenerator; // NOT CONSTANT
+
+    static {
+        randomGenerator = new Random();
+        replyToGenerator = new AtomicInteger(randomGenerator.nextInt(REPLY_TO_SEQUENCE_SIZE));
+    }
 
     private xMsgUtil() { }
 
@@ -325,7 +328,7 @@ public final class xMsgUtil {
 
     static String getUniqueReplyTo(String subject) {
         long next = replyToGenerator.getAndIncrement() & 0xffffffffL;
-        int id = (int) (next % replyToSequenceSize + replyToSequenceSize);
+        int id = (int) (next % REPLY_TO_SEQUENCE_SIZE + REPLY_TO_SEQUENCE_SIZE);
         return "ret:" + subject + ":" + id;
     }
 

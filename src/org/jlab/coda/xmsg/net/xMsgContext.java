@@ -32,11 +32,10 @@ import org.zeromq.ZContext;
  * @author gurjyan
  * @since 2.x
  */
-// CHECKSTYLE.OFF: ConstantName
 public final class xMsgContext {
 
-    private static xMsgContext ourInstance = new xMsgContext();
-    private static final Object lock = new Object();
+    private static final xMsgContext ourInstance = new xMsgContext(); // NOT CONSTANT
+    private static final Object lock = new Object(); // NOT CONSTANT
 
     private final ZContext context;
 
