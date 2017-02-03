@@ -84,6 +84,8 @@ public final class xMsgRegInfo {
 
     /**
      * Returns the type parameter (publisher or subscriber).
+     *
+     * @return the registration type
      */
     public xMsgRegistration.OwnerType type() {
         return type;
@@ -91,6 +93,8 @@ public final class xMsgRegInfo {
 
     /**
      * Returns the topic parameter.
+     *
+     * @return the registration topic
      */
     public xMsgTopic topic() {
         return topic;
@@ -98,6 +102,8 @@ public final class xMsgRegInfo {
 
     /**
      * Returns the description parameter.
+     *
+     * @return the registration description
      */
     public String description() {
         return description;

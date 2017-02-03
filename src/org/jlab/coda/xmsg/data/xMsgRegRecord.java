@@ -35,12 +35,19 @@ public class xMsgRegRecord {
 
     private final xMsgRegistration data;
 
+    /**
+     * Creates a record wrapping the given registration data.
+     *
+     * @param regb the registration data
+     */
     public xMsgRegRecord(xMsgRegistration regb) {
         data = regb;
     }
 
     /**
      * Returns the name of the registered actor.
+     *
+     * @return the name of the actor
      */
     public String name() {
         return data.getName();
@@ -48,6 +55,8 @@ public class xMsgRegRecord {
 
     /**
      * Returns the type of the registered actor (a publisher or a subscriber).
+     *
+     * @return the type of the actor
      */
     public xMsgRegistration.OwnerType type() {
         return data.getOwnerType();
@@ -55,6 +64,8 @@ public class xMsgRegRecord {
 
     /**
      * Returns the address to which the registered actor is connected.
+     *
+     * @return the address of the actor
      */
     public xMsgProxyAddress address() {
         return new xMsgProxyAddress(data.getHost(), data.getPort());
@@ -62,6 +73,8 @@ public class xMsgRegRecord {
 
     /**
      * Returns the topic of interest for the registered actor.
+     *
+     * @return the topic used by the actor
      */
     public xMsgTopic topic() {
         return xMsgTopic.build(data.getDomain(), data.getSubject(), data.getType());
@@ -69,6 +82,8 @@ public class xMsgRegRecord {
 
     /**
      * Returns a description of the registered actor.
+     *
+     * @return the description of the actor
      */
     public String description() {
         return data.getDescription();
@@ -76,6 +91,8 @@ public class xMsgRegRecord {
 
     /**
      * Returns the registration protobuf data.
+     *
+     * @return the wrapped registration data object.
      */
     public xMsgRegistration data() {
         return data;
