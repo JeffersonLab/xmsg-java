@@ -30,10 +30,8 @@ final class IdentityGenerator {
 
     private IdentityGenerator() { }
 
-    // CHECKSTYLE.OFF: ConstantName
-    private static final Random randomGenerator = new Random();
-    private static final long ctrlIdPrefix = getCtrlIdPrefix();
-    // CHECKSTYLE.ON: ConstantName
+    private static final Random randomGenerator = new Random(); // NOT CONSTANT
+    private static final long CTRL_ID_PREFIX = getCtrlIdPrefix();
 
     private static long getCtrlIdPrefix() {
         final int javaId = 1;
@@ -42,6 +40,6 @@ final class IdentityGenerator {
     }
 
     static String getCtrlId() {
-        return Long.toString(ctrlIdPrefix + randomGenerator.nextInt(100000));
+        return Long.toString(CTRL_ID_PREFIX + randomGenerator.nextInt(100000));
     }
 }
