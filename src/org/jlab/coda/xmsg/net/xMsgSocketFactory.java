@@ -30,14 +30,29 @@ import org.zeromq.ZMQException;
 
 import zmq.ZError;
 
+/**
+ * Creates and connects new 0MQ sockets.
+ */
 public class xMsgSocketFactory {
 
     private final Context ctx;
 
+    /**
+     * Creates a new socket factory.
+     *
+     * @param ctx the ZMQ context to be used by sockets
+     */
     public xMsgSocketFactory(Context ctx) {
         this.ctx = ctx;
     }
 
+    /**
+     * Creates a new 0MQ socket.
+     *
+     * @param type the type of the socket
+     * @return a new socket of the given type
+     * @throws xMsgException if the context cannot create more sockets
+     */
     public Socket createSocket(int type) throws xMsgException {
         try {
             Socket socket = ctx.socket(type);
@@ -49,6 +64,13 @@ public class xMsgSocketFactory {
         }
     }
 
+    /**
+     * Binds the given socket to the given port.
+     *
+     * @param socket the socket to bind
+     * @param port the listening port
+     * @throws xMsgException if the port is in use
+     */
     public void bindSocket(Socket socket, int port) throws xMsgException {
         try {
             socket.bind("tcp://*:" + port);
@@ -60,6 +82,14 @@ public class xMsgSocketFactory {
         }
     }
 
+    /**
+     * Connects the given socket to the given port.
+     *
+     * @param socket the socket to be connected
+     * @param host the address of the host
+     * @param port the connection port
+     * @throws xMsgException if no 0MQ I/O threads are available for the connection
+     */
     public void connectSocket(Socket socket, String host, int port) throws xMsgException {
         try {
             socket.connect("tcp://" + host + ":" + port);
@@ -70,6 +100,12 @@ public class xMsgSocketFactory {
         }
     }
 
+    /**
+     * Sets the linger period for the given socket.
+     *
+     * @param socket the socket to be configured
+     * @param linger the linger period, in milliseconds
+     */
     public void setLinger(Socket socket, int linger) {
         try {
             socket.setLinger(linger);
@@ -78,6 +114,11 @@ public class xMsgSocketFactory {
         }
     }
 
+    /**
+     * Closes the given socket.
+     *
+     * @param socket the socket to be closed, it can be null
+     */
     public void closeQuietly(Socket socket) {
         if (socket != null) {
             socket.close();
