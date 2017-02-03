@@ -37,40 +37,45 @@ import java.util.Arrays;
 import java.util.List;
 
 /**
- * Defines a message to be passed through 0MQ.
+ * The user-data message for xMsg pub/sub communications.
  * <p>
- * Uses {@link xMsgData} class generated as a result of the proto-buffer
- * description to pass Java primitive types and arrays of primitive types.
- * xMsgData is also used to pass byte[]: the result of a user specific object
- * serialization.
+ * An xMsg message is composed of a <i>topic</i>, <i>metadata</i> and binary data.
+ * The {@link xMsgTopic topic} to which the message is published will be used by
+ * subscribers to filter messages of interest.
+ * The {@link xMsgMeta metadata} is a protobuf class with fields that can be
+ * used to describe the data of the message and the communication request the
+ * message is part of. At minimum, the {@code dataType} field is required to
+ * indicate the mime-type of the binary data.
+ * The data byte array contains the binary representation of the actual data of
+ * the message. xMsg provides helpers to serialize primitive data types. Complex
+ * objects must be serialized before creating the message
+ * (i.e. applications using xMsg must take care of the binary data format).
  * <p>
- * This class will also contain complete metadata of the message data,
- * describing details of the data. In case a message is constructed
- * without metadata, the default metadata will be created with only the
- * data type set.
+ * When a message is sync-published, the <i>metadata</i> will contain an
+ * auto-generated {@code replyTopic} where the response can be published to.
  *
  * @author gurjyan
  * @version 2.x
  */
 public class xMsgMessage {
 
-    // topic of the message
     private final xMsgTopic topic;
-
-    // metadata of the message
     private final xMsgMeta.Builder metaData;
-
-    // data of the message
     private final byte[] data;
 
-
     /**
-     * Constructs a message containing a byte[] that is most likely is the result of
-     * user serialization. Thus, user also provides a metadata describing the
-     * type of the data among other things.
+     * Constructs a new message.
+     * The message will be published to the given topic.
+     * The metadata must contain the mime-type describing the data.
+     * <p>
+     * The byte array will be owned by the message, thus, it cannot be modified
+     * by the calling code after creating this message.
+     * If the byte array must be reused or modified, pass the array to the
+     * constructor as {@code data.clone()} to ensure the message keeps a copy of
+     * the data and not the original array.
      *
      * @param topic    the topic of the message
-     * @param metaData the metadata of the message, describing the data
+     * @param metaData the metadata of the message
      * @param data     serialized data
      */
     public xMsgMessage(xMsgTopic topic, xMsgMeta.Builder metaData, byte[] data) {
@@ -80,13 +85,20 @@ public class xMsgMessage {
     }
 
     /**
-     * Constructs a message containing a byte[] that is most likely is the result of
-     * user serialization. Thus, user also provides a mime-type describing the
-     * type of the data.
+     * Constructs a new message.
+     * The message will be published to the given topic.
+     * The metadata will only contain the specified {@code mime-type} describing
+     * the data.
+     * <p>
+     * The byte array will be owned by the message, thus, it cannot be modified
+     * by the calling code after creating this message.
+     * If the byte array must be reused or modified, pass the array to the
+     * constructor as {@code data.clone()} to ensure the message keeps a copy of
+     * the data and not the original array.
      *
-     * @param topic the topic of the message
-     * @param mimeType user textual definition of the data type
-     * @param data data object
+     * @param topic    the topic of the message
+     * @param mimeType the mime-type string for the data
+     * @param data     serialized data
      */
     public xMsgMessage(xMsgTopic topic, String mimeType, byte[] data) {
         this.topic = topic;
@@ -96,10 +108,9 @@ public class xMsgMessage {
     }
 
     /**
-     *  Create xMsgMessage from the 0MQ message received off the wire, i.e.
-     *  de-serializes the received 0MQ message
+     *  Creates a message from the 0MQ message received from the wire.
      *
-     * @param msg the received message
+     * @param msg the received 0MQ message
      */
     xMsgMessage(ZMsg msg) throws xMsgException {
 
@@ -125,7 +136,7 @@ public class xMsgMessage {
      * Serializes this message into a 0MQ message,
      * ready to send it over the wire.
      *
-     * @return the raw multi-part message
+     * @return the 0MQ message
      */
     ZMsg serialize() {
         ZMsg msg = new ZMsg();
@@ -137,6 +148,8 @@ public class xMsgMessage {
 
     /**
      * Returns the topic of the message.
+     *
+     * @return the topic to which the message is published
      */
     public xMsgTopic getTopic() {
         return topic;
@@ -144,6 +157,8 @@ public class xMsgMessage {
 
     /**
      * Returns the metadata of the message.
+     *
+     * @return a reference to the metadata of the message
      */
     public xMsgMeta.Builder getMetaData() {
         return metaData;
@@ -151,6 +166,8 @@ public class xMsgMessage {
 
     /**
      * Returns the mime-type of the message data.
+     *
+     * @return a string with the mime-type
      */
     public String getMimeType() {
         return metaData.getDataType();
@@ -160,6 +177,8 @@ public class xMsgMessage {
      * Checks if the message has a reply topic.
      * If true, the message is part of a sync-publish request and a response is
      * expected to be published to the reply topic.
+     *
+     * @return true if the message was sent as a sync-publish request, false otherwise
      */
     public boolean hasReplyTopic() {
         return metaData.hasReplyTo();
@@ -167,6 +186,8 @@ public class xMsgMessage {
 
     /**
      * Returns the topic this message should be replied to.
+     *
+     * @return the topic to publish the response for this message
      */
     public xMsgTopic getReplyTopic() {
         return xMsgTopic.wrap(metaData.getReplyTo());
@@ -174,6 +195,8 @@ public class xMsgMessage {
 
     /**
      * Checks if the metadata contains byte order information.
+     *
+     * @return true if the data must be used with a certain byte-order
      */
     public boolean hasDataOrder() {
         return metaData.hasByteOrder();
@@ -183,6 +206,8 @@ public class xMsgMessage {
      * Returns the byte order of the data, if set.
      * If the byte order is not set in the metadata,
      * the returned value is {@link ByteOrder#BIG_ENDIAN BIG_ENDIAN}.
+     *
+     * @return the byte-order on which the data must be accessed
      */
     public ByteOrder getDataOrder() {
         if (!metaData.hasByteOrder()) {
@@ -199,7 +224,9 @@ public class xMsgMessage {
     }
 
     /**
-     * Returns the size of the message data (i.e. serialized byte[] ).
+     * Returns the size of the byte array containing the data.
+     *
+     * @return the size of the data, in bytes
      */
     public int getDataSize() {
         return data != null ? data.length : 0;
@@ -207,6 +234,8 @@ public class xMsgMessage {
 
     /**
      * Returns the data of the message.
+     *
+     * @return the byte array with the raw message data
      */
     public byte[] getData() {
         return data;
@@ -214,16 +243,20 @@ public class xMsgMessage {
 
 
     /**
-     * Constructs a message, data of which is passed as an Object. This method will
-     * do it's best to figure out the type of the object, updating accordingly the
-     * data mimeType. It will also serialize the object and store it as a byte[].
-     * Note that this will fail in case the passed object is not serializable.
-     * So, serializable java objects will be serialized and metadata dataType will
-     * be assigned to the mimeType = "binary/java".
+     * Constructs a message with the given data.
+     * <p>
+     * This method will do it's best to figure out the type of the object,
+     * updating accordingly the data mime-type.
+     * It will also serialize the object and store it as a byte array.
+     * <p>
+     * In case of passing a Java object, this will fail if the object is not
+     * serializable.
      *
      * @param topic the topic of the message
-     * @param data the data object
+     * @param data the data of the message
+     * @return a new message containing the given data
      * @throws UncheckedIOException if data is a Java object and serialization failed
+     * @see xMsgMimeType
      */
     public static xMsgMessage createFrom(xMsgTopic topic, Object data) {
 
@@ -295,9 +328,11 @@ public class xMsgMessage {
     /**
      * Deserializes simple data from the given message.
      *
+     * @param <T> the type of the data
      * @param message the message that contains the required data
      * @param dataType the type of the required data
      * @return the deserialized data of the message
+     * @see xMsgMimeType
      */
     public static <T> T parseData(xMsgMessage message, Class<T> dataType) {
         try {

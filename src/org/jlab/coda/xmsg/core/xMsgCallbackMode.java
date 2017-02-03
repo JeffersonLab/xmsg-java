@@ -27,6 +27,9 @@ package org.jlab.coda.xmsg.core;
  * messages.
  */
 public enum xMsgCallbackMode {
+    /** The callbacks will run in a single thread. */
     SINGLE_THREAD,
+
+    /** The callbacks will run in a thread pool. */
     MULTI_THREAD
 }

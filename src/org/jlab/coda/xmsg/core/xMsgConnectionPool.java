@@ -26,8 +26,8 @@ public final class xMsgConnectionPool implements Closeable {
 
 
     /**
-     * Helps creating the setup of an xMsg connection pool by picking what
-     * options are set. All others will be initialized to their default values.
+     * Helps creating and configuring an xMsg connection pool.
+     * All parameters not set will be initialized to their default values.
      */
     public static final class Builder extends ConnectionSetup.Builder<Builder> {
 
@@ -69,7 +69,7 @@ public final class xMsgConnectionPool implements Closeable {
     /**
      * Closes all connections.
      *
-     * @param linger the ZMQ linger period when closing the sockets
+     * @param linger the linger period when closing the sockets
      * @see <a href="http://api.zeromq.org/3-2:zmq-setsockopt">ZMQ_LINGER</a>
      */
     public void destroy(int linger) {

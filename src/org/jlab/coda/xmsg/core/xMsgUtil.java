@@ -54,7 +54,6 @@ import java.util.regex.Pattern;
  * @author gurjyan
  * @since 2.x
  */
-
 public final class xMsgUtil {
 
     private static List<String> localHostIps = new ArrayList<>();
@@ -102,6 +101,7 @@ public final class xMsgUtil {
      * <p>
      * Fallbacks to the loopback address if no other address was found.
      *
+     * @return a string with the localhost IPv4
      * @throws UncheckedIOException if an I/O error occurs.
      */
     public static String localhost() {
@@ -368,6 +368,10 @@ public final class xMsgUtil {
 
     /**
      * Creates a new ThreadPoolExecutor.
+     *
+     * @param maxThreads the maximum number of threads
+     * @param namePrefix the prefix for the name of the threads
+     * @return the created xMsg custom thread pool executor
      */
     public static ThreadPoolExecutor newThreadPool(int maxThreads, String namePrefix) {
         return ThreadUtils.newThreadPool(maxThreads, namePrefix, new LinkedBlockingQueue<>());
@@ -375,6 +379,11 @@ public final class xMsgUtil {
 
     /**
      * Creates a new ThreadPoolExecutor with a user controlled queue.
+     *
+     * @param maxThreads the maximum number of threads
+     * @param namePrefix the prefix for the name of the threads
+     * @param workQueue the queue to hold waiting tasks
+     * @return the created xMsg custom thread pool executor
      */
     public static ThreadPoolExecutor newThreadPool(int maxThreads,
                                                    String namePrefix,

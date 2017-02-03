@@ -23,12 +23,18 @@
 package org.jlab.coda.xmsg.core;
 
 /**
- * xMsg callback interface.
+ * A user-defined action to process subscribed messages.
  *
  * @author gurjyan
  * @since 2.x
  */
 public interface xMsgCallBack {
 
+    /**
+     * Runs the user-action on a received message.
+     * This method can be executed concurrently in several threads.
+     *
+     * @param msg a received message.
+     */
     void callback(xMsgMessage msg);
 }

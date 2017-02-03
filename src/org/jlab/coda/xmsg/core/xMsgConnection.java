@@ -31,6 +31,15 @@ import java.io.Closeable;
 
 /**
  * The standard connection to xMsg nodes.
+ * <p>
+ * Connections are managed by the xMsg actor, that keeps an internal connection
+ * pool to cache and reuse connections.
+ * The actor must be destroyed in order to close all connections cached in the
+ * connection pool.
+ * An external pool can also be used to shared connections between many actors.
+ * <p>
+ * Connections should be closed in order to return them to the connection pool,
+ * so they can be reused by other publishing threads.
  */
 public class xMsgConnection implements Closeable {
 
@@ -42,6 +51,12 @@ public class xMsgConnection implements Closeable {
         this.connection = connection;
     }
 
+    /**
+     * If not destroyed, returns this connection the connection pool to be
+     * reused.
+     * Use {@link xMsg#destroyConnection} to destroy the connection and actually
+     * close the socket.
+     */
     @Override
     public void close() {
         if (connection != null) {
@@ -69,6 +84,11 @@ public class xMsgConnection implements Closeable {
         }
     }
 
+    /**
+     * Returns the address of the connected proxy.
+     *
+     * @return the address of the proxy
+     */
     public xMsgProxyAddress getAddress() {
         if (connection == null) {
             throw new IllegalStateException("Connection is closed");

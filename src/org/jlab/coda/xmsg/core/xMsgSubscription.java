@@ -35,11 +35,12 @@ import java.util.Set;
 import java.util.stream.Collectors;
 
 /**
- * A subscription object uses a {@link xMsgConnection connection} to receive
+ * A handler for a running subscription of specific topic(s).
+ * A subscription uses a {@link xMsgConnection connection} to receive
  * {@link xMsgMessage messages} of the interested {@link xMsgTopic topic},
  * and calls a user action on every message.
  * <p>
- * When the subscription is constructed, the connection will be subscribed to
+ * When the subscription is created, the connection will be subscribed to
  * the topic, and a background thread will be started polling the connection for
  * received messages. For every message, the user-provide callback will be
  * executed.
@@ -77,9 +78,8 @@ public abstract class xMsgSubscription {
     /**
      * Process a received message.
      *
-     * @param msg {@link org.zeromq.ZMsg} object of the wire
-     * @throws xMsgException
-     * @throws TimeoutException
+     * @param msg the received message
+     * @throws xMsgException if there was an error handling the message
      */
     abstract void handle(xMsgMessage msg) throws xMsgException;
 
@@ -168,6 +168,8 @@ public abstract class xMsgSubscription {
 
     /**
      * Indicates if the subscription thread is running.
+     *
+     * @return true if the subscription is running, false otherwise
      */
     public boolean isAlive() {
         return thread.isAlive();
@@ -175,6 +177,8 @@ public abstract class xMsgSubscription {
 
     /**
      * Returns the name of this subscription.
+     *
+     * @return the unique name of the subscription
      */
     public String getName() {
         return name;
