@@ -53,15 +53,16 @@ import joptsimple.OptionSet;
 import joptsimple.OptionSpec;
 
 /**
- * xMsg pub-sub proxy executable.
+ * xMsg pub-sub proxy server.
  * This is a simple stateless message switch, i.e. a device that forwards
- * messages without inspecting them. This simplifies dynamic discovery problem.
- * All xMsg actors (publishers and subscribers) connect to the proxy, instead
- * of to each other. It becomes trivial to add more subscribers or publishers.
+ * messages without inspecting them.
+ * <p>
+ * The proxy simplifies the dynamic connection problems. All xMsg actors
+ * (publishers and subscribers) connect to the proxy, instead of to each other.
+ * It becomes trivial to add more subscribers or publishers.
  *
  * @author gurjyan
  * @version 2.x
- * @since 5/5/15
  */
 public class xMsgProxy {
 
@@ -130,9 +131,10 @@ public class xMsgProxy {
     }
 
     /**
-     * Construct the proxy on a local host.
+     * Construct a proxy that uses the localhost and
+     * {@link org.jlab.coda.xmsg.core.xMsgConstants#DEFAULT_PORT default port}.
      *
-     * @param context zmq context object
+     * @param context a 0MQ context to handle the proxy sockets
      * @throws xMsgException if the address is already in use
      */
     public xMsgProxy(ZContext context) throws xMsgException {
@@ -142,9 +144,8 @@ public class xMsgProxy {
     /**
      * Construct the proxy with the given local address.
      *
-     * @param context zmq context object
+     * @param context a 0MQ context to handle the proxy sockets
      * @param address the local address
-     * @throws xMsgException
      * @throws xMsgException if the address is already in use
      */
     public xMsgProxy(ZContext context, xMsgProxyAddress address) throws xMsgException {
@@ -204,6 +205,8 @@ public class xMsgProxy {
 
     /**
      * Tests if the proxy is running.
+     *
+     * @return true if the proxy is running, false otherwise
      */
     public boolean isAlive() {
         return proxy.isAlive() && controller.isAlive();
@@ -211,6 +214,8 @@ public class xMsgProxy {
 
     /**
      * Returns the address of the proxy.
+     *
+     * @return the address used by the proxy
      */
     public xMsgProxyAddress address() {
         return addr;

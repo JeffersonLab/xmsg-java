@@ -43,7 +43,13 @@ import joptsimple.OptionSet;
 import joptsimple.OptionSpec;
 
 /**
- * xMsgRegistrar executable. Starts a local registrar service in it's own thread.
+ * xMsg registration server.
+ * It contains an in-memory database of registered actors.
+ * <p>
+ * Long-running actors subscribed to a topic of interest, or periodically
+ * publishing messages, can register with the xMsg registrar service so others
+ * actors can discover and communicate with them by using the same registered
+ * topic.
  *
  * @author gurjyan
  * @since 2.x
@@ -108,7 +114,7 @@ public class xMsgRegistrar {
      * Constructs a registrar that uses the localhost and
      * {@link org.jlab.coda.xmsg.core.xMsgConstants#REGISTRAR_PORT default port}.
      *
-     * @param context the context to run the registrar service
+     * @param context a 0MQ context to handle the registrar sockets
      * @throws xMsgException if the address is already in use
      */
     public xMsgRegistrar(ZContext context) throws xMsgException {
@@ -118,7 +124,7 @@ public class xMsgRegistrar {
     /**
      * Constructs a registrar that uses the specified address.
      *
-     * @param context the context to run the registrar service
+     * @param context a 0MQ context to handle the registrar sockets
      * @param address the address of the registrar service
      * @throws xMsgException if the address is already in use
      */
@@ -161,6 +167,8 @@ public class xMsgRegistrar {
 
     /**
      * Tests if the registrar is running.
+     *
+     * @return true if the registrar is running, false otherwise
      */
     public boolean isAlive() {
         return registrar.isAlive();
@@ -168,6 +176,8 @@ public class xMsgRegistrar {
 
     /**
      * Returns the address of the registrar.
+     *
+     * @return the address used by the registrar
      */
     public xMsgRegAddress address() {
         return addr;
