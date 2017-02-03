@@ -210,6 +210,7 @@ printClasspath.dependsOn cacheClasspath
 checkstyle {
     toolVersion = '7.3'
     configFile = file('config/quality/checkstyle.xml')
+    configProperties['samedir'] = file('config/quality')
 }
 
 findbugs {

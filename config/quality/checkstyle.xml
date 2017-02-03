@@ -228,4 +228,9 @@
       <property name="checkFormat" value=".*"/>
       <property name="influenceFormat" value="20000"/>
     </module>
+
+    <module name="SuppressionFilter">
+      <property name="file" value="${samedir}/checkstyle-suppress.xml"/>
+    </module>
+
 </module>
