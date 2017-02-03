@@ -434,8 +434,8 @@ public final class xMsgUtil {
     /**
      * Creates a new {@link org.jlab.coda.xmsg.core.xMsgUtil.FixedExecutor}.
      */
-    public static ThreadPoolExecutor newFixedThreadPool(int nThreads, String namePrefix) {
-        return newFixedThreadPool(nThreads,
+    public static ThreadPoolExecutor newFixedThreadPool(int maxThreads, String namePrefix) {
+        return newFixedThreadPool(maxThreads,
                                   namePrefix,
                                   new LinkedBlockingQueue<>());
     }
@@ -443,14 +443,14 @@ public final class xMsgUtil {
     /**
      * Creates a new ThreadPoolExecutor with a user controlled queue.
      */
-    public static ThreadPoolExecutor newFixedThreadPool(int nThreads,
+    public static ThreadPoolExecutor newFixedThreadPool(int maxThreads,
                                                         String namePrefix,
                                                         BlockingQueue<Runnable> workQueue) {
         DefaultThreadFactory threadFactory = new DefaultThreadFactory(namePrefix);
-        return new FixedExecutor(nThreads, nThreads,
-                                      0L, TimeUnit.MILLISECONDS,
-                                      workQueue,
-                                      threadFactory);
+        return new FixedExecutor(maxThreads, maxThreads,
+                                 0L, TimeUnit.MILLISECONDS,
+                                 workQueue,
+                                 threadFactory);
     }
 
     /**
@@ -459,8 +459,8 @@ public final class xMsgUtil {
     public static class FixedExecutor extends ThreadPoolExecutor {
 
         public FixedExecutor(int corePoolSize, int maximumPoolSize, long keepAliveTime,
-                                TimeUnit unit, BlockingQueue<Runnable> workQueue,
-                                ThreadFactory factory) {
+                             TimeUnit unit, BlockingQueue<Runnable> workQueue,
+                             ThreadFactory factory) {
             super(corePoolSize, maximumPoolSize, keepAliveTime, unit, workQueue, factory);
         }
 
