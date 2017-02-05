@@ -115,7 +115,7 @@ public class xMsgRegDriver {
      */
     public void addRegistration(String sender, xMsgRegistration data)
             throws xMsgException {
-        addRegistration(sender, data, xMsgConstants.REGISTER_REQUEST_TIMEOUT);
+        addRegistration(sender, data, xMsgConstants.REGISTRATION_TIMEOUT);
     }
 
     /**
@@ -145,7 +145,7 @@ public class xMsgRegDriver {
      */
     public void removeRegistration(String sender, xMsgRegistration data)
             throws xMsgException {
-        removeRegistration(sender, data, xMsgConstants.REMOVE_REQUEST_TIMEOUT);
+        removeRegistration(sender, data, xMsgConstants.REGISTRATION_TIMEOUT);
     }
 
     /**
@@ -178,7 +178,7 @@ public class xMsgRegDriver {
      */
     public void removeAllRegistration(String sender, String host)
             throws xMsgException {
-        removeAllRegistration(sender, host, xMsgConstants.REMOVE_REQUEST_TIMEOUT);
+        removeAllRegistration(sender, host, xMsgConstants.REGISTRATION_TIMEOUT);
     }
 
     /**
@@ -212,7 +212,7 @@ public class xMsgRegDriver {
      */
     public Set<xMsgRegistration> findRegistration(String sender, xMsgRegistration data)
             throws xMsgException {
-        return findRegistration(sender, data, xMsgConstants.FIND_REQUEST_TIMEOUT);
+        return findRegistration(sender, data, xMsgConstants.DISCOVERY_TIMEOUT);
     }
 
     /**
@@ -261,7 +261,7 @@ public class xMsgRegDriver {
      */
     public Set<xMsgRegistration> filterRegistration(String sender, xMsgRegistration data)
             throws xMsgException {
-        return filterRegistration(sender, data, xMsgConstants.FILTER_REQUEST_TIMEOUT);
+        return filterRegistration(sender, data, xMsgConstants.DISCOVERY_TIMEOUT);
     }
 
     /**
@@ -320,7 +320,7 @@ public class xMsgRegDriver {
     public Set<xMsgRegistration> sameRegistration(String sender,
                                                   xMsgRegistration data)
             throws xMsgException {
-        return sameRegistration(sender, data, xMsgConstants.FIND_REQUEST_TIMEOUT);
+        return sameRegistration(sender, data, xMsgConstants.DISCOVERY_TIMEOUT);
     }
 
     /**
@@ -367,7 +367,7 @@ public class xMsgRegDriver {
      */
     public Set<xMsgRegistration> allRegistration(String sender, xMsgRegistration data)
             throws xMsgException {
-        return allRegistration(sender, data, xMsgConstants.FIND_REQUEST_TIMEOUT);
+        return allRegistration(sender, data, xMsgConstants.DISCOVERY_TIMEOUT);
     }
 
     /**

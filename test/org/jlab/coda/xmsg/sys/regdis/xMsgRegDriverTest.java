@@ -76,7 +76,7 @@ public class xMsgRegDriverTest {
 
         assertRequest(publisher.build(),
                       xMsgRegConstants.REGISTER_PUBLISHER,
-                      xMsgConstants.REGISTER_REQUEST_TIMEOUT);
+                      xMsgConstants.REGISTRATION_TIMEOUT);
     }
 
 
@@ -89,7 +89,7 @@ public class xMsgRegDriverTest {
 
         assertRequest(subscriber.build(),
                       xMsgRegConstants.REGISTER_SUBSCRIBER,
-                      xMsgConstants.REGISTER_REQUEST_TIMEOUT);
+                      xMsgConstants.REGISTRATION_TIMEOUT);
     }
 
 
@@ -101,7 +101,7 @@ public class xMsgRegDriverTest {
 
         assertRequest(publisher.build(),
                       xMsgRegConstants.REMOVE_PUBLISHER,
-                      xMsgConstants.REMOVE_REQUEST_TIMEOUT);
+                      xMsgConstants.REGISTRATION_TIMEOUT);
     }
 
 
@@ -113,7 +113,7 @@ public class xMsgRegDriverTest {
 
         assertRequest(subscriber.build(),
                       xMsgRegConstants.REMOVE_SUBSCRIBER,
-                      xMsgConstants.REMOVE_REQUEST_TIMEOUT);
+                      xMsgConstants.REGISTRATION_TIMEOUT);
     }
 
 
@@ -123,7 +123,7 @@ public class xMsgRegDriverTest {
 
         assertRequest("10.2.9.1",
                       xMsgRegConstants.REMOVE_ALL_REGISTRATION,
-                      xMsgConstants.REMOVE_REQUEST_TIMEOUT);
+                      xMsgConstants.REGISTRATION_TIMEOUT);
     }
 
 
@@ -135,7 +135,7 @@ public class xMsgRegDriverTest {
 
         assertRequest(data.build(),
                       xMsgRegConstants.FIND_PUBLISHER,
-                      xMsgConstants.FIND_REQUEST_TIMEOUT);
+                      xMsgConstants.DISCOVERY_TIMEOUT);
     }
 
 
@@ -147,7 +147,7 @@ public class xMsgRegDriverTest {
 
         assertRequest(data.build(),
                       xMsgRegConstants.FIND_SUBSCRIBER,
-                      xMsgConstants.FIND_REQUEST_TIMEOUT);
+                      xMsgConstants.DISCOVERY_TIMEOUT);
     }
 
 
@@ -159,7 +159,7 @@ public class xMsgRegDriverTest {
 
         assertRequest(data.build(),
                       xMsgRegConstants.FILTER_PUBLISHER,
-                      xMsgConstants.FILTER_REQUEST_TIMEOUT);
+                      xMsgConstants.DISCOVERY_TIMEOUT);
     }
 
 
@@ -171,7 +171,7 @@ public class xMsgRegDriverTest {
 
         assertRequest(data.build(),
                       xMsgRegConstants.FILTER_SUBSCRIBER,
-                      xMsgConstants.FILTER_REQUEST_TIMEOUT);
+                      xMsgConstants.DISCOVERY_TIMEOUT);
     }
 
 
@@ -183,7 +183,7 @@ public class xMsgRegDriverTest {
 
         assertRequest(data.build(),
                       xMsgRegConstants.ALL_PUBLISHER,
-                      xMsgConstants.FIND_REQUEST_TIMEOUT);
+                      xMsgConstants.DISCOVERY_TIMEOUT);
     }
 
 
@@ -195,7 +195,7 @@ public class xMsgRegDriverTest {
 
         assertRequest(data.build(),
                       xMsgRegConstants.ALL_SUBSCRIBER,
-                      xMsgConstants.FIND_REQUEST_TIMEOUT);
+                      xMsgConstants.DISCOVERY_TIMEOUT);
     }
 
 

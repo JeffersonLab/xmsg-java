@@ -33,11 +33,6 @@ public final class xMsgConstants {
     public static final String ANY = "*";
     public static final String TOPIC_SEP = ":";
 
-    public static final long REGISTER_REQUEST_TIMEOUT = 3000;
-    public static final long REMOVE_REQUEST_TIMEOUT = 3000;
-    public static final long FIND_REQUEST_TIMEOUT = 3000;
-    public static final long FILTER_REQUEST_TIMEOUT = 3000;
-
     public static final int DEFAULT_PORT = 7771;
     public static final int REGISTRAR_PORT = 8888;
 
@@ -45,6 +40,9 @@ public final class xMsgConstants {
 
     public static final int CONNECTION_TIMEOUT = 1000;
     public static final int SUBSCRIPTION_TIMEOUT = 1000;
+
+    public static final int REGISTRATION_TIMEOUT = 3000;
+    public static final int DISCOVERY_TIMEOUT = 3000;
 
     private xMsgConstants() { }
 }
