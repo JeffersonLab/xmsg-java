@@ -22,11 +22,11 @@
 
 package org.jlab.coda.xmsg.sys.util;
 
-import org.jlab.coda.xmsg.core.xMsgUtil;
-
 import java.io.OutputStream;
 import java.io.PrintWriter;
 import java.io.StringWriter;
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.function.Supplier;
 import java.util.logging.ConsoleHandler;
 import java.util.logging.Formatter;
@@ -39,6 +39,7 @@ public final class LogUtils {
     private LogUtils() { }
 
     public static Logger getConsoleLogger(String name) {
+        DateTimeFormatter dateFormat = DateTimeFormatter.ofPattern("yyyy-mm-dd HH:MM:SS");
         Logger logger = Logger.getLogger(name);
         ConsoleHandler handler = new ConsoleHandler() {
             @Override
@@ -51,7 +52,7 @@ public final class LogUtils {
             @Override
             public String format(LogRecord record) {
                 return String.format("[%s] %s %s: %s%n",
-                                     xMsgUtil.currentTime(4),
+                                     LocalDateTime.now().format(dateFormat),
                                      record.getLoggerName(),
                                      record.getLevel(),
                                      record.getMessage());

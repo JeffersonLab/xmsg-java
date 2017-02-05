@@ -33,9 +33,7 @@ import java.io.UncheckedIOException;
 import java.net.Inet4Address;
 import java.net.InetAddress;
 import java.net.NetworkInterface;
-import java.text.DateFormat;
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.Enumeration;
 import java.util.LinkedHashSet;
 import java.util.List;
@@ -76,62 +74,6 @@ public final class xMsgUtil {
     }
 
     private xMsgUtil() { }
-
-
-    /**
-     * Returns formatted string of the current date and time.
-     * Options 1 through 10 are accepted, producing following formatting:
-     * <p>
-     * <ol>
-     * <li>Tue Nov 04 20:14:11 EST 2003</li>
-     * <li>11/4/03 8:14 PM</li>
-     * <li>8:14:11 PM</li>
-     * <li>Nov 4, 2003 8:14:11 PM</li>
-     * <li>8:14 PM</li>
-     * <li>8:14:11 PM</li>
-     * <li>8:14:11 PM EST</li>
-     * <li>11/4/03 8:14 PM</li>
-     * <li>Nov 4, 2003 8:14 PM</li>
-     * <li>November 4, 2003 8:14:11 PM EST</li>
-     * </ol>
-     *
-     * @param type the option of the formatting.
-     * @return formatted string of the current data
-     */
-    public static String currentTime(int type) {
-
-        // Make a new Date object.
-        // It will be initialized to the current time.
-        Date now = new Date();
-
-        switch (type) {
-            case 1:
-                return now.toString();
-            case 2:
-                return DateFormat.getInstance().format(now);
-            case 3:
-                return DateFormat.getTimeInstance().format(now);
-            case 4:
-                return DateFormat.getDateTimeInstance().format(now);
-            case 5:
-                return DateFormat.getTimeInstance(DateFormat.SHORT).format(now);
-            case 6:
-                return DateFormat.getTimeInstance(DateFormat.MEDIUM).format(now);
-            case 7:
-                return DateFormat.getTimeInstance(DateFormat.LONG).format(now);
-            case 8:
-                return DateFormat.getDateTimeInstance(
-                        DateFormat.SHORT, DateFormat.SHORT).format(now);
-            case 9:
-                return DateFormat.getDateTimeInstance(
-                        DateFormat.MEDIUM, DateFormat.SHORT).format(now);
-            case 10:
-                return DateFormat.getDateTimeInstance(
-                        DateFormat.LONG, DateFormat.LONG).format(now);
-            default:
-                throw new IllegalArgumentException("unsupported date formatting option");
-        }
-    }
 
     /**
      * Thread sleep wrapper.
