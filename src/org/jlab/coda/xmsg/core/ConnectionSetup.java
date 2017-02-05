@@ -22,8 +22,8 @@
 
 package org.jlab.coda.xmsg.core;
 
-import org.jlab.coda.xmsg.net.xMsgConnectionSetup;
 import org.jlab.coda.xmsg.net.xMsgProxyAddress;
+import org.jlab.coda.xmsg.sys.pubsub.xMsgConnectionSetup;
 import org.zeromq.ZMQ.Socket;
 
 import java.util.Objects;

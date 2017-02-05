@@ -23,7 +23,7 @@
 package org.jlab.coda.xmsg.core;
 
 import org.jlab.coda.xmsg.excp.xMsgException;
-import org.jlab.coda.xmsg.net.xMsgConnectionSetup;
+import org.jlab.coda.xmsg.sys.pubsub.xMsgConnectionSetup;
 import org.jlab.coda.xmsg.sys.pubsub.xMsgPoller;
 import org.jlab.coda.xmsg.sys.pubsub.xMsgProxyDriver;
 import org.zeromq.ZMQ;

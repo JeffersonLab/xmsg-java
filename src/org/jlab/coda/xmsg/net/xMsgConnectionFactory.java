@@ -24,6 +24,7 @@ package org.jlab.coda.xmsg.net;
 
 import org.jlab.coda.xmsg.core.xMsgUtil;
 import org.jlab.coda.xmsg.excp.xMsgException;
+import org.jlab.coda.xmsg.sys.pubsub.xMsgConnectionSetup;
 import org.jlab.coda.xmsg.sys.pubsub.xMsgProxyDriver;
 import org.jlab.coda.xmsg.sys.regdis.xMsgRegDriver;
 import org.zeromq.ZContext;

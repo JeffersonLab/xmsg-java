@@ -22,9 +22,9 @@
 
 package org.jlab.coda.xmsg.core;
 
-import org.jlab.coda.xmsg.net.xMsgConnectionSetup;
 import org.jlab.coda.xmsg.net.xMsgProxyAddress;
 import org.jlab.coda.xmsg.net.xMsgRegAddress;
+import org.jlab.coda.xmsg.sys.pubsub.xMsgConnectionSetup;
 
 import java.util.Objects;
 
