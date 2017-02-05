@@ -61,7 +61,6 @@ import joptsimple.OptionSpec;
  * (publishers and subscribers) connect to the proxy, instead of to each other.
  * It becomes trivial to add more subscribers or publishers.
  *
- * @author gurjyan
  * @version 2.x
  */
 public class xMsgProxy {

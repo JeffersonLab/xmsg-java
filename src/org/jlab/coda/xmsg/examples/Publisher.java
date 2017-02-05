@@ -35,7 +35,6 @@ import org.jlab.coda.xmsg.data.xMsgRegInfo;
  *
  * Published data is a byte array with a specified size.
  *
- * @author gurjyan
  * @version 2.x
  */
 public class Publisher extends xMsg {

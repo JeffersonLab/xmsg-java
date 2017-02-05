@@ -31,7 +31,6 @@ import java.io.UncheckedIOException;
 /**
  * xMsg Registrar address.
  *
- * @author gurjyan
  * @version 2.x
  */
 public class xMsgRegAddress {

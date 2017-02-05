@@ -51,7 +51,6 @@ import java.util.regex.Pattern;
 /**
  * xMsg utility methods.
  *
- * @author gurjyan
  * @since 2.x
  */
 public final class xMsgUtil {

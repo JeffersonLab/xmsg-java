@@ -50,7 +50,6 @@ import java.util.stream.Collectors;
  * <p>
  * Creation and destruction of subscriptions are controlled by the xMsg actor.
  *
- * @author gurjyan
  * @version 2.x
  */
 public abstract class xMsgSubscription {

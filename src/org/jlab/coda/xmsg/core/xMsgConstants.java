@@ -25,7 +25,6 @@ package org.jlab.coda.xmsg.core;
 /**
  * xMsg constants.
  *
- * @author gurjyan
  * @since 2.x
  */
 public final class xMsgConstants {

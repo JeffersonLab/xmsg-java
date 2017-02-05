@@ -68,7 +68,6 @@ import java.util.StringTokenizer;
  * Similarly, a subscription to {@code "A:B:1"} will only accept that exact
  * topic, rejecting {@code "A:B:2"}, {@code "A:C"}, {@code "A"}, etc.
  *
- * @author smancill
  * @version 2.x
  */
 public final class xMsgTopic {

@@ -25,7 +25,6 @@ package org.jlab.coda.xmsg.excp;
 /**
  * A problem resolving a host address.
  *
- * @author gurjyan
  * @since 2.x
  */
 public class xMsgAddressException extends RuntimeException {

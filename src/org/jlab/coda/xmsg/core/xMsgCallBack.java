@@ -25,7 +25,6 @@ package org.jlab.coda.xmsg.core;
 /**
  * A user-defined action to process subscribed messages.
  *
- * @author gurjyan
  * @since 2.x
  */
 public interface xMsgCallBack {

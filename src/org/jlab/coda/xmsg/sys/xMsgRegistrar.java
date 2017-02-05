@@ -51,7 +51,6 @@ import joptsimple.OptionSpec;
  * actors can discover and communicate with them by using the same registered
  * topic.
  *
- * @author gurjyan
  * @since 2.x
  */
 public class xMsgRegistrar {

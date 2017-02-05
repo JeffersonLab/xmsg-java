@@ -31,7 +31,6 @@ import java.io.UncheckedIOException;
 /**
  * xMsg proxy address.
  *
- * @author gurjyan
  * @version 2.x
  */
 public class xMsgProxyAddress {

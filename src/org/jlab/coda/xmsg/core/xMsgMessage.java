@@ -54,7 +54,6 @@ import java.util.List;
  * When a message is sync-published, the <i>metadata</i> will contain an
  * auto-generated {@code replyTopic} where the response can be published to.
  *
- * @author gurjyan
  * @version 2.x
  */
 public class xMsgMessage {

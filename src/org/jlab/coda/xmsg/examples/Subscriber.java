@@ -42,7 +42,6 @@ import java.util.List;
  * It also includes an inner class presenting the callback to be executed at
  * every arrival of the data.
  *
- * @author gurjyan
  * @version 2.x
  */
 public class Subscriber extends xMsg {

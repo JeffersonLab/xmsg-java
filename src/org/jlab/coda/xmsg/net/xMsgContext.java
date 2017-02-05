@@ -29,7 +29,6 @@ import org.zeromq.ZContext;
  * Singleton class that provides unique
  * {@link org.zeromq.ZContext 0MQ contex} for entire JVM process.
  *
- * @author gurjyan
  * @since 2.x
  */
 public final class xMsgContext {
