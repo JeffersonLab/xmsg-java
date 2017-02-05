@@ -75,7 +75,7 @@ public class xMsgRegDriverTest {
         driver.addRegistration(sender, publisher.build());
 
         assertRequest(publisher.build(),
-                      xMsgConstants.REGISTER_PUBLISHER,
+                      xMsgRegConstants.REGISTER_PUBLISHER,
                       xMsgConstants.REGISTER_REQUEST_TIMEOUT);
     }
 
@@ -88,7 +88,7 @@ public class xMsgRegDriverTest {
         driver.addRegistration(sender, subscriber.build());
 
         assertRequest(subscriber.build(),
-                      xMsgConstants.REGISTER_SUBSCRIBER,
+                      xMsgRegConstants.REGISTER_SUBSCRIBER,
                       xMsgConstants.REGISTER_REQUEST_TIMEOUT);
     }
 
@@ -100,7 +100,7 @@ public class xMsgRegDriverTest {
         driver.removeRegistration(sender, publisher.build());
 
         assertRequest(publisher.build(),
-                      xMsgConstants.REMOVE_PUBLISHER,
+                      xMsgRegConstants.REMOVE_PUBLISHER,
                       xMsgConstants.REMOVE_REQUEST_TIMEOUT);
     }
 
@@ -112,7 +112,7 @@ public class xMsgRegDriverTest {
         driver.removeRegistration(sender, subscriber.build());
 
         assertRequest(subscriber.build(),
-                      xMsgConstants.REMOVE_SUBSCRIBER,
+                      xMsgRegConstants.REMOVE_SUBSCRIBER,
                       xMsgConstants.REMOVE_REQUEST_TIMEOUT);
     }
 
@@ -122,7 +122,7 @@ public class xMsgRegDriverTest {
         driver.removeAllRegistration(sender, "10.2.9.1");
 
         assertRequest("10.2.9.1",
-                      xMsgConstants.REMOVE_ALL_REGISTRATION,
+                      xMsgRegConstants.REMOVE_ALL_REGISTRATION,
                       xMsgConstants.REMOVE_REQUEST_TIMEOUT);
     }
 
@@ -134,7 +134,7 @@ public class xMsgRegDriverTest {
         driver.findRegistration(sender, data.build());
 
         assertRequest(data.build(),
-                      xMsgConstants.FIND_PUBLISHER,
+                      xMsgRegConstants.FIND_PUBLISHER,
                       xMsgConstants.FIND_REQUEST_TIMEOUT);
     }
 
@@ -146,7 +146,7 @@ public class xMsgRegDriverTest {
         driver.findRegistration(sender, data.build());
 
         assertRequest(data.build(),
-                      xMsgConstants.FIND_SUBSCRIBER,
+                      xMsgRegConstants.FIND_SUBSCRIBER,
                       xMsgConstants.FIND_REQUEST_TIMEOUT);
     }
 
@@ -158,7 +158,7 @@ public class xMsgRegDriverTest {
         driver.filterRegistration(sender, data.build());
 
         assertRequest(data.build(),
-                      xMsgConstants.FILTER_PUBLISHER,
+                      xMsgRegConstants.FILTER_PUBLISHER,
                       xMsgConstants.FILTER_REQUEST_TIMEOUT);
     }
 
@@ -170,7 +170,7 @@ public class xMsgRegDriverTest {
         driver.filterRegistration(sender, data.build());
 
         assertRequest(data.build(),
-                      xMsgConstants.FILTER_SUBSCRIBER,
+                      xMsgRegConstants.FILTER_SUBSCRIBER,
                       xMsgConstants.FILTER_REQUEST_TIMEOUT);
     }
 
@@ -182,7 +182,7 @@ public class xMsgRegDriverTest {
         driver.allRegistration(sender, data.build());
 
         assertRequest(data.build(),
-                      xMsgConstants.ALL_PUBLISHER,
+                      xMsgRegConstants.ALL_PUBLISHER,
                       xMsgConstants.FIND_REQUEST_TIMEOUT);
     }
 
@@ -194,7 +194,7 @@ public class xMsgRegDriverTest {
         driver.allRegistration(sender, data.build());
 
         assertRequest(data.build(),
-                      xMsgConstants.ALL_SUBSCRIBER,
+                      xMsgRegConstants.ALL_SUBSCRIBER,
                       xMsgConstants.FIND_REQUEST_TIMEOUT);
     }
 

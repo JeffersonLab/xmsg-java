@@ -34,6 +34,7 @@ import org.jlab.coda.xmsg.excp.xMsgException;
 import org.jlab.coda.xmsg.net.xMsgContext;
 import org.jlab.coda.xmsg.net.xMsgProxyAddress;
 import org.jlab.coda.xmsg.net.xMsgSocketFactory;
+import org.jlab.coda.xmsg.sys.pubsub.xMsgCtrlConstants;
 import org.jlab.coda.xmsg.sys.util.Environment;
 import org.jlab.coda.xmsg.sys.util.LogUtils;
 import org.jlab.coda.xmsg.sys.util.ThreadUtils;
@@ -294,7 +295,7 @@ public class xMsgProxy {
                 router.setRouterHandover(true);
                 factory.bindSocket(router, addr.pubPort() + 2);
 
-                control.subscribe(xMsgConstants.CTRL_TOPIC.getBytes());
+                control.subscribe(xMsgCtrlConstants.CTRL_TOPIC.getBytes());
             } catch (Exception e) {
                 factory.closeQuietly(control);
                 factory.closeQuietly(publisher);
@@ -339,21 +340,21 @@ public class xMsgProxy {
             String id = new String(idFrame.getData());
 
             switch (type) {
-                case xMsgConstants.CTRL_CONNECT: {
+                case xMsgCtrlConstants.CTRL_CONNECT: {
                     ZMsg ack = new ZMsg();
                     ack.add(id);
                     ack.add(type);
                     ack.send(router);
                     break;
                 }
-                case xMsgConstants.CTRL_SUBSCRIBE: {
+                case xMsgCtrlConstants.CTRL_SUBSCRIBE: {
                     ZMsg ack = new ZMsg();
                     ack.add(id);
                     ack.add(type);
                     ack.send(publisher);
                     break;
                 }
-                case xMsgConstants.CTRL_REPLY: {
+                case xMsgCtrlConstants.CTRL_REPLY: {
                     ZMsg ack = new ZMsg();
                     ack.add(id);
                     ack.add(type);

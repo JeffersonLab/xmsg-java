@@ -83,8 +83,8 @@ public final class xMsgRegFactory {
      */
     public static xMsgRegistration.Builder newFilter(xMsgRegistration.OwnerType type) {
         xMsgRegistration.Builder filter = xMsgRegistration.newBuilder();
-        filter.setName(xMsgConstants.UNDEFINED);
-        filter.setHost(xMsgConstants.UNDEFINED);
+        filter.setName(xMsgRegConstants.UNDEFINED);
+        filter.setHost(xMsgRegConstants.UNDEFINED);
         filter.setPort(0);
         filter.setDomain(xMsgConstants.ANY);
         filter.setSubject(xMsgConstants.ANY);

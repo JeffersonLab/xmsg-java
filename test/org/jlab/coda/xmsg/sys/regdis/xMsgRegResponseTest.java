@@ -22,7 +22,6 @@
 
 package org.jlab.coda.xmsg.sys.regdis;
 
-import org.jlab.coda.xmsg.core.xMsgConstants;
 import org.jlab.coda.xmsg.data.xMsgR.xMsgRegistration;
 import org.jlab.coda.xmsg.excp.xMsgException;
 import org.junit.Before;
@@ -62,7 +61,7 @@ public class xMsgRegResponseTest {
 
         assertThat(recvResponse.topic(), is("foo:bar"));
         assertThat(recvResponse.sender(), is("registration_fe"));
-        assertThat(recvResponse.status(), is(xMsgConstants.SUCCESS));
+        assertThat(recvResponse.status(), is(xMsgRegConstants.SUCCESS));
         assertThat(recvResponse.data(), is(empty()));
     }
 
@@ -86,7 +85,7 @@ public class xMsgRegResponseTest {
 
         assertThat(recvResponse.topic(), is("foo:bar"));
         assertThat(recvResponse.sender(), is("registration_fe"));
-        assertThat(recvResponse.status(), is(xMsgConstants.SUCCESS));
+        assertThat(recvResponse.status(), is(xMsgRegConstants.SUCCESS));
         assertThat(recvResponse.data(), is(data));
     }
 
@@ -109,7 +108,7 @@ public class xMsgRegResponseTest {
         ZMsg msg = new ZMsg();
         msg.addString("foo:bar");
         msg.addString("foo_service");
-        msg.addString(xMsgConstants.SUCCESS);
+        msg.addString(xMsgRegConstants.SUCCESS);
         msg.add(data2.build().toByteArray());
         msg.add(Arrays.copyOf(bb, bb.length - 10));
 

@@ -220,7 +220,7 @@ class xMsgRegDatabase {
      * </ul>
      * Only defined terms will be used for matching actors.
      * The topic parts are undefined if its value is {@link xMsgConstants#ANY}.
-     * The address is undefined if its value is {@link xMsgConstants#UNDEFINED}.
+     * The address is undefined if its value is {@link xMsgRegConstants#UNDEFINED}.
      *
      * @param data the searched terms
      * @return the set of all actors that match the terms
@@ -369,7 +369,7 @@ class xMsgRegDatabase {
             private AddressFilter(xMsgRegistration data) {
                 this.host = data.getHost();
                 this.port = data.getPort();
-                this.filter = !host.equals(xMsgConstants.UNDEFINED);
+                this.filter = !host.equals(xMsgRegConstants.UNDEFINED);
             }
         }
 

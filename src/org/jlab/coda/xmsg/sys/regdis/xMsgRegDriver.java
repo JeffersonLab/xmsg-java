@@ -97,7 +97,7 @@ public class xMsgRegDriver {
         if (rc != -1 && items[0].isReadable()) {
             xMsgRegResponse response = new xMsgRegResponse(ZMsg.recvMsg(socket));
             String status = response.status();
-            if (!status.equals(xMsgConstants.SUCCESS)) {
+            if (!status.equals(xMsgRegConstants.SUCCESS)) {
                 throw new xMsgException("xMsg-Error: unsuccessful registration: " + status);
             }
             return response;
@@ -129,8 +129,8 @@ public class xMsgRegDriver {
     public void addRegistration(String sender, xMsgRegistration data, long timeout)
             throws xMsgException {
         String topic = selectTopic(data.getOwnerType(),
-                                   xMsgConstants.REGISTER_PUBLISHER,
-                                   xMsgConstants.REGISTER_SUBSCRIBER);
+                                   xMsgRegConstants.REGISTER_PUBLISHER,
+                                   xMsgRegConstants.REGISTER_SUBSCRIBER);
 
         xMsgRegRequest request = new xMsgRegRequest(topic, sender, data);
         request(request, timeout);
@@ -159,8 +159,8 @@ public class xMsgRegDriver {
     public void removeRegistration(String sender, xMsgRegistration data, long timeout)
             throws xMsgException {
         String topic = selectTopic(data.getOwnerType(),
-                                   xMsgConstants.REMOVE_PUBLISHER,
-                                   xMsgConstants.REMOVE_SUBSCRIBER);
+                                   xMsgRegConstants.REMOVE_PUBLISHER,
+                                   xMsgRegConstants.REMOVE_SUBSCRIBER);
 
         xMsgRegRequest request = new xMsgRegRequest(topic, sender, data);
         request(request, timeout);
@@ -194,7 +194,7 @@ public class xMsgRegDriver {
      */
     public void removeAllRegistration(String sender, String host, long timeout)
             throws xMsgException {
-        String topic = xMsgConstants.REMOVE_ALL_REGISTRATION;
+        String topic = xMsgRegConstants.REMOVE_ALL_REGISTRATION;
 
         xMsgRegRequest request = new xMsgRegRequest(topic, sender, host);
         request(request, timeout);
@@ -231,8 +231,8 @@ public class xMsgRegDriver {
                                                   long timeout)
             throws xMsgException {
         String topic = selectTopic(data.getOwnerType(),
-                                   xMsgConstants.FIND_PUBLISHER,
-                                   xMsgConstants.FIND_SUBSCRIBER);
+                                   xMsgRegConstants.FIND_PUBLISHER,
+                                   xMsgRegConstants.FIND_SUBSCRIBER);
 
         xMsgRegRequest request = new xMsgRegRequest(topic, sender, data);
         xMsgRegResponse response = request(request, timeout);
@@ -251,7 +251,7 @@ public class xMsgRegDriver {
      * </ul>
      * Only defined terms will be used for matching actors.
      * To topic parts should be undefined with {@link xMsgConstants#ANY}.
-     * The address should be undefined with {@link xMsgConstants#UNDEFINED}.
+     * The address should be undefined with {@link xMsgRegConstants#UNDEFINED}.
      * The name is ignored.
      *
      * @param sender the sender of the request
@@ -276,7 +276,7 @@ public class xMsgRegDriver {
      * </ul>
      * Only defined terms will be used for matching actors.
      * To topic parts should be undefined with {@link xMsgConstants#ANY}.
-     * The address should be undefined with {@link xMsgConstants#UNDEFINED}.
+     * The address should be undefined with {@link xMsgRegConstants#UNDEFINED}.
      * The name is ignored.
      *
      * @param sender the sender of the request
@@ -290,8 +290,8 @@ public class xMsgRegDriver {
                                                     long timeout)
             throws xMsgException {
         String topic = selectTopic(data.getOwnerType(),
-                                   xMsgConstants.FILTER_PUBLISHER,
-                                   xMsgConstants.FILTER_SUBSCRIBER);
+                                   xMsgRegConstants.FILTER_PUBLISHER,
+                                   xMsgRegConstants.FILTER_SUBSCRIBER);
 
         xMsgRegRequest request = new xMsgRegRequest(topic, sender, data);
         xMsgRegResponse response = request(request, timeout);
@@ -348,8 +348,8 @@ public class xMsgRegDriver {
                                                   long timeout)
             throws xMsgException {
         String topic = selectTopic(data.getOwnerType(),
-                                   xMsgConstants.EXACT_PUBLISHER,
-                                   xMsgConstants.EXACT_SUBSCRIBER);
+                                   xMsgRegConstants.EXACT_PUBLISHER,
+                                   xMsgRegConstants.EXACT_SUBSCRIBER);
 
         xMsgRegRequest request = new xMsgRegRequest(topic, sender, data);
         xMsgRegResponse response = request(request, timeout);
@@ -385,8 +385,8 @@ public class xMsgRegDriver {
                                                  long timeout)
             throws xMsgException {
         String topic = selectTopic(data.getOwnerType(),
-                                   xMsgConstants.ALL_PUBLISHER,
-                                   xMsgConstants.ALL_SUBSCRIBER);
+                                   xMsgRegConstants.ALL_PUBLISHER,
+                                   xMsgRegConstants.ALL_SUBSCRIBER);
 
         xMsgRegRequest request = new xMsgRegRequest(topic, sender, data);
         xMsgRegResponse response = request(request, timeout);

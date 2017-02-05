@@ -22,7 +22,6 @@
 
 package org.jlab.coda.xmsg.sys.pubsub;
 
-import org.jlab.coda.xmsg.core.xMsgConstants;
 import org.jlab.coda.xmsg.excp.xMsgException;
 import org.jlab.coda.xmsg.net.xMsgProxyAddress;
 import org.jlab.coda.xmsg.net.xMsgSocketFactory;
@@ -77,8 +76,8 @@ public abstract class xMsgProxyDriver {
             while (totalTime < timeout) {
                 try {
                     ZMsg ctrlMsg = new ZMsg();
-                    ctrlMsg.add(xMsgConstants.CTRL_TOPIC + ":con");
-                    ctrlMsg.add(xMsgConstants.CTRL_CONNECT);
+                    ctrlMsg.add(xMsgCtrlConstants.CTRL_TOPIC + ":con");
+                    ctrlMsg.add(xMsgCtrlConstants.CTRL_CONNECT);
                     ctrlMsg.add(identity);
                     ctrlMsg.send(getSocket());
 
@@ -88,7 +87,7 @@ public abstract class xMsgProxyDriver {
                         if (replyMsg.size() == 1) {
                             ZFrame typeFrame = replyMsg.pop();
                             String type = new String(typeFrame.getData());
-                            if (type.equals(xMsgConstants.CTRL_CONNECT)) {
+                            if (type.equals(xMsgCtrlConstants.CTRL_CONNECT)) {
                                 return true;
                             }
                         }
@@ -119,8 +118,8 @@ public abstract class xMsgProxyDriver {
             while (totalTime < timeout) {
                 try {
                     ZMsg ctrlMsg = new ZMsg();
-                    ctrlMsg.add(xMsgConstants.CTRL_TOPIC + ":sub");
-                    ctrlMsg.add(xMsgConstants.CTRL_SUBSCRIBE);
+                    ctrlMsg.add(xMsgCtrlConstants.CTRL_TOPIC + ":sub");
+                    ctrlMsg.add(xMsgCtrlConstants.CTRL_SUBSCRIBE);
                     ctrlMsg.add(topic);
                     ctrlMsg.send(pubSocket);
 
@@ -133,7 +132,7 @@ public abstract class xMsgProxyDriver {
 
                             String id = new String(idFrame.getData());
                             String type = new String(typeFrame.getData());
-                            if (id.equals(topic) && type.equals(xMsgConstants.CTRL_SUBSCRIBE)) {
+                            if (id.equals(topic) && type.equals(xMsgCtrlConstants.CTRL_SUBSCRIBE)) {
                                 return true;
                             }
                         }
