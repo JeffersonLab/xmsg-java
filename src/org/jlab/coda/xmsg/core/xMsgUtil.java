@@ -24,6 +24,8 @@ package org.jlab.coda.xmsg.core;
 
 import com.google.protobuf.ByteString;
 
+import org.jlab.coda.xmsg.sys.util.ThreadUtils;
+
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
@@ -37,17 +39,11 @@ import java.util.ArrayList;
 import java.util.Enumeration;
 import java.util.LinkedHashSet;
 import java.util.List;
-import java.util.Objects;
 import java.util.Random;
 import java.util.Set;
 import java.util.concurrent.BlockingQueue;
-import java.util.concurrent.CancellationException;
-import java.util.concurrent.ExecutionException;
-import java.util.concurrent.Future;
 import java.util.concurrent.LinkedBlockingQueue;
-import java.util.concurrent.ThreadFactory;
 import java.util.concurrent.ThreadPoolExecutor;
-import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -367,92 +363,22 @@ public final class xMsgUtil {
      * @return a Thread object that will run the target
      */
     public static Thread newThread(String name, Runnable target) {
-        Objects.requireNonNull(name, "name is null");
-        Objects.requireNonNull(target, "target is null");
-        Thread thread = new Thread(target);
-        thread.setName(name);
-        thread.setUncaughtExceptionHandler((t, e) -> e.printStackTrace());
-        return thread;
+        return ThreadUtils.newThread(name, target);
     }
 
-
     /**
-     * Creates a new {@link org.jlab.coda.xmsg.core.xMsgUtil.FixedExecutor}.
+     * Creates a new ThreadPoolExecutor.
      */
-    public static ThreadPoolExecutor newFixedThreadPool(int maxThreads, String namePrefix) {
-        return newFixedThreadPool(maxThreads,
-                                  namePrefix,
-                                  new LinkedBlockingQueue<>());
+    public static ThreadPoolExecutor newThreadPool(int maxThreads, String namePrefix) {
+        return ThreadUtils.newThreadPool(maxThreads, namePrefix, new LinkedBlockingQueue<>());
     }
 
     /**
      * Creates a new ThreadPoolExecutor with a user controlled queue.
      */
-    public static ThreadPoolExecutor newFixedThreadPool(int maxThreads,
-                                                        String namePrefix,
-                                                        BlockingQueue<Runnable> workQueue) {
-        DefaultThreadFactory threadFactory = new DefaultThreadFactory(namePrefix);
-        return new FixedExecutor(maxThreads, maxThreads,
-                                 0L, TimeUnit.MILLISECONDS,
-                                 workQueue,
-                                 threadFactory);
-    }
-
-    /**
-     * A thread pool executor that prints the stackTrace of uncaught exceptions.
-     */
-    public static class FixedExecutor extends ThreadPoolExecutor {
-
-        public FixedExecutor(int corePoolSize, int maximumPoolSize, long keepAliveTime,
-                             TimeUnit unit, BlockingQueue<Runnable> workQueue,
-                             ThreadFactory factory) {
-            super(corePoolSize, maximumPoolSize, keepAliveTime, unit, workQueue, factory);
-        }
-
-        @Override
-        protected void afterExecute(Runnable r, Throwable t) {
-            super.afterExecute(r, t);
-            if (t == null && r instanceof Future<?>) {
-                try {
-                    Future<?> future = (Future<?>) r;
-                    if (future.isDone()) {
-                        future.get();
-                    }
-                } catch (CancellationException ce) {
-                    t = ce;
-                } catch (ExecutionException ee) {
-                    t = ee.getCause();
-                } catch (InterruptedException ie) {
-                    Thread.currentThread().interrupt(); // ignore/reset
-                }
-            }
-            if (t != null) {
-                t.printStackTrace();
-            }
-        }
-    }
-
-    /**
-     * A thread pool factory with custom thread names.
-     */
-    private static final class DefaultThreadFactory implements ThreadFactory {
-        private final AtomicInteger threadNumber = new AtomicInteger(1);
-        private final String namePrefix;
-
-        private DefaultThreadFactory(String name) {
-            namePrefix = name + "-thread-";
-        }
-
-        @Override
-        public Thread newThread(Runnable r) {
-            Thread t = new Thread(r, namePrefix + threadNumber.getAndIncrement());
-            if (t.isDaemon()) {
-                t.setDaemon(false);
-            }
-            if (t.getPriority() != Thread.NORM_PRIORITY) {
-                t.setPriority(Thread.NORM_PRIORITY);
-            }
-            return t;
-        }
+    public static ThreadPoolExecutor newThreadPool(int maxThreads,
+                                                   String namePrefix,
+                                                   BlockingQueue<Runnable> workQueue) {
+        return ThreadUtils.newThreadPool(maxThreads, namePrefix, workQueue);
     }
 }

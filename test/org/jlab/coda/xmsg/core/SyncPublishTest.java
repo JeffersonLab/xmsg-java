@@ -100,7 +100,7 @@ public final class SyncPublishTest {
     }
 
     private Result publisher(int cores, int numMessages) throws Exception {
-        ThreadPoolExecutor pool = xMsgUtil.newFixedThreadPool(cores, "sync-pub-");
+        ThreadPoolExecutor pool = xMsgUtil.newThreadPool(cores, "sync-pub-");
 
         try (xMsg actor = new xMsg("sync_tester", regAddress)) {
             xMsgRegQuery query = xMsgRegQuery.subscribers().withDomain(TOPIC);

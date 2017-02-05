@@ -234,7 +234,7 @@ public class xMsg implements AutoCloseable {
         this.setup = setup;
 
         // create fixed size thread pool
-        this.threadPool = xMsgUtil.newFixedThreadPool(setup.poolSize(), name);
+        this.threadPool = xMsgUtil.newThreadPool(setup.poolSize(), name);
 
         // create the connection pool
         this.connectionManager = new ConnectionManager(factory, setup.connectionSetup());
