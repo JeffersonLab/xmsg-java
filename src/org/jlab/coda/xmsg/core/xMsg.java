@@ -822,6 +822,7 @@ public class xMsg implements AutoCloseable {
     }
 
     private xMsgRegistration.Builder createRegistration(xMsgRegInfo info) {
-        return xMsgRegFactory.newRegistration(myName, setup.proxyAddress(), info);
+        return xMsgRegFactory.newRegistration(myName, setup.proxyAddress(),
+                                              info.type(), info.topic());
     }
 }
