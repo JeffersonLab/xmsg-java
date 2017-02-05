@@ -646,7 +646,7 @@ public class xMsg implements AutoCloseable {
             throws xMsgException {
         xMsgRegDriver regDriver = connectionManager.getRegistrarConnection(address);
         try {
-            xMsgRegistration.Builder reg = _createRegistration(info);
+            xMsgRegistration.Builder reg = createRegistration(info);
             reg.setDescription(info.description());
             regDriver.addRegistration(myName, reg.build(), timeout);
             connectionManager.releaseRegistrarConnection(regDriver);
@@ -703,7 +703,7 @@ public class xMsg implements AutoCloseable {
             throws xMsgException {
         xMsgRegDriver regDriver = connectionManager.getRegistrarConnection(address);
         try {
-            xMsgRegistration.Builder reg = _createRegistration(info);
+            xMsgRegistration.Builder reg = createRegistration(info);
             regDriver.removeRegistration(myName, reg.build(), timeout);
             connectionManager.releaseRegistrarConnection(regDriver);
         } catch (ZMQException | xMsgException e) {
@@ -821,7 +821,7 @@ public class xMsg implements AutoCloseable {
         return threadPool.getMaximumPoolSize();
     }
 
-    private xMsgRegistration.Builder _createRegistration(xMsgRegInfo info) {
+    private xMsgRegistration.Builder createRegistration(xMsgRegInfo info) {
         return xMsgRegFactory.newRegistration(myName, setup.proxyAddress(), info);
     }
 }
