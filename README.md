@@ -59,6 +59,51 @@ In a conclusion we present the xMsg entire API
 For more details and API method signatures check the Javadoc.
 
 
+## Basic usage
+
+Simple publisher:
+```java
+xMsg actor = new xMsg("publisher");
+xMsgTopic topic = xMsgTopic.build("report");
+xMsgMessage msg = xMsgMessage.createFrom(topic, "reportData");
+actor.publish(msg);
+actor.close();
+```
+
+Async subscriber:
+```java
+xMsg actor = new xMsg("subscriber");
+xMsgTopic topic = xMsgTopic.build("report");
+xMsgSubscription sub = actor.subscribe(topic, msg -> {
+    System.out.println("Received: " + xMsgMessage.parseData(msg, String.class));
+});
+// subscription runs in background until actor is destroyed
+```
+
+Registration and discovery:
+```java
+xMsg actor = new xMsg("example");
+xMsgTopic topic = xMsgTopic.build("report");
+// register as publisher
+actor.register(xMsgRegInfo.publisher(topic, "description"));
+// find all subscribers to some topic
+for (xMsgRegRecord reg : actor.discover(xMsgRegQuery.subscribers(topic))) {
+    System.out.printf("%s: %s%n", reg.address(), reg.name());
+}
+actor.close();
+```
+
+A proxy server must be running in order to deliver messages between actors:
+```
+$ java org.jlab.coda.xmsg.sys.xMsgProxy
+```
+
+A registrar server must be running in order to deliver messages between actors:
+```
+$ java org.jlab.coda.xmsg.sys.xMsgRegistrar
+```
+
+
 ## Installation
 
 With Gradle:
