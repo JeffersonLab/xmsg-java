@@ -1,5 +1,5 @@
 /*
- *    Copyright (C) 2016. Jefferson Lab (JLAB). All Rights Reserved.
+ *    Copyright (C) 2017. Jefferson Lab (JLAB). All Rights Reserved.
  *    Permission to use, copy, modify, and distribute this software and its
  *    documentation for governmental use, educational, research, and not-for-profit
  *    purposes, without fee and without a signed licensing agreement.
@@ -20,29 +20,14 @@
  *    Department of Experimental Nuclear Physics, Jefferson Lab.
  */
 
-package org.jlab.coda.xmsg.core;
+package org.jlab.coda.xmsg.sys.pubsub;
 
-/**
- * xMsg constants.
- *
- * @author gurjyan
- * @since 2.x
- */
-public final class xMsgConstants {
+public final class xMsgCtrlConstants {
 
-    public static final String ANY = "*";
-    public static final String TOPIC_SEP = ":";
+    public static final String CTRL_TOPIC = "xmsg:control";
+    public static final String CTRL_CONNECT = "pub";
+    public static final String CTRL_SUBSCRIBE = "sub";
+    public static final String CTRL_REPLY = "rep";
 
-    public static final int DEFAULT_PORT = 7771;
-    public static final int REGISTRAR_PORT = 8888;
-
-    public static final int DEFAULT_POOL_SIZE = 2;
-
-    public static final int CONNECTION_TIMEOUT = 1000;
-    public static final int SUBSCRIPTION_TIMEOUT = 1000;
-
-    public static final int REGISTRATION_TIMEOUT = 3000;
-    public static final int DISCOVERY_TIMEOUT = 3000;
-
-    private xMsgConstants() { }
+    private xMsgCtrlConstants() { }
 }

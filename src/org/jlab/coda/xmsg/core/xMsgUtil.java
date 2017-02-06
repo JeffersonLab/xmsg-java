@@ -24,6 +24,8 @@ package org.jlab.coda.xmsg.core;
 
 import com.google.protobuf.ByteString;
 
+import org.jlab.coda.xmsg.sys.util.ThreadUtils;
+
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
@@ -33,23 +35,15 @@ import java.io.UncheckedIOException;
 import java.net.Inet4Address;
 import java.net.InetAddress;
 import java.net.NetworkInterface;
-import java.text.DateFormat;
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.Enumeration;
 import java.util.LinkedHashSet;
 import java.util.List;
-import java.util.Objects;
 import java.util.Random;
 import java.util.Set;
 import java.util.concurrent.BlockingQueue;
-import java.util.concurrent.CancellationException;
-import java.util.concurrent.ExecutionException;
-import java.util.concurrent.Future;
 import java.util.concurrent.LinkedBlockingQueue;
-import java.util.concurrent.ThreadFactory;
 import java.util.concurrent.ThreadPoolExecutor;
-import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -76,62 +70,6 @@ public final class xMsgUtil {
     }
 
     private xMsgUtil() { }
-
-
-    /**
-     * Returns formatted string of the current date and time.
-     * Options 1 through 10 are accepted, producing following formatting:
-     * <p>
-     * <ol>
-     * <li>Tue Nov 04 20:14:11 EST 2003</li>
-     * <li>11/4/03 8:14 PM</li>
-     * <li>8:14:11 PM</li>
-     * <li>Nov 4, 2003 8:14:11 PM</li>
-     * <li>8:14 PM</li>
-     * <li>8:14:11 PM</li>
-     * <li>8:14:11 PM EST</li>
-     * <li>11/4/03 8:14 PM</li>
-     * <li>Nov 4, 2003 8:14 PM</li>
-     * <li>November 4, 2003 8:14:11 PM EST</li>
-     * </ol>
-     *
-     * @param type the option of the formatting.
-     * @return formatted string of the current data
-     */
-    public static String currentTime(int type) {
-
-        // Make a new Date object.
-        // It will be initialized to the current time.
-        Date now = new Date();
-
-        switch (type) {
-            case 1:
-                return now.toString();
-            case 2:
-                return DateFormat.getInstance().format(now);
-            case 3:
-                return DateFormat.getTimeInstance().format(now);
-            case 4:
-                return DateFormat.getDateTimeInstance().format(now);
-            case 5:
-                return DateFormat.getTimeInstance(DateFormat.SHORT).format(now);
-            case 6:
-                return DateFormat.getTimeInstance(DateFormat.MEDIUM).format(now);
-            case 7:
-                return DateFormat.getTimeInstance(DateFormat.LONG).format(now);
-            case 8:
-                return DateFormat.getDateTimeInstance(
-                        DateFormat.SHORT, DateFormat.SHORT).format(now);
-            case 9:
-                return DateFormat.getDateTimeInstance(
-                        DateFormat.MEDIUM, DateFormat.SHORT).format(now);
-            case 10:
-                return DateFormat.getDateTimeInstance(
-                        DateFormat.LONG, DateFormat.LONG).format(now);
-            default:
-                throw new IllegalArgumentException("unsupported date formatting option");
-        }
-    }
 
     /**
      * Thread sleep wrapper.
@@ -425,92 +363,22 @@ public final class xMsgUtil {
      * @return a Thread object that will run the target
      */
     public static Thread newThread(String name, Runnable target) {
-        Objects.requireNonNull(name, "name is null");
-        Objects.requireNonNull(target, "target is null");
-        Thread thread = new Thread(target);
-        thread.setName(name);
-        thread.setUncaughtExceptionHandler((t, e) -> e.printStackTrace());
-        return thread;
+        return ThreadUtils.newThread(name, target);
     }
 
-
     /**
-     * Creates a new {@link org.jlab.coda.xmsg.core.xMsgUtil.FixedExecutor}.
+     * Creates a new ThreadPoolExecutor.
      */
-    public static ThreadPoolExecutor newFixedThreadPool(int maxThreads, String namePrefix) {
-        return newFixedThreadPool(maxThreads,
-                                  namePrefix,
-                                  new LinkedBlockingQueue<>());
+    public static ThreadPoolExecutor newThreadPool(int maxThreads, String namePrefix) {
+        return ThreadUtils.newThreadPool(maxThreads, namePrefix, new LinkedBlockingQueue<>());
     }
 
     /**
      * Creates a new ThreadPoolExecutor with a user controlled queue.
      */
-    public static ThreadPoolExecutor newFixedThreadPool(int maxThreads,
-                                                        String namePrefix,
-                                                        BlockingQueue<Runnable> workQueue) {
-        DefaultThreadFactory threadFactory = new DefaultThreadFactory(namePrefix);
-        return new FixedExecutor(maxThreads, maxThreads,
-                                 0L, TimeUnit.MILLISECONDS,
-                                 workQueue,
-                                 threadFactory);
-    }
-
-    /**
-     * A thread pool executor that prints the stackTrace of uncaught exceptions.
-     */
-    public static class FixedExecutor extends ThreadPoolExecutor {
-
-        public FixedExecutor(int corePoolSize, int maximumPoolSize, long keepAliveTime,
-                             TimeUnit unit, BlockingQueue<Runnable> workQueue,
-                             ThreadFactory factory) {
-            super(corePoolSize, maximumPoolSize, keepAliveTime, unit, workQueue, factory);
-        }
-
-        @Override
-        protected void afterExecute(Runnable r, Throwable t) {
-            super.afterExecute(r, t);
-            if (t == null && r instanceof Future<?>) {
-                try {
-                    Future<?> future = (Future<?>) r;
-                    if (future.isDone()) {
-                        future.get();
-                    }
-                } catch (CancellationException ce) {
-                    t = ce;
-                } catch (ExecutionException ee) {
-                    t = ee.getCause();
-                } catch (InterruptedException ie) {
-                    Thread.currentThread().interrupt(); // ignore/reset
-                }
-            }
-            if (t != null) {
-                t.printStackTrace();
-            }
-        }
-    }
-
-    /**
-     * A thread pool factory with custom thread names.
-     */
-    private static final class DefaultThreadFactory implements ThreadFactory {
-        private final AtomicInteger threadNumber = new AtomicInteger(1);
-        private final String namePrefix;
-
-        private DefaultThreadFactory(String name) {
-            namePrefix = name + "-thread-";
-        }
-
-        @Override
-        public Thread newThread(Runnable r) {
-            Thread t = new Thread(r, namePrefix + threadNumber.getAndIncrement());
-            if (t.isDaemon()) {
-                t.setDaemon(false);
-            }
-            if (t.getPriority() != Thread.NORM_PRIORITY) {
-                t.setPriority(Thread.NORM_PRIORITY);
-            }
-            return t;
-        }
+    public static ThreadPoolExecutor newThreadPool(int maxThreads,
+                                                   String namePrefix,
+                                                   BlockingQueue<Runnable> workQueue) {
+        return ThreadUtils.newThreadPool(maxThreads, namePrefix, workQueue);
     }
 }

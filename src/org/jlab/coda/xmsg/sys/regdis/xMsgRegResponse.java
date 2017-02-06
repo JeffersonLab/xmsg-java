@@ -23,7 +23,7 @@
 package org.jlab.coda.xmsg.sys.regdis;
 
 import com.google.protobuf.InvalidProtocolBufferException;
-import org.jlab.coda.xmsg.core.xMsgConstants;
+
 import org.jlab.coda.xmsg.data.xMsgR.xMsgRegistration;
 import org.jlab.coda.xmsg.excp.xMsgException;
 import org.zeromq.ZFrame;
@@ -53,7 +53,7 @@ public class xMsgRegResponse {
     /**
      * Constructs a success response. No registration data is returned.
      * The response status is set to
-     * {@link org.jlab.coda.xmsg.core.xMsgConstants#SUCCESS}.
+     * {@link org.jlab.coda.xmsg.sys.regdis.xMsgRegConstants#SUCCESS}.
      * This response is used to signal that a request was successful.
      *
      * @param topic the request being responded
@@ -62,7 +62,7 @@ public class xMsgRegResponse {
     public xMsgRegResponse(String topic, String sender) {
         this.topic = topic;
         this.sender = sender;
-        this.status = xMsgConstants.SUCCESS;
+        this.status = xMsgRegConstants.SUCCESS;
         this.data = new HashSet<>();
     }
 
@@ -70,7 +70,7 @@ public class xMsgRegResponse {
     /**
      * Constructs a data response. The data can be an empty set.
      * The response status is set to
-     * {@link org.jlab.coda.xmsg.core.xMsgConstants#SUCCESS}.
+     * {@link org.jlab.coda.xmsg.sys.regdis.xMsgRegConstants#SUCCESS}.
      * This response is used to return registration data for discovery requests.
      *
      * @param topic the request being responded
@@ -80,7 +80,7 @@ public class xMsgRegResponse {
     public xMsgRegResponse(String topic, String sender, Set<xMsgRegistration> data) {
         this.topic = topic;
         this.sender = sender;
-        this.status = xMsgConstants.SUCCESS;
+        this.status = xMsgRegConstants.SUCCESS;
         this.data = data;
     }
 
@@ -125,7 +125,7 @@ public class xMsgRegResponse {
         topic = new String(topicFrame.getData());
         sender = new String(senderFrame.getData());
         status = new String(statusFrame.getData());
-        if (!status.equals(xMsgConstants.SUCCESS)) {
+        if (!status.equals(xMsgRegConstants.SUCCESS)) {
             throw new xMsgException("xMsg-Error: unsuccessful registration: " + status);
         }
 
@@ -177,7 +177,7 @@ public class xMsgRegResponse {
 
     /**
      * Returns the status of the response.
-     * It can be {@link org.jlab.coda.xmsg.core.xMsgConstants#SUCCESS}
+     * It can be {@link org.jlab.coda.xmsg.sys.regdis.xMsgRegConstants#SUCCESS}
      * or an error string indicating a problem with the request.
      */
     public String status() {

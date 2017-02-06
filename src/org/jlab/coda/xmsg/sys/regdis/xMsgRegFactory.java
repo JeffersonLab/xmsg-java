@@ -24,7 +24,6 @@ package org.jlab.coda.xmsg.sys.regdis;
 
 import org.jlab.coda.xmsg.core.xMsgConstants;
 import org.jlab.coda.xmsg.core.xMsgTopic;
-import org.jlab.coda.xmsg.data.xMsgRegInfo;
 import org.jlab.coda.xmsg.data.xMsgR.xMsgRegistration;
 import org.jlab.coda.xmsg.net.xMsgProxyAddress;
 
@@ -34,20 +33,6 @@ import org.jlab.coda.xmsg.net.xMsgProxyAddress;
 public final class xMsgRegFactory {
 
     private xMsgRegFactory() { }
-
-    /**
-     * Creates the data for a registration request.
-     *
-     * @param name the name of the actor
-     * @param address the address of the actor
-     * @param info the registration parameters
-     * @return the registration data
-     */
-    public static xMsgRegistration.Builder newRegistration(String name,
-                                                           xMsgProxyAddress address,
-                                                           xMsgRegInfo info) {
-        return newRegistration(name, address, info.type(), info.topic());
-    }
 
     /**
      * Creates the data for a registration request.
@@ -98,8 +83,8 @@ public final class xMsgRegFactory {
      */
     public static xMsgRegistration.Builder newFilter(xMsgRegistration.OwnerType type) {
         xMsgRegistration.Builder filter = xMsgRegistration.newBuilder();
-        filter.setName(xMsgConstants.UNDEFINED);
-        filter.setHost(xMsgConstants.UNDEFINED);
+        filter.setName(xMsgRegConstants.UNDEFINED);
+        filter.setHost(xMsgRegConstants.UNDEFINED);
         filter.setPort(0);
         filter.setDomain(xMsgConstants.ANY);
         filter.setSubject(xMsgConstants.ANY);

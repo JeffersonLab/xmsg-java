@@ -141,7 +141,7 @@ public class xMsgRegService implements Runnable {
         // Note these fields do not play any critical role what so ever, due to
         // the fact that registration is done using client-server type communication,
         // and are always synchronous.
-        String topic = xMsgConstants.UNDEFINED;
+        String topic = xMsgRegConstants.UNDEFINED;
         String sender = regAddress.host() + ":registrar";
 
         // response message
@@ -157,70 +157,70 @@ public class xMsgRegService implements Runnable {
             // retrieve the topic
             topic = request.topic();
 
-            if (topic.equals(xMsgConstants.REGISTER_PUBLISHER)) {
+            if (topic.equals(xMsgRegConstants.REGISTER_PUBLISHER)) {
                 logRegistration("registered", "publisher ", request.data());
                 publishers.register(request.data());
 
-            } else if (topic.equals(xMsgConstants.REGISTER_SUBSCRIBER)) {
+            } else if (topic.equals(xMsgRegConstants.REGISTER_SUBSCRIBER)) {
                 logRegistration("registered", "subscriber", request.data());
                 subscribers.register(request.data());
 
-            } else if (topic.equals(xMsgConstants.REMOVE_PUBLISHER)) {
+            } else if (topic.equals(xMsgRegConstants.REMOVE_PUBLISHER)) {
                 logRegistration("removed", "publisher ", request.data());
                 publishers.remove(request.data());
 
-            } else if (topic.equals(xMsgConstants.REMOVE_SUBSCRIBER)) {
+            } else if (topic.equals(xMsgRegConstants.REMOVE_SUBSCRIBER)) {
                 logRegistration("removed", "subscriber", request.data());
                 subscribers.remove(request.data());
 
-            } else if (topic.equals(xMsgConstants.REMOVE_ALL_REGISTRATION)) {
+            } else if (topic.equals(xMsgRegConstants.REMOVE_ALL_REGISTRATION)) {
                 LOGGER.fine(() -> "removed all host = " + request.text());
                 publishers.remove(request.text());
                 subscribers.remove(request.text());
 
-            } else if (topic.equals(xMsgConstants.FIND_PUBLISHER)) {
+            } else if (topic.equals(xMsgRegConstants.FIND_PUBLISHER)) {
                 xMsgRegistration data = request.data();
                 logDiscovery("publishers ", data);
                 registration = publishers.find(data.getDomain(),
                                                data.getSubject(),
                                                data.getType());
 
-            } else if (topic.equals(xMsgConstants.FIND_SUBSCRIBER)) {
+            } else if (topic.equals(xMsgRegConstants.FIND_SUBSCRIBER)) {
                 xMsgRegistration data = request.data();
                 logDiscovery("subscribers", data);
                 registration = subscribers.rfind(data.getDomain(),
                                                  data.getSubject(),
                                                  data.getType());
 
-            } else if (topic.equals(xMsgConstants.FILTER_PUBLISHER)) {
+            } else if (topic.equals(xMsgRegConstants.FILTER_PUBLISHER)) {
                 xMsgRegistration data = request.data();
                 logFilter("publishers ", data);
                 registration = publishers.filter(data);
 
-            } else if (topic.equals(xMsgConstants.FILTER_SUBSCRIBER)) {
+            } else if (topic.equals(xMsgRegConstants.FILTER_SUBSCRIBER)) {
                 xMsgRegistration data = request.data();
                 logFilter("subscribers", data);
                 registration = subscribers.filter(data);
 
-            } else if (topic.equals(xMsgConstants.EXACT_PUBLISHER)) {
+            } else if (topic.equals(xMsgRegConstants.EXACT_PUBLISHER)) {
                 xMsgRegistration data = request.data();
                 logFilter("publishers with exact topic ", data);
                 registration = publishers.same(data.getDomain(),
                                                data.getSubject(),
                                                data.getType());
 
-            } else if (topic.equals(xMsgConstants.EXACT_SUBSCRIBER)) {
+            } else if (topic.equals(xMsgRegConstants.EXACT_SUBSCRIBER)) {
                 xMsgRegistration data = request.data();
                 logFilter("subscribers with exact topic ", data);
                 registration = subscribers.same(data.getDomain(),
                                                 data.getSubject(),
                                                 data.getType());
 
-            } else if (topic.equals(xMsgConstants.ALL_PUBLISHER)) {
+            } else if (topic.equals(xMsgRegConstants.ALL_PUBLISHER)) {
                 LOGGER.fine(() -> "get all publishers");
                 registration = publishers.all();
 
-            } else if (topic.equals(xMsgConstants.ALL_SUBSCRIBER)) {
+            } else if (topic.equals(xMsgRegConstants.ALL_SUBSCRIBER)) {
                 LOGGER.fine(() -> "get all subscribers");
                 registration = subscribers.all();
 
@@ -270,7 +270,7 @@ public class xMsgRegService implements Runnable {
             if (!data.getType().equals(xMsgConstants.ANY)) {
                 sb.append("  type = ").append(data.getType());
             }
-            if (!data.getHost().equals(xMsgConstants.UNDEFINED)) {
+            if (!data.getHost().equals(xMsgRegConstants.UNDEFINED)) {
                 sb.append("  address = ")
                   .append(data.getHost()).append(':').append(data.getPort());
             }
