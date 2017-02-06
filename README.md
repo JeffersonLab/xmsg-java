@@ -58,6 +58,43 @@ In a conclusion we present the xMsg entire API
 
 For more details and API method signatures check the Javadoc.
 
+
+## Installation
+
+With Gradle:
+
+```groovy
+repositories {
+    maven {
+        url 'http://clasweb.jlab.org/clas12maven/'
+    }
+}
+
+dependencies {
+    compile 'org.jlab.coda:xmsg:2.3-SNAPSHOT'
+}
+```
+
+With Maven:
+
+```xml
+<repositories>
+   <repository>
+      <id>clas12maven</id>
+      <url>http://clasweb.jlab.org/clas12maven</url>
+   </repository>
+</repositories>
+
+<dependencies>
+   <dependency>
+      <groupId>org.jlab.coda</groupId>
+      <artifactId>xmsg</artifactId>
+      <version>2.3-SNAPSHOT</version>
+  </dependency>
+</dependencies>
+```
+
+
 ## Build notes
 
 xMsg requires the Java 8 JDK.
@@ -104,7 +141,7 @@ Check the version:
     Java(TM) SE Runtime Environment (build 1.8.0_92-b14)
     Java HotSpot(TM) 64-Bit Server VM (build 25.92-b14, mixed mode)
 
-### Installation
+### Build
 
 To build xMsg use the provided [Gradle](https://gradle.org/) wrapper.
 It will download the required Gradle version and all dependencies.
