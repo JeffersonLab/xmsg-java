@@ -23,7 +23,7 @@
 package org.jlab.coda.xmsg.excp;
 
 /**
- * xMsg exception class for problems resolving addresses.
+ * A problem resolving a host address.
  *
  * @author gurjyan
  * @since 2.x
@@ -31,14 +31,9 @@ package org.jlab.coda.xmsg.excp;
 public class xMsgAddressException extends RuntimeException {
 
     /**
-     * Constructs a new exception with the specified detail message and
-     * cause.
-     * <p>
-     * Note that the detail message associated with {@code cause} is <i>not</i>
-     * automatically incorporated in this exception's detail message.
+     * Constructs a new exception.
      *
-     * @param  cause the cause (which is saved for later retrieval by the
-     *         {@link #getCause()} method).
+     * @param cause the cause of the exception
      */
     public xMsgAddressException(Throwable cause) {
         super(cause);
