@@ -8,55 +8,28 @@ presenting asynchronous publish/subscribe inter-process communication.
 
 ## Overview
 
-xMsg provides in memory registration database that is used to register xMsg
-actors (i.e. publishers and subscribers). Hence, xMsg API includes methods for
-registering and discovering publishers and subscribers. This makes xMsg a
-suitable framework to build symmetric SOA based applications. For example a
-services that has a message to publishing can check to see if there are enough
-subscribers of this particular message type.
+xMsg actors are required to publish and/or subscribe to messages.
+The messages are identified by topics, and contain metadata
+and user-serialized data.
+xMsg topic convention defines three parts:
+_domain_, _subject_, and _type_.
+The data is identified by the _mime-type_ metadata field,
+and it can be used by applications to deserialize the raw bytes
+into its proper data-type object.
 
-To solve dynamic discovery problem in pub/sub environment the need of a proxy
-server is unavoidable. xMsg is using 0MQ socket libraries and borrows 0MQ
-proxy, which is a simple stateless message switch to address mentioned dynamic
-discovery problem.
+Multi-threaded publication of messages is supported,
+with each thread using its own connection to send messages.
+Subscriptions run in a background thread,
+and each received message is processed by a user-defined callback
+executed by a thread-pool.
+Note that the provided callback must be thread-safe.
 
-xMsg stores proxy connection objects internally in a connection pool for
-efficiency reasons. To avoid proxy connection concurrency, thus achieving
-maximum performance, connection objects are not shared between threads. Each
-xMsg actor tread will reuse an available connection object, or create a new
-proxy connection if it is not available in the pool.
-
-xMsg publisher can send a message of any topic. xMsg subscribers subscribe
-to abstract topics and provide callbacks to handle messages as they arrive,
-in a so called subscribe-and-forget mode. Neither publisher nor subscriber
-knows of each others existence. Thus publishers and subscribers are completely
-independent of each others. Yet, for a proper communication they need to
-establish some kind of relationship or binding, and that binding is the
-communication or message topic. Note that multiple xMsg actors can
-communicate without interfering with each other via simple topic
-naming conventions. xMsg topic convention defines three parts: _domain_,
-_subject_, and _type_, presented by the xMsgTopic class.
-
-xMsg subscriber callbacks (implementing xMsgCallBack interface) will run in a
-separate thread. For that reason xMsg provides a thread pool, simplifying the
-job of a user. Note that user provided callback routines must be thread safe
-and/or thread enabled.
-
-In a conclusion we present the xMsg entire API
-
-    createConnection
-    getConnection
-    releaseConnection
-    destroyConnection
-    publish
-    syncPublish
-    subscribe
-    unsubscribe
-    register
-    deregister
-    discover
-
-For more details and API method signatures check the Javadoc.
+A proxy must be running in order to pass messages between actors.
+Messages must be published to the same proxy than the subscription,
+or the subscriber will not receive them.
+Long-lived actors can register with a global registrar service
+if they are periodically publishing or subscribed to a given topic,
+and others actors can search the registrar to discover them.
 
 
 ## Basic usage
