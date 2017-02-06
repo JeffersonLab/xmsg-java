@@ -39,7 +39,6 @@ import java.util.stream.Collectors;
  *    Actors are grouped by topic, i.e., actors registered with the same topic will
  *    be in the same group.
  *
- * @author smancill
  * @version 2.x
  */
 class xMsgRegDatabase {

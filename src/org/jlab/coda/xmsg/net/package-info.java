@@ -20,41 +20,7 @@
  *    Department of Experimental Nuclear Physics, Jefferson Lab.
  */
 
-package org.jlab.coda.xmsg.core;
-
 /**
- * xMsg constants.
- *
- * @since 2.x
+ * Network classes to identify and handle xMsg connections using 0MQ.
  */
-public final class xMsgConstants {
-
-    /** The regex indicating any topic part. */
-    public static final String ANY = "*";
-
-    /** The character to separate the topic parts. */
-    public static final String TOPIC_SEP = ":";
-
-    /** The default proxy server port. */
-    public static final int DEFAULT_PORT = 7771;
-
-    /** The default registrar server port. */
-    public static final int REGISTRAR_PORT = 8888;
-
-    /** The default size for the callback thread pool. */
-    public static final int DEFAULT_POOL_SIZE = 2;
-
-    /** The default timeout to wait for a connection confirmation. */
-    public static final int CONNECTION_TIMEOUT = 1000;
-
-    /** The default timeout to wait for a subscription confirmation. */
-    public static final int SUBSCRIPTION_TIMEOUT = 1000;
-
-    /** The default timeout to wait for a registration request response. */
-    public static final int REGISTRATION_TIMEOUT = 3000;
-
-    /** The default timeout to wait for a discovery request response. */
-    public static final int DISCOVERY_TIMEOUT = 3000;
-
-    private xMsgConstants() { }
-}
+package org.jlab.coda.xmsg.net;

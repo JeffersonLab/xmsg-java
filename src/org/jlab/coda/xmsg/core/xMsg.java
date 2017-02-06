@@ -79,8 +79,8 @@ import java.util.stream.Collectors;
  * necessary connections inside the thread that uses them. The <em>connect</em> methods
  * will ensure that each thread gets a different connection.
  * <p>
- * Publishers must be sending messages through the same <em>proxy</em> than the
- * subscribers for the messages to be received. Normally, this proxy will be
+ * Publishers must send messages through the same <em>proxy</em> than the
+ * subscribers for the messages to be delivered. Normally, this proxy will be
  * the <em>default proxy</em> of a long-term subscriber with many dynamic publishers, or
  * the <em>default proxy</em> of a long-term publisher with many dynamic subscribers.
  * To have many publishers sending messages to many subscribers, they all must
@@ -98,9 +98,6 @@ import java.util.stream.Collectors;
  * through which the actor is publishing/subscribed to messages.
  * If registration for different proxies is needed, multiple actors should be
  * used, each one with an appropriate default proxy.
- * <p>
- * The proxy and the registrar are provided as stand-alone executables,
- * but only the Java implementation can be used to run a registrar.
  *
  * @see xMsgMessage
  * @see xMsgTopic
@@ -224,6 +221,10 @@ public class xMsg implements AutoCloseable {
 
     /**
      * Full constructor.
+     *
+     * @param name the name of this actor
+     * @param setup the setup of this actor
+     * @param factory the connection factory for this actor
      */
     protected xMsg(String name,
                    xMsgSetup setup,
@@ -366,8 +367,8 @@ public class xMsg implements AutoCloseable {
      * @param msg the message to be published
      * @param timeout the length of time to wait a response, in milliseconds
      * @return the response message
-     * @throws xMsgException
-     * @throws TimeoutException
+     * @throws xMsgException if the message could not be published
+     * @throws TimeoutException if a response is not received in the given time
      */
     public xMsgMessage syncPublish(xMsgMessage msg, long timeout)
             throws xMsgException, TimeoutException {
@@ -390,8 +391,8 @@ public class xMsg implements AutoCloseable {
      * @param msg the message to be published
      * @param timeout the length of time to wait a response, in milliseconds
      * @return the response message
-     * @throws xMsgException
-     * @throws TimeoutException
+     * @throws xMsgException if the message could not be published
+     * @throws TimeoutException if a response is not received in the given time
      */
     public xMsgMessage syncPublish(xMsgProxyAddress address, xMsgMessage msg, long timeout)
             throws xMsgException, TimeoutException {
@@ -414,8 +415,8 @@ public class xMsg implements AutoCloseable {
      * @param msg the message to be published
      * @param timeout the length of time to wait a response, in milliseconds
      * @return the response message
-     * @throws xMsgException
-     * @throws TimeoutException
+     * @throws xMsgException if the message could not be published
+     * @throws TimeoutException if a response is not received in the given time
      */
     public xMsgMessage syncPublish(xMsgConnection connection, xMsgMessage msg, long timeout)
             throws xMsgException, TimeoutException {
@@ -445,7 +446,8 @@ public class xMsg implements AutoCloseable {
      *
      * @param topic the topic to select messages
      * @param callback the user action to run when a message is received
-     * @throws xMsgException
+     * @throws xMsgException if the subscription could not be created
+     * @return the subscription handler
      */
     public xMsgSubscription subscribe(xMsgTopic topic,
                                       xMsgCallBack callback) throws xMsgException {
@@ -458,7 +460,8 @@ public class xMsg implements AutoCloseable {
      *
      * @param topics the topics to select messages
      * @param callback the user action to run when a message is received
-     * @throws xMsgException
+     * @throws xMsgException if the subscription could not be created
+     * @return the subscription handler
      */
     public xMsgSubscription subscribe(Set<xMsgTopic> topics,
                                       xMsgCallBack callback) throws xMsgException {
@@ -472,7 +475,8 @@ public class xMsg implements AutoCloseable {
      * @param address the address to the proxy
      * @param topic the topic to select messages
      * @param callback the user action to run when a message is received
-     * @throws xMsgException
+     * @throws xMsgException if the subscription could not be created
+     * @return the subscription handler
      */
     public xMsgSubscription subscribe(xMsgProxyAddress address,
                                       xMsgTopic topic,
@@ -487,7 +491,8 @@ public class xMsg implements AutoCloseable {
      * @param address the address to the proxy
      * @param topics the topics to select messages
      * @param callback the user action to run when a message is received
-     * @throws xMsgException
+     * @throws xMsgException if the subscription could not be created
+     * @return the subscription handler
      */
     public xMsgSubscription subscribe(xMsgProxyAddress address,
                                       Set<xMsgTopic> topics,
@@ -795,6 +800,8 @@ public class xMsg implements AutoCloseable {
 
     /**
      * Returns the name of this actor.
+     *
+     * @return a string with the name
      */
     public String getName() {
         return myName;
@@ -802,6 +809,8 @@ public class xMsg implements AutoCloseable {
 
     /**
      * Returns the address of the default proxy used by this actor.
+     *
+     * @return the address of the default proxy
      */
     public xMsgProxyAddress getDefaultProxyAddress() {
         return setup.proxyAddress();
@@ -809,6 +818,8 @@ public class xMsg implements AutoCloseable {
 
     /**
      * Returns the address of the default registrar used by this actor.
+     *
+     * @return the address of the default registrar
      */
     public xMsgRegAddress getDefaultRegistrarAddress() {
         return setup.registrarAddress();
@@ -816,6 +827,8 @@ public class xMsg implements AutoCloseable {
 
     /**
      * Returns the size of the callback thread pool.
+     *
+     * @return the pool size to run callbacks
      */
     public int getPoolSize() {
         return threadPool.getMaximumPoolSize();

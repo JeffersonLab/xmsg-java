@@ -54,7 +54,6 @@ import java.util.logging.Logger;
  *   <li>Find subscriber</li>
  * </ul>
  *
- * @author gurjyan
  * @since 2.x
  */
 public class xMsgRegService implements Runnable {

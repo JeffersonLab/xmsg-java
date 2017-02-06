@@ -31,7 +31,6 @@ import java.io.UncheckedIOException;
 /**
  * xMsg Registrar address.
  *
- * @author gurjyan
  * @version 2.x
  */
 public class xMsgRegAddress {
@@ -51,6 +50,7 @@ public class xMsgRegAddress {
     /**
      * Creates an address with provided host and default port.
      *
+     * @param host the host IP address
      * @throws xMsgAddressException if the IP address of the host could not be resolved
      */
     public xMsgRegAddress(String host) {
@@ -81,6 +81,8 @@ public class xMsgRegAddress {
 
     /**
      * Returns the host address.
+     *
+     * @return the host IP address
      */
     public String host() {
         return host;
@@ -88,6 +90,8 @@ public class xMsgRegAddress {
 
     /**
      * Returns the port number.
+     *
+     * @return the port
      */
     public int port() {
         return port;

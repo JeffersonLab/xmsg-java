@@ -31,7 +31,6 @@ import java.io.UncheckedIOException;
 /**
  * xMsg proxy address.
  *
- * @author gurjyan
  * @version 2.x
  */
 public class xMsgProxyAddress {
@@ -52,6 +51,7 @@ public class xMsgProxyAddress {
     /**
      * Creates an address with provided host and default ports.
      *
+     * @param host the host IP address
      * @throws xMsgAddressException if the IP address of the host could not be resolved
      */
     public xMsgProxyAddress(String host) {
@@ -84,6 +84,8 @@ public class xMsgProxyAddress {
 
     /**
      * Returns the host address.
+     *
+     * @return the host IP address
      */
     public String host() {
         return host;
@@ -91,6 +93,8 @@ public class xMsgProxyAddress {
 
     /**
      * Returns the publication port number.
+     *
+     * @return the PUB port
      */
     public int pubPort() {
         return pubPort;
@@ -98,6 +102,8 @@ public class xMsgProxyAddress {
 
     /**
      * Returns the subscription port number.
+     *
+     * @return the SUB port
      */
     public int subPort() {
         return subPort;

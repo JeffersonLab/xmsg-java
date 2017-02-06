@@ -33,7 +33,6 @@ import java.util.Arrays;
 /**
  * A wrapper for a a registration request.
  *
- * @author gurjyan
  * @since 2.x
  */
 class xMsgRegRequest {

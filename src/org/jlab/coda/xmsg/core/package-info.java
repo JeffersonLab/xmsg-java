@@ -20,41 +20,25 @@
  *    Department of Experimental Nuclear Physics, Jefferson Lab.
  */
 
-package org.jlab.coda.xmsg.core;
-
 /**
- * xMsg constants.
- *
- * @since 2.x
+ * Main classes for xMsg clients.
+ * <p>
+ * xMsg {@link org.jlab.coda.xmsg.core.xMsg actors} use
+ * {@link org.jlab.coda.xmsg.core.xMsgConnection connections} to publish and
+ * subscribe {@link org.jlab.coda.xmsg.core.xMsgMessage messages} to specific
+ * {@link org.jlab.coda.xmsg.core.xMsgTopic topics}.
+ * When subscribing, a {@link org.jlab.coda.xmsg.core.xMsgCallBack callback}
+ * must be provided to process the received messages. Each actor process its
+ * registered callbacks in a background thread pool.
+ * <p>
+ * Actors are data-agnostic, i.e., the data is always stored and published in
+ * the message as a binary byte array. Serialization and interpretation of the
+ * data must be user-provided.
+ * <p>
+ * A {@link org.jlab.coda.xmsg.sys.xMsgProxy proxy server} must be running and both
+ * publisher(s) and subscriber(s) must use a connection to the same proxy for
+ * the messages to be delivered.
+ * Actors can register with a {@link org.jlab.coda.xmsg.sys.xMsgRegistrar
+ * registrar server} to be discovered by other actors.
  */
-public final class xMsgConstants {
-
-    /** The regex indicating any topic part. */
-    public static final String ANY = "*";
-
-    /** The character to separate the topic parts. */
-    public static final String TOPIC_SEP = ":";
-
-    /** The default proxy server port. */
-    public static final int DEFAULT_PORT = 7771;
-
-    /** The default registrar server port. */
-    public static final int REGISTRAR_PORT = 8888;
-
-    /** The default size for the callback thread pool. */
-    public static final int DEFAULT_POOL_SIZE = 2;
-
-    /** The default timeout to wait for a connection confirmation. */
-    public static final int CONNECTION_TIMEOUT = 1000;
-
-    /** The default timeout to wait for a subscription confirmation. */
-    public static final int SUBSCRIPTION_TIMEOUT = 1000;
-
-    /** The default timeout to wait for a registration request response. */
-    public static final int REGISTRATION_TIMEOUT = 3000;
-
-    /** The default timeout to wait for a discovery request response. */
-    public static final int DISCOVERY_TIMEOUT = 3000;
-
-    private xMsgConstants() { }
-}
+package org.jlab.coda.xmsg.core;

@@ -43,7 +43,6 @@ import java.util.Set;
  * {@link org.jlab.coda.xmsg.sys.regdis.xMsgRegService xMsg registrar service},
  * using a 0MQ REQ socket.
  *
- * @author gurjyan
  * @since 2.x
  */
 public class xMsgRegDriver {

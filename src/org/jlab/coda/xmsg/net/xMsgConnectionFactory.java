@@ -30,14 +30,31 @@ import org.jlab.coda.xmsg.sys.regdis.xMsgRegDriver;
 import org.zeromq.ZContext;
 import org.zeromq.ZMQException;
 
+/**
+ * Creates new xMsg connections.
+ */
 public class xMsgConnectionFactory {
 
     private final xMsgSocketFactory factory;
 
+    /**
+     * Creates a new connection factory.
+     *
+     * @param context the ZMQ context to be used by sockets
+     */
     public xMsgConnectionFactory(ZContext context) {
         this.factory = new xMsgSocketFactory(context.getContext());
     }
 
+    /**
+     * Creates a new subscriber connection.
+     *
+     * @param address the address of the proxy used by the connection
+     * @param setup the settings of the connection
+     * @return a new connection that can subscribe to topics
+     *         through the proxy running on the given address
+     * @throws xMsgException if the connection could not be created
+     */
     public xMsgProxyDriver createSubscriberConnection(xMsgProxyAddress address,
                                                       xMsgConnectionSetup setup)
             throws xMsgException {
@@ -46,6 +63,15 @@ public class xMsgConnectionFactory {
         return connection;
     }
 
+    /**
+     * Creates a new publisher connection.
+     *
+     * @param address the address of the proxy used by the connection
+     * @param setup the settings of the connection
+     * @return a new connection that can publish to topics
+     *         through the proxy running on the given address
+     * @throws xMsgException if the connection could not be created
+     */
     public xMsgProxyDriver createPublisherConnection(xMsgProxyAddress address,
                                                      xMsgConnectionSetup setup)
             throws xMsgException {
@@ -70,6 +96,15 @@ public class xMsgConnectionFactory {
         }
     }
 
+
+    /**
+     * Creates a new registrar connection.
+     *
+     * @param address the address of the registrar used by the connection
+     * @return a new connection that can communicate with
+     *         the registrar running on the given address
+     * @throws xMsgException if the connection could not be created
+     */
     public xMsgRegDriver createRegistrarConnection(xMsgRegAddress address) throws xMsgException {
         xMsgRegDriver driver = new xMsgRegDriver(address, factory);
         try {

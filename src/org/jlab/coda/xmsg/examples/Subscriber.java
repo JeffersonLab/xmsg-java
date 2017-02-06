@@ -42,12 +42,11 @@ import java.util.List;
  * It also includes an inner class presenting the callback to be executed at
  * every arrival of the data.
  *
- * @author gurjyan
  * @version 2.x
  */
 public class Subscriber extends xMsg {
 
-    public Subscriber() {
+    Subscriber() {
         super("test_subscriber", 1);
     }
 
@@ -55,7 +54,7 @@ public class Subscriber extends xMsg {
      * Subscribes to a hard-coded topic on the local proxy,
      * and registers with the local registrar.
      */
-    public void start() throws xMsgException  {
+    void start() throws xMsgException  {
         // build the subscribing topic (hard-coded)
         String domain = "test_domain";
         String subject = "test_subject";

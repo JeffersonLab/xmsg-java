@@ -68,13 +68,20 @@ import java.util.StringTokenizer;
  * Similarly, a subscription to {@code "A:B:1"} will only accept that exact
  * topic, rejecting {@code "A:B:2"}, {@code "A:C"}, {@code "A"}, etc.
  *
- * @author smancill
  * @version 2.x
  */
 public final class xMsgTopic {
 
+    /**
+     * A regex indicating to match any value.
+     */
     public static final String ANY = xMsgConstants.ANY;
+
+    /**
+     * The separator of the topic parts.
+     */
     public static final String SEPARATOR = xMsgConstants.TOPIC_SEP;
+
     private final String topic;
 
 
@@ -118,6 +125,7 @@ public final class xMsgTopic {
      * Builds a new topic with only a domain part.
      *
      * @param domain the domain of the topic
+     * @return the created topic
      */
     public static xMsgTopic build(String domain) {
         return new xMsgTopic(domain, ANY, ANY);
@@ -128,6 +136,7 @@ public final class xMsgTopic {
      *
      * @param domain the domain of the topic
      * @param subject the subject of the topic
+     * @return the created topic
      */
     public static xMsgTopic build(String domain, String subject) {
         return new xMsgTopic(domain, subject, ANY);
@@ -139,6 +148,7 @@ public final class xMsgTopic {
      * @param domain the domain of the topic
      * @param subject the subject of the topic
      * @param type the type of the subject
+     * @return the created topic
      */
     public static xMsgTopic build(String domain, String subject, String type) {
         return new xMsgTopic(domain, subject, type);
@@ -152,6 +162,7 @@ public final class xMsgTopic {
      * It should be used with caution.
      *
      * @param topic a valid xMsg topic string
+     * @return the created topic
      */
     public static xMsgTopic wrap(String topic) {
         return new xMsgTopic(topic);
@@ -170,6 +181,8 @@ public final class xMsgTopic {
 
     /**
      * Returns the domain part of the topic.
+     *
+     * @return the domain of the topic
      */
     public String domain() {
         int firstSep = topic.indexOf(SEPARATOR);
@@ -183,6 +196,8 @@ public final class xMsgTopic {
     /**
      * Returns the subject part of the topic. If the topic has no subject, then
      * {@code "*"} is returned.
+     *
+     * @return the subject of the topic, of {@link #ANY} if not set
      */
     public String subject() {
         int firstSep = topic.indexOf(SEPARATOR);
@@ -200,6 +215,8 @@ public final class xMsgTopic {
     /**
      * Returns the type part of the topic. If the topic has no type, then
      * {@code "*"} is returned.
+     *
+     * @return the type of the topic, of {@link #ANY} if not set
      */
     public String type() {
         int firstSep = topic.indexOf(SEPARATOR);

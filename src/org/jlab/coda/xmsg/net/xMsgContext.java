@@ -29,7 +29,6 @@ import org.zeromq.ZContext;
  * Singleton class that provides unique
  * {@link org.zeromq.ZContext 0MQ contex} for entire JVM process.
  *
- * @author gurjyan
  * @since 2.x
  */
 public final class xMsgContext {
@@ -49,6 +48,8 @@ public final class xMsgContext {
 
     /**
      * Returns the global singleton 0MQ context.
+     *
+     * @return the global 0MQ context
      */
     public static ZContext getContext() {
         return getInstance().context;
@@ -56,6 +57,8 @@ public final class xMsgContext {
 
     /**
      * Set the size of the 0MQ thread pool to handle I/O operations.
+     *
+     * @param ioThreads the number of I/O threads
      */
     public static void setIOThreads(int ioThreads) {
         ourInstance.context.getContext().setIOThreads(ioThreads);
@@ -63,6 +66,9 @@ public final class xMsgContext {
 
     /**
      * Sets the maximum number of sockets allowed on the context.
+     *
+     * @param maxSockets the maximum number of sockets that can be created
+     *        with the context
      */
     public static void setMaxSockets(int maxSockets) {
         ourInstance.context.getContext().setMaxSockets(maxSockets);

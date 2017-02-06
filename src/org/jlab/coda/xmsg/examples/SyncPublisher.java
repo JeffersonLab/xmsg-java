@@ -38,12 +38,11 @@ import org.jlab.coda.xmsg.data.xMsgRegInfo;
  *
  * Published data is a hard-coded integer.
  *
- * @author gurjyan
  * @version 2.x
  */
 public class SyncPublisher extends xMsg {
 
-    public SyncPublisher() {
+    SyncPublisher() {
         super("test_sync_publisher");
     }
 

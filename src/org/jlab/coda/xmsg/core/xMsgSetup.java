@@ -44,8 +44,8 @@ public final class xMsgSetup extends ConnectionSetup {
 
 
     /**
-     * Helps creating the setup of an xMsg actor by picking what options are
-     * set. All others will be initialized to their default values.
+     * Helps creating the setup for an xMsg actor.
+     * All parameters not set will be initialized to their default values.
      */
     public static final class Builder extends ConnectionSetup.Builder<Builder> {
 

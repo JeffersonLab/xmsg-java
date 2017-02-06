@@ -5,4 +5,8 @@
     "http://www.puppycrawl.com/dtds/suppressions_1_1.dtd">
 
 <suppressions>
+  <!-- ignore Javadoc -->
+  <suppress checks="Javadoc.*" files=".*Test\.java"/>
+  <suppress checks="Javadoc.*" files=".+[\\/]sys[\\/].+[\\/].+\.java"/>
+  <suppress checks="Javadoc.*" files="perf[\\/].+\.java"/>
 </suppressions>

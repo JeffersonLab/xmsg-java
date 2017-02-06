@@ -40,7 +40,6 @@ import java.util.Set;
  * in case a discovery request was received, or an error description indicating
  * that something wrong happened with the request.
  *
- * @author gurjyan
  * @since 2.x
  */
 public class xMsgRegResponse {

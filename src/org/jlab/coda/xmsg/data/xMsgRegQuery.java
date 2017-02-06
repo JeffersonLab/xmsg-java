@@ -79,9 +79,16 @@ public final class xMsgRegQuery {
      * Each category uses a different driver method.
      */
     public enum Category {
+        /** Query the registrar by topic matching. */
         MATCHING,
+
+        /** Query the registrar by comparing registration data. */
         FILTER,
+
+        /** Query the registrar by exact topic. */
         EXACT,
+
+        /** Query the registrar for all actors. */
         ALL
     }
 
@@ -99,6 +106,9 @@ public final class xMsgRegQuery {
 
         /**
          * A query for registered actors matching the given topic.
+         *
+         * @param topic the topic to be matched
+         * @return a query for actors with topics matching the given topic
          */
         public xMsgRegQuery matching(xMsgTopic topic) {
             data.setDomain(topic.domain());
@@ -109,6 +119,10 @@ public final class xMsgRegQuery {
 
         /**
          * A query for registered actors with this exact domain.
+         *
+         * @param domain the expected domain
+         * @return a query for actors registered to the given domain
+         *         (subject and type are ignored)
          */
         public xMsgRegQuery withDomain(String domain) {
             data.setDomain(domain);
@@ -117,6 +131,10 @@ public final class xMsgRegQuery {
 
         /**
          * A query for registered actors with this exact subject.
+         *
+         * @param subject the expected subject
+         * @return a query for actors registered to the given subject
+         *         (domain and type are ignored)
          */
         public xMsgRegQuery withSubject(String subject) {
             data.setSubject(subject);
@@ -125,6 +143,10 @@ public final class xMsgRegQuery {
 
         /**
          * A query for registered actor with this exact type.
+         *
+         * @param type the expected type
+         * @return a query for actors registered to the given type
+         *         (domain and subject are ignored)
          */
         public xMsgRegQuery withType(String type) {
             data.setType(type);
@@ -133,6 +155,9 @@ public final class xMsgRegQuery {
 
         /**
          * A query for registered actors with this exact topic.
+         *
+         * @param topic the topic to be compared
+         * @return a query for actors with the same topic as the given topic
          */
         public xMsgRegQuery withSame(xMsgTopic topic) {
             data.setDomain(topic.domain());
@@ -143,6 +168,9 @@ public final class xMsgRegQuery {
 
         /**
          * A query for registered actors with this exact hostname.
+         *
+         * @param host the expected host
+         * @return a query for actors registered from the given host
          */
         public xMsgRegQuery withHost(String host) {
             data.setHost(xMsgUtil.toHostAddress(host));
@@ -151,6 +179,8 @@ public final class xMsgRegQuery {
 
         /**
          * A query to get all registered actors.
+         *
+         * @return a query for all registered actors
          */
         public xMsgRegQuery all() {
             return new xMsgRegQuery(data, Category.ALL);
@@ -165,6 +195,8 @@ public final class xMsgRegQuery {
 
     /**
      * Serializes the query into a protobuf object.
+     *
+     * @return the query as a registration data object
      */
     public xMsgRegistration.Builder data() {
         return data;
@@ -172,6 +204,8 @@ public final class xMsgRegQuery {
 
     /**
      * The category of the query.
+     *
+     * @return the category
      */
     public Category category() {
         return category;
