@@ -14,7 +14,7 @@ and user-serialized data.
 xMsg topic convention defines three parts:
 _domain_, _subject_, and _type_.
 The data is identified by the _mime-type_ metadata field,
-and it can be used by applications to deserialize the raw bytes
+which can be used by applications to deserialize the raw bytes
 into its proper data-type object.
 
 Multi-threaded publication of messages is supported,
