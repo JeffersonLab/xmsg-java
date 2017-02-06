@@ -71,7 +71,7 @@ A proxy server must be running in order to deliver messages between actors:
 $ java org.jlab.coda.xmsg.sys.xMsgProxy
 ```
 
-A registrar server must be running in order to deliver messages between actors:
+A registrar server must be running in order to register actors:
 ```
 $ java org.jlab.coda.xmsg.sys.xMsgRegistrar
 ```
