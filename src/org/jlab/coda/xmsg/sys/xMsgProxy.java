@@ -42,6 +42,7 @@ import org.zeromq.ZContext;
 import org.zeromq.ZFrame;
 import org.zeromq.ZMQ;
 import org.zeromq.ZMQException;
+import org.zeromq.ZMQ.Context;
 import org.zeromq.ZMQ.Socket;
 import org.zeromq.ZMsg;
 import org.zeromq.ZThread;
@@ -66,7 +67,7 @@ import joptsimple.OptionSpec;
 public class xMsgProxy {
 
     private final xMsgProxyAddress addr;
-    private final ZContext ctx;
+    private final Context ctx;
 
     private final Thread proxy;
     private final Thread controller;
@@ -148,7 +149,7 @@ public class xMsgProxy {
      * @throws xMsgException if the address is already in use
      */
     public xMsgProxy(xMsgContext context, xMsgProxyAddress address) throws xMsgException {
-        ctx = context.getContext();
+        ctx = context.getContext().getContext();
         addr = address;
 
         Proxy proxyTask = null;
@@ -229,7 +230,7 @@ public class xMsgProxy {
         final Socket in;
         final Socket out;
 
-        final xMsgSocketFactory factory = new xMsgSocketFactory(ctx.getContext());
+        final xMsgSocketFactory factory = new xMsgSocketFactory(ctx);
 
         Proxy() throws xMsgException {
             Socket in = null;
@@ -250,10 +251,11 @@ public class xMsgProxy {
 
         @Override
         public void run() {
+            ZContext wrapper = wrapContext();
             try {
                 LOGGER.info("running on host = " + addr.host() + "  port = " + addr.pubPort());
                 if (LOGGER.isLoggable(Level.FINE)) {
-                    Socket listener = ZThread.fork(ctx, new Listener());
+                    Socket listener = ZThread.fork(wrapper, new Listener());
                     ZMQ.proxy(in, out, listener);
                 } else {
                     ZMQ.proxy(in, out, null);
@@ -261,8 +263,16 @@ public class xMsgProxy {
             } catch (Exception e) {
                 LOGGER.severe(LogUtils.exceptionReporter(e));
             }  finally {
+                wrapper.close();
                 close();
             }
+        }
+
+        private ZContext wrapContext() {
+            ZContext c = new ZContext();
+            c.setContext(ctx);
+            c.setMain(false);
+            return c;
         }
 
         public void close() {
@@ -282,7 +292,7 @@ public class xMsgProxy {
         final Socket publisher;
         final Socket router;
 
-        final xMsgSocketFactory factory = new xMsgSocketFactory(ctx.getContext());
+        final xMsgSocketFactory factory = new xMsgSocketFactory(ctx);
 
         Controller() throws xMsgException {
             Socket control = null;
