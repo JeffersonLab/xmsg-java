@@ -1,7 +1,7 @@
 # xMsg
 
 xMsg is a lightweight, yet full featured publish/subscribe messaging system,
-presenting asynchronous publish/subscribe inter-process communication.
+presenting asynchronous inter-process communication.
 
 [![Build Status](https://travis-ci.org/JeffersonLab/xmsg-java.svg?branch=master)](https://travis-ci.org/JeffersonLab/xmsg-java)
 [![Javadoc](https://img.shields.io/badge/javadoc-2.3--SNAPSHOT-blue.svg?style=flat)](https://claraweb.jlab.org/xmsg/api/java/)
