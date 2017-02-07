@@ -98,7 +98,7 @@ public class xMsgProxy {
             int port = options.valueOf(portSpec);
             xMsgProxyAddress address = new xMsgProxyAddress(host, port);
 
-            xMsgProxy proxy = new xMsgProxy(xMsgContext.getInstance().getContext(), address);
+            xMsgProxy proxy = new xMsgProxy(xMsgContext.getInstance(), address);
             if (options.has("verbose")) {
                 proxy.verbose();
             }
@@ -133,22 +133,22 @@ public class xMsgProxy {
      * Construct a proxy that uses the localhost and
      * {@link org.jlab.coda.xmsg.core.xMsgConstants#DEFAULT_PORT default port}.
      *
-     * @param context a 0MQ context to handle the proxy sockets
+     * @param context the context to handle the proxy sockets
      * @throws xMsgException if the address is already in use
      */
-    public xMsgProxy(ZContext context) throws xMsgException {
+    public xMsgProxy(xMsgContext context) throws xMsgException {
         this(context, new xMsgProxyAddress());
     }
 
     /**
      * Construct the proxy with the given local address.
      *
-     * @param context a 0MQ context to handle the proxy sockets
+     * @param context the context to handle the proxy sockets
      * @param address the local address
      * @throws xMsgException if the address is already in use
      */
-    public xMsgProxy(ZContext context, xMsgProxyAddress address) throws xMsgException {
-        ctx = context;
+    public xMsgProxy(xMsgContext context, xMsgProxyAddress address) throws xMsgException {
+        ctx = context.getContext();
         addr = address;
 
         Proxy proxyTask = null;

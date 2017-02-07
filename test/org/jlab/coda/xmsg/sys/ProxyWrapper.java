@@ -35,7 +35,7 @@ public class ProxyWrapper implements AutoCloseable {
 
     public ProxyWrapper() {
         try {
-            proxy = new xMsgProxy(context.getContext());
+            proxy = new xMsgProxy(context);
             proxy.start();
             xMsgUtil.sleep(100);
         } catch (xMsgException e) {
