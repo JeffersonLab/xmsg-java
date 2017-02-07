@@ -34,10 +34,14 @@ import org.zeromq.ZMQ.Context;
  * This context is shared by all xMsg actors in the same JVM process,
  * and it must be destroyed at the end of the process,
  * after all actors have been destroyed.
+ * <p>
+ * New contexts can be created with {@link #newContext()},
+ * for cases when the global context cannot be used
+ * (i.e. the context should be destroyed before exiting the application)
  *
  * @since 2.x
  */
-public final class xMsgContext {
+public final class xMsgContext implements AutoCloseable {
 
     private static final xMsgContext ourInstance = new xMsgContext(); // NOT CONSTANT
 
@@ -54,6 +58,15 @@ public final class xMsgContext {
      */
     public static xMsgContext getInstance() {
         return ourInstance;
+    }
+
+    /**
+     * Creates a new xMsg context.
+     *
+     * @return the created xMsg context
+     */
+    public static xMsgContext newContext() {
+        return new xMsgContext();
     }
 
     /**
@@ -88,9 +101,18 @@ public final class xMsgContext {
 
     /**
      * Destroys the context.
-     * All connections and actors must be closed otherwise this will hang.
+     * All connections must be already closed otherwise this will hang.
      */
     public void destroy() {
         ctx.term();
+    }
+
+    /**
+     * Destroys the context.
+     * All connections must be already closed otherwise this will hang.
+     */
+    @Override
+    public void close() {
+        destroy();
     }
 }

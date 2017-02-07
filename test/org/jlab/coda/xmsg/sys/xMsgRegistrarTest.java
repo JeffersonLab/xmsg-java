@@ -31,13 +31,13 @@ import org.jlab.coda.xmsg.data.xMsgR.xMsgRegistration.Builder;
 import org.jlab.coda.xmsg.data.xMsgR.xMsgRegistration.OwnerType;
 import org.jlab.coda.xmsg.excp.xMsgException;
 import org.jlab.coda.xmsg.net.xMsgConnectionFactory;
+import org.jlab.coda.xmsg.net.xMsgContext;
 import org.jlab.coda.xmsg.net.xMsgRegAddress;
 import org.jlab.coda.xmsg.sys.regdis.RegistrationDataFactory;
 import org.jlab.coda.xmsg.sys.regdis.xMsgRegDriver;
 import org.jlab.coda.xmsg.testing.IntegrationTest;
 import org.junit.Test;
 import org.junit.experimental.categories.Category;
-import org.zeromq.ZContext;
 
 import java.util.HashSet;
 import java.util.Iterator;
@@ -59,11 +59,11 @@ public class xMsgRegistrarTest {
 
     @Test
     public void testRegistrationDataBase() throws Exception {
-        ZContext context = new ZContext();
+        xMsgContext context = xMsgContext.newContext();
         xMsgRegistrar registrar = null;
         try {
             try {
-                registrar = new xMsgRegistrar(context);
+                registrar = new xMsgRegistrar(context.getContext());
                 registrar.start();
             } catch (xMsgException e) {
                 System.err.println(e.getMessage());
