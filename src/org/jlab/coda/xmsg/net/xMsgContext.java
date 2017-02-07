@@ -22,7 +22,6 @@
 
 package org.jlab.coda.xmsg.net;
 
-import org.zeromq.ZContext;
 import org.zeromq.ZMQ;
 import org.zeromq.ZMQ.Context;
 
@@ -112,10 +111,8 @@ public final class xMsgContext implements AutoCloseable {
      *
      * @return the wrapped 0MQ context
      */
-    public ZContext getContext() {
-        ZContext context = new ZContext();
-        context.setContext(ctx);
-        return context;
+    public Context getContext() {
+        return ctx;
     }
 
     /**

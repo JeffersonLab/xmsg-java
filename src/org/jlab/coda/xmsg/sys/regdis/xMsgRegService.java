@@ -83,7 +83,7 @@ public class xMsgRegService implements Runnable {
      * @throws xMsgException if the address is already in use
      */
     public xMsgRegService(xMsgContext context, xMsgRegAddress address) throws xMsgException {
-        factory = new xMsgSocketFactory(context.getContext().getContext());
+        factory = new xMsgSocketFactory(context.getContext());
         regAddress = address;
         regSocket = factory.createSocket(ZMQ.REP);
         try {

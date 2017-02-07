@@ -149,7 +149,7 @@ public class xMsgProxy {
      * @throws xMsgException if the address is already in use
      */
     public xMsgProxy(xMsgContext context, xMsgProxyAddress address) throws xMsgException {
-        ctx = context.getContext().getContext();
+        ctx = context.getContext();
         addr = address;
 
         Proxy proxyTask = null;
