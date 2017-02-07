@@ -325,6 +325,99 @@ public class xMsgMessage {
 
 
     /**
+     * Deserializes data from the given message.
+     *
+     * @param message the message that contains the required data
+     * @return the deserialized data of the message
+     */
+    public static Object parseData(xMsgMessage message) {
+        try {
+            byte[] data = message.getData();
+            String dataType = message.getMimeType();
+
+            if (dataType.equals(xMsgMimeType.SFIXED32)) {
+                xMsgData xd = xMsgData.parseFrom(data);
+                if (xd.hasFLSINT32()) {
+                    return xd.getFLSINT32();
+                }
+
+            } else if (dataType.equals(xMsgMimeType.SFIXED64)) {
+                xMsgData xd = xMsgData.parseFrom(data);
+                if (xd.hasFLSINT64()) {
+                    return xd.getFLSINT64();
+                }
+
+            } else if (dataType.equals(xMsgMimeType.FLOAT)) {
+                xMsgData xd = xMsgData.parseFrom(data);
+                if (xd.hasFLOAT()) {
+                    return xd.getFLOAT();
+                }
+
+            } else if (dataType.equals(xMsgMimeType.DOUBLE)) {
+                xMsgData xd = xMsgData.parseFrom(data);
+                if (xd.hasDOUBLE()) {
+                    return xd.getDOUBLE();
+                }
+
+            } else if (dataType.equals(xMsgMimeType.STRING)) {
+                xMsgData xd = xMsgData.parseFrom(data);
+                if (xd.hasSTRING()) {
+                    return xd.getSTRING();
+                }
+
+            } else if (dataType.equals(xMsgMimeType.ARRAY_SFIXED32)) {
+                xMsgData xd = xMsgData.parseFrom(data);
+                List<Integer> list = xd.getFLSINT32AList();
+                if (!list.isEmpty()) {
+                    return list.toArray(new Integer[list.size()]);
+                }
+
+            } else if (dataType.equals(xMsgMimeType.ARRAY_SFIXED64)) {
+                xMsgData xd = xMsgData.parseFrom(data);
+                List<Long> list = xd.getFLSINT64AList();
+                if (!list.isEmpty()) {
+                    return list.toArray(new Long[list.size()]);
+                }
+
+            } else if (dataType.equals(xMsgMimeType.ARRAY_FLOAT)) {
+                xMsgData xd = xMsgData.parseFrom(data);
+                List<Float> list = xd.getFLOATAList();
+                if (!list.isEmpty()) {
+                    return list.toArray(new Float[list.size()]);
+                }
+
+            } else if (dataType.equals(xMsgMimeType.ARRAY_DOUBLE)) {
+                xMsgData xd = xMsgData.parseFrom(data);
+                List<Double> list = xd.getDOUBLEAList();
+                if (!list.isEmpty()) {
+                    return list.toArray(new Double[list.size()]);
+                }
+
+            } else if (dataType.equals(xMsgMimeType.ARRAY_STRING)) {
+                xMsgData xd = xMsgData.parseFrom(data);
+                List<String> list = xd.getSTRINGAList();
+                if (!list.isEmpty()) {
+                    return list.toArray(new String[list.size()]);
+                }
+
+            } else {
+                try {
+                    return xMsgUtil.deserialize(data);
+                } catch (ClassNotFoundException | IOException e) {
+                    throw new RuntimeException("Could not deserialize data", e);
+                }
+            }
+
+            throw new IllegalArgumentException("The message data doesn't match the mime-type:"
+                                               + dataType);
+
+        } catch (InvalidProtocolBufferException e) {
+            throw new IllegalArgumentException("Message doesn't contain a valid xMsg data buffer");
+        }
+    }
+
+
+    /**
      * Deserializes simple data from the given message.
      * Useful when the message was created with {@link #createFrom}.
      * The message should contain data of the given {@code dataType}.
@@ -425,17 +518,6 @@ public class xMsgMessage {
         } catch (InvalidProtocolBufferException e) {
             throw new IllegalArgumentException("Message doesn't contain a valid xMsg data buffer");
         }
-    }
-
-
-    /**
-     * Deserializes data from the given message as a Java Object.
-     *
-     * @param message the message that contains the required data
-     * @return the deserialized Object of the message
-     */
-    public static Object parseData(xMsgMessage message) {
-        return parseData(message, Object.class);
     }
 
 

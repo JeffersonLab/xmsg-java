@@ -44,22 +44,22 @@ public class xMsgMessageTest {
         xMsgMessage msg;
 
         msg = xMsgMessage.createFrom(testTopic, 460);
-        int ivalue = xMsgMessage.parseData(msg, Integer.class);
 
         assertThat(msg.getMimeType(), is(xMsgMimeType.SFIXED32));
-        assertThat(ivalue, is(460));
+        assertThat(xMsgMessage.parseData(msg), is(460));
+        assertThat(xMsgMessage.parseData(msg, Integer.class), is(460));
 
         msg = xMsgMessage.createFrom(testTopic, 2000.5);
-        double dvalue = xMsgMessage.parseData(msg, Double.class);
 
         assertThat(msg.getMimeType(), is(xMsgMimeType.DOUBLE));
-        assertThat(dvalue, is(2000.5));
+        assertThat(xMsgMessage.parseData(msg), is(2000.5));
+        assertThat(xMsgMessage.parseData(msg, Double.class), is(2000.5));
 
         msg = xMsgMessage.createFrom(testTopic, "test_data");
-        String svalue = xMsgMessage.parseData(msg, String.class);
 
         assertThat(msg.getMimeType(), is(xMsgMimeType.STRING));
-        assertThat(svalue, is("test_data"));
+        assertThat(xMsgMessage.parseData(msg), is("test_data"));
+        assertThat(xMsgMessage.parseData(msg, String.class), is("test_data"));
     }
 
     @Test
@@ -67,26 +67,28 @@ public class xMsgMessageTest {
         xMsgMessage msg;
 
         msg = xMsgMessage.createFrom(testTopic, new Integer[] { 3, 4, 5});
-        Integer[] ivalue = xMsgMessage.parseData(msg, Integer[].class);
+        Integer[] ivalue = new Integer[] { 3, 4, 5};
 
         assertThat(msg.getMimeType(), is(xMsgMimeType.ARRAY_SFIXED32));
-        assertThat(ivalue, is(new Integer[] { 3, 4, 5}));
+        assertThat(xMsgMessage.parseData(msg), is(ivalue));
+        assertThat(xMsgMessage.parseData(msg, Integer[].class), is(ivalue));
 
         msg = xMsgMessage.createFrom(testTopic, new Double[] { 300.2, 4000.7, 58.8});
-        Double[] dvalue = xMsgMessage.parseData(msg, Double[].class);
+        Double[] dvalue = new Double[] { 300.2, 4000.7, 58.8};
 
         assertThat(msg.getMimeType(), is(xMsgMimeType.ARRAY_DOUBLE));
-        assertThat(dvalue, is(new Double[] { 300.2, 4000.7, 58.8}));
+        assertThat(xMsgMessage.parseData(msg), is(dvalue));
+        assertThat(xMsgMessage.parseData(msg, Double[].class), is(dvalue));
 
         msg = xMsgMessage.createFrom(testTopic, new String[] { "test_data", "test_value" });
-        String[] svalue = xMsgMessage.parseData(msg, String[].class);
+        String[] svalue = new String[] { "test_data", "test_value" };
 
         assertThat(msg.getMimeType(), is(xMsgMimeType.ARRAY_STRING));
-        assertThat(svalue, is(new String[] { "test_data", "test_value" }));
+        assertThat(xMsgMessage.parseData(msg), is(svalue));
+        assertThat(xMsgMessage.parseData(msg, String[].class), is(svalue));
     }
 
     @Test
-    @SuppressWarnings("unchecked")
     public void createFromJavaObject() throws Exception {
         List<String> orig = Arrays.asList("led zeppelin", "pink floyd", "black sabbath");
 
@@ -94,8 +96,8 @@ public class xMsgMessageTest {
 
         assertThat(msg.getData(), is(xMsgUtil.serializeToBytes(orig)));
 
-        List<String> data = (List<String>) xMsgMessage.parseData(msg);
-        assertThat(data, is(orig));
+        assertThat(xMsgMessage.parseData(msg), is(orig));
+        assertThat(xMsgMessage.parseData(msg, Object.class), is(orig));
     }
 
     @Test

@@ -48,7 +48,7 @@ Async subscriber:
 xMsg actor = new xMsg("subscriber");
 xMsgTopic topic = xMsgTopic.build("report");
 xMsgSubscription sub = actor.subscribe(topic, msg -> {
-    System.out.println("Received: " + xMsgMessage.parseData(msg, String.class));
+    System.out.println("Received: " + xMsgMessage.parseData(msg));
 });
 // subscription runs in background until actor is destroyed
 ```
