@@ -70,12 +70,31 @@ public final class xMsgContext implements AutoCloseable {
     }
 
     /**
+     * Gets the size of the 0MQ thread pool to handle I/O operations.
+     *
+     * @return the number of I/O threads used by the context
+     */
+    public int getIOThreads() {
+        return ctx.getIOThreads();
+    }
+
+    /**
      * Set the size of the 0MQ thread pool to handle I/O operations.
      *
      * @param ioThreads the number of I/O threads
      */
     public void setIOThreads(int ioThreads) {
         ctx.setIOThreads(ioThreads);
+    }
+
+    /**
+     * Gets the maximum number of sockets allowed on the context.
+     *
+     * @return the maximum number of sockets that can be created
+     *         with the context
+     */
+    public int getMaxSockets() {
+        return ctx.getMaxSockets();
     }
 
     /**
