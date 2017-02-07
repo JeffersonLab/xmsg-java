@@ -41,6 +41,7 @@ import java.util.HashSet;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
+import java.util.concurrent.RejectedExecutionHandler;
 import java.util.concurrent.ThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
@@ -236,6 +237,7 @@ public class xMsg implements AutoCloseable {
 
         // create fixed size thread pool
         this.threadPool = xMsgUtil.newThreadPool(setup.poolSize(), name);
+        this.threadPool.setRejectedExecutionHandler(new RejectedCallbackHandler());
 
         // create the connection pool
         this.connectionManager = new ConnectionManager(factory, setup.connectionSetup());
@@ -837,5 +839,14 @@ public class xMsg implements AutoCloseable {
     private xMsgRegistration.Builder createRegistration(xMsgRegInfo info) {
         return xMsgRegFactory.newRegistration(myName, setup.proxyAddress(),
                                               info.type(), info.topic());
+    }
+
+
+    private final class RejectedCallbackHandler implements RejectedExecutionHandler {
+
+        @Override
+        public void rejectedExecution(Runnable r, ThreadPoolExecutor executor) {
+            System.err.println("Rejected callback execution for subscribed message.");
+        }
     }
 }
