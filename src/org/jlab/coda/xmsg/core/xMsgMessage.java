@@ -263,7 +263,11 @@ public class xMsgMessage {
         final String mimeType;
         xMsgData.Builder xd = xMsgData.newBuilder();
 
-        if (data instanceof Integer) {
+        if (data instanceof String) {
+            mimeType = xMsgMimeType.STRING;
+            xd.setSTRING((String) data);
+
+        } else if (data instanceof Integer) {
             mimeType = xMsgMimeType.SFIXED32;
             xd.setFLSINT32((Integer) data);
 
@@ -279,9 +283,9 @@ public class xMsgMessage {
             mimeType = xMsgMimeType.DOUBLE;
             xd.setDOUBLE((Double) data);
 
-        } else if (data instanceof String) {
-            mimeType = xMsgMimeType.STRING;
-            xd.setSTRING((String) data);
+        } else if (data instanceof String[]) {
+            mimeType = xMsgMimeType.ARRAY_STRING;
+            xd.addAllSTRINGA(Arrays.asList((String[]) data));
 
         } else if (data instanceof Integer[]) {
             mimeType = xMsgMimeType.ARRAY_SFIXED32;
@@ -298,10 +302,6 @@ public class xMsgMessage {
         } else if (data instanceof Double[]) {
             mimeType = xMsgMimeType.ARRAY_DOUBLE;
             xd.addAllDOUBLEA(Arrays.asList((Double[]) data));
-
-        } else if (data instanceof String[]) {
-            mimeType = xMsgMimeType.ARRAY_STRING;
-            xd.addAllSTRINGA(Arrays.asList((String[]) data));
 
         } else if (data instanceof byte[]) {
             mimeType = xMsgMimeType.BYTES;
@@ -337,7 +337,13 @@ public class xMsgMessage {
         try {
             byte[] data = message.getData();
 
-            if (dataType.equals(Integer.class)) {
+            if (dataType.equals(String.class)) {
+                xMsgData xd = xMsgData.parseFrom(data);
+                if (xd.hasSTRING()) {
+                    return dataType.cast(xd.getSTRING());
+                }
+
+            } else if (dataType.equals(Integer.class)) {
                 xMsgData xd = xMsgData.parseFrom(data);
                 if (xd.hasFLSINT32()) {
                     return dataType.cast(xd.getFLSINT32());
@@ -361,10 +367,12 @@ public class xMsgMessage {
                     return dataType.cast(xd.getDOUBLE());
                 }
 
-            } else if (dataType.equals(String.class)) {
+            } else if (dataType.equals(String[].class)) {
                 xMsgData xd = xMsgData.parseFrom(data);
-                if (xd.hasSTRING()) {
-                    return dataType.cast(xd.getSTRING());
+                List<String> list = xd.getSTRINGAList();
+                if (!list.isEmpty()) {
+                    String[] array = list.toArray(new String[list.size()]);
+                    return dataType.cast(array);
                 }
 
             } else if (dataType.equals(Integer[].class)) {
@@ -396,14 +404,6 @@ public class xMsgMessage {
                 List<Double> list = xd.getDOUBLEAList();
                 if (!list.isEmpty()) {
                     Double[] array = list.toArray(new Double[list.size()]);
-                    return dataType.cast(array);
-                }
-
-            } else if (dataType.equals(String[].class)) {
-                xMsgData xd = xMsgData.parseFrom(data);
-                List<String> list = xd.getSTRINGAList();
-                if (!list.isEmpty()) {
-                    String[] array = list.toArray(new String[list.size()]);
                     return dataType.cast(array);
                 }
 
