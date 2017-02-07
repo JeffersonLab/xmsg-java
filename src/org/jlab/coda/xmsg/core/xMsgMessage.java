@@ -326,11 +326,16 @@ public class xMsgMessage {
 
     /**
      * Deserializes simple data from the given message.
+     * Useful when the message was created with {@link #createFrom}.
+     * The message should contain data of the given {@code dataType}.
      *
-     * @param <T> the type of the data
+     * @param <T> the expected type of the data
      * @param message the message that contains the required data
      * @param dataType the type of the required data
-     * @return the deserialized data of the message
+     * @return the deserialized data of the message,
+     *         if the message contains data of the given type
+     * @throws IllegalArgumentException if the message does not contain data
+     *         of the expected type
      * @see xMsgMimeType
      */
     public static <T> T parseData(xMsgMessage message, Class<T> dataType) {
@@ -415,7 +420,7 @@ public class xMsgMessage {
                 }
             }
 
-            throw new IllegalArgumentException("Invalid data type: " + dataType);
+            throw new IllegalArgumentException("Message doesn't contain data of type: " + dataType);
 
         } catch (InvalidProtocolBufferException e) {
             throw new IllegalArgumentException("Message doesn't contain a valid xMsg data buffer");
