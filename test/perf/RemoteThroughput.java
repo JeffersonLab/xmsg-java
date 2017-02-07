@@ -61,7 +61,7 @@ public final class RemoteThroughput {
         }
 
         // wait until all messages are published
-        xMsgContext.destroyContext();
+        xMsgContext.getInstance().destroy();
         System.out.println("Done!");
     }
 

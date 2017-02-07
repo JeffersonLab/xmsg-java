@@ -81,7 +81,7 @@ public class xMsgRegistrar {
             int port = options.valueOf(portSpec);
             xMsgRegAddress address = new xMsgRegAddress("localhost", port);
 
-            xMsgRegistrar registrar = new xMsgRegistrar(xMsgContext.getContext(), address);
+            xMsgRegistrar registrar = new xMsgRegistrar(xMsgContext.getInstance().getContext(), address);
             if (options.has("verbose")) {
                 registrar.verbose();
             }
@@ -89,7 +89,7 @@ public class xMsgRegistrar {
             Runtime.getRuntime().addShutdownHook(new Thread() {
                 @Override
                 public void run() {
-                    xMsgContext.destroyContext();
+                    xMsgContext.getInstance().destroy();
                     registrar.shutdown();
                 }
             });

@@ -40,6 +40,15 @@ public class xMsgConnectionFactory {
     /**
      * Creates a new connection factory.
      *
+     * @param context the context to handle connections
+     */
+    public xMsgConnectionFactory(xMsgContext context) {
+        this(context.getContext());
+    }
+
+    /**
+     * Creates a new connection factory.
+     *
      * @param context the ZMQ context to be used by sockets
      */
     public xMsgConnectionFactory(ZContext context) {

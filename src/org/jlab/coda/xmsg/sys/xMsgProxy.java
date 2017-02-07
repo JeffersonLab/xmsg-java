@@ -98,7 +98,7 @@ public class xMsgProxy {
             int port = options.valueOf(portSpec);
             xMsgProxyAddress address = new xMsgProxyAddress(host, port);
 
-            xMsgProxy proxy = new xMsgProxy(xMsgContext.getContext(), address);
+            xMsgProxy proxy = new xMsgProxy(xMsgContext.getInstance().getContext(), address);
             if (options.has("verbose")) {
                 proxy.verbose();
             }
@@ -106,7 +106,7 @@ public class xMsgProxy {
             Runtime.getRuntime().addShutdownHook(new Thread() {
                 @Override
                 public void run() {
-                    xMsgContext.destroyContext();
+                    xMsgContext.getInstance().destroy();
                     proxy.shutdown();
                 }
             });
