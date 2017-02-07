@@ -32,7 +32,6 @@ import org.jlab.coda.xmsg.sys.regdis.xMsgRegService;
 import org.jlab.coda.xmsg.sys.util.Environment;
 import org.jlab.coda.xmsg.sys.util.LogUtils;
 import org.jlab.coda.xmsg.sys.util.ThreadUtils;
-import org.zeromq.ZContext;
 
 import java.io.PrintStream;
 import java.util.logging.Level;
@@ -81,7 +80,7 @@ public class xMsgRegistrar {
             int port = options.valueOf(portSpec);
             xMsgRegAddress address = new xMsgRegAddress("localhost", port);
 
-            xMsgRegistrar registrar = new xMsgRegistrar(xMsgContext.getInstance().getContext(), address);
+            xMsgRegistrar registrar = new xMsgRegistrar(xMsgContext.getInstance(), address);
             if (options.has("verbose")) {
                 registrar.verbose();
             }
@@ -113,21 +112,21 @@ public class xMsgRegistrar {
      * Constructs a registrar that uses the localhost and
      * {@link org.jlab.coda.xmsg.core.xMsgConstants#REGISTRAR_PORT default port}.
      *
-     * @param context a 0MQ context to handle the registrar sockets
+     * @param context the context to handle the registrar sockets
      * @throws xMsgException if the address is already in use
      */
-    public xMsgRegistrar(ZContext context) throws xMsgException {
+    public xMsgRegistrar(xMsgContext context) throws xMsgException {
         this(context, new xMsgRegAddress());
     }
 
     /**
      * Constructs a registrar that uses the specified address.
      *
-     * @param context a 0MQ context to handle the registrar sockets
+     * @param context the context to handle the registrar sockets
      * @param address the address of the registrar service
      * @throws xMsgException if the address is already in use
      */
-    public xMsgRegistrar(ZContext context, xMsgRegAddress address) throws xMsgException {
+    public xMsgRegistrar(xMsgContext context, xMsgRegAddress address) throws xMsgException {
         addr = address;
         registrar = ThreadUtils.newThread("registration-service",
                                           new xMsgRegService(context, address));

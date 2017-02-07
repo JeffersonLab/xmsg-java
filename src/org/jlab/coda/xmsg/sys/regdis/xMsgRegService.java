@@ -26,10 +26,10 @@ import com.google.protobuf.InvalidProtocolBufferException;
 import org.jlab.coda.xmsg.core.xMsgConstants;
 import org.jlab.coda.xmsg.data.xMsgR.xMsgRegistration;
 import org.jlab.coda.xmsg.excp.xMsgException;
+import org.jlab.coda.xmsg.net.xMsgContext;
 import org.jlab.coda.xmsg.net.xMsgRegAddress;
 import org.jlab.coda.xmsg.net.xMsgSocketFactory;
 import org.jlab.coda.xmsg.sys.util.LogUtils;
-import org.zeromq.ZContext;
 import org.zeromq.ZMQ;
 import org.zeromq.ZMQ.Socket;
 import org.zeromq.ZMQException;
@@ -81,10 +81,9 @@ public class xMsgRegService implements Runnable {
      * @param context the context to run the registrar service
      * @param address the address of the registrar service
      * @throws xMsgException if the address is already in use
-     * @see ZContext#shadow
      */
-    public xMsgRegService(ZContext context, xMsgRegAddress address) throws xMsgException {
-        factory = new xMsgSocketFactory(context.getContext());
+    public xMsgRegService(xMsgContext context, xMsgRegAddress address) throws xMsgException {
+        factory = new xMsgSocketFactory(context.getContext().getContext());
         regAddress = address;
         regSocket = factory.createSocket(ZMQ.REP);
         try {

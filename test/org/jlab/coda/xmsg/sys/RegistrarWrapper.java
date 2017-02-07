@@ -35,7 +35,7 @@ public class RegistrarWrapper implements AutoCloseable {
 
     public RegistrarWrapper() {
         try {
-            registrar = new xMsgRegistrar(context.getContext());
+            registrar = new xMsgRegistrar(context);
             registrar.start();
             xMsgUtil.sleep(100);
         } catch (xMsgException e) {

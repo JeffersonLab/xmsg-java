@@ -63,7 +63,7 @@ public class xMsgRegistrarTest {
         xMsgRegistrar registrar = null;
         try {
             try {
-                registrar = new xMsgRegistrar(context.getContext());
+                registrar = new xMsgRegistrar(context);
                 registrar.start();
             } catch (xMsgException e) {
                 System.err.println(e.getMessage());
