@@ -23,6 +23,7 @@
 package org.jlab.coda.xmsg.core;
 
 import org.jlab.coda.xmsg.excp.xMsgException;
+import org.jlab.coda.xmsg.net.xMsgProxyAddress;
 import org.jlab.coda.xmsg.sys.pubsub.xMsgConnectionSetup;
 import org.jlab.coda.xmsg.sys.pubsub.xMsgPoller;
 import org.jlab.coda.xmsg.sys.pubsub.xMsgProxyDriver;
@@ -166,6 +167,24 @@ public abstract class xMsgSubscription {
     }
 
     /**
+     * Gets the address of the proxy used by the subscription.
+     *
+     * @return the address of the proxy
+     */
+    public xMsgProxyAddress getAddress() {
+        return connection.getAddress();
+    }
+
+    /**
+     * Gets the set of subscribed topics of interest.
+     *
+     * @return the subscribed topics
+     */
+    public Set<xMsgTopic> getTopics() {
+        return topics.stream().map(xMsgTopic::wrap).collect(Collectors.toSet());
+    }
+
+    /**
      * Indicates if the subscription thread is running.
      *
      * @return true if the subscription is running, false otherwise
@@ -174,12 +193,7 @@ public abstract class xMsgSubscription {
         return thread.isAlive();
     }
 
-    /**
-     * Returns the name of this subscription.
-     *
-     * @return the unique name of the subscription
-     */
-    public String getName() {
+    String getName() {
         return name;
     }
 }
