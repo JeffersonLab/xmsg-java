@@ -27,7 +27,6 @@ import org.jlab.coda.xmsg.excp.xMsgException;
 import org.jlab.coda.xmsg.sys.pubsub.xMsgConnectionSetup;
 import org.jlab.coda.xmsg.sys.pubsub.xMsgProxyDriver;
 import org.jlab.coda.xmsg.sys.regdis.xMsgRegDriver;
-import org.zeromq.ZContext;
 import org.zeromq.ZMQException;
 
 /**
@@ -40,9 +39,9 @@ public class xMsgConnectionFactory {
     /**
      * Creates a new connection factory.
      *
-     * @param context the ZMQ context to be used by sockets
+     * @param context the context to handle connections
      */
-    public xMsgConnectionFactory(ZContext context) {
+    public xMsgConnectionFactory(xMsgContext context) {
         this.factory = new xMsgSocketFactory(context.getContext());
     }
 

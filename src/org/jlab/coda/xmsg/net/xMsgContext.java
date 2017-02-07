@@ -22,37 +22,59 @@
 
 package org.jlab.coda.xmsg.net;
 
-import org.zeromq.ZContext;
+import org.zeromq.ZMQ;
+import org.zeromq.ZMQ.Context;
 
 
 /**
- * Singleton class that provides unique
- * {@link org.zeromq.ZContext 0MQ contex} for entire JVM process.
+ * A wrapper over a 0MQ context to handle connection sockets.
+ * <p>
+ * A global singleton can be obtained with {@link #getInstance()}.
+ * This context is shared by all xMsg actors in the same JVM process,
+ * and it must be destroyed at the end of the process,
+ * after all actors have been destroyed.
+ * <p>
+ * New contexts can be created with {@link #newContext()},
+ * for cases when the global context cannot be used
+ * (i.e. the context should be destroyed before exiting the application)
  *
  * @since 2.x
  */
-public final class xMsgContext {
+public final class xMsgContext implements AutoCloseable {
 
     private static final xMsgContext ourInstance = new xMsgContext(); // NOT CONSTANT
-    private static final Object lock = new Object(); // NOT CONSTANT
 
-    private final ZContext context;
+    private final Context ctx;
 
     private xMsgContext() {
-        context = new ZContext();
+        ctx = ZMQ.context(1);
     }
 
-    private static xMsgContext getInstance() {
+    /**
+     * Returns the global singleton context.
+     *
+     * @return the global xMsg context
+     */
+    public static xMsgContext getInstance() {
         return ourInstance;
     }
 
     /**
-     * Returns the global singleton 0MQ context.
+     * Creates a new xMsg context.
      *
-     * @return the global 0MQ context
+     * @return the created xMsg context
      */
-    public static ZContext getContext() {
-        return getInstance().context;
+    public static xMsgContext newContext() {
+        return new xMsgContext();
+    }
+
+    /**
+     * Gets the size of the 0MQ thread pool to handle I/O operations.
+     *
+     * @return the number of I/O threads used by the context
+     */
+    public int getIOThreads() {
+        return ctx.getIOThreads();
     }
 
     /**
@@ -60,8 +82,18 @@ public final class xMsgContext {
      *
      * @param ioThreads the number of I/O threads
      */
-    public static void setIOThreads(int ioThreads) {
-        ourInstance.context.getContext().setIOThreads(ioThreads);
+    public void setIOThreads(int ioThreads) {
+        ctx.setIOThreads(ioThreads);
+    }
+
+    /**
+     * Gets the maximum number of sockets allowed on the context.
+     *
+     * @return the maximum number of sockets that can be created
+     *         with the context
+     */
+    public int getMaxSockets() {
+        return ctx.getMaxSockets();
     }
 
     /**
@@ -70,17 +102,33 @@ public final class xMsgContext {
      * @param maxSockets the maximum number of sockets that can be created
      *        with the context
      */
-    public static void setMaxSockets(int maxSockets) {
-        ourInstance.context.getContext().setMaxSockets(maxSockets);
+    public void setMaxSockets(int maxSockets) {
+        ctx.setMaxSockets(maxSockets);
     }
 
     /**
-     * Destroys the global singleton 0MQ context.
-     * All connections and actors must be closed otherwise this will hang.
+     * Returns the internal wrapped 0MQ context.
+     *
+     * @return the wrapped 0MQ context
      */
-    public static void destroyContext() {
-        synchronized (lock) {
-            ourInstance.context.destroy();
-        }
+    public Context getContext() {
+        return ctx;
+    }
+
+    /**
+     * Destroys the context.
+     * All connections must be already closed otherwise this will hang.
+     */
+    public void destroy() {
+        ctx.term();
+    }
+
+    /**
+     * Destroys the context.
+     * All connections must be already closed otherwise this will hang.
+     */
+    @Override
+    public void close() {
+        destroy();
     }
 }

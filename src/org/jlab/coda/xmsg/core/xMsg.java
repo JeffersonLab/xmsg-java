@@ -216,7 +216,7 @@ public class xMsg implements AutoCloseable {
      * @param setup the setup of this actor
      */
     public xMsg(String name, xMsgSetup setup) {
-        this(name, setup, new xMsgConnectionFactory(xMsgContext.getContext()));
+        this(name, setup, new xMsgConnectionFactory(xMsgContext.getInstance()));
     }
 
     /**

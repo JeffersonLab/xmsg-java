@@ -43,7 +43,7 @@ public final class xMsgConnectionPool implements Closeable {
          */
         public xMsgConnectionPool build() {
             ConnectionSetup setup = new ConnectionSetup(proxyAddress, conSetup.build());
-            xMsgConnectionFactory factory = new xMsgConnectionFactory(xMsgContext.getContext());
+            xMsgConnectionFactory factory = new xMsgConnectionFactory(xMsgContext.getInstance());
             return new xMsgConnectionPool(setup, factory);
         }
     }
