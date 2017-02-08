@@ -65,12 +65,16 @@ class ConnectionManager {
         return factory.createSubscriberConnection(address, proxySetup);
     }
 
+    xMsgProxyDriver createProxyConnection(xMsgProxyAddress address) throws xMsgException {
+        return factory.createPublisherConnection(address, proxySetup);
+    }
+
     xMsgProxyDriver getProxyConnection(xMsgProxyAddress address) throws xMsgException {
         xMsgProxyDriver cachedConnection = proxyConnections.getConnection(address);
         if (cachedConnection != null) {
             return cachedConnection;
         }
-        return factory.createPublisherConnection(address, proxySetup);
+        return createProxyConnection(address);
     }
 
     void releaseProxyConnection(xMsgProxyDriver connection) {

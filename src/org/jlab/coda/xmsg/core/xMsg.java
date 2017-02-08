@@ -286,6 +286,10 @@ public class xMsg implements AutoCloseable {
     /**
      * Obtains a connection to the default proxy.
      * If there is no available connection, a new one will be created.
+     * <p>
+     * Creating new connections takes some time, and the first published
+     * messages may be lost. The {@link #cacheConnection()} method can be used
+     * to create connections before using them .
      *
      * @return a connection to the proxy
      * @throws xMsgException if a new connection could not be created
@@ -297,6 +301,10 @@ public class xMsg implements AutoCloseable {
     /**
      * Obtains a connection to the specified proxy.
      * If there is no available connection, a new one will be created.
+     * <p>
+     * Creating new connections takes some time, and the first published
+     * messages may be lost. The {@link #cacheConnection(xMsgProxyAddress)}
+     * method can be used to create connections before using them .
      *
      * @param address the address of the proxy
      * @return a connection to the proxy
@@ -305,6 +313,32 @@ public class xMsg implements AutoCloseable {
     public xMsgConnection getConnection(xMsgProxyAddress address) throws xMsgException {
         return new xMsgConnection(connectionManager,
                                   connectionManager.getProxyConnection(address));
+    }
+
+    /**
+     * Creates and stores a connection to the default proxy in the internal
+     * connection pool.
+     * Useful to ensure that there is a connection ready when {@link
+     * #getConnection()} is called.
+     *
+     * @throws xMsgException if the new connection could not be created
+     */
+    public void cacheConnection() throws xMsgException {
+        cacheConnection(setup.proxyAddress());
+    }
+
+    /**
+     * Creates and stores a connection to the specified proxy in the internal
+     * connection pool.
+     * Useful to ensure that there is a connection ready when {@link
+     * #getConnection(xMsgProxyAddress)} is called.
+     *
+     * @param address the address of the proxy
+     * @throws xMsgException if the new connection could not be created
+     */
+    public void cacheConnection(xMsgProxyAddress address) throws xMsgException {
+        xMsgProxyDriver driver = connectionManager.createProxyConnection(address);
+        connectionManager.releaseProxyConnection(driver);
     }
 
     /**
