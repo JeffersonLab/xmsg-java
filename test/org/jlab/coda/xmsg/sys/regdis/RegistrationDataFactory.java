@@ -49,12 +49,12 @@ public final class RegistrationDataFactory {
         "actor:drama:movies",
         "actor:drama:series",
     };
-    public static String[] testNames = { "A", "B", "C", "D", "E",
-                                         "F", "G", "H", "I", "J",
-                                         "K", "L", "M", "N", "O",
-                                         "P", "Q", "R", "S", "T",
-                                         "U", "V", "W", "X", "Y",
-                                         "Z" };
+    public static String[] testNames = {"A", "B", "C", "D", "E",
+                                        "F", "G", "H", "I", "J",
+                                        "K", "L", "M", "N", "O",
+                                        "P", "Q", "R", "S", "T",
+                                        "U", "V", "W", "X", "Y",
+                                        "Z"};
     public static String[] testHosts = {
         "10.2.9.50",  "10.2.9.60",
         "10.2.9.51",  "10.2.9.61",

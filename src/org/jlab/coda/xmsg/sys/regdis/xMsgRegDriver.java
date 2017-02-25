@@ -87,8 +87,8 @@ public class xMsgRegDriver {
         try {
             requestMsg.send(socket);
         } catch (ZMQException e) {
-            throw new xMsgException("xMsg-Error: sending registration message. " +
-                    e.getMessage(), e.getCause());
+            throw new xMsgException("xMsg-Error: sending registration message. " + e.getMessage(),
+                                    e.getCause());
         }
 
         ZMQ.PollItem[] items = {new ZMQ.PollItem(socket, ZMQ.Poller.POLLIN)};

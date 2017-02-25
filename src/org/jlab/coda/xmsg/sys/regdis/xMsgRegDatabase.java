@@ -85,8 +85,8 @@ class xMsgRegDatabase {
             Set<xMsgRegistration> set = map.get(key);
             for (Iterator<xMsgRegistration> i = set.iterator(); i.hasNext();) {
                 xMsgRegistration r = i.next();
-                if (r.getName().equals(regData.getName()) &&
-                        r.getHost().equals(regData.getHost())) {
+                if (r.getName().equals(regData.getName())
+                        && r.getHost().equals(regData.getHost())) {
                     i.remove();
                 }
             }

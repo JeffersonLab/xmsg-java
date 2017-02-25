@@ -66,22 +66,22 @@ public class xMsgMessageTest {
     public void createFromArray() throws Exception {
         xMsgMessage msg;
 
-        msg = xMsgMessage.createFrom(testTopic, new Integer[] { 3, 4, 5});
-        Integer[] ivalue = new Integer[] { 3, 4, 5};
+        msg = xMsgMessage.createFrom(testTopic, new Integer[] {3, 4, 5});
+        Integer[] ivalue = new Integer[] {3, 4, 5};
 
         assertThat(msg.getMimeType(), is(xMsgMimeType.ARRAY_SFIXED32));
         assertThat(xMsgMessage.parseData(msg), is(ivalue));
         assertThat(xMsgMessage.parseData(msg, Integer[].class), is(ivalue));
 
-        msg = xMsgMessage.createFrom(testTopic, new Double[] { 300.2, 4000.7, 58.8});
-        Double[] dvalue = new Double[] { 300.2, 4000.7, 58.8};
+        msg = xMsgMessage.createFrom(testTopic, new Double[] {300.2, 4000.7, 58.8});
+        Double[] dvalue = new Double[] {300.2, 4000.7, 58.8};
 
         assertThat(msg.getMimeType(), is(xMsgMimeType.ARRAY_DOUBLE));
         assertThat(xMsgMessage.parseData(msg), is(dvalue));
         assertThat(xMsgMessage.parseData(msg, Double[].class), is(dvalue));
 
-        msg = xMsgMessage.createFrom(testTopic, new String[] { "test_data", "test_value" });
-        String[] svalue = new String[] { "test_data", "test_value" };
+        msg = xMsgMessage.createFrom(testTopic, new String[] {"test_data", "test_value" });
+        String[] svalue = new String[] {"test_data", "test_value" };
 
         assertThat(msg.getMimeType(), is(xMsgMimeType.ARRAY_STRING));
         assertThat(xMsgMessage.parseData(msg), is(svalue));
@@ -102,7 +102,7 @@ public class xMsgMessageTest {
 
     @Test
     public void createWithoutByteOrder() throws Exception {
-        byte[] data = new byte[] { 0x0, 0x1, 0x2, 0x3, 0xa, 0xb };
+        byte[] data = new byte[] {0x0, 0x1, 0x2, 0x3, 0xa, 0xb};
         xMsgMeta.Builder meta = xMsgMeta.newBuilder();
         meta.setDataType("test/binary");
 
@@ -114,7 +114,7 @@ public class xMsgMessageTest {
 
     @Test
     public void createAndSetByteOrder() throws Exception {
-        byte[] data = new byte[] { 0x0, 0x1, 0x2, 0x3, 0xa, 0xb };
+        byte[] data = new byte[] {0x0, 0x1, 0x2, 0x3, 0xa, 0xb};
         xMsgMeta.Builder meta = xMsgMeta.newBuilder();
         meta.setByteOrder(xMsgMeta.Endian.Little);
         meta.setDataType("test/binary");
@@ -127,7 +127,7 @@ public class xMsgMessageTest {
 
     @Test
     public void createSimpleResponse() throws Exception {
-        byte[] data = new byte[] { 0x0, 0x1, 0x2, 0x3, 0xa, 0xb };
+        byte[] data = new byte[] {0x0, 0x1, 0x2, 0x3, 0xa, 0xb};
         xMsgMeta.Builder meta = xMsgMeta.newBuilder();
         meta.setReplyTo("return_123");
         meta.setDataType("test/binary");
@@ -143,7 +143,7 @@ public class xMsgMessageTest {
 
     @Test
     public void createDataResponse() throws Exception {
-        byte[] data = new byte[] { 0x0, 0x1, 0x2, 0x3, 0xa, 0xb };
+        byte[] data = new byte[] {0x0, 0x1, 0x2, 0x3, 0xa, 0xb};
         xMsgMeta.Builder meta = xMsgMeta.newBuilder();
         meta.setReplyTo("return_123");
         meta.setDataType("test/binary");
