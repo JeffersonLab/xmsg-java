@@ -144,7 +144,7 @@ public class PublishersTest {
                     } catch (Exception e) {
                         e.printStackTrace();
                     } finally {
-                        if (actor != pubActor && actor != null) {
+                        if (actor != pubActor) {
                             actor.destroy();
                         }
                     }
