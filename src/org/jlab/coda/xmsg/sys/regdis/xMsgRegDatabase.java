@@ -54,11 +54,8 @@ class xMsgRegDatabase {
      * @param regData the description of the actor
      */
     public void register(xMsgRegistration regData) {
-        ConcurrentMap<xMsgTopic, Set<xMsgRegistration>> map = db.get(regData.getDomain());
-        if (map == null) {
-            map = new ConcurrentHashMap<>();
-            db.put(regData.getDomain(), map);
-        }
+        ConcurrentMap<xMsgTopic, Set<xMsgRegistration>> map =
+                db.computeIfAbsent(regData.getDomain(), k -> new ConcurrentHashMap<>());
         xMsgTopic key = generateKey(regData);
         if (map.containsKey(key)) {
             map.get(key).add(regData);
@@ -83,13 +80,8 @@ class xMsgRegDatabase {
         xMsgTopic key = generateKey(regData);
         if (map.containsKey(key)) {
             Set<xMsgRegistration> set = map.get(key);
-            for (Iterator<xMsgRegistration> i = set.iterator(); i.hasNext();) {
-                xMsgRegistration r = i.next();
-                if (r.getName().equals(regData.getName())
-                        && r.getHost().equals(regData.getHost())) {
-                    i.remove();
-                }
-            }
+            set.removeIf(r -> r.getName().equals(regData.getName())
+                           && r.getHost().equals(regData.getHost()));
             if (set.isEmpty()) {
                 map.remove(key);
             }
@@ -109,13 +101,7 @@ class xMsgRegDatabase {
             Iterator<Entry<xMsgTopic, Set<xMsgRegistration>>> dbIt = map.entrySet().iterator();
             while (dbIt.hasNext()) {
                 Entry<xMsgTopic, Set<xMsgRegistration>> dbEntry = dbIt.next();
-                Iterator<xMsgRegistration> regIt = dbEntry.getValue().iterator();
-                while (regIt.hasNext()) {
-                    xMsgRegistration reg = regIt.next();
-                    if (reg.getHost().equals(host)) {
-                        regIt.remove();
-                    }
-                }
+                dbEntry.getValue().removeIf(reg -> reg.getHost().equals(host));
                 if (dbEntry.getValue().isEmpty()) {
                     dbIt.remove();
                 }
