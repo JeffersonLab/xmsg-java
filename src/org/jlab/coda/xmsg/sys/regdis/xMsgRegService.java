@@ -240,19 +240,15 @@ public class xMsgRegService implements Runnable {
 
 
     private void logRegistration(String action, String type, xMsgRegistration data) {
-        LOGGER.fine(() -> {
-            return String.format("%s %s name = %s  host = %s  port = %d  topic = %s:%s:%s",
-                    action, type, data.getName(),
-                    data.getHost(), data.getPort(),
-                    data.getDomain(), data.getSubject(), data.getType());
-        });
+        LOGGER.fine(() -> String.format("%s %s name = %s  host = %s  port = %d  topic = %s:%s:%s",
+                action, type, data.getName(),
+                data.getHost(), data.getPort(),
+                data.getDomain(), data.getSubject(), data.getType()));
     }
 
     private void logDiscovery(String type, xMsgRegistration data) {
-        LOGGER.fine(() -> {
-            return String.format("search %s topic = %s:%s:%s",
-                    type, data.getDomain(), data.getSubject(), data.getType());
-        });
+        LOGGER.fine(() -> String.format("search %s topic = %s:%s:%s",
+                type, data.getDomain(), data.getSubject(), data.getType()));
     }
 
     private void logFilter(String type, xMsgRegistration data) {

@@ -85,13 +85,10 @@ public class xMsgRegistrar {
                 registrar.verbose();
             }
 
-            Runtime.getRuntime().addShutdownHook(new Thread() {
-                @Override
-                public void run() {
-                    xMsgContext.getInstance().destroy();
-                    registrar.shutdown();
-                }
-            });
+            Runtime.getRuntime().addShutdownHook(new Thread(() -> {
+                xMsgContext.getInstance().destroy();
+                registrar.shutdown();
+            }));
 
             registrar.start();
 

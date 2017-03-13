@@ -104,13 +104,10 @@ public class xMsgProxy {
                 proxy.verbose();
             }
 
-            Runtime.getRuntime().addShutdownHook(new Thread() {
-                @Override
-                public void run() {
-                    xMsgContext.getInstance().destroy();
-                    proxy.shutdown();
-                }
-            });
+            Runtime.getRuntime().addShutdownHook(new Thread(() -> {
+                xMsgContext.getInstance().destroy();
+                proxy.shutdown();
+            }));
 
             proxy.start();
 
