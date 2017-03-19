@@ -1,10 +1,10 @@
 Instructions to run simple publisher and subscriber example.
-- start xMsg node   : jx_node
-- start a publisher : jx_publisher
-- start a subscriber: jx_subscriber
+- start xMsg proxy:     jx_proxy
+- start a publisher:    jx_publisher
+- start a subscriber:   jx_subscriber
 
 Instructions to run sync_publisher and a subscriber example.
-- start xMsg node   : jx_node
-- start a subscriber: js_subscriber
+- start xMsg proxy:     jx_proxy
+- start a subscriber:   js_subscriber
 - start sync publisher: jx_sync_publisher
 
