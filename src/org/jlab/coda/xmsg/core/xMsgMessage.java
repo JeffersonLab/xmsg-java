@@ -335,7 +335,13 @@ public class xMsgMessage {
             byte[] data = message.getData();
             String dataType = message.getMimeType();
 
-            if (dataType.equals(xMsgMimeType.SFIXED32)) {
+            if (dataType.equals(xMsgMimeType.STRING)) {
+                xMsgData xd = xMsgData.parseFrom(data);
+                if (xd.hasSTRING()) {
+                    return xd.getSTRING();
+                }
+
+            } else if (dataType.equals(xMsgMimeType.SFIXED32)) {
                 xMsgData xd = xMsgData.parseFrom(data);
                 if (xd.hasFLSINT32()) {
                     return xd.getFLSINT32();
@@ -359,10 +365,11 @@ public class xMsgMessage {
                     return xd.getDOUBLE();
                 }
 
-            } else if (dataType.equals(xMsgMimeType.STRING)) {
+            } else if (dataType.equals(xMsgMimeType.ARRAY_STRING)) {
                 xMsgData xd = xMsgData.parseFrom(data);
-                if (xd.hasSTRING()) {
-                    return xd.getSTRING();
+                List<String> list = xd.getSTRINGAList();
+                if (!list.isEmpty()) {
+                    return list.toArray(new String[list.size()]);
                 }
 
             } else if (dataType.equals(xMsgMimeType.ARRAY_SFIXED32)) {
@@ -391,13 +398,6 @@ public class xMsgMessage {
                 List<Double> list = xd.getDOUBLEAList();
                 if (!list.isEmpty()) {
                     return list.toArray(new Double[list.size()]);
-                }
-
-            } else if (dataType.equals(xMsgMimeType.ARRAY_STRING)) {
-                xMsgData xd = xMsgData.parseFrom(data);
-                List<String> list = xd.getSTRINGAList();
-                if (!list.isEmpty()) {
-                    return list.toArray(new String[list.size()]);
                 }
 
             } else {
