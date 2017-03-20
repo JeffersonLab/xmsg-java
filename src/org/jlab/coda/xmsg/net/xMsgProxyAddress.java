@@ -71,7 +71,7 @@ public class xMsgProxyAddress {
             if (host == null) {
                 throw new IllegalArgumentException("Null IP address");
             }
-            if (port <= 1023) {
+            if (port <= 0) {
                 throw new IllegalArgumentException("Illegal port: " + port);
             }
             this.host = xMsgUtil.toHostAddress(host);
