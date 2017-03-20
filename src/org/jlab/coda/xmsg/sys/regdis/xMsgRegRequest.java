@@ -76,7 +76,7 @@ class xMsgRegRequest {
     xMsgRegRequest(ZMsg msg) throws xMsgException {
 
         if (msg.size() != 3) {
-            throw new xMsgException("xMsg-Error: registration message format violation");
+            throw new xMsgException("invalid registrar server request format");
         }
 
         ZFrame topicFrame = msg.pop();

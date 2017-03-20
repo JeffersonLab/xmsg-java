@@ -74,13 +74,13 @@ public class xMsgConnection implements Closeable {
 
     void publish(xMsgMessage msg) throws xMsgException {
         if (connection == null) {
-            throw new IllegalStateException("Connection is closed");
+            throw new IllegalStateException("connection is closed");
         }
         try {
             connection.send(msg.serialize());
         } catch (ZMQException e) {
             destroy();
-            throw new xMsgException("Could not publish message", e);
+            throw new xMsgException("could not publish message", e);
         }
     }
 
@@ -91,7 +91,7 @@ public class xMsgConnection implements Closeable {
      */
     public xMsgProxyAddress getAddress() {
         if (connection == null) {
-            throw new IllegalStateException("Connection is closed");
+            throw new IllegalStateException("connection is closed");
         }
         return connection.getAddress();
     }

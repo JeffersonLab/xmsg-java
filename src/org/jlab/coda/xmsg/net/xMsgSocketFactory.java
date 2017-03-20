@@ -60,7 +60,8 @@ public class xMsgSocketFactory {
             socket.setSndHWM(0);
             return socket;
         } catch (IllegalStateException e) {
-            throw new xMsgException("Reached maximum number of sockets");
+            int maxSockets = xMsgContext.getInstance().getMaxSockets();
+            throw new xMsgException("reached maximum number of sockets: " + maxSockets);
         }
     }
 
@@ -76,7 +77,7 @@ public class xMsgSocketFactory {
             socket.bind("tcp://*:" + port);
         } catch (ZMQException e) {
             if (e.getErrorCode() == ZMQ.Error.EADDRINUSE.getCode()) {
-                throw new xMsgException("Could not bind to port " + port);
+                throw new xMsgException("could not bind to port " + port);
             }
             throw e;
         }
@@ -95,7 +96,7 @@ public class xMsgSocketFactory {
             socket.connect("tcp://" + host + ":" + port);
         } catch (ZMQException e) {
             if (e.getErrorCode() == ZMQ.Error.EMTHREAD.getCode()) {
-                throw new xMsgException("No I/O thread available", e);
+                throw new xMsgException("no I/O thread available", e);
             }
         }
     }

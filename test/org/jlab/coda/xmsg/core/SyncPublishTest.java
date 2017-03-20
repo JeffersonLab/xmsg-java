@@ -107,7 +107,7 @@ public final class SyncPublishTest {
             Set<xMsgRegRecord> listeners = actor.discover(query);
             int numListeners = listeners.size();
             if (numListeners == 0) {
-                throw new RuntimeException("No subscribers registered on" + regAddress);
+                throw new RuntimeException("no subscribers registered on" + regAddress);
             }
 
             Result results = new Result(cores, numListeners, numMessages);

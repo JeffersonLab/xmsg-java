@@ -191,7 +191,7 @@ public final class xMsgUtil {
                 if (loopback != null) {
                     ips.add(loopback.getHostAddress());
                 } else {
-                    throw new IOException("No IPv4 address found");
+                    throw new IOException("no IPv4 address found");
                 }
             }
 
@@ -255,10 +255,10 @@ public final class xMsgUtil {
      */
     public static String validateIP(String address) {
         if (address == null) {
-            throw new IllegalArgumentException("Null IP address");
+            throw new IllegalArgumentException("null IP address");
         }
         if (!isIP(address)) {
-            throw new IllegalArgumentException("Invalid IP address: " + address);
+            throw new IllegalArgumentException("invalid IP address: " + address);
         }
         return address;
     }

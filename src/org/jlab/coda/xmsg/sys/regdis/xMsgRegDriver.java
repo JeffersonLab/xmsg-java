@@ -87,8 +87,7 @@ public class xMsgRegDriver {
         try {
             requestMsg.send(socket);
         } catch (ZMQException e) {
-            throw new xMsgException("xMsg-Error: sending registration message. " + e.getMessage(),
-                                    e.getCause());
+            throw new xMsgException("could not send registration request", e);
         }
 
         ZMQ.PollItem[] items = {new ZMQ.PollItem(socket, ZMQ.Poller.POLLIN)};
@@ -97,11 +96,11 @@ public class xMsgRegDriver {
             xMsgRegResponse response = new xMsgRegResponse(ZMsg.recvMsg(socket));
             String status = response.status();
             if (!status.equals(xMsgRegConstants.SUCCESS)) {
-                throw new xMsgException("xMsg-Error: unsuccessful registration: " + status);
+                throw new xMsgException("registrar server could not process request: " + status);
             }
             return response;
         } else {
-            throw new xMsgException("xMsg-Error: Actor registration timeout");
+            throw new xMsgException("registrar server response timeout");
         }
     }
 
@@ -412,7 +411,7 @@ public class xMsgRegDriver {
         switch (type) {
             case PUBLISHER: return pubTopic;
             case SUBSCRIBER: return subTopic;
-            default: throw new RuntimeException("Invalid registration owner-type: " + type);
+            default: throw new RuntimeException("invalid registration owner-type: " + type);
         }
     }
 }

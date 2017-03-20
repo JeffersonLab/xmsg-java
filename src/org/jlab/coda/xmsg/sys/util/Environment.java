@@ -35,11 +35,11 @@ public final class Environment {
         try {
             long timeout = Long.parseLong(value);
             if (timeout < 0) {
-                throw new IllegalArgumentException("Invalid value " + var + "=" + value);
+                throw new IllegalArgumentException("invalid value " + var + "=" + value);
             }
             return timeout;
         } catch (NumberFormatException e) {
-            throw new IllegalArgumentException("Invalid value " + var + "=" + value);
+            throw new IllegalArgumentException("invalid value " + var + "=" + value);
         }
     }
 

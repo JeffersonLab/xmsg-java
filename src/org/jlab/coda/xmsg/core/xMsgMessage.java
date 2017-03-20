@@ -114,7 +114,7 @@ public class xMsgMessage {
     xMsgMessage(ZMsg msg) throws xMsgException {
 
         if (msg.size() != 3) {
-            throw new xMsgException("xMsg-Error: invalid pub/sub message format");
+            throw new xMsgException("invalid pub/sub message format");
         }
 
         ZFrame topicFrame = msg.pop();
@@ -127,7 +127,7 @@ public class xMsgMessage {
             this.metaData = metaDataObj.toBuilder();
             this.data = dataFrame.getData();
         } catch (InvalidProtocolBufferException e) {
-            throw new xMsgException("xMsg-Error: Could not parse metadata", e);
+            throw new xMsgException("could not parse metadata", e);
         }
     }
 
@@ -218,7 +218,7 @@ public class xMsgMessage {
             case Little:
                 return ByteOrder.LITTLE_ENDIAN;
             default:
-                throw new RuntimeException("Invalide byte order: " + metaData.getByteOrder());
+                throw new RuntimeException("invalid byte order: " + metaData.getByteOrder());
         }
     }
 
@@ -404,15 +404,15 @@ public class xMsgMessage {
                 try {
                     return xMsgUtil.deserialize(data);
                 } catch (ClassNotFoundException | IOException e) {
-                    throw new RuntimeException("Could not deserialize data", e);
+                    throw new RuntimeException("could not deserialize data", e);
                 }
             }
 
-            throw new IllegalArgumentException("The message data doesn't match the mime-type:"
+            throw new IllegalArgumentException("the message data doesn't match the mime-type:"
                                                + dataType);
 
         } catch (InvalidProtocolBufferException e) {
-            throw new IllegalArgumentException("Message doesn't contain a valid xMsg data buffer");
+            throw new IllegalArgumentException("message doesn't contain a valid xMsg data buffer");
         }
     }
 
@@ -509,14 +509,14 @@ public class xMsgMessage {
                 try {
                     return dataType.cast(xMsgUtil.deserialize(data));
                 } catch (ClassNotFoundException | IOException e) {
-                    throw new RuntimeException("Could not deserialize data", e);
+                    throw new RuntimeException("could not deserialize data", e);
                 }
             }
 
-            throw new IllegalArgumentException("Message doesn't contain data of type: " + dataType);
+            throw new IllegalArgumentException("message doesn't contain data of type: " + dataType);
 
         } catch (InvalidProtocolBufferException e) {
-            throw new IllegalArgumentException("Message doesn't contain a valid xMsg data buffer");
+            throw new IllegalArgumentException("message doesn't contain a valid xMsg data buffer");
         }
     }
 

@@ -114,7 +114,7 @@ public class xMsgRegResponse {
     public xMsgRegResponse(ZMsg msg) throws xMsgException {
 
         if (msg.size() < 3) {
-            throw new xMsgException("xMsg-Error: registration message format violation");
+            throw new xMsgException("invalid registrar server response format");
         }
 
         ZFrame topicFrame = msg.pop();
@@ -125,7 +125,7 @@ public class xMsgRegResponse {
         sender = new String(senderFrame.getData());
         status = new String(statusFrame.getData());
         if (!status.equals(xMsgRegConstants.SUCCESS)) {
-            throw new xMsgException("xMsg-Error: unsuccessful registration: " + status);
+            throw new xMsgException("registrar server could not process request: " + status);
         }
 
         data = new HashSet<>();
@@ -134,8 +134,7 @@ public class xMsgRegResponse {
             try {
                 data.add(xMsgRegistration.parseFrom(dataFrame.getData()));
             } catch (InvalidProtocolBufferException e) {
-                throw new xMsgException("xMsg-Error: Could not deserialize protobuf data.",
-                                        e.getCause());
+                throw new xMsgException("could not parse registrar server response", e);
             }
         }
     }

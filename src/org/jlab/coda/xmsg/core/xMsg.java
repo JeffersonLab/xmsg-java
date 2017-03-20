@@ -578,7 +578,7 @@ public class xMsg implements AutoCloseable {
                 };
 
             default:
-                throw new IllegalArgumentException("Invalid callback mode: " + mode);
+                throw new IllegalArgumentException("invalid callback mode: " + callbackMode);
         }
     }
 
@@ -821,7 +821,7 @@ public class xMsg implements AutoCloseable {
                     result = regDriver.allRegistration(myName, reg.build(), timeout);
                     break;
                 default:
-                    throw new IllegalArgumentException("Illegal query type: " + query.category());
+                    throw new IllegalArgumentException("invalid query type: " + query.category());
             }
             connectionManager.releaseRegistrarConnection(regDriver);
 

@@ -75,7 +75,7 @@ class ResponseListener extends xMsgListener {
             xMsgUtil.sleep(1);
             t += 1;
         }
-        throw new TimeoutException("Error: no response for time_out = " + t);
+        throw new TimeoutException("no response for timeout = " + t);
     }
 
     @Override

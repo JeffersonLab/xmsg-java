@@ -97,7 +97,7 @@ public class xMsgRegResponseTest {
         msg.addString("foo_service");
 
         expectedEx.expect(xMsgException.class);
-        expectedEx.expectMessage("message format violation");
+        expectedEx.expectMessage("invalid registrar server response format");
         new xMsgRegResponse(msg);
     }
 
@@ -113,7 +113,7 @@ public class xMsgRegResponseTest {
         msg.add(Arrays.copyOf(bb, bb.length - 10));
 
         expectedEx.expect(xMsgException.class);
-        expectedEx.expectMessage("Could not deserialize protobuf data");
+        expectedEx.expectMessage("could not parse registrar server response");
         new xMsgRegResponse(msg);
     }
 }

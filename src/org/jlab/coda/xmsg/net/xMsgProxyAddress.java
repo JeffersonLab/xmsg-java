@@ -69,10 +69,10 @@ public class xMsgProxyAddress {
     public xMsgProxyAddress(String host, int port) {
         try {
             if (host == null) {
-                throw new IllegalArgumentException("Null IP address");
+                throw new IllegalArgumentException("null IP address");
             }
             if (port <= 0) {
-                throw new IllegalArgumentException("Illegal port: " + port);
+                throw new IllegalArgumentException("invalid port: " + port);
             }
             this.host = xMsgUtil.toHostAddress(host);
             this.pubPort = port;
