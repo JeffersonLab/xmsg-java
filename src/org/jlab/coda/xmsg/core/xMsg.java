@@ -45,7 +45,6 @@ import java.util.concurrent.RejectedExecutionHandler;
 import java.util.concurrent.ThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
-import java.util.concurrent.atomic.AtomicReference;
 import java.util.stream.Collectors;
 
 /**
@@ -121,9 +120,9 @@ public class xMsg implements AutoCloseable {
 
     // map of active subscriptions
     private final ConcurrentMap<String, xMsgSubscription> mySubscriptions;
-    private final AtomicReference<xMsgCallbackMode> callbackMode;
+    private final xMsgCallbackMode callbackMode;
 
-    private ResponseListener syncPubListener;
+    private final ResponseListener syncPubListener;
 
     /**
      * Creates an actor with default settings.
@@ -248,7 +247,7 @@ public class xMsg implements AutoCloseable {
 
         // create the map of running subscriptions
         this.mySubscriptions = new ConcurrentHashMap<>();
-        this.callbackMode = new AtomicReference<>(setup.subscriptionMode());
+        this.callbackMode = setup.subscriptionMode();
     }
 
     /**
@@ -561,8 +560,7 @@ public class xMsg implements AutoCloseable {
                                                 xMsgProxyDriver connection,
                                                 Set<xMsgTopic> topics,
                                                 xMsgCallBack callback) {
-        xMsgCallbackMode mode = callbackMode.get();
-        switch (mode) {
+        switch (callbackMode) {
             case MULTI_THREAD:
                 return new xMsgSubscription(name, connection, topics) {
                     @Override
