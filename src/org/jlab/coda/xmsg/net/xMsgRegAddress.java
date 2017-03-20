@@ -24,7 +24,6 @@ package org.jlab.coda.xmsg.net;
 
 import org.jlab.coda.xmsg.core.xMsgConstants;
 import org.jlab.coda.xmsg.core.xMsgUtil;
-import org.jlab.coda.xmsg.excp.xMsgAddressException;
 
 import java.io.UncheckedIOException;
 
@@ -41,7 +40,7 @@ public class xMsgRegAddress {
     /**
      * Creates an address with default host and port.
      *
-     * @throws xMsgAddressException if the IP address of the host could not be resolved
+     * @throws UncheckedIOException if the IP address of the host could not be resolved
      */
     public xMsgRegAddress() {
         this("localhost", xMsgConstants.REGISTRAR_PORT);
@@ -51,7 +50,7 @@ public class xMsgRegAddress {
      * Creates an address with provided host and default port.
      *
      * @param host the host IP address
-     * @throws xMsgAddressException if the IP address of the host could not be resolved
+     * @throws UncheckedIOException if the IP address of the host could not be resolved
      */
     public xMsgRegAddress(String host) {
         this(host, xMsgConstants.REGISTRAR_PORT);
@@ -62,21 +61,17 @@ public class xMsgRegAddress {
      *
      * @param host the host address
      * @param port the port number
-     * @throws xMsgAddressException if the IP address of the host could not be resolved
+     * @throws UncheckedIOException if the IP address of the host could not be resolved
      */
     public xMsgRegAddress(String host, int port) {
-        try {
-            if (host == null) {
-                throw new IllegalArgumentException("null IP address");
-            }
-            if (port <= 0) {
-                throw new IllegalArgumentException("invalid port: " + port);
-            }
-            this.host = xMsgUtil.toHostAddress(host);
-            this.port = port;
-        } catch (UncheckedIOException e) {
-            throw new xMsgAddressException(e);
+        if (host == null) {
+            throw new IllegalArgumentException("null IP address");
         }
+        if (port <= 0) {
+            throw new IllegalArgumentException("invalid port: " + port);
+        }
+        this.host = xMsgUtil.toHostAddress(host);
+        this.port = port;
     }
 
     /**
