@@ -1,7 +1,5 @@
-#!/bin/sh -f
+#!/bin/sh
 
-if [ -n "$CLARA_HOME" ]; then
-    export CLASSPATH="$CLARA_HOME/lib/*:$CLARA_HOME/services/*"
-fi
+export CLASSPATH="$( cd "$( dirname "$0" )"/.. && pwd )/lib/*"
 
 java -XX:+UseNUMA -XX:+UseBiasedLocking org.jlab.coda.xmsg.examples.SyncPublisher
