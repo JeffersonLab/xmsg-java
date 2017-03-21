@@ -11,7 +11,7 @@ apply plugin: 'idea'
 
 group = 'org.jlab.coda'
 archivesBaseName = 'xmsg'
-version = '2.3'
+version = '2.4-SNAPSHOT'
 
 defaultTasks 'build'
 
