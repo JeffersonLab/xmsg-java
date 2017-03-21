@@ -3,8 +3,8 @@
 xMsg is a lightweight, yet full featured publish/subscribe messaging system,
 presenting asynchronous inter-process communication.
 
-[![Build Status](https://travis-ci.org/JeffersonLab/xmsg-java.svg?branch=master)](https://travis-ci.org/JeffersonLab/xmsg-java)
-[![Javadoc](https://img.shields.io/badge/javadoc-2.3--SNAPSHOT-blue.svg?style=flat)](https://claraweb.jlab.org/xmsg/api/java/)
+[![Build Status](https://travis-ci.org/JeffersonLab/xmsg-java.svg?branch=v2.3)](https://travis-ci.org/JeffersonLab/xmsg-java)
+[![Javadoc](https://img.shields.io/badge/javadoc-2.3-blue.svg?style=flat)](https://claraweb.jlab.org/xmsg/api/java/v2.3/)
 
 ## Overview
 
@@ -94,7 +94,7 @@ repositories {
 }
 
 dependencies {
-    compile 'org.jlab.coda:xmsg:2.3-SNAPSHOT'
+    compile 'org.jlab.coda:xmsg:2.3'
 }
 ```
 
@@ -112,7 +112,7 @@ With Maven:
    <dependency>
       <groupId>org.jlab.coda</groupId>
       <artifactId>xmsg</artifactId>
-      <version>2.3-SNAPSHOT</version>
+      <version>2.3</version>
   </dependency>
 </dependencies>
 ```
