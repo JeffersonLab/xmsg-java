@@ -1,9 +1,9 @@
 To run the performance tests, go to the base directory and run the following
 on several terminals:
 
-1. Start an xMsg node:
+1. Start an xMsg proxy:
 
-    $ gradle startNode
+    $ ./scripts/dev/jx_proxy
 
 2. Start the subscriber. Pass the message size and the expected number of
    messages:
