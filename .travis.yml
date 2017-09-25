@@ -15,4 +15,4 @@ matrix:
       jdk: oraclejdk8
 
 script:
-  - ./gradlew check && ./gradlew integration
+  - ./gradlew -PciMode=true check findbugs && ./gradlew integration
