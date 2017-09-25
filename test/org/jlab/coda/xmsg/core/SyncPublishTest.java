@@ -193,7 +193,7 @@ public final class SyncPublishTest {
             sum.addAndGet(value);
         }
 
-        public void check() {
+        public boolean check() {
             if (sum.get() == totalSum) {
                 System.out.println("OK: all messages received.");
                 System.out.println("Total messages: " + totalMessages * numListeners);
@@ -202,9 +202,10 @@ public final class SyncPublishTest {
                 double average = 1.0 * (endTime - startTime) / (totalMessages * numListeners);
                 System.out.printf("Total time: %.2f [s]%n", duration);
                 System.out.printf("Average time: %.2f [ms]%n", average);
+                return true;
             } else {
                 System.out.printf("ERROR: expected = %d  received = %d%n", totalSum, sum.get());
-                System.exit(1);
+                return false;
             }
         }
     }
@@ -244,10 +245,14 @@ public final class SyncPublishTest {
             } else {
                 int pubThreads = Integer.parseInt(cores);
                 int totalMessages = Integer.parseInt(command);
-                test.publisher(pubThreads, totalMessages).check();
+                boolean stat = test.publisher(pubThreads, totalMessages).check();
+                if (!stat) {
+                    System.exit(1);
+                }
             }
         } catch (Exception e) {
             e.printStackTrace();
+            System.exit(1);
         }
     }
 }

@@ -42,7 +42,7 @@ public final class RemoteThroughput {
 
         final String bindTo = argv[0];
         final int messageSize = Integer.parseInt(argv[1]);
-        final long messageCount = Long.valueOf(argv[2]);
+        final long messageCount = Long.parseLong(argv[2]);
 
         final xMsgProxyAddress address = new xMsgProxyAddress(bindTo);
 

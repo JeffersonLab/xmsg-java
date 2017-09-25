@@ -49,7 +49,7 @@ public final class LocalThroughput {
 
         final String bindTo = argv[0];
         final int messageSize = Integer.parseInt(argv[1]);
-        final long messageCount = Long.valueOf(argv[2]);
+        final long messageCount = Long.parseLong(argv[2]);
 
         final CountDownLatch finished = new CountDownLatch(1);
         final Timer timer = new Timer();
