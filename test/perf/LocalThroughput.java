@@ -109,7 +109,7 @@ public final class LocalThroughput {
     }
 
 
-    private static void printf(String str, Object ... args) {
+    private static void printf(String str, Object... args) {
         System.out.print(String.format(str, args));
     }
 
