@@ -39,7 +39,7 @@ public final class LogUtils {
     private LogUtils() { }
 
     public static Logger getConsoleLogger(String name) {
-        DateTimeFormatter dateFormat = DateTimeFormatter.ofPattern("yyyy-mm-dd HH:MM:SS");
+        DateTimeFormatter dateFormat = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
         Logger logger = Logger.getLogger(name);
         ConsoleHandler handler = new ConsoleHandler() {
             @Override
