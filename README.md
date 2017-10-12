@@ -79,7 +79,7 @@ $ java org.jlab.coda.xmsg.sys.xMsgRegistrar
 
 ## Documentation
 
-The reference documentation is available at <http:://claraweb.org/xmsg>.
+The reference documentation is available at <https://claraweb.jlab.org/xmsg/>.
 
 
 ## Installation
