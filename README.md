@@ -89,7 +89,7 @@ With Gradle:
 ```groovy
 repositories {
     maven {
-        url 'http://clasweb.jlab.org/clas12maven/'
+        url 'https://clasweb.jlab.org/clas12maven/'
     }
 }
 
@@ -104,7 +104,7 @@ With Maven:
 <repositories>
    <repository>
       <id>clas12maven</id>
-      <url>http://clasweb.jlab.org/clas12maven</url>
+      <url>https://clasweb.jlab.org/clas12maven</url>
    </repository>
 </repositories>
 
