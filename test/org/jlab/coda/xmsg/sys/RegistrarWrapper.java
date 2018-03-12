@@ -26,8 +26,8 @@ import org.jlab.coda.xmsg.core.xMsgUtil;
 import org.jlab.coda.xmsg.excp.xMsgException;
 import org.jlab.coda.xmsg.net.xMsgContext;
 
-// CHECKSTYLE.OFF: JavadocType
-// CHECKSTYLE.OFF: JavadocMethod
+// checkstyle.off: JavadocType
+// checkstyle.off: JavadocMethod
 public class RegistrarWrapper implements AutoCloseable {
 
     private xMsgContext context = xMsgContext.newContext();

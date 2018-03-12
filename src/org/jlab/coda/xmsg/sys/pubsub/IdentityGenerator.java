@@ -30,7 +30,7 @@ final class IdentityGenerator {
 
     private IdentityGenerator() { }
 
-    private static final Random randomGenerator = new Random(); // SUPPRESS CHECKSTYLE ConstantName
+    private static final Random randomGenerator = new Random(); // nocheck: ConstantName
     private static final long CTRL_ID_PREFIX = getCtrlIdPrefix();
 
     private static long getCtrlIdPrefix() {

@@ -42,8 +42,7 @@ import org.zeromq.ZMQ.Context;
  */
 public final class xMsgContext implements AutoCloseable {
 
-    // SUPPRESS CHECKSTYLE ConstantName
-    private static final xMsgContext ourInstance = new xMsgContext();
+    private static final xMsgContext ourInstance = new xMsgContext();  // nocheck: ConstantName
 
     private final Context ctx;
 

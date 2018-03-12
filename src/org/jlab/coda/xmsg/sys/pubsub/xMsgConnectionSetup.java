@@ -217,7 +217,7 @@ public final class xMsgConnectionSetup {
     private final boolean checkSubscription;
 
 
-    // CHECKSTYLE.OFF: ParameterNumber
+    // checkstyle.off: ParameterNumber
     private xMsgConnectionSetup(Consumer<Socket> preConnection,
                                 Runnable postConnection,
                                 Consumer<Socket> preSubscription,
@@ -235,7 +235,7 @@ public final class xMsgConnectionSetup {
         this.checkConnection = checkConnection;
         this.checkSubscription = checkSubscription;
     }
-    // CHECKSTYLE.ON: ParameterNumber
+    // checkstyle.on: ParameterNumber
 
     /**
      * Runs the pre-connection action on the given socket.

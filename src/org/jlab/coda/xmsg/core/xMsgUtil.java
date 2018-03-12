@@ -59,8 +59,8 @@ public final class xMsgUtil {
 
     private static final int REPLY_TO_SEQUENCE_SIZE = 1000000;
 
-    private static final Random randomGenerator; // SUPPRESS CHECKSTYLE ConstantName
-    private static final AtomicInteger replyToGenerator; // SUPPRESS CHECKSTYLE ConstantName
+    private static final Random randomGenerator; // nocheck: ConstantName
+    private static final AtomicInteger replyToGenerator; // nocheck: ConstantName
 
     static {
         randomGenerator = new Random();
