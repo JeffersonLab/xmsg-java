@@ -116,7 +116,7 @@ public class SubscriptionsTest {
 
         Thread pubThread = xMsgUtil.newThread("pub-thread", () -> {
             try (xMsg actor = new xMsg("test_publisher");
-                 xMsgConnection con = actor.getConnection()) {
+                 xMsgConnection con = actor.getConnection()) { // nocheck: Indentation
                 xMsgTopic topic = xMsgTopic.wrap("test_topic");
                 for (int i = 0; i < Check.N; i++) {
                     xMsgMessage msg = xMsgMessage.createFrom(topic, i);
@@ -149,7 +149,7 @@ public class SubscriptionsTest {
 
         Thread pubThread = xMsgUtil.newThread("syncpub-thread", () -> {
             try (xMsg subActor = new xMsg("test_subscriber");
-                 xMsg pubActor = new xMsg("test_publisher")) {
+                 xMsg pubActor = new xMsg("test_publisher")) { // nocheck: Indentation
                 xMsgTopic subTopic = xMsgTopic.wrap("test_topic");
                 subActor.subscribe(subTopic, msg -> {
                     try {
@@ -192,7 +192,7 @@ public class SubscriptionsTest {
 
         Thread pubThread = xMsgUtil.newThread("syncpub-thread", () -> {
             try (xMsg subActor = new xMsg("test_subscriber");
-                 xMsg pubActor = new xMsg("test_publisher")) {
+                 xMsg pubActor = new xMsg("test_publisher")) { // nocheck: Indentation
                 xMsgTopic subTopic = xMsgTopic.wrap("test_topic");
                 xMsgSubscription sub = subActor.subscribe(subTopic, msg -> {
                     try {
@@ -259,7 +259,7 @@ public class SubscriptionsTest {
 
         Thread pubThread = xMsgUtil.newThread("pub-thread", () -> {
             try (xMsg actor = new xMsg("test_publisher");
-                 xMsgConnection con = actor.getConnection()) {
+                 xMsgConnection con = actor.getConnection()) { // nocheck: Indentation
                 xMsgTopic[] topics = new xMsgTopic[] {
                         xMsgTopic.wrap("1_test_topic"), xMsgTopic.wrap("2_test_topic")
                 };

@@ -5,6 +5,9 @@
     "http://www.puppycrawl.com/dtds/suppressions_1_1.dtd">
 
 <suppressions>
+  <!-- ignore protbuf generated code -->
+  <suppress checks=".*" files="generated[\\/]source[\\/]proto[\\/].+\.java"/>
+
   <!-- ignore Javadoc -->
   <suppress checks="Javadoc.*" files=".*Test\.java"/>
   <suppress checks="Javadoc.*" files=".+[\\/]sys[\\/].+[\\/].+\.java"/>

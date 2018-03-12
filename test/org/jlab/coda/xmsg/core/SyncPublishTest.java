@@ -213,9 +213,9 @@ public final class SyncPublishTest {
     @Test
     public void run() throws Exception {
         try (RegistrarWrapper registrar = new RegistrarWrapper();
-             ProxyWrapper proxy = new ProxyWrapper()) {
+             ProxyWrapper proxy = new ProxyWrapper()) { // nocheck: Indentation
             try (xMsg list1 = listener(1, "foo");
-                 xMsg list2 = listener(1, "bar")) {
+                 xMsg list2 = listener(1, "bar")) { // nocheck: Indentation
                 xMsgUtil.sleep(100);
                 Result results = publisher(1, 1000);
                 assertThat(results.sum.get(), is(results.totalSum));
