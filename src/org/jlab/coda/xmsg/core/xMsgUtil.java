@@ -296,7 +296,7 @@ public final class xMsgUtil {
             return ByteString.copyFrom((byte[]) object);
         } else {
             try (ByteString.Output bs = ByteString.newOutput();
-                 ObjectOutputStream out = new ObjectOutputStream(bs)) { // nocheck: Indentation
+                 ObjectOutputStream out = new ObjectOutputStream(bs)) {
                 out.writeObject(object);
                 out.flush();
                 return bs.toByteString();
@@ -317,7 +317,7 @@ public final class xMsgUtil {
             return (byte[]) object;
         }
         try (ByteArrayOutputStream bs = new ByteArrayOutputStream();
-             ObjectOutputStream out = new ObjectOutputStream(bs)) { // nocheck: Indentation
+             ObjectOutputStream out = new ObjectOutputStream(bs)) {
             out.writeObject(object);
             out.flush();
             return bs.toByteArray();
@@ -349,7 +349,7 @@ public final class xMsgUtil {
     public static Object deserialize(byte[] bytes)
             throws IOException, ClassNotFoundException {
         try (ByteArrayInputStream bs = new ByteArrayInputStream(bytes);
-             ObjectInputStream in = new ObjectInputStream(bs)) { // nocheck: Indentation
+             ObjectInputStream in = new ObjectInputStream(bs)) {
             return in.readObject();
         }
     }

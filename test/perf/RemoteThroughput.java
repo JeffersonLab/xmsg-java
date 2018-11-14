@@ -47,7 +47,7 @@ public final class RemoteThroughput {
         final xMsgProxyAddress address = new xMsgProxyAddress(bindTo);
 
         try (xMsg publisher = new xMsg("thr_publisher");
-             xMsgConnection con = publisher.getConnection(address)) { // nocheck: Indentation
+             xMsgConnection con = publisher.getConnection(address)) {
             System.out.println("Publishing messages...");
             xMsgTopic topic = xMsgTopic.wrap("thr_topic");
             byte[] data = new byte[messageSize];
