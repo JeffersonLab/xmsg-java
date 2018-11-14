@@ -26,22 +26,29 @@ import org.zeromq.ZMQ.Poller;
 import org.zeromq.ZMQ.Socket;
 import org.zeromq.ZMQException;
 
-public class xMsgPoller {
+import java.io.Closeable;
+
+public class xMsgPoller implements Closeable {
 
     final Socket subSocket;
-    final Poller items;
+    final Poller poller;
 
     public xMsgPoller(xMsgProxyDriver connection) {
         this.subSocket = connection.getSocket();
-        this.items = new Poller(1);
-        this.items.register(subSocket, Poller.POLLIN);
+        this.poller = connection.getContext().poller(1);
+        this.poller.register(subSocket, Poller.POLLIN);
     }
 
     public boolean poll(long timeout) {
-        int rc = items.poll(timeout);
+        int rc = poller.poll(timeout);
         if (rc < 0) {
             throw new ZMQException("error polling subscription", subSocket.base().errno());
         }
-        return items.pollin(0);
+        return poller.pollin(0);
+    }
+
+    @Override
+    public void close() {
+        poller.close();
     }
 }

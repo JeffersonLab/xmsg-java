@@ -27,6 +27,7 @@ import org.jlab.coda.xmsg.net.xMsgProxyAddress;
 import org.jlab.coda.xmsg.net.xMsgSocketFactory;
 import org.zeromq.ZFrame;
 import org.zeromq.ZMQ;
+import org.zeromq.ZMQ.Context;
 import org.zeromq.ZMQ.Poller;
 import org.zeromq.ZMQ.Socket;
 import org.zeromq.ZMQException;
@@ -67,9 +68,8 @@ public abstract class xMsgProxyDriver {
     public boolean checkConnection(long timeout) throws xMsgException {
         String identity = IdentityGenerator.getCtrlId();
         Socket ctrlSocket = createControlSocket(identity);
-        try {
-            Poller items = new Poller(1);
-            items.register(ctrlSocket, Poller.POLLIN);
+        try (Poller poller = factory.context().poller(1)) {
+            poller.register(ctrlSocket, Poller.POLLIN);
 
             long pollTimeout = timeout < 100 ? timeout : 100;
             long totalTime = 0;
@@ -81,8 +81,8 @@ public abstract class xMsgProxyDriver {
                     ctrlMsg.add(identity);
                     ctrlMsg.send(getSocket());
 
-                    items.poll(pollTimeout);
-                    if (items.pollin(0)) {
+                    poller.poll(pollTimeout);
+                    if (poller.pollin(0)) {
                         ZMsg replyMsg = ZMsg.recvMsg(ctrlSocket);
                         if (replyMsg.size() == 1) {
                             ZFrame typeFrame = replyMsg.pop();
@@ -109,9 +109,8 @@ public abstract class xMsgProxyDriver {
 
     public boolean checkSubscription(String topic, long timeout) throws xMsgException {
         Socket pubSocket = createPubSocket();
-        try {
-            Poller items = new Poller(1);
-            items.register(getSocket(), Poller.POLLIN);
+        try (Poller poller = factory.context().poller(1)) {
+            poller.register(getSocket(), Poller.POLLIN);
 
             long pollTimeout = timeout < 100 ? timeout : 100;
             long totalTime = 0;
@@ -123,8 +122,8 @@ public abstract class xMsgProxyDriver {
                     ctrlMsg.add(topic);
                     ctrlMsg.send(pubSocket);
 
-                    items.poll(pollTimeout);
-                    if (items.pollin(0)) {
+                    poller.poll(pollTimeout);
+                    if (poller.pollin(0)) {
                         ZMsg replyMsg = ZMsg.recvMsg(getSocket());
                         if (replyMsg.size() == 2) {
                             ZFrame idFrame = replyMsg.pop();
@@ -175,6 +174,10 @@ public abstract class xMsgProxyDriver {
 
     public Socket getSocket() {
         return socket;
+    }
+
+    public Context getContext() {
+        return factory.context();
     }
 
 

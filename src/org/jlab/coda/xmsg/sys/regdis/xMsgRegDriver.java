@@ -29,6 +29,7 @@ import org.jlab.coda.xmsg.excp.xMsgException;
 import org.jlab.coda.xmsg.net.xMsgRegAddress;
 import org.jlab.coda.xmsg.net.xMsgSocketFactory;
 import org.zeromq.ZMQ;
+import org.zeromq.ZMQ.Poller;
 import org.zeromq.ZMQ.Socket;
 import org.zeromq.ZMQException;
 import org.zeromq.ZMsg;
@@ -90,17 +91,20 @@ public class xMsgRegDriver {
             throw new xMsgException("could not send registration request", e);
         }
 
-        ZMQ.PollItem[] items = {new ZMQ.PollItem(socket, ZMQ.Poller.POLLIN)};
-        int rc = ZMQ.poll(items, timeout);
-        if (rc != -1 && items[0].isReadable()) {
-            xMsgRegResponse response = new xMsgRegResponse(ZMsg.recvMsg(socket));
-            String status = response.status();
-            if (!status.equals(xMsgRegConstants.SUCCESS)) {
-                throw new xMsgException("registrar server could not process request: " + status);
+        try (Poller poller = factory.context().poller(1)) {
+            poller.register(socket, ZMQ.Poller.POLLIN);
+            poller.poll(timeout);
+            if (poller.pollin(0)) {
+                xMsgRegResponse response = new xMsgRegResponse(ZMsg.recvMsg(socket));
+                String status = response.status();
+                if (!status.equals(xMsgRegConstants.SUCCESS)) {
+                    throw new xMsgException("registrar server could not process request: "
+                                            + status);
+                }
+                return response;
+            } else {
+                throw new xMsgException("registrar server response timeout");
             }
-            return response;
-        } else {
-            throw new xMsgException("registrar server response timeout");
         }
     }
 

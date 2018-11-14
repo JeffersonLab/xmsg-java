@@ -23,9 +23,9 @@
 package org.jlab.coda.xmsg.sys.pubsub;
 
 import org.jlab.coda.xmsg.excp.xMsgException;
+import org.jlab.coda.xmsg.net.xMsgContext;
 import org.jlab.coda.xmsg.net.xMsgProxyAddress;
 import org.jlab.coda.xmsg.sys.util.ThreadUtils;
-import org.zeromq.ZMQ;
 import org.zeromq.ZMQ.Poller;
 import org.zeromq.ZMsg;
 
@@ -38,11 +38,15 @@ public abstract class xMsgListener implements Runnable {
 
     protected final ConcurrentMap<xMsgProxyAddress, xMsgProxyDriver> items;
 
+    private final xMsgContext context;
+
     private final Thread pollingThread;
     private volatile boolean isRunning = false;
 
-    public xMsgListener(String name) {
+
+    public xMsgListener(String name, xMsgContext context) {
         this.items = new ConcurrentHashMap<>();
+        this.context = context;
         this.pollingThread = ThreadUtils.newThread(name, this);
     }
 
@@ -67,31 +71,40 @@ public abstract class xMsgListener implements Runnable {
 
     @Override
     public void run() {
-        while (isRunning) {
-            ZMQ.Poller poller = new ZMQ.Poller(items.size());
-            for (xMsgProxyDriver connection : items.values()) {
-                poller.register(connection.getSocket(), Poller.POLLIN);
+        try (Poller poller = context.getContext().poller(items.size())) {
+            while (isRunning) {
+                for (xMsgProxyDriver connection : items.values()) {
+                    poller.register(connection.getSocket(), Poller.POLLIN);
+                }
+                checkMessages(poller);
+                for (xMsgProxyDriver connection : items.values()) {
+                    poller.unregister(connection.getSocket());
+                }
             }
-            int rc = poller.poll(TIMEOUT);
-            if (rc == 0) {
-                continue;
-            }
-            for (int i = 0; i < poller.getSize(); i++) {
-                if (poller.pollin(i)) {
-                    ZMsg rawMsg = ZMsg.recvMsg(poller.getSocket(i));
-                    if (rawMsg == null) {
-                        break; // interrupted
+        }
+    }
+
+    private void checkMessages(Poller poller) {
+        int rc = poller.poll(TIMEOUT);
+        if (rc == 0) {
+            return;
+        }
+        for (int i = 0; i < poller.getSize(); i++) {
+            if (poller.pollin(i)) {
+                ZMsg rawMsg = ZMsg.recvMsg(poller.getSocket(i));
+                if (rawMsg == null) {
+                    isRunning = false; // interrupted
+                    return;
+                }
+                try {
+                    if (rawMsg.size() == 2) {
+                        // ignore control message
+                        // (which are composed of 2 frames)
+                        continue;
                     }
-                    try {
-                        if (rawMsg.size() == 2) {
-                            // ignore control message
-                            // (which are composed of 2 frames)
-                            continue;
-                        }
-                        handle(rawMsg);
-                    } catch (Exception e) {
-                        e.printStackTrace();
-                    }
+                    handle(rawMsg);
+                } catch (Exception e) {
+                    e.printStackTrace();
                 }
             }
         }

@@ -25,6 +25,7 @@ package org.jlab.coda.xmsg.sys;
 import static java.util.Arrays.asList;
 
 import java.io.PrintStream;
+import java.lang.reflect.Field;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -42,7 +43,6 @@ import org.zeromq.ZContext;
 import org.zeromq.ZFrame;
 import org.zeromq.ZMQ;
 import org.zeromq.ZMQException;
-import org.zeromq.ZMQ.Context;
 import org.zeromq.ZMQ.Socket;
 import org.zeromq.ZMsg;
 import org.zeromq.ZThread;
@@ -67,7 +67,7 @@ import joptsimple.OptionSpec;
 public class xMsgProxy {
 
     private final xMsgProxyAddress addr;
-    private final Context ctx;
+    private final xMsgContext ctx;
 
     private final Thread proxy;
     private final Thread controller;
@@ -146,7 +146,7 @@ public class xMsgProxy {
      * @throws xMsgException if the address is already in use
      */
     public xMsgProxy(xMsgContext context, xMsgProxyAddress address) throws xMsgException {
-        ctx = context.getContext();
+        ctx = context;
         addr = address;
 
         Proxy proxyTask = null;
@@ -227,7 +227,7 @@ public class xMsgProxy {
         final Socket in;
         final Socket out;
 
-        final xMsgSocketFactory factory = new xMsgSocketFactory(ctx);
+        final xMsgSocketFactory factory = new xMsgSocketFactory(ctx.getContext());
 
         Proxy() throws xMsgException {
             Socket in = null;
@@ -266,10 +266,15 @@ public class xMsgProxy {
         }
 
         private ZContext wrapContext() {
-            ZContext c = new ZContext();
-            c.setContext(ctx);
-            c.setMain(false);
-            return c;
+            try {
+                // I don't want to expose the ZContext private field in xMsgContext
+                // since it is never actually used except here.
+                Field zctx = ctx.getClass().getDeclaredField("ctx");
+                zctx.setAccessible(true);
+                return ZContext.shadow((ZContext) zctx.get(ctx));
+            } catch (Exception e) {
+                throw new RuntimeException(e);
+            }
         }
 
         public void close() {
@@ -289,7 +294,7 @@ public class xMsgProxy {
         final Socket publisher;
         final Socket router;
 
-        final xMsgSocketFactory factory = new xMsgSocketFactory(ctx);
+        final xMsgSocketFactory factory = new xMsgSocketFactory(ctx.getContext());
 
         Controller() throws xMsgException {
             Socket control = null;

@@ -125,4 +125,13 @@ public class xMsgSocketFactory {
             socket.close();
         }
     }
+
+    /**
+     * Returns the ZMQ context used by this factory.
+     *
+     * @return the context
+     */
+    public Context context() {
+        return ctx;
+    }
 }

@@ -42,7 +42,7 @@ class ResponseListener extends xMsgListener {
     private final ConcurrentMap<String, xMsgMessage> responses;
 
     ResponseListener(String id, xMsgConnectionFactory factory) {
-        super("poll-" + id);
+        super("poll-" + id, factory.getContext());
         this.factory = factory;
         this.topic = xMsgTopic.build("ret", id).toString();
         this.responses = new ConcurrentHashMap<>();

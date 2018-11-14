@@ -34,6 +34,7 @@ import org.zeromq.ZMQException;
  */
 public class xMsgConnectionFactory {
 
+    private final xMsgContext context;
     private final xMsgSocketFactory factory;
 
     /**
@@ -42,6 +43,7 @@ public class xMsgConnectionFactory {
      * @param context the context to handle connections
      */
     public xMsgConnectionFactory(xMsgContext context) {
+        this.context = context;
         this.factory = new xMsgSocketFactory(context.getContext());
     }
 
@@ -95,7 +97,6 @@ public class xMsgConnectionFactory {
         }
     }
 
-
     /**
      * Creates a new registrar connection.
      *
@@ -113,5 +114,14 @@ public class xMsgConnectionFactory {
             driver.close();
             throw e;
         }
+    }
+
+    /**
+     * Returns the context used by this factory.
+     *
+     * @return the context
+     */
+    public xMsgContext getContext() {
+        return context;
     }
 }

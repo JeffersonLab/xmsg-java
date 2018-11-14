@@ -22,7 +22,7 @@
 
 package org.jlab.coda.xmsg.net;
 
-import org.zeromq.ZMQ;
+import org.zeromq.ZContext;
 import org.zeromq.ZMQ.Context;
 
 
@@ -44,10 +44,14 @@ public final class xMsgContext implements AutoCloseable {
 
     private static final xMsgContext ourInstance = new xMsgContext();  // nocheck: ConstantName
 
-    private final Context ctx;
+    // xMsg uses ZMQ.Context for all context operations, but some jeromq APIs
+    // may require a shadow ZContext and since 0.4.x a shadow context cannot be
+    // created from an existing ZMQ.Context anymore, so this needs to be a
+    // ZContext.
+    private final ZContext ctx;
 
     private xMsgContext() {
-        ctx = ZMQ.context(1);
+        ctx = new ZContext(1);
     }
 
     /**
@@ -74,7 +78,7 @@ public final class xMsgContext implements AutoCloseable {
      * @return the number of I/O threads used by the context
      */
     public int getIOThreads() {
-        return ctx.getIOThreads();
+        return ctx.getContext().getIOThreads();
     }
 
     /**
@@ -83,7 +87,7 @@ public final class xMsgContext implements AutoCloseable {
      * @param ioThreads the number of I/O threads
      */
     public void setIOThreads(int ioThreads) {
-        ctx.setIOThreads(ioThreads);
+        ctx.getContext().setIOThreads(ioThreads);
     }
 
     /**
@@ -93,7 +97,7 @@ public final class xMsgContext implements AutoCloseable {
      *         with the context
      */
     public int getMaxSockets() {
-        return ctx.getMaxSockets();
+        return ctx.getContext().getMaxSockets();
     }
 
     /**
@@ -103,7 +107,7 @@ public final class xMsgContext implements AutoCloseable {
      *        with the context
      */
     public void setMaxSockets(int maxSockets) {
-        ctx.setMaxSockets(maxSockets);
+        ctx.getContext().setMaxSockets(maxSockets);
     }
 
     /**
@@ -112,7 +116,7 @@ public final class xMsgContext implements AutoCloseable {
      * @return the wrapped 0MQ context
      */
     public Context getContext() {
-        return ctx;
+        return ctx.getContext();
     }
 
     /**
@@ -120,7 +124,7 @@ public final class xMsgContext implements AutoCloseable {
      * All connections must be already closed otherwise this will hang.
      */
     public void destroy() {
-        ctx.term();
+        ctx.destroy();
     }
 
     /**

@@ -90,7 +90,7 @@ repositories {
 
 
 dependencies {
-    compile 'org.zeromq:jeromq:0.3.6'
+    compile 'org.zeromq:jeromq:0.4.3'
     compile 'com.google.protobuf:protobuf-java:3.6.1'
     compile 'net.sf.jopt-simple:jopt-simple:4.9'
     deployerJars 'org.apache.maven.wagon:wagon-ssh-external:2.12'

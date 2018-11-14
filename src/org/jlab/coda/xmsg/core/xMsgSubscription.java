@@ -91,7 +91,12 @@ public abstract class xMsgSubscription {
 
         @Override
         public void run() {
-            xMsgPoller poller = new xMsgPoller(connection);
+            try (xMsgPoller poller = new xMsgPoller(connection)) {
+                waitMessages(poller);
+            }
+        }
+
+        private void waitMessages(xMsgPoller poller) {
             while (isRunning) {
                 try {
                     if (poller.poll(100)) {
