@@ -44,7 +44,7 @@ import static org.jlab.coda.xmsg.data.xMsgR.xMsgRegistration.OwnerType.SUBSCRIBE
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.is;
 import static org.mockito.Mockito.any;
-import static org.mockito.Mockito.anyInt;
+import static org.mockito.Mockito.anyLong;
 import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.spy;
@@ -231,6 +231,6 @@ public class xMsgRegDriverTest {
 
 
     private void setResponse(xMsgRegResponse response) throws Exception {
-        doReturn(response).when(driver).request(any(xMsgRegRequest.class), anyInt());
+        doReturn(response).when(driver).request(any(xMsgRegRequest.class), anyLong());
     }
 }
