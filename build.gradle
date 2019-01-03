@@ -179,7 +179,7 @@ def deploySpec = copySpec {
 }
 
 
-task deploy(type: Copy, overwrite: true, dependsOn: install) {
+task deploy(type: Copy, dependsOn: install) {
     def dest = "$System.env.CLARA_HOME"
 
     into dest
