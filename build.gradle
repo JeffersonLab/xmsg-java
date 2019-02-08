@@ -303,8 +303,8 @@ gradle.taskGraph.whenReady { taskGraph ->
 eclipse {
     classpath {
         file {
-            whenMerged {
-                cp -> cp.entries.add(new org.gradle.plugins.ide.eclipse.model.SourceFolder(generatedProtoDir, null))
+            whenMerged { classpath ->
+                classpath.entries.add(new org.gradle.plugins.ide.eclipse.model.SourceFolder(generatedProtoDir, null))
             }
             withXml { xml ->
                 xml.asNode().find {
