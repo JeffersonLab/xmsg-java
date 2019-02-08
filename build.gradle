@@ -303,7 +303,13 @@ gradle.taskGraph.whenReady { taskGraph ->
 eclipse {
     classpath {
         file {
+            defaultOutputDir = file("${buildDir}/eclipse")
             whenMerged { classpath ->
+                classpath.entries.each { source ->
+                    if (source.kind == 'src' && source.hasProperty('output')) {
+                        source.output = "${buildDir.getName()}/eclipse"
+                    }
+                }
                 classpath.entries.add(new org.gradle.plugins.ide.eclipse.model.SourceFolder(generatedProtoDir, null))
             }
             withXml { xml ->
@@ -314,7 +320,6 @@ eclipse {
                 .appendNode('attribute', [name:'ignore_optional_problems', value:'true'])
             }
         }
-        defaultOutputDir = file("${buildDir}/eclipse-classes")
     }
 }
 
