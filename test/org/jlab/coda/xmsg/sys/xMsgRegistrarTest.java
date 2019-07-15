@@ -35,9 +35,8 @@ import org.jlab.coda.xmsg.net.xMsgContext;
 import org.jlab.coda.xmsg.net.xMsgRegAddress;
 import org.jlab.coda.xmsg.sys.regdis.RegistrationDataFactory;
 import org.jlab.coda.xmsg.sys.regdis.xMsgRegDriver;
-import org.jlab.coda.xmsg.testing.IntegrationTest;
-import org.junit.Test;
-import org.junit.experimental.categories.Category;
+import org.junit.jupiter.api.Tag;
+import org.junit.jupiter.api.Test;
 
 import java.util.HashSet;
 import java.util.Iterator;
@@ -47,9 +46,9 @@ import java.util.function.Predicate;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
-import static org.junit.Assert.fail;
+import static org.junit.jupiter.api.Assertions.fail;
 
-@Category(IntegrationTest.class)
+@Tag("integration")
 public class xMsgRegistrarTest {
 
     private xMsgRegDriver driver;

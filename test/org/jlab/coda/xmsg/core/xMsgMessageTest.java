@@ -24,7 +24,7 @@ package org.jlab.coda.xmsg.core;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.is;
-import static org.junit.Assert.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertFalse;
 
 import java.nio.ByteOrder;
 import java.util.Arrays;
@@ -33,7 +33,7 @@ import java.util.List;
 import org.jlab.coda.xmsg.data.xMsgD.xMsgData;
 import org.jlab.coda.xmsg.data.xMsgM.xMsgMeta;
 import org.jlab.coda.xmsg.data.xMsgMimeType;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 public class xMsgMessageTest {
 

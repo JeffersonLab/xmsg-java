@@ -24,10 +24,8 @@ package org.jlab.coda.xmsg.sys.regdis;
 
 import org.jlab.coda.xmsg.data.xMsgR.xMsgRegistration;
 import org.jlab.coda.xmsg.excp.xMsgException;
-import org.junit.Before;
-import org.junit.Rule;
-import org.junit.Test;
-import org.junit.rules.ExpectedException;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import org.zeromq.ZMsg;
 
 import java.util.Arrays;
@@ -36,17 +34,17 @@ import java.util.Set;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.empty;
+import static org.hamcrest.Matchers.containsString;
 import static org.hamcrest.Matchers.is;
 import static org.jlab.coda.xmsg.sys.regdis.RegistrationDataFactory.newRegistration;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 
 public class xMsgRegResponseTest {
 
-    @Rule
-    public ExpectedException expectedEx = ExpectedException.none();
     private xMsgRegistration.Builder data1;
     private xMsgRegistration.Builder data2;
 
-    @Before
+    @BeforeEach
     public void setup() {
         xMsgRegistration.OwnerType type = xMsgRegistration.OwnerType.SUBSCRIBER;
         data1 = newRegistration("asimov", "10.2.9.1", type, "writer.scifi:books");
@@ -71,9 +69,9 @@ public class xMsgRegResponseTest {
         String error = "could not handle request";
         xMsgRegResponse sendResponse = new xMsgRegResponse("foo:bar", "registration_fe", error);
 
-        expectedEx.expect(xMsgException.class);
-        expectedEx.expectMessage(error);
-        new xMsgRegResponse(sendResponse.msg());
+        xMsgException ex = assertThrows(
+                xMsgException.class, () -> new xMsgRegResponse(sendResponse.msg()));
+        assertThat(ex.getMessage(), containsString(error));
     }
 
 
@@ -96,9 +94,8 @@ public class xMsgRegResponseTest {
         msg.addString("foo:bar");
         msg.addString("foo_service");
 
-        expectedEx.expect(xMsgException.class);
-        expectedEx.expectMessage("invalid registrar server response format");
-        new xMsgRegResponse(msg);
+        xMsgException ex = assertThrows(xMsgException.class, () -> new xMsgRegResponse(msg));
+        assertThat(ex.getMessage(), is("invalid registrar server response format"));
     }
 
 
@@ -112,8 +109,7 @@ public class xMsgRegResponseTest {
         msg.add(data2.build().toByteArray());
         msg.add(Arrays.copyOf(bb, bb.length - 10));
 
-        expectedEx.expect(xMsgException.class);
-        expectedEx.expectMessage("could not parse registrar server response");
-        new xMsgRegResponse(msg);
+        xMsgException ex = assertThrows(xMsgException.class, () -> new xMsgRegResponse(msg));
+        assertThat(ex.getMessage(), is("could not parse registrar server response"));
     }
 }

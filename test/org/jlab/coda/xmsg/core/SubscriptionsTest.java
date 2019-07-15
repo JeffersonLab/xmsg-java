@@ -24,11 +24,10 @@ package org.jlab.coda.xmsg.core;
 
 import org.jlab.coda.xmsg.excp.xMsgException;
 import org.jlab.coda.xmsg.sys.ProxyWrapper;
-import org.jlab.coda.xmsg.testing.IntegrationTest;
-import org.junit.After;
-import org.junit.Before;
-import org.junit.Test;
-import org.junit.experimental.categories.Category;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Tag;
+import org.junit.jupiter.api.Test;
 
 import java.util.HashSet;
 import java.util.Set;
@@ -38,8 +37,8 @@ import java.util.concurrent.atomic.AtomicLong;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.is;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertTrue;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 
 /**
@@ -53,18 +52,18 @@ import static org.junit.Assert.assertTrue;
  * <p>
  * For more complex cases see {@link PublishersTest} and {@link SyncPublishTest}.
  */
-@Category(IntegrationTest.class)
+@Tag("integration")
 public class SubscriptionsTest {
 
     private ProxyWrapper proxyThread;
 
-    @Before
+    @BeforeEach
     public void setup() {
         proxyThread = new ProxyWrapper();
     }
 
 
-    @After
+    @AfterEach
     public void teardown() {
         proxyThread.close();
     }
@@ -219,8 +218,8 @@ public class SubscriptionsTest {
         pubThread.start();
         pubThread.join();
 
-        assertTrue("not received", check.received);
-        assertTrue("no timeout", check.timeout);
+        assertTrue(check.received, "not received");
+        assertTrue(check.timeout, "no timeout");
     }
 
     @Test

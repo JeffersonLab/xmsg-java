@@ -25,8 +25,8 @@ package org.jlab.coda.xmsg.sys.regdis;
 import com.google.protobuf.InvalidProtocolBufferException;
 import org.jlab.coda.xmsg.data.xMsgR.xMsgRegistration;
 import org.jlab.coda.xmsg.excp.xMsgException;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import org.zeromq.ZMsg;
 
 import java.util.Arrays;
@@ -34,12 +34,13 @@ import java.util.Arrays;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.is;
 import static org.jlab.coda.xmsg.sys.regdis.RegistrationDataFactory.newRegistration;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 
 public class xMsgRegRequestTest {
 
     private xMsgRegistration.Builder data;
 
-    @Before
+    @BeforeEach
     public void setup() {
         xMsgRegistration.OwnerType type = xMsgRegistration.OwnerType.SUBSCRIBER;
         data = newRegistration("asimov", "10.2.9.1", type, "writer.scifi:books");
@@ -68,17 +69,17 @@ public class xMsgRegRequestTest {
     }
 
 
-    @Test(expected = xMsgException.class)
+    @Test
     public void failWithMalformedMessage() throws Exception {
         ZMsg msg = new ZMsg();
         msg.addString("foo:bar");
         msg.addString("foo_service");
 
-        new xMsgRegRequest(msg);
+        assertThrows(xMsgException.class, () -> new xMsgRegRequest(msg));
     }
 
 
-    @Test(expected = InvalidProtocolBufferException.class)
+    @Test
     public void failWithMalformedData() throws Exception {
         byte[] bb = data.build().toByteArray();
         ZMsg msg = new ZMsg();
@@ -88,6 +89,6 @@ public class xMsgRegRequestTest {
 
         xMsgRegRequest recvRequest = new xMsgRegRequest(msg);
 
-        recvRequest.data();
+        assertThrows(InvalidProtocolBufferException.class, () -> recvRequest.data());
     }
 }

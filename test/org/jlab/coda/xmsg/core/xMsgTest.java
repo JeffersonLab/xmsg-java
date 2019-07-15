@@ -29,8 +29,8 @@ import org.jlab.coda.xmsg.net.xMsgConnectionFactory;
 import org.jlab.coda.xmsg.net.xMsgRegAddress;
 import org.jlab.coda.xmsg.sys.regdis.xMsgRegDriver;
 import org.jlab.coda.xmsg.sys.regdis.RegistrationDataFactory;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
 import static org.jlab.coda.xmsg.data.xMsgR.xMsgRegistration.OwnerType.PUBLISHER;
 import static org.jlab.coda.xmsg.data.xMsgR.xMsgRegistration.OwnerType.SUBSCRIBER;
@@ -50,7 +50,7 @@ public class xMsgTest {
     private final xMsgTopic topic = xMsgTopic.wrap("writer:scifi:book");
     private final xMsgRegAddress regAddr = new xMsgRegAddress();
 
-    @Before
+    @BeforeEach
     public void setup() throws Exception {
         xMsgConnectionFactory factory = mock(xMsgConnectionFactory.class);
         xMsgSetup setup = xMsgSetup.newBuilder()

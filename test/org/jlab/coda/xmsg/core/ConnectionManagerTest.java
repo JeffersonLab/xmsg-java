@@ -28,8 +28,8 @@ import org.jlab.coda.xmsg.net.xMsgProxyAddress;
 import org.jlab.coda.xmsg.net.xMsgRegAddress;
 import org.jlab.coda.xmsg.sys.pubsub.xMsgProxyDriver;
 import org.jlab.coda.xmsg.sys.regdis.xMsgRegDriver;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.is;
@@ -68,7 +68,7 @@ public class ConnectionManagerTest {
                 });
     }
 
-    @Before
+    @BeforeEach
     public void setup() {
         manager = new ConnectionManager(factory);
     }

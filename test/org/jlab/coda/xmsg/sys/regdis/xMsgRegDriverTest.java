@@ -29,8 +29,8 @@ import org.jlab.coda.xmsg.data.xMsgR.xMsgRegistration;
 import org.jlab.coda.xmsg.data.xMsgR.xMsgRegistration.Builder;
 import org.jlab.coda.xmsg.net.xMsgRegAddress;
 import org.jlab.coda.xmsg.net.xMsgSocketFactory;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
 import java.util.Arrays;
 import java.util.HashSet;
@@ -58,7 +58,7 @@ public class xMsgRegDriverTest {
     private final String topic = "writer:scifi:books";
 
 
-    @Before
+    @BeforeEach
     public void setup() throws Exception {
         xMsgRegAddress address = new xMsgRegAddress("10.2.9.1");
         xMsgSocketFactory factory = mock(xMsgSocketFactory.class);

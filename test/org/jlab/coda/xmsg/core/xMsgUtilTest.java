@@ -25,22 +25,17 @@ package org.jlab.coda.xmsg.core;
 import java.util.Arrays;
 import java.util.List;
 
-import org.junit.Rule;
-import org.junit.Test;
-import org.junit.rules.ExpectedException;
+import org.junit.jupiter.api.Test;
 
 import com.google.protobuf.ByteString;
 
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertTrue;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.is;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 
 public class xMsgUtilTest {
-
-    @Rule
-    public ExpectedException expectedEx = ExpectedException.none();
 
     @Test
     public void checkValidIPs() throws Exception {
@@ -55,7 +50,7 @@ public class xMsgUtilTest {
         };
 
         for (String ip : ips) {
-            assertTrue(ip + " should be valid", xMsgUtil.isIP(ip));
+            assertTrue(xMsgUtil.isIP(ip), ip + " should be valid");
         }
     }
 
@@ -75,7 +70,7 @@ public class xMsgUtilTest {
         };
 
         for (String ip : ips) {
-            assertFalse(ip + " should be invalid", xMsgUtil.isIP(ip));
+            assertFalse(xMsgUtil.isIP(ip), ip + " should be invalid");
         }
     }
 
@@ -88,7 +83,7 @@ public class xMsgUtilTest {
         };
 
         for (String ip : ips) {
-            assertFalse(ip + " should be invalid", xMsgUtil.isIP(ip));
+            assertFalse(xMsgUtil.isIP(ip), ip + " should be invalid");
         }
     }
 

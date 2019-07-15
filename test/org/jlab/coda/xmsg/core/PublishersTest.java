@@ -30,9 +30,8 @@ import java.util.concurrent.atomic.AtomicLong;
 
 import org.jlab.coda.xmsg.excp.xMsgException;
 import org.jlab.coda.xmsg.sys.ProxyWrapper;
-import org.jlab.coda.xmsg.testing.IntegrationTest;
-import org.junit.Test;
-import org.junit.experimental.categories.Category;
+import org.junit.jupiter.api.Tag;
+import org.junit.jupiter.api.Test;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.is;
@@ -51,7 +50,7 @@ import static org.hamcrest.Matchers.is;
  *
  * @see SubscriptionsTest
  */
-@Category(IntegrationTest.class)
+@Tag("integration")
 public class PublishersTest {
 
     @Test

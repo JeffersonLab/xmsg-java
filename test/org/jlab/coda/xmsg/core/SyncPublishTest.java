@@ -29,9 +29,8 @@ import org.jlab.coda.xmsg.excp.xMsgException;
 import org.jlab.coda.xmsg.net.xMsgRegAddress;
 import org.jlab.coda.xmsg.sys.ProxyWrapper;
 import org.jlab.coda.xmsg.sys.RegistrarWrapper;
-import org.jlab.coda.xmsg.testing.IntegrationTest;
-import org.junit.Test;
-import org.junit.experimental.categories.Category;
+import org.junit.jupiter.api.Tag;
+import org.junit.jupiter.api.Test;
 
 import java.util.Set;
 import java.util.concurrent.ThreadPoolExecutor;
@@ -58,27 +57,14 @@ import static org.hamcrest.MatcherAssert.assertThat;
  *
  * @see SubscriptionsTest
  */
-@Category(IntegrationTest.class)
+@Tag("integration")
 public final class SyncPublishTest {
 
     private static final String TOPIC = "sync_pub_test";
     private static final int TIME_OUT = 1000;
 
-    private final xMsgRegAddress regAddress;
-
-    public SyncPublishTest() {
-        this(xMsgUtil.localhost());
-    }
-
-    private SyncPublishTest(String feHost) {
-        regAddress = new xMsgRegAddress(feHost);
-    }
-
-    private xMsg listener(int poolSize) throws xMsgException {
-        return listener(poolSize, xMsgUtil.localhost());
-    }
-
-    private xMsg listener(int poolSize, String name) throws xMsgException {
+    private static xMsg listener(int poolSize, String name, xMsgRegAddress regAddress)
+            throws xMsgException {
         xMsgTopic topic = xMsgTopic.build(TOPIC, name);
         xMsg actor = new xMsg(name, regAddress, poolSize);
         try {
@@ -99,7 +85,8 @@ public final class SyncPublishTest {
         }
     }
 
-    private Result publisher(int cores, int numMessages) throws Exception {
+    private static Result publisher(int cores, int numMessages, xMsgRegAddress regAddress)
+            throws Exception {
         ThreadPoolExecutor pool = xMsgUtil.newThreadPool(cores, "sync-pub-");
 
         try (xMsg actor = new xMsg("sync_tester", regAddress)) {
@@ -212,12 +199,13 @@ public final class SyncPublishTest {
 
     @Test
     public void run() throws Exception {
+        xMsgRegAddress address = new xMsgRegAddress();
         try (RegistrarWrapper registrar = new RegistrarWrapper();
              ProxyWrapper proxy = new ProxyWrapper()) {
-            try (xMsg list1 = listener(1, "foo");
-                 xMsg list2 = listener(1, "bar")) {
+            try (xMsg list1 = listener(1, "foo", address);
+                 xMsg list2 = listener(1, "bar", address)) {
                 xMsgUtil.sleep(100);
-                Result results = publisher(1, 1000);
+                Result results = publisher(1, 1000, address);
                 assertThat(results.sum.get(), is(results.totalSum));
             }
         }
@@ -236,16 +224,17 @@ public final class SyncPublishTest {
         String command = args[2];
 
         try {
-            SyncPublishTest test = new SyncPublishTest(frontEnd);
+            xMsgRegAddress address = new xMsgRegAddress(frontEnd);
             if (command.equals("listener")) {
                 int poolSize = Integer.parseInt(cores);
-                try (xMsg sub = test.listener(poolSize)) {
+                try (xMsg sub = SyncPublishTest.listener(poolSize, "local", address)) {
                     xMsgUtil.keepAlive();
                 }
             } else {
                 int pubThreads = Integer.parseInt(cores);
                 int totalMessages = Integer.parseInt(command);
-                boolean stat = test.publisher(pubThreads, totalMessages).check();
+                boolean stat = SyncPublishTest.publisher(pubThreads, totalMessages, address)
+                                              .check();
                 if (!stat) {
                     System.exit(1);
                 }

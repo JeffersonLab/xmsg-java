@@ -28,8 +28,8 @@ import java.util.stream.Stream;
 
 import org.jlab.coda.xmsg.core.xMsgTopic;
 import org.jlab.coda.xmsg.data.xMsgR.xMsgRegistration;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.empty;
@@ -71,7 +71,7 @@ public class xMsgRegDatabaseTest {
     }
 
 
-    @Before
+    @BeforeEach
     public void setup() {
         db = new xMsgRegDatabase();
     }
