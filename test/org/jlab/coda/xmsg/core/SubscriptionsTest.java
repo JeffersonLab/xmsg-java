@@ -218,8 +218,8 @@ public class SubscriptionsTest {
         pubThread.start();
         pubThread.join();
 
-        assertTrue(check.received, "not received");
-        assertTrue(check.timeout, "no timeout");
+        assertTrue(check.received, "Received message");
+        assertTrue(check.timeout, "Timeout reached");
     }
 
     @Test

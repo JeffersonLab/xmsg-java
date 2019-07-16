@@ -76,6 +76,18 @@ public class xMsgRegDatabaseTest {
         db = new xMsgRegDatabase();
     }
 
+    private void register(xMsgRegistration.Builder... regs) {
+        Stream.of(regs).forEach(r -> db.register(r.build()));
+    }
+
+    private void registerAll() {
+        register(asimov1, asimov2, bradbury1, bradbury2, brando2, twain1, twain2, tolkien1);
+    }
+
+    private void remove(xMsgRegistration.Builder... regs) {
+        Stream.of(regs).forEach(r -> db.remove(r.build()));
+    }
+
 
     @Test
     public void newRegistrationDatabaseIsEmpty() throws Exception {
@@ -85,65 +97,57 @@ public class xMsgRegDatabaseTest {
 
     @Test
     public void addFirstRegistrationOfFirstTopicCreatesTopic() throws Exception {
-        db.register(asimov1.build());
+        register(asimov1);
 
-        assertThat(db.topics(), is(newTopicSet("writer:scifi:books")));
-        assertThat(db.get("writer:scifi:books"), is(newRegSet(asimov1)));
+        assertThat(db.topics(), is(setOf("writer:scifi:books")));
+        assertThat(db.get("writer:scifi:books"), is(setOf(asimov1)));
     }
 
 
     @Test
     public void addNextRegistrationOfFirstTopic() throws Exception {
-        db.register(twain1.build());
-        db.register(twain2.build());
+        register(twain1, twain2);
 
-        assertThat(db.get("writer:adventure"), is(newRegSet(twain1, twain2)));
+        assertThat(db.get("writer:adventure"), is(setOf(twain1, twain2)));
     }
 
 
     @Test
     public void addFirstRegistrationOfNewTopic() throws Exception {
-        db.register(asimov1.build());
-        db.register(bradbury1.build());
-        db.register(twain1.build());
-        db.register(tolkien1.build());
+        register(asimov1, bradbury1, twain1, tolkien1);
 
-        assertThat(db.topics(),
-                is(newTopicSet("writer:scifi:books",
-                               "writer:adventure",
-                               "writer:adventure:tales")));
+        assertThat(db.topics(), is(setOf("writer:scifi:books",
+                                         "writer:adventure",
+                                         "writer:adventure:tales")));
 
-        assertThat(db.get("writer:scifi:books"), is(newRegSet(asimov1, bradbury1)));
-        assertThat(db.get("writer:adventure"), is(newRegSet(twain1)));
-        assertThat(db.get("writer:adventure:tales"), is(newRegSet(tolkien1)));
+        assertThat(db.get("writer:scifi:books"), is(setOf(asimov1, bradbury1)));
+        assertThat(db.get("writer:adventure"), is(setOf(twain1)));
+        assertThat(db.get("writer:adventure:tales"), is(setOf(tolkien1)));
     }
 
 
     @Test
     public void addNextRegistrationOfNewTopic() throws Exception {
-        db.register(asimov1.build());
-        db.register(twain1.build());
-        db.register(twain2.build());
+        register(asimov1, twain1, twain2);
 
-        assertThat(db.get("writer:scifi:books"), is(newRegSet(asimov1)));
-        assertThat(db.get("writer:adventure"), is(newRegSet(twain1, twain2)));
+        assertThat(db.get("writer:scifi:books"), is(setOf(asimov1)));
+        assertThat(db.get("writer:adventure"), is(setOf(twain1, twain2)));
     }
 
 
     @Test
     public void addDuplicatedRegistrationDoesNothing() throws Exception {
-        db.register(asimov1.build());
-        db.register(bradbury1.build());
-        db.register(bradbury1.build());
+        register(asimov1, bradbury1, bradbury1);
 
-        assertThat(db.get("writer:scifi:books"), is(newRegSet(asimov1, bradbury1)));
+        assertThat(db.get("writer:scifi:books"), is(setOf(asimov1, bradbury1)));
     }
 
 
     @Test
     public void removeRegistrationFromOnlyTopicWithOneElement() throws Exception {
-        db.register(asimov1.build());
-        db.remove(asimov1.build());
+        register(asimov1);
+
+        remove(asimov1);
 
         assertThat(db.find("writer", "scifi", "books"), is(empty()));
     }
@@ -151,85 +155,67 @@ public class xMsgRegDatabaseTest {
 
     @Test
     public void removeRegistrationFromOnlyTopicWithSeveralElements() throws Exception {
-        db.register(asimov1.build());
-        db.register(asimov2.build());
-        db.register(bradbury1.build());
+        register(asimov1, asimov2, bradbury1);
 
-        db.remove(asimov2.build());
+        remove(asimov2);
 
-        assertThat(db.find("writer", "scifi", "books"),
-                   is(newRegSet(asimov1, bradbury1)));
+        assertThat(db.find("writer", "scifi", "books"), is(setOf(asimov1, bradbury1)));
     }
 
 
     @Test
     public void removeRegistrationFromTopicWithOneElement() throws Exception {
-        db.register(asimov1.build());
-        db.register(twain1.build());
-        db.register(twain2.build());
+        register(asimov1, twain1, twain2);
 
-        db.remove(asimov1.build());
+        remove(asimov1);
 
-        assertThat(db.topics(), is(newTopicSet("writer:adventure")));
-        assertThat(db.get("writer:adventure"), is(newRegSet(twain1, twain2)));
+        assertThat(db.topics(), is(setOf("writer:adventure")));
+        assertThat(db.get("writer:adventure"), is(setOf(twain1, twain2)));
     }
 
 
     @Test
     public void removeRegistrationFromTopicWithSeveralElements() throws Exception {
-        db.register(asimov1.build());
-        db.register(asimov2.build());
-        db.register(bradbury1.build());
-        db.register(twain1.build());
-        db.register(twain2.build());
+        register(asimov1, asimov2, bradbury1, twain1, twain2);
 
-        db.remove(bradbury1.build());
+        remove(bradbury1);
 
-        assertThat(db.get("writer:scifi:books"), is(newRegSet(asimov1, asimov2)));
-        assertThat(db.get("writer:adventure"), is(newRegSet(twain1, twain2)));
+        assertThat(db.get("writer:scifi:books"), is(setOf(asimov1, asimov2)));
+        assertThat(db.get("writer:adventure"), is(setOf(twain1, twain2)));
     }
 
 
     @Test
     public void removeMissingRegistrationDoesNothing() throws Exception {
-        db.register(asimov1.build());
-        db.register(asimov2.build());
+        register(asimov1, asimov2);
 
-        db.remove(bradbury1.build());
+        remove(bradbury1);
 
-        assertThat(db.get("writer:scifi:books"), is(newRegSet(asimov1, asimov2)));
+        assertThat(db.get("writer:scifi:books"), is(setOf(asimov1, asimov2)));
     }
 
 
     @Test
     public void removeRegistrationByHost() throws Exception {
-        db.register(asimov1.build());
-        db.register(asimov2.build());
-        db.register(bradbury1.build());
-        db.register(bradbury2.build());
-        db.register(twain1.build());
-        db.register(twain2.build());
-        db.register(brando2.build());
-        db.register(tolkien1.build());
+        registerAll();
 
         db.remove("10.2.9.2");
 
-        assertThat(db.topics(),
-                   is(newTopicSet("writer:scifi:books",
-                                  "writer:adventure",
-                                  "writer:adventure:tales")));
+        assertThat(db.topics(), is(setOf("writer:scifi:books",
+                                         "writer:adventure",
+                                         "writer:adventure:tales")));
 
-        assertThat(db.get("writer:scifi:books"), is(newRegSet(asimov1, bradbury1)));
-        assertThat(db.get("writer:adventure"), is(newRegSet(twain1)));
-        assertThat(db.get("writer:adventure:tales"), is(newRegSet(tolkien1)));
+        assertThat(db.get("writer:scifi:books"), is(setOf(asimov1, bradbury1)));
+        assertThat(db.get("writer:adventure"), is(setOf(twain1)));
+        assertThat(db.get("writer:adventure:tales"), is(setOf(tolkien1)));
     }
 
 
     @Test
     public void removeLastRegistrationByData() throws Exception {
-        db.register(asimov1.build());
+        register(asimov1);
 
-        db.remove(asimov1.build());
+        remove(asimov1);
 
         assertThat(db.topics(), is(empty()));
     }
@@ -237,7 +223,7 @@ public class xMsgRegDatabaseTest {
 
     @Test
     public void removeLastRegistrationByHost() throws Exception {
-        db.register(asimov1.build());
+        register(asimov1);
 
         db.remove("10.2.9.1");
 
@@ -247,55 +233,34 @@ public class xMsgRegDatabaseTest {
 
     @Test
     public void findByDomain() throws Exception {
-        db.register(asimov1.build());
-        db.register(twain2.build());
-        db.register(brando2.build());
-        db.register(tolkien1.build());
+        register(asimov1, twain2, brando2, tolkien1);
 
-        assertThat(db.find("writer", "*", "*"),
-                   is(newRegSet(asimov1, twain2, tolkien1)));
-        assertThat(db.find("actor", "*", "*"),
-                   is(newRegSet(brando2)));
+        assertThat(db.find("writer", "*", "*"), is(setOf(asimov1, twain2, tolkien1)));
+        assertThat(db.find("actor", "*", "*"), is(setOf(brando2)));
     }
 
 
     @Test
     public void findByDomainAndSubject() throws Exception {
-        db.register(asimov1.build());
-        db.register(bradbury2.build());
-        db.register(twain1.build());
-        db.register(twain2.build());
-        db.register(brando2.build());
-        db.register(tolkien1.build());
+        register(asimov1, bradbury2, twain1, twain2, brando2, tolkien1);
 
-        assertThat(db.find("writer", "adventure", "*"),
-                   is(newRegSet(twain1, twain2, tolkien1)));
-        assertThat(db.find("actor", "drama", "*"),
-                   is(empty()));
+        assertThat(db.find("writer", "adventure", "*"), is(setOf(twain1, twain2, tolkien1)));
+        assertThat(db.find("actor", "drama", "*"), is(empty()));
     }
 
 
     @Test
     public void findByFullTopic() throws Exception {
-        db.register(asimov1.build());
-        db.register(bradbury2.build());
-        db.register(brando2.build());
-        db.register(twain1.build());
-        db.register(tolkien1.build());
+        register(asimov1, bradbury2, brando2, twain1, tolkien1);
 
-        assertThat(db.find("writer", "scifi", "books"),
-                   is(newRegSet(asimov1, bradbury2)));
-        assertThat(db.find("actor", "drama", "movies"),
-                   is(empty()));
+        assertThat(db.find("writer", "scifi", "books"), is(setOf(asimov1, bradbury2)));
+        assertThat(db.find("actor", "drama", "movies"), is(empty()));
     }
 
 
     @Test
     public void findUnregisteredTopicReturnsEmpty() throws Exception {
-        db.register(asimov1.build());
-        db.register(bradbury2.build());
-        db.register(brando2.build());
-        db.register(tolkien1.build());
+        register(asimov1, bradbury2, brando2, tolkien1);
 
         assertThat(db.find("writer", "adventure", "books"), is(empty()));
     }
@@ -303,50 +268,34 @@ public class xMsgRegDatabaseTest {
 
     @Test
     public void reverseFindByDomain() throws Exception {
-        db.register(asimov1.build());
-        db.register(twain2.build());
-        db.register(brando2.build());
-        db.register(tolkien1.build());
+        register(asimov1, twain2, brando2, tolkien1);
 
-        assertThat(db.rfind("writer", "*", "*"),
-                   is(empty()));
-        assertThat(db.rfind("actor", "*", "*"),
-                   is(newRegSet(brando2)));
+        assertThat(db.rfind("writer", "*", "*"), is(empty()));
+        assertThat(db.rfind("actor", "*", "*"), is(setOf(brando2)));
     }
 
 
     @Test
     public void reverseFindByDomainAndSubject() throws Exception {
-        db.register(asimov1.build());
-        db.register(bradbury2.build());
-        db.register(twain1.build());
-        db.register(twain2.build());
-        db.register(brando2.build());
-        db.register(tolkien1.build());
+        register(asimov1, bradbury2, twain1, twain2, brando2, tolkien1);
 
-        assertThat(db.rfind("writer", "adventure", "*"), is(newRegSet(twain1, twain2)));
-        assertThat(db.rfind("actor", "drama", "*"), is(newRegSet(brando2)));
+        assertThat(db.rfind("writer", "adventure", "*"), is(setOf(twain1, twain2)));
+        assertThat(db.rfind("actor", "drama", "*"), is(setOf(brando2)));
     }
 
 
     @Test
     public void reverseFindByFullTopic() throws Exception {
-        db.register(asimov1.build());
-        db.register(bradbury2.build());
-        db.register(brando2.build());
-        db.register(twain1.build());
-        db.register(tolkien1.build());
+        register(asimov1, bradbury2, brando2, twain1, tolkien1);
 
-        assertThat(db.rfind("writer", "adventure", "tales"), is(newRegSet(twain1, tolkien1)));
-        assertThat(db.rfind("actor", "drama", "movies"), is(newRegSet(brando2)));
+        assertThat(db.rfind("writer", "adventure", "tales"), is(setOf(twain1, tolkien1)));
+        assertThat(db.rfind("actor", "drama", "movies"), is(setOf(brando2)));
     }
 
 
     @Test
     public void reverseFindUnregisteredTopicReturnsEmpty() throws Exception {
-        db.register(asimov1.build());
-        db.register(twain2.build());
-        db.register(tolkien1.build());
+        register(asimov1, twain2, tolkien1);
 
         assertThat(db.rfind("writer", "scifi", "tales"), is(empty()));
     }
@@ -354,121 +303,71 @@ public class xMsgRegDatabaseTest {
 
     @Test
     public void filterByDomain() throws Exception {
-        db.register(asimov1.build());
-        db.register(asimov2.build());
-        db.register(bradbury1.build());
-        db.register(bradbury2.build());
-        db.register(brando2.build());
-        db.register(twain1.build());
-        db.register(twain2.build());
-        db.register(tolkien1.build());
+        registerAll();
 
-        xMsgRegistration.Builder filter = emptyFilter();
-        filter.setDomain("writer");
+        xMsgRegistration filter = newFilter().setDomain("writer").build();
 
-        assertThat(db.filter(filter.build()),
-                   is(newRegSet(asimov1, asimov2, bradbury1, bradbury2, twain1, twain2, tolkien1)));
+        assertThat(db.filter(filter),
+                   is(setOf(asimov1, asimov2, bradbury1, bradbury2, twain1, twain2, tolkien1)));
     }
 
 
     @Test
     public void filterBySubject() throws Exception {
-        db.register(asimov1.build());
-        db.register(asimov2.build());
-        db.register(bradbury1.build());
-        db.register(bradbury2.build());
-        db.register(brando2.build());
-        db.register(twain1.build());
-        db.register(twain2.build());
-        db.register(tolkien1.build());
+        registerAll();
 
-        xMsgRegistration.Builder filter = emptyFilter();
-        filter.setSubject("adventure");
+        xMsgRegistration filter = newFilter().setSubject("adventure").build();
 
-        assertThat(db.filter(filter.build()), is(newRegSet(twain1, twain2, tolkien1)));
+        assertThat(db.filter(filter), is(setOf(twain1, twain2, tolkien1)));
     }
 
 
     @Test
     public void filterByType() throws Exception {
-        db.register(asimov1.build());
-        db.register(asimov2.build());
-        db.register(bradbury1.build());
-        db.register(bradbury2.build());
-        db.register(brando2.build());
-        db.register(twain1.build());
-        db.register(twain2.build());
-        db.register(tolkien1.build());
+        registerAll();
 
-        xMsgRegistration.Builder filter = emptyFilter();
-        filter.setType("books");
+        xMsgRegistration filter = newFilter().setType("books").build();
 
-        assertThat(db.filter(filter.build()),
-                   is(newRegSet(asimov1, asimov2, bradbury1, bradbury2)));
+        assertThat(db.filter(filter),
+                   is(setOf(asimov1, asimov2, bradbury1, bradbury2)));
     }
 
 
     @Test
     public void filterByAddress() throws Exception {
-        db.register(asimov1.build());
-        db.register(asimov2.build());
-        db.register(bradbury1.build());
-        db.register(bradbury2.build());
-        db.register(brando2.build());
-        db.register(twain1.build());
-        db.register(twain2.build());
-        db.register(tolkien1.build());
+        registerAll();
 
-        xMsgRegistration.Builder filter = emptyFilter();
-        filter.setHost("10.2.9.2");
+        xMsgRegistration filter = newFilter().setHost("10.2.9.2").build();
 
-        assertThat(db.filter(filter.build()),
-                   is(newRegSet(asimov2, bradbury2, brando2, twain2)));
+        assertThat(db.filter(filter),
+                   is(setOf(asimov2, bradbury2, brando2, twain2)));
     }
 
 
     @Test
     public void filterUnregisteredTopicReturnsEmpty() throws Exception {
-        db.register(asimov1.build());
-        db.register(twain2.build());
-        db.register(tolkien1.build());
+        register(asimov1, twain2, tolkien1);
 
-        xMsgRegistration.Builder filter = emptyFilter();
-        filter.setDomain("artist");
+        xMsgRegistration filter = newFilter().setDomain("artist").build();
 
-        assertThat(db.filter(filter.build()), is(empty()));
+        assertThat(db.filter(filter), is(empty()));
     }
 
 
     @Test
     public void getSame() throws Exception {
-        db.register(asimov1.build());
-        db.register(brando2.build());
-        db.register(twain1.build());
-        db.register(twain2.build());
-        db.register(tolkien1.build());
+        register(asimov1, brando2, twain1, twain2, tolkien1);
 
-        assertThat(db.same("writer", "adventure", "*"), is(newRegSet(twain1, twain2)));
+        assertThat(db.same("writer", "adventure", "*"), is(setOf(twain1, twain2)));
     }
 
 
     @Test
     public void getAll() throws Exception {
-        db.register(asimov1.build());
-        db.register(asimov2.build());
-        db.register(bradbury1.build());
-        db.register(bradbury2.build());
-        db.register(brando2.build());
-        db.register(twain1.build());
-        db.register(twain2.build());
-        db.register(tolkien1.build());
+        registerAll();
 
-        assertThat(db.all(), is(newRegSet(asimov1, asimov2,
-                                          bradbury1, bradbury2,
-                                          twain1, twain2,
-                                          brando2,
-                                          tolkien1
-                                          )));
+        assertThat(db.all(), is(setOf(asimov1, asimov2, bradbury1, bradbury2,
+                                      twain1, twain2, brando2, tolkien1)));
     }
 
 
@@ -479,17 +378,17 @@ public class xMsgRegDatabaseTest {
     }
 
 
-    private static xMsgRegistration.Builder emptyFilter() {
+    private static xMsgRegistration.Builder newFilter() {
         return xMsgRegFactory.newFilter(TYPE);
     }
 
 
-    private static Set<xMsgTopic> newTopicSet(String... topics) {
+    private static Set<xMsgTopic> setOf(String... topics) {
         return Stream.of(topics).map(xMsgTopic::wrap).collect(Collectors.toSet());
     }
 
 
-    private static Set<xMsgRegistration> newRegSet(xMsgRegistration.Builder... regs) {
-        return Stream.of(regs).map(r -> r.build()).collect(Collectors.toSet());
+    private static Set<xMsgRegistration> setOf(xMsgRegistration.Builder... regs) {
+        return Stream.of(regs).map(xMsgRegistration.Builder::build).collect(Collectors.toSet());
     }
 }

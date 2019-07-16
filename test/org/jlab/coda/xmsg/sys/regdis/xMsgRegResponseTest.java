@@ -69,8 +69,8 @@ public class xMsgRegResponseTest {
         String error = "could not handle request";
         xMsgRegResponse sendResponse = new xMsgRegResponse("foo:bar", "registration_fe", error);
 
-        xMsgException ex = assertThrows(
-                xMsgException.class, () -> new xMsgRegResponse(sendResponse.msg()));
+        xMsgException ex = assertThrows(xMsgException.class, () ->
+                new xMsgRegResponse(sendResponse.msg()));
         assertThat(ex.getMessage(), containsString(error));
     }
 

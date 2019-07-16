@@ -27,8 +27,8 @@ import org.junit.jupiter.api.Test;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.is;
 import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
-import static org.junit.jupiter.api.Assertions.fail;
 
 public class xMsgTopicTest {
 
@@ -62,36 +62,21 @@ public class xMsgTopicTest {
     @Test
     public void buildWithUndefinedDomainFails() throws Exception {
         for (String s : new String[]{"*", null}) {
-            try {
-                xMsgTopic.build(s);
-            } catch (IllegalArgumentException e) {
-                continue;
-            }
-            fail("build(\"" + s + "\") should throw an exception");
+            assertThrows(IllegalArgumentException.class, () -> xMsgTopic.build(s));
         }
     }
 
     @Test
     public void buildWithUndefinedDomainAndValidSubjectFails() throws Exception {
         for (String s : new String[]{"*", null}) {
-            try {
-                xMsgTopic.build(s, "metal");
-            } catch (IllegalArgumentException e) {
-                continue;
-            }
-            fail("build(\"" + s + "\") should throw an exception");
+            assertThrows(IllegalArgumentException.class, () -> xMsgTopic.build(s, "metal"));
         }
     }
 
     @Test
     public void buildWithNullDomainAndValidTypeFails() throws Exception {
         for (String s : new String[]{"*", null}) {
-            try {
-                xMsgTopic.build(s);
-            } catch (IllegalArgumentException e) {
-                continue;
-            }
-            fail("build(\"" + s + "\") should throw an exception");
+            assertThrows(IllegalArgumentException.class, () -> xMsgTopic.build(s));
         }
     }
 

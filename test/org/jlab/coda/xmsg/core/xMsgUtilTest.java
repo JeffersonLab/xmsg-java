@@ -50,7 +50,7 @@ public class xMsgUtilTest {
         };
 
         for (String ip : ips) {
-            assertTrue(xMsgUtil.isIP(ip), ip + " should be valid");
+            assertTrue(xMsgUtil.isIP(ip), "isIP: " + ip);
         }
     }
 
@@ -70,7 +70,7 @@ public class xMsgUtilTest {
         };
 
         for (String ip : ips) {
-            assertFalse(xMsgUtil.isIP(ip), ip + " should be invalid");
+            assertFalse(xMsgUtil.isIP(ip), "is IP: " + ip);
         }
     }
 
@@ -83,7 +83,7 @@ public class xMsgUtilTest {
         };
 
         for (String ip : ips) {
-            assertFalse(xMsgUtil.isIP(ip), ip + " should be invalid");
+            assertFalse(xMsgUtil.isIP(ip), "is IP: " + ip);
         }
     }
 
@@ -117,6 +117,7 @@ public class xMsgUtilTest {
         for (int i = 1; i < 10000; i++) {
             xMsgUtil.getUniqueReplyTo("subject");
         }
+
         assertThat(xMsgUtil.getUniqueReplyTo("subject"), is("ret:subject:1000000"));
         assertThat(xMsgUtil.getUniqueReplyTo("subject"), is("ret:subject:1000001"));
         assertThat(xMsgUtil.getUniqueReplyTo("subject"), is("ret:subject:1000002"));
@@ -126,9 +127,9 @@ public class xMsgUtilTest {
     public void overflowReplyToGenerator() throws Exception {
         xMsgUtil.setUniqueReplyToGenerator(Integer.MAX_VALUE);
 
-        assertThat(xMsgUtil.getUniqueReplyTo("subject"), is("ret:subject:1483647"));
-        assertThat(xMsgUtil.getUniqueReplyTo("subject"), is("ret:subject:1483648"));
-        assertThat(xMsgUtil.getUniqueReplyTo("subject"), is("ret:subject:1483649"));
+        assertThat(xMsgUtil.getUniqueReplyTo("subject"), is("ret:subject:1483647"));  // 0x7fff_ffff
+        assertThat(xMsgUtil.getUniqueReplyTo("subject"), is("ret:subject:1483648"));  // 0x8000_0000
+        assertThat(xMsgUtil.getUniqueReplyTo("subject"), is("ret:subject:1483649"));  // 0x8000_0001
 
         for (int i = 0; i < 1000000 - 483650; i++) {
             xMsgUtil.getUniqueReplyTo("subject");
@@ -137,13 +138,19 @@ public class xMsgUtilTest {
         assertThat(xMsgUtil.getUniqueReplyTo("subject"), is("ret:subject:1000000"));
         assertThat(xMsgUtil.getUniqueReplyTo("subject"), is("ret:subject:1000001"));
         assertThat(xMsgUtil.getUniqueReplyTo("subject"), is("ret:subject:1000002"));
+
+        xMsgUtil.setUniqueReplyToGenerator(-1);
+
+        assertThat(xMsgUtil.getUniqueReplyTo("subject"), is("ret:subject:1967295"));  // 0xffff_ffff
+        assertThat(xMsgUtil.getUniqueReplyTo("subject"), is("ret:subject:1000000"));  // 0x0000_0000
+        assertThat(xMsgUtil.getUniqueReplyTo("subject"), is("ret:subject:1000001"));  // 0x0000_0001
     }
 
     @Test
     public void encodeIdentity() throws Exception {
         String encode = xMsgUtil.encodeIdentity(xMsgUtil.localhost(), "test_actor");
-        assertThat(encode.length(), is(8));
 
+        assertThat(encode.length(), is(8));
     }
 
     @Test

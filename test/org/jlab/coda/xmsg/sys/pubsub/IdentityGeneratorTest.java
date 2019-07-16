@@ -25,6 +25,7 @@ package org.jlab.coda.xmsg.sys.pubsub;
 import org.junit.jupiter.api.Test;
 
 import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.hasLength;
 import static org.hamcrest.Matchers.is;
 import static org.hamcrest.Matchers.not;
 
@@ -32,9 +33,9 @@ public class IdentityGeneratorTest {
 
     @Test
     public void ctrlIdentityHas9Digits() throws Exception {
-        assertThat(IdentityGenerator.getCtrlId().length(), is(9));
-        assertThat(IdentityGenerator.getCtrlId().length(), is(9));
-        assertThat(IdentityGenerator.getCtrlId().length(), is(9));
+        assertThat(IdentityGenerator.getCtrlId(), hasLength(9));
+        assertThat(IdentityGenerator.getCtrlId(), hasLength(9));
+        assertThat(IdentityGenerator.getCtrlId(), hasLength(9));
     }
 
     @Test
@@ -49,7 +50,7 @@ public class IdentityGeneratorTest {
     }
 
     @Test
-    public void ctrlIdentityFourthDigitIsJavaIdentifier() throws Exception {
+    public void ctrlIdentityFirstDigitIsJavaIdentifier() throws Exception {
         assertThat(IdentityGenerator.getCtrlId().charAt(0), is('1'));
         assertThat(IdentityGenerator.getCtrlId().charAt(0), is('1'));
         assertThat(IdentityGenerator.getCtrlId().charAt(0), is('1'));
