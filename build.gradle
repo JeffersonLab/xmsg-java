@@ -113,13 +113,13 @@ javadoc {
 }
 
 task javadocJar(type: Jar) {
-    classifier = 'javadoc'
+    archiveClassifier = 'javadoc'
     from javadoc
 }
 
 
 task sourcesJar(type: Jar, dependsOn: classes) {
-    classifier = 'sources'
+    archiveClassifier = 'sources'
     from sourceSets.main.allJava
     from generatedProtoDir
 }
@@ -169,7 +169,7 @@ task integrationTest(type: Test) {
 def deploySpec = copySpec {
     into ('lib') {
         from configurations.runtime
-        from jar.archivePath
+        from jar.archiveFile
     }
 
     from ('scripts/unix') {
