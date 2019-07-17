@@ -21,7 +21,7 @@
  */
 
 plugins {
-    id 'java'
+    id 'java-library'
     id 'maven'
     id 'com.google.protobuf' version '0.8.10'
 
@@ -90,14 +90,14 @@ repositories {
 
 
 dependencies {
-    compile 'org.zeromq:jeromq:0.4.3'
-    compile 'com.google.protobuf:protobuf-java:3.6.1'
-    compile 'net.sf.jopt-simple:jopt-simple:5.0.4'
+    api 'org.zeromq:jeromq:0.4.3'
+    api 'com.google.protobuf:protobuf-java:3.6.1'
+    implementation 'net.sf.jopt-simple:jopt-simple:5.0.4'
     deployerJars 'org.apache.maven.wagon:wagon-ssh-external:2.12'
-    testCompile 'org.junit.jupiter:junit-jupiter-api:5.5.0'
+    testImplementation 'org.junit.jupiter:junit-jupiter-api:5.5.0'
     testRuntimeOnly 'org.junit.jupiter:junit-jupiter-engine:5.5.0'
-    testCompile 'org.hamcrest:hamcrest-library:2.1'
-    testCompile 'org.mockito:mockito-core:2.28.2'
+    testImplementation 'org.hamcrest:hamcrest-library:2.1'
+    testImplementation 'org.mockito:mockito-core:2.28.2'
 }
 
 
