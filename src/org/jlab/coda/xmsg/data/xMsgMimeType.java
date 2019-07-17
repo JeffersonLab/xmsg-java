@@ -97,7 +97,7 @@ public final class xMsgMimeType {
     /**
      * An array of signed integers of 32 bytes and fixed length.
      */
-    public static final String ARRAY_SFIXED64 = "binary/array-sfixed32";
+    public static final String ARRAY_SFIXED64 = "binary/array-sfixed64";
 
     /**
      * An array of 32 bytes single-precision floating-point numbers.
