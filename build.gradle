@@ -94,7 +94,7 @@ dependencies {
     compile 'com.google.protobuf:protobuf-java:3.6.1'
     compile 'net.sf.jopt-simple:jopt-simple:5.0.4'
     deployerJars 'org.apache.maven.wagon:wagon-ssh-external:2.12'
-    testCompileOnly 'org.junit.jupiter:junit-jupiter-api:5.5.0'
+    testCompile 'org.junit.jupiter:junit-jupiter-api:5.5.0'
     testRuntimeOnly 'org.junit.jupiter:junit-jupiter-engine:5.5.0'
     testCompile 'org.hamcrest:hamcrest-library:2.1'
     testCompile 'org.mockito:mockito-core:2.28.2'
