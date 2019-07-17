@@ -132,10 +132,10 @@ public abstract class xMsgSubscription {
      */
     void start(xMsgConnectionSetup setup) throws xMsgException {
         setup.preSubscription(connection.getSocket());
-        topics.forEach(t -> connection.subscribe(t));
+        topics.forEach(connection::subscribe);
         if (setup.checkSubscription()
                 && !connection.checkSubscription(topics.get(0), setup.subscriptionTimeout())) {
-            topics.forEach(t -> connection.unsubscribe(t));
+            topics.forEach(connection::unsubscribe);
             throw new xMsgException(subscriptionError());
         }
         setup.postSubscription();
@@ -153,7 +153,7 @@ public abstract class xMsgSubscription {
         } catch (InterruptedException e) {
             Thread.currentThread().interrupt();
         } finally {
-            topics.forEach(t -> connection.unsubscribe(t));
+            topics.forEach(connection::unsubscribe);
             connection.close();
         }
     }

@@ -144,7 +144,7 @@ public final class xMsgUtil {
         try {
             // prefer address returned by getLocalHost first, if any
             InetAddress local = InetAddress.getLocalHost();
-            if (local != null && local instanceof Inet4Address && !local.isLoopbackAddress()) {
+            if (local instanceof Inet4Address && !local.isLoopbackAddress()) {
                 ips.add(local.getHostAddress());
             }
         } catch (IOException e) {

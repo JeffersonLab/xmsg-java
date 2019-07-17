@@ -89,6 +89,6 @@ public class xMsgRegRequestTest {
 
         xMsgRegRequest recvRequest = new xMsgRegRequest(msg);
 
-        assertThrows(InvalidProtocolBufferException.class, () -> recvRequest.data());
+        assertThrows(InvalidProtocolBufferException.class, recvRequest::data);
     }
 }

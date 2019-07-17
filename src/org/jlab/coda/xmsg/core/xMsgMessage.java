@@ -369,35 +369,35 @@ public class xMsgMessage {
                 xMsgData xd = xMsgData.parseFrom(data);
                 List<String> list = xd.getSTRINGAList();
                 if (!list.isEmpty()) {
-                    return list.toArray(new String[list.size()]);
+                    return list.toArray(new String[0]);
                 }
 
             } else if (dataType.equals(xMsgMimeType.ARRAY_SFIXED32)) {
                 xMsgData xd = xMsgData.parseFrom(data);
                 List<Integer> list = xd.getFLSINT32AList();
                 if (!list.isEmpty()) {
-                    return list.toArray(new Integer[list.size()]);
+                    return list.toArray(new Integer[0]);
                 }
 
             } else if (dataType.equals(xMsgMimeType.ARRAY_SFIXED64)) {
                 xMsgData xd = xMsgData.parseFrom(data);
                 List<Long> list = xd.getFLSINT64AList();
                 if (!list.isEmpty()) {
-                    return list.toArray(new Long[list.size()]);
+                    return list.toArray(new Long[0]);
                 }
 
             } else if (dataType.equals(xMsgMimeType.ARRAY_FLOAT)) {
                 xMsgData xd = xMsgData.parseFrom(data);
                 List<Float> list = xd.getFLOATAList();
                 if (!list.isEmpty()) {
-                    return list.toArray(new Float[list.size()]);
+                    return list.toArray(new Float[0]);
                 }
 
             } else if (dataType.equals(xMsgMimeType.ARRAY_DOUBLE)) {
                 xMsgData xd = xMsgData.parseFrom(data);
                 List<Double> list = xd.getDOUBLEAList();
                 if (!list.isEmpty()) {
-                    return list.toArray(new Double[list.size()]);
+                    return list.toArray(new Double[0]);
                 }
 
             } else {
@@ -469,7 +469,7 @@ public class xMsgMessage {
                 xMsgData xd = xMsgData.parseFrom(data);
                 List<String> list = xd.getSTRINGAList();
                 if (!list.isEmpty()) {
-                    String[] array = list.toArray(new String[list.size()]);
+                    String[] array = list.toArray(new String[0]);
                     return dataType.cast(array);
                 }
 
@@ -477,7 +477,7 @@ public class xMsgMessage {
                 xMsgData xd = xMsgData.parseFrom(data);
                 List<Integer> list = xd.getFLSINT32AList();
                 if (!list.isEmpty()) {
-                    Integer[] array = list.toArray(new Integer[list.size()]);
+                    Integer[] array = list.toArray(new Integer[0]);
                     return dataType.cast(array);
                 }
 
@@ -485,7 +485,7 @@ public class xMsgMessage {
                 xMsgData xd = xMsgData.parseFrom(data);
                 List<Long> list = xd.getFLSINT64AList();
                 if (!list.isEmpty()) {
-                    Long[] array = list.toArray(new Long[list.size()]);
+                    Long[] array = list.toArray(new Long[0]);
                     return dataType.cast(array);
                 }
 
@@ -493,7 +493,7 @@ public class xMsgMessage {
                 xMsgData xd = xMsgData.parseFrom(data);
                 List<Float> list = xd.getFLOATAList();
                 if (!list.isEmpty()) {
-                    Float[] array = list.toArray(new Float[list.size()]);
+                    Float[] array = list.toArray(new Float[0]);
                     return dataType.cast(array);
                 }
 
@@ -501,7 +501,7 @@ public class xMsgMessage {
                 xMsgData xd = xMsgData.parseFrom(data);
                 List<Double> list = xd.getDOUBLEAList();
                 if (!list.isEmpty()) {
-                    Double[] array = list.toArray(new Double[list.size()]);
+                    Double[] array = list.toArray(new Double[0]);
                     return dataType.cast(array);
                 }
 
@@ -545,7 +545,6 @@ public class xMsgMessage {
      */
     public static xMsgMessage createResponse(xMsgMessage msg, Object data) {
         xMsgTopic resTopic = xMsgTopic.wrap(msg.metaData.getReplyTo());
-        xMsgMessage res = createFrom(resTopic, data);
-        return res;
+        return createFrom(resTopic, data);
     }
 }
