@@ -32,35 +32,11 @@ plugins {
     id 'idea'
 }
 
-
 group = 'org.jlab.coda'
 archivesBaseName = 'xmsg'
 version = '2.4-SNAPSHOT'
 
 defaultTasks 'build'
-
-compileJava {
-    sourceCompatibility = 1.8
-    targetCompatibility = 1.8
-}
-
-protobuf {
-    protoc {
-        artifact = 'com.google.protobuf:protoc:3.6.1'
-    }
-}
-
-if (hasProperty('protocPath')) {
-    protobuf {
-        protoc {
-            path = protocPath
-        }
-    }
-}
-
-ext {
-    generatedProtoDir = "${buildDir.name}/generated/source/proto/main/java"
-}
 
 
 configurations {
@@ -83,11 +59,9 @@ sourceSets {
     }
 }
 
-
 repositories {
     mavenCentral()
 }
-
 
 dependencies {
     api 'org.zeromq:jeromq:0.4.3'
@@ -98,6 +72,25 @@ dependencies {
     testRuntimeOnly 'org.junit.jupiter:junit-jupiter-engine:5.5.0'
     testImplementation 'org.hamcrest:hamcrest-library:2.1'
     testImplementation 'org.mockito:mockito-core:2.28.2'
+}
+
+
+compileJava {
+    sourceCompatibility = 1.8
+    targetCompatibility = 1.8
+}
+
+ext {
+    generatedProtoDir = "${buildDir.name}/generated/source/proto/main/java"
+}
+
+protobuf {
+    protoc {
+        artifact = 'com.google.protobuf:protoc:3.6.1'
+        if (project.hasProperty('protocPath')) {
+            path = protocPath
+        }
+    }
 }
 
 
@@ -112,11 +105,11 @@ javadoc {
     exclude "org/jlab/coda/xmsg/sys/*/*.java"
 }
 
+
 task javadocJar(type: Jar) {
     archiveClassifier = 'javadoc'
     from javadoc
 }
-
 
 task sourcesJar(type: Jar, dependsOn: classes) {
     archiveClassifier = 'sources'
@@ -124,12 +117,10 @@ task sourcesJar(type: Jar, dependsOn: classes) {
     from generatedProtoDir
 }
 
-
 artifacts {
     archives javadocJar
     archives sourcesJar
 }
-
 
 uploadArchives {
     repositories {
@@ -152,7 +143,6 @@ test {
     }
 }
 
-
 task integrationTest(type: Test) {
     useJUnitPlatform {
         includeTags 'integration'
@@ -163,7 +153,6 @@ task integrationTest(type: Test) {
     }
     outputs.upToDateWhen { false }
 }
-
 
 
 def deploySpec = copySpec {
@@ -179,7 +168,6 @@ def deploySpec = copySpec {
     }
 }
 
-
 task deploy(type: Copy, dependsOn: install) {
     def dest = "$System.env.CLARA_HOME"
 
@@ -192,7 +180,6 @@ task deploy(type: Copy, dependsOn: install) {
         }
     }
 }
-
 
 
 ext.classPathCache = file("${buildDir}/tmp/classpath")
@@ -229,7 +216,6 @@ def ciMode() {
     }
     return false
 }
-
 
 checkstyle {
     toolVersion = '8.22'
