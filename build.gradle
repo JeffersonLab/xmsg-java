@@ -36,6 +36,9 @@ group = 'org.jlab.coda'
 archivesBaseName = 'xmsg'
 version = '2.4-SNAPSHOT'
 
+sourceCompatibility = '1.8'
+targetCompatibility = '1.8'
+
 defaultTasks 'build'
 
 
@@ -75,11 +78,6 @@ dependencies {
 }
 
 
-compileJava {
-    sourceCompatibility = 1.8
-    targetCompatibility = 1.8
-}
-
 ext {
     generatedProtoDir = "${buildDir.name}/generated/source/proto/main/java"
 }
@@ -90,6 +88,12 @@ protobuf {
         if (project.hasProperty('protocPath')) {
             path = protocPath
         }
+    }
+}
+
+tasks.withType(JavaCompile) {
+    if (JavaVersion.current() > JavaVersion.VERSION_1_8) {
+        options.compilerArgs += ['--release', '8']
     }
 }
 
