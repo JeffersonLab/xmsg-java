@@ -33,7 +33,6 @@ plugins {
 }
 
 group = 'org.jlab.coda'
-archivesBaseName = 'xmsg'
 version = '2.4-SNAPSHOT'
 
 sourceCompatibility = '1.8'
