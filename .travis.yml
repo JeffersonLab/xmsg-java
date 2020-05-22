@@ -12,6 +12,7 @@ cache:
 matrix:
   include:
     - os: linux
+      dist: trusty
       jdk: oraclejdk8
 
 script:
