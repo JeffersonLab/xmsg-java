@@ -24,6 +24,7 @@ package org.jlab.coda.xmsg.net;
 
 import org.jlab.coda.xmsg.core.xMsgUtil;
 import org.jlab.coda.xmsg.excp.xMsgException;
+import org.jlab.coda.xmsg.sys.p2p.xMsgPtpDriver;
 import org.jlab.coda.xmsg.sys.pubsub.xMsgConnectionSetup;
 import org.jlab.coda.xmsg.sys.pubsub.xMsgProxyDriver;
 import org.jlab.coda.xmsg.sys.regdis.xMsgRegDriver;
@@ -80,6 +81,74 @@ public class xMsgConnectionFactory {
         prepareProxyConnection(connection, setup);
         return connection;
     }
+
+
+
+
+    /**
+     * Creates a new push connection.
+     *
+     * @param address the address of the pusher used by the connection
+     * @param setup the settings of the connection
+     * @return a new connection that can publish to topics
+     *         through the proxy running on the given address
+     * @throws xMsgException if the connection could not be created
+     */
+    public xMsgPtpDriver createPusherConnection(xMsgProxyAddress address,
+                                                xMsgConnectionSetup setup)
+        throws xMsgException {
+        xMsgPtpDriver connection = xMsgPtpDriver.pusher(address, factory);
+        preparePtpConnector(connection, setup);
+        return connection;
+    }
+
+    private void preparePtpConnector(xMsgPtpDriver connection, xMsgConnectionSetup setup)
+        throws xMsgException {
+        try {
+            setup.preConnection(connection.getSocket());
+            connection.connect();
+            xMsgUtil.sleep(10);
+            setup.postConnection();
+        } catch (ZMQException | xMsgException e) {
+            connection.close();
+            throw e;
+        }
+    }
+
+    /**
+     * Creates a new pull connection.
+     *
+     * @param address the address of the puller used by the connection
+     * @param setup the settings of the connection
+     * @return a new connection that can publish to topics
+     *         through the proxy running on the given address
+     * @throws xMsgException if the connection could not be created
+     */
+    public xMsgPtpDriver createPullerConnection(xMsgProxyAddress address,
+                                                xMsgConnectionSetup setup)
+        throws xMsgException {
+        xMsgPtpDriver connection = xMsgPtpDriver.puller(address, factory);
+        preparePtpBinder(connection, setup);
+        return connection;
+    }
+
+    private void preparePtpBinder(xMsgPtpDriver connection, xMsgConnectionSetup setup)
+        throws xMsgException {
+        try {
+            setup.preConnection(connection.getSocket());
+            connection.bind();
+            setup.postConnection();
+        } catch (ZMQException | xMsgException e) {
+            connection.close();
+            throw e;
+        }
+    }
+
+
+
+
+
+
 
     private void prepareProxyConnection(xMsgProxyDriver connection, xMsgConnectionSetup setup)
             throws xMsgException {
