@@ -40,11 +40,11 @@ import org.zeromq.ZMsg;
  * This is designed to send evio data which has it own embedded metadata,
  * including the endianness.
  *
- * @version 2.x
+ * @since 2.4
  */
 public class xMsgMessagePtp {
 
-    private byte[] data;
+    private final byte[] data;
 
     /**
      * Constructs a new message.
@@ -72,22 +72,6 @@ public class xMsgMessagePtp {
 
         ZFrame dataFrame = msg.pop();
         this.data = dataFrame.getData();
-    }
-
-    /**
-     * Set the data in this message.
-     * @param msg containing serialized data.
-     */
-    void setData(ZMsg msg) {
-        this.data = msg.getFirst().getData();
-    }
-
-    /**
-     * Set the data in this message.
-     * @param data serialized data.
-     */
-    void setData(byte[] data) {
-        this.data = data;
     }
 
     /**

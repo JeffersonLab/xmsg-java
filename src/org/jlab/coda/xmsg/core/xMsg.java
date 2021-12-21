@@ -31,13 +31,11 @@ import org.jlab.coda.xmsg.net.xMsgConnectionFactory;
 import org.jlab.coda.xmsg.net.xMsgContext;
 import org.jlab.coda.xmsg.net.xMsgProxyAddress;
 import org.jlab.coda.xmsg.net.xMsgRegAddress;
-import org.jlab.coda.xmsg.sys.p2p.xMsgPtpDriver;
 import org.jlab.coda.xmsg.sys.pubsub.xMsgConnectionSetup;
 import org.jlab.coda.xmsg.sys.pubsub.xMsgProxyDriver;
 import org.jlab.coda.xmsg.sys.regdis.xMsgRegDriver;
 import org.jlab.coda.xmsg.sys.regdis.xMsgRegFactory;
 import org.zeromq.ZMQException;
-import org.zeromq.ZMsg;
 
 import java.util.Arrays;
 import java.util.HashSet;
@@ -122,8 +120,9 @@ public class xMsg implements AutoCloseable {
     private final ConnectionManager connectionManager;
 
     // Save this here so we can make push-pull connections directly
-    // instead of through the connectionManager // C. Timmer
+    // instead of through the connectionManager // Timmer
     private final xMsgConnectionFactory factory;
+
     // Save this here so we can make push-pull connections directly. // Timmer
     private volatile xMsgConnectionSetup connectionSetup;
 
@@ -326,21 +325,17 @@ public class xMsg implements AutoCloseable {
     }
 
 
-
-
-    // Bypass the ConnectionManager since each point-to-point connection is unique.
-    // Use the factory directly right here instead of relegating that to a manager.
-
     /**
      * Obtains a point-to-point connection from a pusher to the specified puller.
      * Unlike the pub-sub connections, this is not managed by a ConnectionManager
-     * since that would NOT work for point-to-point. // Timmer
+     * since each point-to-point connection is unique.
+     * Use the factory directly right here instead of relegating that to a manager.
      * <p>
      * Creating new connections takes some time, and the first published
      * messages may be lost. The {@link #cacheConnection(xMsgProxyAddress)}
      * method can be used to create connections before using them .
      *
-     * @param address the address of the puller
+     * @param address the address of the puller to bind to.
      * @throws xMsgException if a new connection could not be created
      */
     public xMsgConnectionPtp connectToPuller(xMsgProxyAddress address) throws xMsgException {
@@ -348,22 +343,21 @@ public class xMsg implements AutoCloseable {
     }
 
     /**
-     * Obtains a point-to-point connection from a puller to the specified pusher.
+     * Obtains a point-to-point connection from a pusher to the specified puller.
      * Unlike the pub-sub connections, this is not managed by a ConnectionManager
-     * since that would NOT work for point-to-point. // Timmer
+     * since each point-to-point connection is unique.
+     * Use the factory directly right here instead of relegating that to a manager.
      * <p>
      * Creating new connections takes some time, and the first published
      * messages may be lost. The {@link #cacheConnection(xMsgProxyAddress)}
      * method can be used to create connections before using them .
      *
-     * @param address the address of the puller
+     * @param address the address of the puller that pusher sends to.
      * @throws xMsgException if a new connection could not be created
      */
     public xMsgConnectionPtp connectToPusher(xMsgProxyAddress address) throws xMsgException {
         return new xMsgConnectionPtp(factory.createPusherConnection(address, connectionSetup));
     }
-
-
 
 
     /**
@@ -442,14 +436,11 @@ public class xMsg implements AutoCloseable {
     }
 
 
-
-
-
     /**
      * Pushes a point-to-point message to the specified puller.
      *
-     * @param connection the connection to the puller
-     * @param msg the message to be pushed
+     * @param connection the connection to the puller.
+     * @param msg the message to be pushed.
      * @throws xMsgException if the request failed
      */
     public void push(xMsgConnectionPtp connection, xMsgMessagePtp msg) throws xMsgException {
@@ -459,19 +450,18 @@ public class xMsg implements AutoCloseable {
     /**
      * Pushes point-to-point binary data to the specified puller.
      *
-     * @param connection the connection to the puller
-     * @param data the binary data to be pushed
+     * @param connection the connection to the puller.
+     * @param data the binary data to be pushed.
      * @throws xMsgException if the request failed
      */
     public void push(xMsgConnectionPtp connection, byte[] data) throws xMsgException {
         connection.push(data);
     }
 
-
     /**
      * Pulls a point-to-point message from the specified pusher.
      *
-     * @param connection the connection to the pusher
+     * @param connection the connection to the pusher.
      * @return byte array containing received data.
      * @throws xMsgException if the request failed
      */
@@ -482,16 +472,13 @@ public class xMsg implements AutoCloseable {
     /**
      * Pulls point-to-point binary data from the specified pusher.
      *
-     * @param connection the connection to the pusher
+     * @param connection the connection to the pusher.
      * @return message containing received data.
      * @throws xMsgException if the request failed
      */
     public xMsgMessagePtp pullMsg(xMsgConnectionPtp connection) throws xMsgException {
         return connection.pullMsg();
     }
-
-
-
 
 
     /**

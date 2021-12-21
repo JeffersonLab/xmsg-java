@@ -74,7 +74,6 @@ public class xMsgSocketFactory {
      */
     public void bindSocket(Socket socket, int port) throws xMsgException {
         try {
-System.out.println("bindSocket to tcp://*:" + port);
             socket.bind("tcp://*:" + port);
         } catch (ZMQException e) {
             if (e.getErrorCode() == ZMQ.Error.EADDRINUSE.getCode()) {
@@ -94,7 +93,6 @@ System.out.println("bindSocket to tcp://*:" + port);
      */
     public void connectSocket(Socket socket, String host, int port) throws xMsgException {
         try {
-System.out.println("connectSocket to tcp://" + host + ":" + port);
             socket.connect("tcp://" + host + ":" + port);
         } catch (ZMQException e) {
             if (e.getErrorCode() == ZMQ.Error.EMTHREAD.getCode()) {

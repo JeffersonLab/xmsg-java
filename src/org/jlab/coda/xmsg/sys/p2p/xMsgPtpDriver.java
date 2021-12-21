@@ -73,21 +73,13 @@ public abstract class xMsgPtpDriver {
 
 
 
-
-    /**
-     * Added by C. Timmer to avoid the expense of using ZMsgs.
-     * @param data binary data to send.
-     */
     public void send(byte[] data) { socket.send(data); }
 
     public void send(xMsgMessagePtp msg) { socket.send(msg.getData()); }
 
-    public void send(ZMsg msg) { msg.send(socket); }
-
     public ZMsg recv() { return ZMsg.recvMsg(socket); }
 
     public byte[] recvData() { return socket.recv(); }
-
 
 
 

@@ -26,7 +26,6 @@ import org.jlab.coda.xmsg.excp.xMsgException;
 import org.jlab.coda.xmsg.net.xMsgProxyAddress;
 import org.jlab.coda.xmsg.sys.p2p.xMsgPtpDriver;
 import org.zeromq.ZMQException;
-import org.zeromq.ZMsg;
 
 import java.io.Closeable;
 

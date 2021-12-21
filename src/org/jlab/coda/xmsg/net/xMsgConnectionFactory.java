@@ -83,15 +83,12 @@ public class xMsgConnectionFactory {
     }
 
 
-
-
     /**
-     * Creates a new push connection.
+     * Creates a new pusher connection.
      *
-     * @param address the address of the pusher used by the connection
-     * @param setup the settings of the connection
-     * @return a new connection that can publish to topics
-     *         through the proxy running on the given address
+     * @param address the address of the connection's puller for the pusher to send to.
+     * @param setup the settings of the connection.
+     * @return a new connection that can send data to the given address.
      * @throws xMsgException if the connection could not be created
      */
     public xMsgPtpDriver createPusherConnection(xMsgProxyAddress address,
@@ -116,12 +113,11 @@ public class xMsgConnectionFactory {
     }
 
     /**
-     * Creates a new pull connection.
+     * Creates a new puller connection.
      *
-     * @param address the address of the puller used by the connection
-     * @param setup the settings of the connection
-     * @return a new connection that can publish to topics
-     *         through the proxy running on the given address
+     * @param address the address of the connection's puller to bind to.
+     * @param setup the settings of the connection.
+     * @return a new connection that can receive data at the given address.
      * @throws xMsgException if the connection could not be created
      */
     public xMsgPtpDriver createPullerConnection(xMsgProxyAddress address,
@@ -143,11 +139,6 @@ public class xMsgConnectionFactory {
             throw e;
         }
     }
-
-
-
-
-
 
 
     private void prepareProxyConnection(xMsgProxyDriver connection, xMsgConnectionSetup setup)
