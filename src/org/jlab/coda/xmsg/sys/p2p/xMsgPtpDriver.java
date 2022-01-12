@@ -69,20 +69,15 @@ public abstract class xMsgPtpDriver {
     }
 
 
-    abstract int getPort();
+    abstract public int getPort();
 
+    abstract public void send(byte[] data) throws xMsgException;
+    abstract public void send(xMsgMessagePtp msg) throws xMsgException;
 
+    abstract public ZMsg recv() throws xMsgException;
+    abstract public byte[] recvData() throws xMsgException;
 
-    public void send(byte[] data) { socket.send(data); }
-
-    public void send(xMsgMessagePtp msg) { socket.send(msg.getData()); }
-
-    public ZMsg recv() { return ZMsg.recvMsg(socket); }
-
-    public byte[] recvData() { return socket.recv(); }
-
-
-
+    
     public void close() {
         factory.closeQuietly(socket);
     }
@@ -112,9 +107,19 @@ public abstract class xMsgPtpDriver {
         }
 
         @Override
-        int getPort() {
-            return address.pubPort();
-        }
+        public int getPort() {return address.pubPort();}
+
+        @Override
+        public void send(byte[] data) {socket.send(data);}
+
+        @Override
+        public void send(xMsgMessagePtp msg) {socket.send(msg.getData());}
+
+        @Override
+        public ZMsg recv() throws xMsgException {throw new xMsgException("receiving not allowed for pushing socket");}
+
+        @Override
+        public byte[] recvData() throws xMsgException {throw new xMsgException("receiving not allowed for pushing socket");}
     }
 
 
@@ -125,7 +130,19 @@ public abstract class xMsgPtpDriver {
         }
 
         @Override
-        int getPort() { return address.pubPort(); }
+        public int getPort() {return address.pubPort();}
+
+        @Override
+        public void send(byte[] data) throws xMsgException {throw new xMsgException("send not allowed for pulling socket");}
+
+        @Override
+        public void send(xMsgMessagePtp msg) throws xMsgException {throw new xMsgException("send not allowed for pulling socket");}
+
+        @Override
+        public ZMsg recv() { return ZMsg.recvMsg(socket); }
+
+        @Override
+        public byte[] recvData() { return socket.recv(); }
     }
 
 }
