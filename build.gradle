@@ -40,7 +40,6 @@ targetCompatibility = '1.8'
 
 defaultTasks 'build'
 
-
 configurations {
     deployerJars
 }
@@ -76,7 +75,6 @@ dependencies {
     testImplementation 'org.mockito:mockito-core:2.28.2'
 }
 
-
 ext {
     generatedProtoDir = "${buildDir.name}/generated/source/proto/main/java"
 }
@@ -108,7 +106,6 @@ javadoc {
     exclude "org/jlab/coda/xmsg/sys/*/*.java"
 }
 
-
 task javadocJar(type: Jar) {
     archiveClassifier = 'javadoc'
     from javadoc
@@ -116,7 +113,7 @@ task javadocJar(type: Jar) {
 
 task sourcesJar(type: Jar, dependsOn: classes) {
     archiveClassifier = 'sources'
-    from sourceSets.main.allJava
+    from sourceSets.main.allSource
     from generatedProtoDir
 }
 
@@ -136,13 +133,12 @@ uploadArchives {
     }
 }
 
-
 test {
-    testLogging {
-        exceptionFormat = 'full'
-    }
     useJUnitPlatform {
         excludeTags 'integration'
+    }
+    testLogging {
+        exceptionFormat = 'full'
     }
 }
 
@@ -157,11 +153,14 @@ task integrationTest(type: Test) {
     outputs.upToDateWhen { false }
 }
 
+//////////////////////////////////////////////////////////////////////////////
+// deployment
+//////////////////////////////////////////////////////////////////////////////
 
 def deploySpec = copySpec {
     into ('lib') {
         from configurations.runtimeClasspath
-        from jar.archiveFile
+        from jar
     }
 
     from ('scripts/unix') {
@@ -184,40 +183,41 @@ task deploy(type: Copy, dependsOn: install) {
     }
 }
 
+//////////////////////////////////////////////////////////////////////////////
+// development scripts
+//////////////////////////////////////////////////////////////////////////////
 
-ext.classPathCache = file("${buildDir}/tmp/classpath")
-ext.testClassPathCache = file("${buildDir}/tmp/test_classpath")
+ext {
+    classPathCache = file("${buildDir}/tmp/classpath")
+    testClassPathCache = file("${buildDir}/tmp/test_classpath")
+}
 
 task cacheClasspath {
+    inputs.files sourceSets.main.runtimeClasspath
+    inputs.files sourceSets.test.runtimeClasspath
+    outputs.files classPathCache
+    outputs.files testClassPathCache
     doLast {
-        if (!classPathCache.isFile()) {
-            classPathCache.parentFile.mkdirs()
-            classPathCache.createNewFile()
-        }
         classPathCache.write sourceSets.main.runtimeClasspath.asPath
         testClassPathCache.write sourceSets.test.runtimeClasspath.asPath
     }
 }
-cacheClasspath.inputs.files sourceSets.main.runtimeClasspath
-cacheClasspath.inputs.files sourceSets.test.runtimeClasspath
-cacheClasspath.outputs.files classPathCache
-cacheClasspath.outputs.files testClassPathCache
 
 task printClasspath {
     doLast {
-        println classPathCache.text
+        println classPathCache.text.replace(':', '\n')
     }
+    dependsOn cacheClasspath
 }
 
-build.dependsOn cacheClasspath
-printClasspath.dependsOn cacheClasspath
+assemble.dependsOn cacheClasspath
 
+//////////////////////////////////////////////////////////////////////////////
+// quality check
+//////////////////////////////////////////////////////////////////////////////
 
-def ciMode() {
-    if (hasProperty("ciMode")) {
-        return ciMode.toBoolean()
-    }
-    return false
+ext {
+    ciMode = properties['ciMode'] ?: 'false'
 }
 
 checkstyle {
@@ -235,24 +235,22 @@ spotbugs {
 }
 
 tasks.withType(com.github.spotbugs.SpotBugsTask) {
-    def useXml = ciMode()
+    def useXml = ciMode.toBoolean()
     reports {
         xml.enabled = useXml
-        html.enabled = !xml.enabled
+        html.enabled = !useXml
     }
 }
-
-// Marker task to enable SpotBugs.
-task spotbugs(
-    group: 'Verification',
-    description: 'Marker task to enable SpotBugs.'
-)
 
 task checkSpotBugsResults {
     doLast {
         def bugsFound = 0
-        [spotbugsMain, spotbugsTest].forEach {
-            bugsFound += printSpotBugs it.reports.xml.destination
+        [spotbugsMain, spotbugsTest].each {
+            try {
+                bugsFound += printSpotBugs it.reports.xml.destination
+            } catch (FileNotFoundException e) {
+                logger.info e.message
+            }
         }
         if (bugsFound > 0) {
             throw new GradleException("$bugsFound SpotBugs rule violations were found.")
@@ -263,7 +261,6 @@ task checkSpotBugsResults {
 def printSpotBugs(File xml) {
     def slurped = new XmlSlurper().parse(xml)
     def bugs = slurped.BugInstance
-
     bugs.each { bug ->
         def line = bug.SourceLine
         logger.error "[SpotBugs] ${line.@sourcepath}:${line.@start}:${line.@end} [${bug.@type}]"
@@ -271,9 +268,14 @@ def printSpotBugs(File xml) {
     bugs.size()
 }
 
-if (ciMode()) {
-    checkSpotBugsResults.mustRunAfter spotbugsMain, spotbugsTest
-    check.dependsOn checkSpotBugsResults
+task spotbugs {
+    group = 'Verification'
+    description = 'Marker task to enable SpotBugs.'
+
+    mustRunAfter spotbugsMain, spotbugsTest
+    if (ciMode.toBoolean()) {
+        finalizedBy checkSpotBugsResults
+    }
 }
 
 gradle.taskGraph.whenReady { taskGraph ->
@@ -288,7 +290,9 @@ gradle.taskGraph.whenReady { taskGraph ->
     }
 }
 
-
+//////////////////////////////////////////////////////////////////////////////
+// IDE configuration
+//////////////////////////////////////////////////////////////////////////////
 
 eclipse {
     classpath {
