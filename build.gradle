@@ -22,11 +22,11 @@
 
 plugins {
     id 'java-library'
-    id 'maven'
-    id 'com.google.protobuf' version '0.8.10'
+    id 'maven-publish'
+    id 'com.google.protobuf' version '0.9.4'
 
     id 'checkstyle'
-    id 'com.github.spotbugs' version '1.6.9'
+    id 'com.github.spotbugs' version '5.2.5'
 
     id 'eclipse'
     id 'idea'
@@ -35,14 +35,7 @@ plugins {
 group = 'org.jlab.coda'
 version = '2.4-SNAPSHOT'
 
-sourceCompatibility = '1.8'
-targetCompatibility = '1.8'
-
 defaultTasks 'build'
-
-configurations {
-    deployerJars
-}
 
 sourceSets {
     main {
@@ -68,11 +61,18 @@ dependencies {
     api 'org.zeromq:jeromq:0.4.3'
     api 'com.google.protobuf:protobuf-java:3.6.1'
     implementation 'net.sf.jopt-simple:jopt-simple:5.0.4'
-    deployerJars 'org.apache.maven.wagon:wagon-ssh-external:2.12'
-    testImplementation 'org.junit.jupiter:junit-jupiter-api:5.5.0'
-    testRuntimeOnly 'org.junit.jupiter:junit-jupiter-engine:5.5.0'
+    testImplementation 'org.junit.jupiter:junit-jupiter:5.5.0'
+    testRuntimeOnly 'org.junit.platform:junit-platform-launcher:1.5.0'
     testImplementation 'org.hamcrest:hamcrest-library:2.1'
     testImplementation 'org.mockito:mockito-core:2.28.2'
+}
+
+java {
+    withSourcesJar()
+    withJavadocJar()
+
+    sourceCompatibility = JavaVersion.VERSION_1_8
+    targetCompatibility = JavaVersion.VERSION_1_8
 }
 
 ext {
@@ -90,10 +90,9 @@ protobuf {
 
 tasks.withType(JavaCompile) {
     if (JavaVersion.current() > JavaVersion.VERSION_1_8) {
-        options.compilerArgs += ['--release', '8']
+        options.release = 8
     }
 }
-
 
 javadoc {
     options.overview = 'src/org/jlab/coda/xmsg/overview.html'
@@ -107,29 +106,10 @@ javadoc {
     exclude "org/jlab/coda/xmsg/sys/*/*.java"
 }
 
-task javadocJar(type: Jar) {
-    archiveClassifier = 'javadoc'
-    from javadoc
-}
-
-task sourcesJar(type: Jar, dependsOn: classes) {
-    archiveClassifier = 'sources'
-    from sourceSets.main.allSource
-    from generatedProtoDir
-}
-
-artifacts {
-    archives javadocJar
-    archives sourcesJar
-}
-
-uploadArchives {
-    repositories {
-        mavenDeployer {
-            configuration = configurations.deployerJars
-            repository(url: 'scpexe://clas12@jlabl1.jlab.org/group/clas/www/clasweb/html/clas12maven') {
-                authentication(userName: 'clas12')
-            }
+publishing {
+    publications {
+        maven(MavenPublication) {
+            from components.java
         }
     }
 }
@@ -143,7 +123,7 @@ test {
     }
 }
 
-task integrationTest(type: Test) {
+tasks.register('integrationTest', Test) {
     useJUnitPlatform {
         includeTags 'integration'
     }
@@ -151,6 +131,8 @@ task integrationTest(type: Test) {
         showStandardStreams = true
         events 'started', 'passed', 'failed'
     }
+    testClassesDirs = testing.suites.test.sources.output.classesDirs
+    classpath = testing.suites.test.sources.runtimeClasspath
     outputs.upToDateWhen { false }
 }
 
@@ -171,7 +153,7 @@ def deploySpec = copySpec {
     }
 }
 
-task deploy(type: Copy, dependsOn: install) {
+tasks.register('deploy', Copy) {
     def dest = "$System.env.CLARA_HOME"
 
     into dest
@@ -182,6 +164,8 @@ task deploy(type: Copy, dependsOn: install) {
             throw new GradleException('CLARA_HOME not set')
         }
     }
+
+    dependsOn publishToMavenLocal
 }
 
 //////////////////////////////////////////////////////////////////////////////
@@ -193,7 +177,7 @@ ext {
     testClassPathCache = file("${buildDir}/tmp/test_classpath")
 }
 
-task cacheClasspath {
+tasks.register('cacheClasspath') {
     inputs.files sourceSets.main.runtimeClasspath
     inputs.files sourceSets.test.runtimeClasspath
     outputs.files classPathCache
@@ -204,7 +188,7 @@ task cacheClasspath {
     }
 }
 
-task printClasspath {
+tasks.register('printClasspath') {
     doLast {
         println classPathCache.text.replace(':', '\n')
     }
@@ -228,14 +212,14 @@ checkstyle {
 }
 
 spotbugs {
-    toolVersion = '3.1.12'
+    toolVersion = '4.8.3'
     ignoreFailures = true
     effort = 'max'
     reportLevel = 'medium'
     excludeFilter = file('config/quality/findbugs-exclude.xml')
 }
 
-tasks.withType(com.github.spotbugs.SpotBugsTask) {
+tasks.withType(com.github.spotbugs.snom.SpotBugsTask) {
     def useXml = ciMode.toBoolean()
     reports {
         xml.enabled = useXml
@@ -243,12 +227,12 @@ tasks.withType(com.github.spotbugs.SpotBugsTask) {
     }
 }
 
-task checkSpotBugsResults {
+tasks.register('checkSpotBugsResults') {
     doLast {
         def bugsFound = 0
         [spotbugsMain, spotbugsTest].each {
             try {
-                bugsFound += printSpotBugs it.reports.xml.destination
+                bugsFound += printSpotBugs it.reports.getByName('xml').destination
             } catch (FileNotFoundException e) {
                 logger.info e.message
             }
@@ -269,7 +253,7 @@ def printSpotBugs(File xml) {
     bugs.size()
 }
 
-task spotbugs {
+tasks.register('spotbugs') {
     group = 'Verification'
     description = 'Marker task to enable SpotBugs.'
 
@@ -281,13 +265,13 @@ task spotbugs {
 
 gradle.taskGraph.whenReady { taskGraph ->
     tasks.spotbugsMain.onlyIf {
-        taskGraph.hasTask((tasks.spotbugs))
+        taskGraph.hasTask(tasks.spotbugs)
     }
     tasks.spotbugsTest.onlyIf {
-        taskGraph.hasTask((tasks.spotbugs))
+        taskGraph.hasTask(tasks.spotbugs)
     }
     tasks.checkSpotBugsResults.onlyIf {
-        taskGraph.hasTask((tasks.spotbugs))
+        taskGraph.hasTask(tasks.spotbugs)
     }
 }
 
