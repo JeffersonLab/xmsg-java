@@ -27,4 +27,15 @@
   <Match>
     <Rank value="17" />
   </Match>
+
+  <!-- Fix false positive -->
+  <Match>
+    <Class name="~.*xMsgUtil" />
+    <Bug pattern="DMI_RANDOM_USED_ONLY_ONCE" />
+  </Match>
+
+  <!-- Exclude new detector added by 4.8.0 -->
+  <Match>
+    <Bug pattern="CT_CONSTRUCTOR_THROW" />
+  </Match>
 </FindBugsFilter>

@@ -56,6 +56,8 @@ public class xMsgRegistrarTest {
     private Set<xMsgRegistration> registration = new HashSet<>();
     private String name = "registrat_test";
 
+    private static Random randomGen = new Random();
+
     @Test
     public void testRegistrationDataBase() throws Exception {
         xMsgContext context = xMsgContext.newContext();
@@ -129,7 +131,7 @@ public class xMsgRegistrarTest {
     public void removeRandom(int size) throws xMsgException {
         System.out.println("INFO: Removing " + size + " random actors...");
 
-        int first = new Random().nextInt(registration.size() - size);
+        int first = randomGen.nextInt(registration.size() - size);
         int end = first + size;
         int i = 0;
         Iterator<xMsgRegistration> it = registration.iterator();

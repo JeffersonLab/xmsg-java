@@ -22,11 +22,11 @@
 
 plugins {
     id 'java-library'
-    id 'maven'
-    id 'com.google.protobuf' version '0.8.10'
+    id 'maven-publish'
+    id 'com.google.protobuf' version '0.9.4'
 
     id 'checkstyle'
-    id 'com.github.spotbugs' version '1.6.9'
+    id 'com.github.spotbugs' version '5.2.5'
 
     id 'eclipse'
     id 'idea'
@@ -35,15 +35,7 @@ plugins {
 group = 'org.jlab.coda'
 version = '2.4-SNAPSHOT'
 
-sourceCompatibility = '1.8'
-targetCompatibility = '1.8'
-
 defaultTasks 'build'
-
-
-configurations {
-    deployerJars
-}
 
 sourceSets {
     main {
@@ -69,13 +61,19 @@ dependencies {
     api 'org.zeromq:jeromq:0.4.3'
     api 'com.google.protobuf:protobuf-java:3.6.1'
     implementation 'net.sf.jopt-simple:jopt-simple:5.0.4'
-    deployerJars 'org.apache.maven.wagon:wagon-ssh-external:2.12'
-    testImplementation 'org.junit.jupiter:junit-jupiter-api:5.5.0'
-    testRuntimeOnly 'org.junit.jupiter:junit-jupiter-engine:5.5.0'
+    testImplementation 'org.junit.jupiter:junit-jupiter:5.5.0'
+    testRuntimeOnly 'org.junit.platform:junit-platform-launcher:1.5.0'
     testImplementation 'org.hamcrest:hamcrest-library:2.1'
     testImplementation 'org.mockito:mockito-core:2.28.2'
 }
 
+java {
+    withSourcesJar()
+    withJavadocJar()
+
+    sourceCompatibility = JavaVersion.VERSION_1_8
+    targetCompatibility = JavaVersion.VERSION_1_8
+}
 
 ext {
     generatedProtoDir = "${buildDir.name}/generated/source/proto/main/java"
@@ -92,61 +90,40 @@ protobuf {
 
 tasks.withType(JavaCompile) {
     if (JavaVersion.current() > JavaVersion.VERSION_1_8) {
-        options.compilerArgs += ['--release', '8']
+        options.release = 8
     }
 }
-
 
 javadoc {
     options.overview = 'src/org/jlab/coda/xmsg/overview.html'
     options.charSet = 'utf8'
     options.encoding = 'utf8'
     options.docEncoding = 'utf8'
+    options.addStringOption('Xdoclint:none', '-quiet')
 
     exclude "org/jlab/coda/xmsg/examples/**"
     exclude "org/jlab/coda/xmsg/net/*Factory.java"
     exclude "org/jlab/coda/xmsg/sys/*/*.java"
 }
 
-
-task javadocJar(type: Jar) {
-    archiveClassifier = 'javadoc'
-    from javadoc
-}
-
-task sourcesJar(type: Jar, dependsOn: classes) {
-    archiveClassifier = 'sources'
-    from sourceSets.main.allJava
-    from generatedProtoDir
-}
-
-artifacts {
-    archives javadocJar
-    archives sourcesJar
-}
-
-uploadArchives {
-    repositories {
-        mavenDeployer {
-            configuration = configurations.deployerJars
-            repository(url: 'scpexe://clas12@jlabl1.jlab.org/group/clas/www/clasweb/html/clas12maven') {
-                authentication(userName: 'clas12')
-            }
+publishing {
+    publications {
+        maven(MavenPublication) {
+            from components.java
         }
     }
 }
 
-
 test {
-    testLogging {
-        exceptionFormat = 'full'
-    }
     useJUnitPlatform {
         excludeTags 'integration'
     }
+    testLogging {
+        exceptionFormat = 'full'
+    }
 }
 
-task integrationTest(type: Test) {
+tasks.register('integrationTest', Test) {
     useJUnitPlatform {
         includeTags 'integration'
     }
@@ -154,14 +131,19 @@ task integrationTest(type: Test) {
         showStandardStreams = true
         events 'started', 'passed', 'failed'
     }
+    testClassesDirs = testing.suites.test.sources.output.classesDirs
+    classpath = testing.suites.test.sources.runtimeClasspath
     outputs.upToDateWhen { false }
 }
 
+//////////////////////////////////////////////////////////////////////////////
+// deployment
+//////////////////////////////////////////////////////////////////////////////
 
 def deploySpec = copySpec {
     into ('lib') {
         from configurations.runtimeClasspath
-        from jar.archiveFile
+        from jar
     }
 
     from ('scripts/unix') {
@@ -171,7 +153,7 @@ def deploySpec = copySpec {
     }
 }
 
-task deploy(type: Copy, dependsOn: install) {
+tasks.register('deploy', Copy) {
     def dest = "$System.env.CLARA_HOME"
 
     into dest
@@ -182,42 +164,45 @@ task deploy(type: Copy, dependsOn: install) {
             throw new GradleException('CLARA_HOME not set')
         }
     }
+
+    dependsOn publishToMavenLocal
 }
 
+//////////////////////////////////////////////////////////////////////////////
+// development scripts
+//////////////////////////////////////////////////////////////////////////////
 
-ext.classPathCache = file("${buildDir}/tmp/classpath")
-ext.testClassPathCache = file("${buildDir}/tmp/test_classpath")
+ext {
+    classPathCache = file("${buildDir}/tmp/classpath")
+    testClassPathCache = file("${buildDir}/tmp/test_classpath")
+}
 
-task cacheClasspath {
+tasks.register('cacheClasspath') {
+    inputs.files sourceSets.main.runtimeClasspath
+    inputs.files sourceSets.test.runtimeClasspath
+    outputs.files classPathCache
+    outputs.files testClassPathCache
     doLast {
-        if (!classPathCache.isFile()) {
-            classPathCache.parentFile.mkdirs()
-            classPathCache.createNewFile()
-        }
         classPathCache.write sourceSets.main.runtimeClasspath.asPath
         testClassPathCache.write sourceSets.test.runtimeClasspath.asPath
     }
 }
-cacheClasspath.inputs.files sourceSets.main.runtimeClasspath
-cacheClasspath.inputs.files sourceSets.test.runtimeClasspath
-cacheClasspath.outputs.files classPathCache
-cacheClasspath.outputs.files testClassPathCache
 
-task printClasspath {
+tasks.register('printClasspath') {
     doLast {
-        println classPathCache.text
+        println classPathCache.text.replace(':', '\n')
     }
+    dependsOn cacheClasspath
 }
 
-build.dependsOn cacheClasspath
-printClasspath.dependsOn cacheClasspath
+assemble.dependsOn cacheClasspath
 
+//////////////////////////////////////////////////////////////////////////////
+// quality check
+//////////////////////////////////////////////////////////////////////////////
 
-def ciMode() {
-    if (hasProperty("ciMode")) {
-        return ciMode.toBoolean()
-    }
-    return false
+ext {
+    ciMode = properties['ciMode'] ?: 'false'
 }
 
 checkstyle {
@@ -227,32 +212,30 @@ checkstyle {
 }
 
 spotbugs {
-    toolVersion = '3.1.12'
+    toolVersion = '4.8.3'
     ignoreFailures = true
     effort = 'max'
     reportLevel = 'medium'
     excludeFilter = file('config/quality/findbugs-exclude.xml')
 }
 
-tasks.withType(com.github.spotbugs.SpotBugsTask) {
-    def useXml = ciMode()
+tasks.withType(com.github.spotbugs.snom.SpotBugsTask) {
+    def useXml = ciMode.toBoolean()
     reports {
         xml.enabled = useXml
-        html.enabled = !xml.enabled
+        html.enabled = !useXml
     }
 }
 
-// Marker task to enable SpotBugs.
-task spotbugs(
-    group: 'Verification',
-    description: 'Marker task to enable SpotBugs.'
-)
-
-task checkSpotBugsResults {
+tasks.register('checkSpotBugsResults') {
     doLast {
         def bugsFound = 0
-        [spotbugsMain, spotbugsTest].forEach {
-            bugsFound += printSpotBugs it.reports.xml.destination
+        [spotbugsMain, spotbugsTest].each {
+            try {
+                bugsFound += printSpotBugs it.reports.getByName('xml').destination
+            } catch (FileNotFoundException e) {
+                logger.info e.message
+            }
         }
         if (bugsFound > 0) {
             throw new GradleException("$bugsFound SpotBugs rule violations were found.")
@@ -263,7 +246,6 @@ task checkSpotBugsResults {
 def printSpotBugs(File xml) {
     def slurped = new XmlSlurper().parse(xml)
     def bugs = slurped.BugInstance
-
     bugs.each { bug ->
         def line = bug.SourceLine
         logger.error "[SpotBugs] ${line.@sourcepath}:${line.@start}:${line.@end} [${bug.@type}]"
@@ -271,24 +253,31 @@ def printSpotBugs(File xml) {
     bugs.size()
 }
 
-if (ciMode()) {
-    checkSpotBugsResults.mustRunAfter spotbugsMain, spotbugsTest
-    check.dependsOn checkSpotBugsResults
+tasks.register('spotbugs') {
+    group = 'Verification'
+    description = 'Marker task to enable SpotBugs.'
+
+    mustRunAfter spotbugsMain, spotbugsTest
+    if (ciMode.toBoolean()) {
+        finalizedBy checkSpotBugsResults
+    }
 }
 
 gradle.taskGraph.whenReady { taskGraph ->
     tasks.spotbugsMain.onlyIf {
-        taskGraph.hasTask((tasks.spotbugs))
+        taskGraph.hasTask(tasks.spotbugs)
     }
     tasks.spotbugsTest.onlyIf {
-        taskGraph.hasTask((tasks.spotbugs))
+        taskGraph.hasTask(tasks.spotbugs)
     }
     tasks.checkSpotBugsResults.onlyIf {
-        taskGraph.hasTask((tasks.spotbugs))
+        taskGraph.hasTask(tasks.spotbugs)
     }
 }
 
-
+//////////////////////////////////////////////////////////////////////////////
+// IDE configuration
+//////////////////////////////////////////////////////////////////////////////
 
 eclipse {
     classpath {
