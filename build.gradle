@@ -30,7 +30,6 @@ plugins {
 
     id 'eclipse'
     id 'idea'
-    id 'com.github.johnrengelman.shadow' version '8.1.0'
 }
 
 group = 'org.jlab.coda'
@@ -116,16 +115,6 @@ publishing {
 }
 
 
-build.dependsOn shadowJar
-
-// creating a uber jar, including all dependencies
-shadowJar {
-    archiveBaseName.set('xmsg-2.4')
-    archiveClassifier.set('')
-    archiveVersion.set('')
-}
-
-
 test {
     useJUnitPlatform {
         excludeTags 'integration'
@@ -178,6 +167,59 @@ tasks.register('deploy', Copy) {
     }
 
     dependsOn publishToMavenLocal
+}
+
+def codaDeploySpec = copySpec {
+    into ('common/jar') {
+        from configurations.runtimeClasspath
+        from jar
+    }
+
+    from ('scripts/unix') {
+        include 'jx_*'
+        into 'common/bin'
+        fileMode 0755
+    }
+}
+
+tasks.register('codaDeploy', Copy) {
+    def codaPath = "$System.env.CODA"
+
+    into codaPath
+    with codaDeploySpec
+
+    doFirst {
+        if (codaPath == 'null') {
+            throw new GradleException('CODA not set')
+        }
+    }
+
+    dependsOn publishToMavenLocal
+}
+
+tasks.register('codaUndeploy', Delete) {
+    def codaPath = "$System.env.CODA"
+
+    doFirst {
+        if (codaPath == 'null') {
+            throw new GradleException('CODA not set')
+        }
+
+        def jarFile = tasks.named('jar').get().archiveFile.get().asFile
+        def runtimeFiles = configurations.runtimeClasspath.files
+        def jarDir = file("$codaPath/common/jar")
+        def binDir = file("$codaPath/common/bin")
+
+        def filesToDelete = runtimeFiles.collect { new File(jarDir, it.name) } + new File(jarDir, jarFile.name)
+
+        def binFiles = binDir.listFiles(new FilenameFilter() {
+            boolean accept(File dir, String name) {
+                return name.startsWith("jx_")
+            }
+        }) ?: []
+
+        delete filesToDelete + binFiles
+    }
 }
 
 //////////////////////////////////////////////////////////////////////////////
