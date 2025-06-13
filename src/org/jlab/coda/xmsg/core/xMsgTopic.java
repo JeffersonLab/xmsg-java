@@ -100,7 +100,7 @@ public final class xMsgTopic {
                 StringTokenizer st = new StringTokenizer(type, SEPARATOR);
                 while (st.hasMoreTokens()) {
                     String tst = st.nextToken();
-                    if (!tst.contains(ANY)) {
+                    if (!tst.equals(ANY)) {
                         topic.append(SEPARATOR).append(tst);
                     } else {
                         break;
