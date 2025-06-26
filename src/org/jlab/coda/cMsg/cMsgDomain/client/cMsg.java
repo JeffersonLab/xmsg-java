@@ -243,7 +243,7 @@ public class cMsg extends cMsgDomainAdapter {
      */
     public int getServerPort() {
         if (currentParsedUDL == null) return 0;
-        return currentParsedUDL.nameServerTcpPort;
+        return domainServerPort;
     }
 
 
@@ -484,17 +484,26 @@ public class cMsg extends cMsgDomainAdapter {
                         packet.setLength(1024);
                         try {
                             udpSocket.receive(packet);
+                            if (debug >= cMsgConstants.debugInfo) {
+                                System.out.println("UdpReceiver.run(): Received a multicast response");
+                            }
                         }
                         catch (SocketTimeoutException e) {
                             // Check to see if we've been asked to quit
                             if (Thread.interrupted()) {
+                                if (debug >= cMsgConstants.debugInfo) {
+                                    System.out.println("UdpReceiver.run(): Thread interrupted");
+                                }
                                 return;
                             }
                             continue;
                         }
 
-                        // if packet is smaller than 6 ints  ...
-                        if (packet.getLength() < 24) {
+                        // if packet is smaller than 5 ints  ...
+                        if (packet.getLength() < 20) {
+                            if (debug >= cMsgConstants.debugInfo) {
+                                System.out.println("UdpReceiver.run(): Packet size smaller that 5 ints");
+                            }
                             continue;
                         }
 
@@ -507,48 +516,60 @@ public class cMsg extends cMsgDomainAdapter {
                         if ( (magicInt1 != cMsgNetworkConstants.magicNumbers[0]) ||
                              (magicInt2 != cMsgNetworkConstants.magicNumbers[1]) ||
                              (magicInt3 != cMsgNetworkConstants.magicNumbers[2]))  {
-                            //System.out.println("  Bad magic numbers for multicast response packet");
+                            if (debug >= cMsgConstants.debugInfo) {
+                                System.out.println("UdpReceiver.run(): Bad magic numbers for multicast response packet");
+                            }
                             continue;
                         }
 
-                        currentParsedUDL.nameServerTcpPort = cMsgUtilities.bytesToInt(buf, 12); // port to do a direct connection to
-                        if ((currentParsedUDL.nameServerTcpPort < 1024 || currentParsedUDL.nameServerTcpPort > 65535)) {
-                            //System.out.println("  Wrong format for multicast response packet");
+                        domainServerPort = cMsgUtilities.bytesToInt(buf, 12); // xMsg Proxy server port
+                        if ((domainServerPort < 1024 || domainServerPort > 65535)) {
+                            if (debug >= cMsgConstants.debugInfo) {
+                                System.out.println("UdpReceiver.run(): Bad port in multicast response packet");
+                            }
                             continue;
                         }
-
-                        // udpPort is next but we'll skip over it since we don't use it
 
                         // # of address pairs to follow
-                        int listLen = cMsgUtilities.bytesToInt(buf, 20);
+                        int listLen = cMsgUtilities.bytesToInt(buf, 16);
                         if (listLen < 0 || listLen > 50) {
-                            System.out.println("  Wrong format for multicast response packet, listLen = " + listLen);
+                            if (debug >= cMsgConstants.debugInfo) {
+                                System.out.println("UdpReceiver.run(): Wrong format for multicast response packet, listLen = " + listLen);
+                            }
                             continue;
                         }
 
-                        int pos = 24;
+                        int pos = 20;
                         String ss;
                         int stringLen;
                         ipList.clear();
                         broadList.clear();
+                        
+                        if (debug >= cMsgConstants.debugInfo) {
+                            System.out.println("UdpReceiver.run(): listLen = " + listLen);
+                        }
 
                         for (int i=0; i < listLen; i++) {
                             try {
                                 stringLen = cMsgUtilities.bytesToInt(buf, pos); pos += 4;
-                                //System.out.println("     ip len = " + listLen);
                                 ss = new String(buf, pos, stringLen, "US-ASCII");
-                                //System.out.println("     ip = " + ss);
+                                if (debug >= cMsgConstants.debugInfo) {
+                                    System.out.println("     ip = " + ss);
+                                }
                                 ipList.add(ss);
                                 pos += stringLen;
 
                                 stringLen = cMsgUtilities.bytesToInt(buf, pos); pos += 4;
-                                //System.out.println("     broad len = " + listLen);
                                 ss = new String(buf, pos, stringLen, "US-ASCII");
-                                //System.out.println("     broad = " + ss);
+                                if (debug >= cMsgConstants.debugInfo) {
+                                    System.out.println("     broad = " + ss);
+                                }
                                 broadList.add(ss);
                                 pos += stringLen;
                             }
-                            catch (UnsupportedEncodingException e) {/*never happen */}
+                            catch (UnsupportedEncodingException e) {
+                                System.out.println("UdpReceiver.run(): encoding error");
+                            }
                         }
                         break;
                     }
