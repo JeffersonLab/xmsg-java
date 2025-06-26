@@ -16,8 +16,6 @@
 
 package org.jlab.coda.cMsg.common;
 
-import org.jlab.coda.cMsg.cMsgDomain.subdomains.cMsgMessageDeliverer;
-
 import java.lang.*;
 import java.nio.channels.SocketChannel;
 import java.net.InetSocketAddress;
@@ -73,9 +71,6 @@ public class cMsgClientInfo {
 
     /** Socket channel used to get messages to and receive messages/requests from client. */
     protected SocketChannel messageChannel;
-
-    /** Object for delivering messages to this client. */
-    protected cMsgMessageDeliverer deliverer;
 
 
     /**
@@ -304,24 +299,6 @@ public class cMsgClientInfo {
     public InetSocketAddress getMessageChannelRemoteSocketAddress() {
         return (InetSocketAddress)messageChannel.socket().getRemoteSocketAddress();
     }
-
-    //-----------------------------------------------------------------------------------
-    /**
-     * Gets the object used to deliver messages to this client.
-     * @return object used to deliver messages to this client
-     */
-    public cMsgMessageDeliverer getDeliverer() {
-        return deliverer;
-    }
-
-    /**
-     * Sets the object used to deliver messages to this client.
-     * @param deliverer object used to deliver messages to this client
-     */
-    public void setDeliverer(cMsgMessageDeliverer deliverer) {
-        this.deliverer = deliverer;
-    }
-
 
  }
 

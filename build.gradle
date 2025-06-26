@@ -92,6 +92,8 @@ tasks.withType(JavaCompile) {
     if (JavaVersion.current() > JavaVersion.VERSION_1_8) {
         options.release = 8
     }
+    options.debug = true
+    options.debugOptions.debugLevel = "source,lines,vars"
 }
 
 javadoc {

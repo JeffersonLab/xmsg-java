@@ -34,21 +34,12 @@ import java.nio.ByteBuffer;
 import org.jlab.coda.cMsg.*;
 import org.jlab.coda.cMsg.remoteExec.IExecutorThread;
 import org.jlab.coda.cMsg.common.cMsgSubdomainInterface;
-import org.jlab.coda.cMsg.cMsgDomain.subdomains.cMsgMessageDeliverer;
-
 import org.jlab.coda.xmsg.net.xMsgProxyAddress;
 import org.jlab.coda.xmsg.net.xMsgContext;
 import org.jlab.coda.xmsg.sys.xMsgProxy;
 
-import joptsimple.OptionException;
-
 /**
  * This class implements a cMsg name server in the cMsg domain.
- * A word of caution. If multiple cMsgNameServer objects exist in
- * a single JVM and they both service clients in the cMsg subdomain,
- * then there will be undesirable effects. In other words, the
- * cMsg subdomain uses static data in some of its implementing
- * classes ({@link cMsgServerBridge} and {@link org.jlab.coda.cMsg.cMsgDomain.subdomains.cMsg}).
  *
  * @author Carl Timmer
  * @version 1.0
@@ -57,12 +48,15 @@ public class cMsgNameServer extends Thread implements IExecutorThread {
 
     /** This xMsg proxy */
     xMsgProxy proxy;
+    
+    /** Contains xMsgProxy port */
+    byte [] successResponse;
+
+    /** Contains error msg */
+    byte [] errorResponse;
 
     /** This server's name. */
     String serverName;
-
-    /** Contains xMsgProxy host and port */
-    byte [] successResponse;
 
     /** Host this server is running on. */
     private String host;
@@ -125,6 +119,15 @@ public class cMsgNameServer extends Thread implements IExecutorThread {
      * end these threads nicely during a shutdown.
      */
     private ArrayList<ClientHandler> handlerThreads;
+    
+    /**
+     * Password that clients need to match before being allowed to connect.
+     * This is subdomain independent and applies to the server as a whole.
+     * If this is null and the client supplies a password anyway, that is also
+     * forbidden. In this way, this password acts as a unique name for this
+     * cMsg server.
+     */
+    String clientPassword;
 
     /**
      * Use this to signal that this server's listening threads have been started
@@ -197,13 +200,11 @@ public class cMsgNameServer extends Thread implements IExecutorThread {
     public cMsgNameServer(int port, int domainPort, int udpPort,
                           boolean standAlone, boolean monitoringOff,
                           String clientPassword, String cloudPassword, String serverToJoin,
-                          int debug, int clientsMax) {
-
-      
+                          int debug, int clientsMax) {  
         handlerThreads = new ArrayList<ClientHandler>(10);
 
         this.debug          = debug;
-       
+        this.clientPassword = clientPassword;
         // read env variable for domain server port number
         if (domainPort < 1) {
             try {
@@ -501,6 +502,8 @@ public class cMsgNameServer extends Thread implements IExecutorThread {
                     usage();
                     System.exit(-1);
                 }
+            } else if (s.equalsIgnoreCase("password")) {
+                clientPassword = System.getProperty(s);
             }
         }
 
@@ -544,34 +547,9 @@ public class cMsgNameServer extends Thread implements IExecutorThread {
         try {
             xMsgProxyAddress address = new xMsgProxyAddress("0.0.0.0", domainServerPort);
             this.proxy = new xMsgProxy(xMsgContext.getInstance(), address);
-        } catch (OptionException e) {
-            System.err.println(e.getMessage());
-            System.exit(1);
         } catch (Exception e) {
             e.printStackTrace();
             System.exit(1);
-        }
-
-        // Prepare success response
-        try {
-            ByteArrayOutputStream successBaos = new ByteArrayOutputStream(128);
-            DataOutputStream successOut = new DataOutputStream(successBaos);
-
-            // send ok back as acknowledgment
-            successOut.writeInt(cMsgConstants.ok);
-
-            // send cMsg domain host & port contact info back to client
-            successOut.writeInt(cMsgNetworkConstants.magicNumbers[0]);
-            successOut.writeInt(cMsgNetworkConstants.magicNumbers[1]);
-            successOut.writeInt(cMsgNetworkConstants.magicNumbers[2]);
-            successOut.writeInt(domainServerPort);
-            successOut.writeInt(host.length());
-            successOut.write(host.getBytes("US-ASCII"));
-            successOut.flush();
-            this.successResponse = successBaos.toByteArray();
-            successBaos.close();
-        } catch (IOException e) {
-           System.out.println("cMsgServerName::run() - Something went wrong during success message creation");
         }
 
         // start this name server accepting client connections
@@ -581,7 +559,8 @@ public class cMsgNameServer extends Thread implements IExecutorThread {
         if (debug >= cMsgConstants.debugInfo) {
             System.out.println(">> NS: Start multicast thd on port "  + multicastPort);
         }
-        multicastThread = new cMsgMulticastListeningThread(this, port, multicastPort, multicastSocket, debug);
+        multicastThread = new cMsgMulticastListeningThread(this, port, multicastPort, multicastSocket,
+                                                           clientPassword, debug);
         multicastThread.start();
 
         // Wait until these 2 listening threads have successfully started before continuing.
@@ -635,20 +614,35 @@ public class cMsgNameServer extends Thread implements IExecutorThread {
             System.out.println(">> NS: Running Name Server at " + (new Date()) );
         }
 
-        byte[] errorResponse = null;
+        // Prepare success response
+        try {
+            ByteArrayOutputStream successBaos = new ByteArrayOutputStream(128);
+            DataOutputStream successOut = new DataOutputStream(successBaos);
+
+            // send ok back as acknowledgment
+            successOut.writeInt(cMsgConstants.ok);
+
+            // send cMsg domain port contact info back to client
+            successOut.writeInt(domainServerPort);
+            successOut.flush();
+            this.successResponse = successBaos.toByteArray();
+            successBaos.close();
+        } catch (IOException e) {
+           System.out.println("cMsgServerName::run() - Something went wrong during success message creation");
+        }
         // Prepare error response
         try {
             ByteArrayOutputStream errorBaos = new ByteArrayOutputStream(128);
             DataOutputStream errorOut = new DataOutputStream(errorBaos);
 
-            errorOut.writeInt(cMsgConstants.error);
+            errorOut.writeInt(cMsgConstants.errorBadFormat);
             String errorMsg = "Incorrect format";
             errorOut.writeInt(errorMsg.length());
             errorOut.write(errorMsg.getBytes("US-ASCII"));
 
             errorOut.flush();
             errorOut.close();
-            errorResponse = errorBaos.toByteArray();
+            this.errorResponse = errorBaos.toByteArray();
             errorBaos.close();
         } catch (IOException e) {
             System.out.println("cMsgServerName::run() - Something went wrong during error message creation");
@@ -704,7 +698,6 @@ public class cMsgNameServer extends Thread implements IExecutorThread {
                     // is this a new connection coming in?
                     if (key.isValid() && key.isAcceptable()) {
                         ServerSocketChannel server = (ServerSocketChannel) key.channel();
-                        System.out.println("got a request to connect");
                         // accept the connection from the client
                         SocketChannel channel = server.accept();
 
@@ -724,7 +717,6 @@ public class cMsgNameServer extends Thread implements IExecutorThread {
 //System.out.println("  Buffer capacity = " + buffer.capacity() + ", limit = " + buffer.limit()
 //                   + ", position = " + buffer.position() );
                                 bytes = channel.read(buffer);
-                                System.out.println("Read bytes " + bytes);
                                 // for End-of-stream ...
                                 if (bytes == -1) {
 //System.out.println("cMsgNameServer: closing bad channel");
@@ -816,11 +808,14 @@ System.out.println("Main server IO error");
 
     /** Class to handle a socket connection to the client of which there may be many. */
     private class ClientHandler extends Thread {
-        
         /** Socket channel to client. */
         SocketChannel channel;
 
-    
+        /** Buffered input communication streams for efficiency. */
+        DataInputStream  in;
+        /** Buffered output communication streams for efficiency. */
+        DataOutputStream out;
+
         /**
          * Constructor.
          * @param channel socket channel to client
@@ -837,23 +832,103 @@ System.out.println("Main server IO error");
           * Note to those who would make changes in the protocol, keep the first three
           * ints the same. That way the server can reliably check for mismatched versions.
           */
-         public void run() {
+         public void run() {     
+
             try {
-                ByteBuffer buffer = ByteBuffer.wrap(successResponse);
+                // buffered communication streams for efficiency
+                in  = new DataInputStream(new BufferedInputStream(channel.socket().getInputStream(), 4096));
+                out = new DataOutputStream(new BufferedOutputStream(channel.socket().getOutputStream(), 2048));
 
-                while (buffer.hasRemaining()) {
-                    channel.write(buffer);
+                // cMsg version
+                int version = in.readInt();
+                // message id
+                int msgId = in.readInt();
+                // password len
+                int lengthPassword = in.readInt();
+                // password
+                byte[] passwordBytes = new byte[lengthPassword];
+                in.readFully(passwordBytes);
+                String password = new String(passwordBytes, "US-ASCII");
+
+                // immediately check if this domain server is different cMsg version than client
+                if (version != cMsgConstants.version) {
+                    if (debug >= cMsgConstants.debugError) {
+                        System.out.println("version mismatch, client(" + version + ") != server(" +
+                                            cMsgConstants.version + ")");
+                    }
+                    out.writeInt(cMsgConstants.errorDifferentVersion);
+                    String s = "version mismatch, client(" + version + ") != server(" +
+                                cMsgConstants.version + ")";
+                    out.writeInt(s.length());
+                    try { out.write(s.getBytes("US-ASCII")); }
+                    catch (UnsupportedEncodingException e) {}
+
+                    out.flush();
+                    return;
+                }
+                
+                // validate msgType
+                if (msgId != cMsgNetworkConstants.cMsgDomainTCP) {
+                    if (debug >= cMsgConstants.debugError) {
+                        System.out.println("cMsg name server: can't understand your message -> " + msgId);
+                    }
+                    out.writeInt(cMsgConstants.errorIllegalMessageType);
+                    String s = "msg type != cMsgNetworkConstants.cMsgDomainTCP";
+                    out.writeInt(s.length());
+                    try { out.write(s.getBytes("US-ASCII")); }
+                    catch (UnsupportedEncodingException e) {}
+
+                    out.flush();
+                    return;
                 }
 
-            } catch (IOException e) {
-                System.err.println("Failed to send success response to client: " + e.getMessage());
-            } finally {
-                try {
-                    channel.close();
-                } catch (IOException e) {
-                    System.err.println("Failed to close channel: " + e.getMessage());
+                // if the client does not provide the correct password if required, return an error
+                if (clientPassword != null) {
+                    if (debug >= cMsgConstants.debugInfo) {
+                        System.out.println("  local password = " + clientPassword);
+                        System.out.println("  given password = " + password);
+                    }
+                    if (password.length() < 1 || !clientPassword.equals(password)) {
+                        if (debug >= cMsgConstants.debugError) {
+                            System.out.println("  wrong password sent");
+                        }
+                        out.writeInt(cMsgConstants.errorWrongPassword);
+                        String s = "wrong password given";
+                        out.writeInt(s.length());
+                        try {
+                            out.write(s.getBytes("US-ASCII"));
+                        }
+                        catch (UnsupportedEncodingException e) {
+                        }
+                        out.flush();
+                        return;
+                    }
                 }
+
+                // all packet tests passed so send back proxy server details
+                out.write(successResponse);
+                out.flush();           
+            }
+            catch (IOException ex) {
+                if (debug >= cMsgConstants.debugError) {
+                    System.out.println("cMsgNameServer's Client thread: IO error in talking to client");
+                }
+                 try {
+                    // Send error response back to client before closing
+                    out.write(errorResponse);
+                    out.flush();
+                } catch (IOException sendError) {
+                    System.err.println("Error sending error response to client: " + sendError.getMessage());
+                    sendError.printStackTrace();
+                }
+            }
+            finally {
+                handlerThreads.remove(this);
+                // we are done with the channel
+                try {in.close();}      catch (IOException ex) {}
+                try {out.close();}     catch (IOException ex) {}
+                try {channel.close();} catch (IOException ex) {}
+            }
+         }       
     }
-}
-}
 }

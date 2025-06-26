@@ -79,6 +79,9 @@ public class cMsgNetworkConstants {
     /** Int to send in UDP packet to cMsg name server if cMsg domain. */
     public static final int    cMsgDomainMulticast = 1;
 
+    /** Int to send in TCP packet to cMsg name server if cMsg domain. */
+    public static final int    cMsgDomainTCP = 2;
+
     /** Int to send in UDP packet to server if RC domain and sender is client. */
     public static final int    rcDomainMulticastClient = 2;
     /** Int to send in UDP packet to rc multicast server if RC domain and sender is server. */
