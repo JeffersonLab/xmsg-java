@@ -547,6 +547,7 @@ public class cMsgNameServer extends Thread implements IExecutorThread {
         try {
             xMsgProxyAddress address = new xMsgProxyAddress("0.0.0.0", domainServerPort);
             this.proxy = new xMsgProxy(xMsgContext.getInstance(), address);
+            this.proxy.start();
         } catch (Exception e) {
             e.printStackTrace();
             System.exit(1);
