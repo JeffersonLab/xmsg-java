@@ -20,8 +20,8 @@
  *    Department of Experimental Nuclear Physics, Jefferson Lab.
  */
 
+syntax = "proto2";
 option optimize_for = SPEED;
-
 option java_outer_classname = "xMsgM";
 
 package org.jlab.coda.xmsg.data;

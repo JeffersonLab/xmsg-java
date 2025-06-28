@@ -72,8 +72,8 @@ java {
     withSourcesJar()
     withJavadocJar()
 
-    sourceCompatibility = JavaVersion.VERSION_1_8
-    targetCompatibility = JavaVersion.VERSION_1_8
+    sourceCompatibility = JavaVersion.VERSION_17
+    targetCompatibility = JavaVersion.VERSION_17
 }
 
 ext {
@@ -85,6 +85,15 @@ protobuf {
         artifact = 'com.google.protobuf:protoc:4.28.2'
         if (project.hasProperty('protocPath')) {
             path = protocPath
+        }
+    }
+    generateProtoTasks {
+        all().each { task ->
+            task.builtins {
+                java {
+                    option 'lite'
+                }
+            }
         }
     }
 }
