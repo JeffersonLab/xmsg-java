@@ -116,23 +116,37 @@ javadoc {
     exclude "org/jlab/coda/xmsg/sys/*/*.java"
 }
 
+
+// ✅ configure fat jar with NO classifier
+shadowJar {
+    archiveClassifier.set('') // ← this makes it replace the default jar
+    archiveVersion.set('')    // optional: remove version in filename
+}
+
+// ✅ publish ONLY the fat jar as main artifact
 publishing {
     publications {
         maven(MavenPublication) {
-            from components.java
+            artifact(shadowJar) // ← no {} block, no classifier, just this
         }
     }
 }
-
+//publishing {
+//    publications {
+//        maven(MavenPublication) {
+//            from components.java
+//        }
+//    }
+//}
 
 build.dependsOn shadowJar
 
 // creating a uber jar, including all dependencies
-shadowJar {
-    archiveBaseName.set('xmsg-2.4')
-    archiveClassifier.set('')
-    archiveVersion.set('')
-}
+//shadowJar {
+//    archiveBaseName.set('xmsg-2.4')
+//    archiveClassifier.set('')
+//    archiveVersion.set('')
+//}
 
 
 test {
