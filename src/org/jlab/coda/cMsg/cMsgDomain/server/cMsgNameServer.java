@@ -46,7 +46,7 @@ import org.jlab.coda.xmsg.sys.xMsgProxy;
  */
 public class cMsgNameServer extends Thread implements IExecutorThread {
 
-    /** This xMsg proxy */
+    /** xMsg proxy this server will run as domain server */
     xMsgProxy proxy;
     
     /** Contains xMsgProxy port */
@@ -187,15 +187,15 @@ public class cMsgNameServer extends Thread implements IExecutorThread {
      * Constructor which reads environmental variables and opens listening sockets.
      *
      * @param port TCP listening port for communication from clients
-     * @param domainPort  listening port for receiving 2 permanent connections from each client
+     * @param domainPort  listening port of xMsgProxy (pub/sub)
      * @param udpPort UDP listening port for receiving multicasts from clients
-     * @param standAlone   if true no other cMsg servers are allowed to attached to this one and form a cloud
-     * @param monitoringOff if true clients are NOT sent monitoring data
+     * @param [NOT_WORKING] standAlone   if true no other cMsg servers are allowed to attached to this one and form a cloud
+     * @param [NOT_WORKING] monitoringOff if true clients are NOT sent monitoring data
      * @param clientPassword password client needs to provide to connect to this server
-     * @param cloudPassword  password server needs to provide to connect to this server to become part of a cloud
-     * @param serverToJoin server whose cloud this server is to be joined to
+     * @param [NOT_WORKING] cloudPassword  password server needs to provide to connect to this server to become part of a cloud
+     * @param [NOT_WORKING] serverToJoin server whose cloud this server is to be joined to
      * @param debug desired level of debug output
-     * @param clientsMax max number of clients per cMsgDomainServerSelect object for regime = low
+     * @param [NOT_WORKING] clientsMax max number of clients per cMsgDomainServerSelect object for regime = low
      */
     public cMsgNameServer(int port, int domainPort, int udpPort,
                           boolean standAlone, boolean monitoringOff,
@@ -339,13 +339,10 @@ public class cMsgNameServer extends Thread implements IExecutorThread {
             // (something not mentioned in any javadocs or books!).
             SocketAddress sa;
             Enumeration<NetworkInterface> enumer = NetworkInterface.getNetworkInterfaces();
-            System.out.println("Multicast group: " + cMsgNetworkConstants.cMsgMulticast);
             while (enumer.hasMoreElements()) {
                 try {
-                    NetworkInterface ni = enumer.nextElement();
-                    System.out.println("Joining multicast group on interface: " + ni.getName() + " (" + ni.getDisplayName() + ")");
                     sa = new InetSocketAddress(InetAddress.getByName(cMsgNetworkConstants.cMsgMulticast), udpPort);
-                    multicastSocket.joinGroup(sa, ni);
+                    multicastSocket.joinGroup(sa, enumer.nextElement());
                 }
                 catch (IOException e) {/* cannot join multicast group cause network messed up */}
             }
@@ -393,7 +390,7 @@ public class cMsgNameServer extends Thread implements IExecutorThread {
         System.out.println("       server         punctuation (not colon) or white space separated list of servers\n" +
                            "                      in host:port format to connect to in order to gain entry to cloud\n" +
                            "                      of servers. First successful connection used. If no connections made,\n" +
-                           "                      no error indicated.");
+                           "                      no error indicated (NOT WORKING ANYMORE)");
         System.out.println("       debug          debug output level has acceptable values of:");
         System.out.println("                          info   for full output");
         System.out.println("                          warn   for severity of warning or greater");
@@ -401,13 +398,13 @@ public class cMsgNameServer extends Thread implements IExecutorThread {
         System.out.println("                          severe for severity of \"cannot go on\"");
         System.out.println("                          none   for no debug output (default)");
         System.out.println("       standalone     means no other servers may connect or vice versa,");
-        System.out.println("                      is incompatible with \"server\" option");
-        System.out.println("       monitorOff     means monitoring data is NOT sent to client,");
+        System.out.println("                      is incompatible with \"server\" option  (NOT WORKING ANYMORE)");
+        System.out.println("       monitorOff     means monitoring data is NOT sent to client  (NOT WORKING ANYMORE),");
         System.out.println("       password       is used to block clients without this password in their UDL's");
-        System.out.println("       cloudpassword  is used to join a password-protected cloud or to allow");
+        System.out.println("       cloudpassword  is used to join a password-protected cloud or to allow  (NOT WORKING ANYMORE)");
         System.out.println("                      servers with this password to join this cloud");
         System.out.println("       lowRegimeSize  for clients of \"regime=low\" type, this sets the number of");
-        System.out.println("                      clients serviced by a single thread");
+        System.out.println("                      clients serviced by a single thread  (NOT WORKING ANYMORE)");
         System.out.println();
     }
 
@@ -586,8 +583,7 @@ public class cMsgNameServer extends Thread implements IExecutorThread {
 
 
     /**
-     * Implement IExecutorThread interface so cMsgNameServer can be
-     * run using the Commander/Executor framework.
+     * Shutdown the name and domain server
      */
     public void cleanUp() {
         shutdown();

@@ -55,7 +55,6 @@ class cMsgMulticastListeningThread extends Thread {
     /** Setting this to true will kill this thread. */
     private boolean killThread;
 
-
     /** Kills this thread. */
     void killThread() {
         killThread = true;
@@ -212,7 +211,7 @@ class cMsgMulticastListeningThread extends Thread {
                 if ( (magicInt1 != cMsgNetworkConstants.magicNumbers[0]) ||
                      (magicInt2 != cMsgNetworkConstants.magicNumbers[1]) ||
                      (magicInt3 != cMsgNetworkConstants.magicNumbers[2]))  {
-                     System.out.println("  Bad magic numbers for multicast response packet");
+//System.out.println("  Bad magic numbers for multicast response packet");
                      continue;
                 }
 
@@ -220,9 +219,10 @@ class cMsgMulticastListeningThread extends Thread {
                 int version = cMsgUtilities.bytesToInt(buf, 12); // what cMsg version is this ?
                 if (version != cMsgConstants.version) {
                     // ignore multicasts from different version
-                    System.out.println("multicast packet: bad version (" + version + ") != expected (" + cMsgConstants.version + ")");
+//System.out.println("multicast packet: bad version (" + version + ") != expected (" + cMsgConstants.version + ")");
                     continue;
                 }
+//System.out.println("multicast packet: version = " + version);
 
                 int msgType     = cMsgUtilities.bytesToInt(buf, 16); // what type of multicast is this ?
                 int passwordLen = cMsgUtilities.bytesToInt(buf, 20); // password length
@@ -231,7 +231,7 @@ class cMsgMulticastListeningThread extends Thread {
                 // to the rc broadcast domain.
                 if (msgType != cMsgNetworkConstants.cMsgDomainMulticast) {
                     // ignore multicasts from unknown sources
-                    System.out.println("bad msgtype");
+//System.out.println("bad msgtype");
                     continue;
                 }
 //System.out.println("multicast packet: msg type = " + msgType);
