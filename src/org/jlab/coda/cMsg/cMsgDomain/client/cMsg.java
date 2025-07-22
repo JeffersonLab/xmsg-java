@@ -18,6 +18,7 @@ package org.jlab.coda.cMsg.cMsgDomain.client;
 
 import org.jlab.coda.cMsg.*;
 import org.jlab.coda.cMsg.common.*;
+
 import org.jlab.coda.xmsg.core.xMsg;
 import org.jlab.coda.xmsg.core.xMsgMessage;
 import org.jlab.coda.xmsg.core.xMsgCallBack;
@@ -30,6 +31,7 @@ import org.jlab.coda.xmsg.data.xMsgD.xMsgData;
 import org.jlab.coda.xmsg.data.xMsgD.xMsgPayload;
 import org.jlab.coda.xmsg.excp.xMsgException;
 import org.jlab.coda.xmsg.net.xMsgProxyAddress;
+import org.jlab.coda.xmsg.core.xMsgConnection;
 import org.jlab.coda.xmsg.net.xMsgRegAddress;
 
 import java.io.*;
@@ -55,7 +57,10 @@ import java.util.regex.Pattern;
  * @version 1.0
  */
 public class cMsg extends cMsgDomainAdapter {
-
+    
+    /** Type of domain this is. */
+    private String domainType = "cMsg";
+    
     /** xMsg actor being used for all pub/sub */
     private xMsg actor;
 
@@ -265,85 +270,85 @@ public class cMsg extends cMsgDomainAdapter {
     /**
      * Method to connect to the domain server from this client.
      * This method handles multiple UDLs,
-     * but passes off the real work to {@link #connectDirect}.
+     * but passes off the real work to {@link #connectToProxy}.
      *
      * @throws cMsgException if there are problems parsing the UDL or
      *                       communication problems with the server(s)
      */
     public void connect() throws cMsgException {
-            // The UDL is a semicolon separated list of UDLs, separate them and
-            // store them for future use in failoverUdls. Only need to do this once.
-            if (!udlsParsed) {
-                setUDL(UDL);
-                udlsParsed = true;
+        // The UDL is a semicolon separated list of UDLs, separate them and
+        // store them for future use in failoverUdls. Only need to do this once.
+        if (!udlsParsed) {
+            setUDL(UDL);
+            udlsParsed = true;
+        }
+
+        cMsgException ex;
+
+        synchronized (failoverUdls) {
+
+            // If we're not connected, go ahead and connect.
+            // If we're connected, and already using the UDL at the head of the list, return.
+            // Else, disconnect from the current server and reconnect using the first UDL.
+            if (connected){
+                if (currentParsedUDL != null &&
+                    !currentParsedUDL.mustMulticast &&
+                    currentParsedUDL.UDL.equals(failoverUdls.get(0).UDL)) {
+                        if (debug >= cMsgConstants.debugInfo) {
+                            System.out.println("connect: we're already connected to this UDL and we're not multicasting, so return");
+                        }
+                        return;
+                }
             }
 
-            cMsgException ex;
+            failoverIndex = -1;
+            
+            // Go through the UDL's until one works
+            do {
+                // get parsed & stored UDL info & store UDL info locally
+                currentParsedUDL = failoverUdls.get(++failoverIndex);
 
-            synchronized (failoverUdls) {
-
-                // If we're not connected, go ahead and connect.
-                // If we're connected, and already using the UDL at the head of the list, return.
-                // Else, disconnect from the current server and reconnect using the first UDL.
-                if (connected){
-                    if (currentParsedUDL != null &&
-                       !currentParsedUDL.mustMulticast &&
-                        currentParsedUDL.UDL.equals(failoverUdls.get(0).UDL)) {
-                            if (debug >= cMsgConstants.debugInfo) {
-                                System.out.println("connect: we're already connected to this UDL and we're not multicasting, so return");
-                            }
-                            return;
-                    }
+                // connect using that UDL info
+                if (debug >= cMsgConstants.debugInfo) {
+                    System.out.println("Trying to connect with UDL = " + currentParsedUDL.UDL);
                 }
 
-                failoverIndex = -1;
-                
-                // Go through the UDL's until one works
-                do {
-                    // get parsed & stored UDL info & store UDL info locally
-                    currentParsedUDL = failoverUdls.get(++failoverIndex);
+                try {
+                    List<String> orderedIpList;
 
-                    // connect using that UDL info
-                    if (debug >= cMsgConstants.debugInfo) {
-                        System.out.println("Trying to connect with UDL = " + currentParsedUDL.UDL);
+                    if (currentParsedUDL.mustMulticast) {
+                        getProxyDetailsThroughMulticast();
+                        // Order server IP addresses so that those on same
+                        // subnet as this client are listed first
+                        orderedIpList = cMsgUtilities.orderIPAddresses(ipList, broadList,
+                                                                        currentParsedUDL.preferredSubnet);
+                    }
+                    else {
+                        getProxyDetailsThroughTCP();
+                        orderedIpList = new ArrayList<String>(1);
+                        orderedIpList.add(currentParsedUDL.nameServerHost);
                     }
 
-                    try {
-                        List<String> orderedIpList;
+                    connectToProxy(orderedIpList);
 
-                        if (currentParsedUDL.mustMulticast) {
-                            getProxyDetailsThroughMulticast();
-                            // Order server IP addresses so that those on same
-                            // subnet as this client are listed first
-                            orderedIpList = cMsgUtilities.orderIPAddresses(ipList, broadList,
-                                                                           currentParsedUDL.preferredSubnet);
-                        }
-                        else {
-                            getProxyDetailsThroughTCP();
-                            orderedIpList = new ArrayList<String>(1);
-                            orderedIpList.add(currentParsedUDL.nameServerHost);
-                        }
+                    return;
+                }
+                catch (cMsgException e) {
+                    currentParsedUDL = null;
+                    ex = e;
+                }
 
-                        connectToProxy(orderedIpList);
-
-                        return;
-                    }
-                    catch (cMsgException e) {
-                        currentParsedUDL = null;
-                        ex = e;
-                    }
-
-                } while (failoverIndex < failoverUdls.size() - 1);
-            }
-
-            throw new cMsgException("connect: all UDLs failed", ex);
+            } while (failoverIndex < failoverUdls.size() - 1);
         }
+
+        throw new cMsgException("connect: all UDLs failed", ex);
+    }
 
 
     /**
      * Method to multicast in order to find the domain server from this client.
      * Once the server is found and returns its host and port, a direct connection
-     * can be made. Only called when connectLock is held.
+     * can be made.
      *
      * @throws cMsgException if there are problems parsing the UDL or
      *                       communication problems with the server.
@@ -641,9 +646,8 @@ public class cMsg extends cMsgDomainAdapter {
 
 
     /**
-     * Method to make the actual connection to the name & domain servers from this client.
-     * Only called by method protected with connectLock (write lock), so no mutex
-     * protection needed. Only called if not already connected.
+     * Method to make the actual connection to the domain server (xMsg Proxy) from this client.
+     * Only called if not already connected.
      *
      * @param addrs list of server IP addresses in order of those with same subnet
      *              as this client first, others last
@@ -678,7 +682,7 @@ public class cMsg extends cMsgDomainAdapter {
             }
         }
 
-
+    
     /**
      * This method does nothing.
      * @param timeout ignored
@@ -698,17 +702,13 @@ public class cMsg extends cMsgDomainAdapter {
 
 
     /**
-     * This method gets the host and port of the domain server from the name server.
-     * It also gets information about the subdomain handler object.
-     * Note to those who would make changes in the protocol, keep the first three
-     * ints the same. That way the server can reliably check for mismatched versions.
-     *
+     * Connects to the name server over TCP to obtain the port number of the domain server.
+     * 
+     * 
      * @param socket socket to server
      * @throws IOException if there are communication problems with the name server
-     * @throws cMsgException if the name server's domain does not match the UDL's domain;
-     *                       the client cannot be registered; the domain server cannot
-     *                       open a listening socket or find a port to listen on; or
-     *                       the name server cannot establish a connection to the client
+     * @throws cMsgException if unsupported encoding is used for password; on server
+     *          communication problems; domain server port sent back can't be read
      */
     void getProxyDetailsThroughTCP() throws cMsgException {
         Socket socket = null;
@@ -1308,6 +1308,278 @@ public class cMsg extends cMsgDomainAdapter {
             return sb.toString();
         }
 
+    }
+
+
+    /**
+     * {@inheritDoc}
+     *
+     * @param message {@inheritDoc}
+     * @throws cMsgException if there are communication problems with the server;
+     *                       subject and/or type is null
+     */
+    public void send(cMsgMessage message) throws cMsgException {
+
+        String subject = message.getSubject();
+        String type = message.getType();
+
+        // Check message fields
+        if (subject == null || type == null) {
+            throw new cMsgException("message subject and/or type is null");
+        }
+
+        // Text field
+        String text = message.getText();
+        int textLen = (text != null) ? text.length() : 0;
+
+        // Payload field
+        long now = System.currentTimeMillis();
+        String payloadTxt;
+        int payloadLen = 0;
+
+        if (message.noHistoryAdditions()) {
+            payloadTxt = message.getPayloadText();
+        } else {
+            payloadTxt = message.addHistoryToPayloadText(name, host, now);
+        }
+
+        if (payloadTxt != null) {
+            payloadLen = payloadTxt.length();
+        }
+
+        int binaryLength = message.getByteArrayLength();
+
+        if (!connected) {
+            throw new cMsgException("cMsgDomain.client.cMsg::send: not connected to server");
+        }
+
+        // Total message body size (excluding size prefix)
+        int size = 4 * 14 + subject.length() + type.length()
+                + payloadLen + textLen + binaryLength;
+
+        // Write full message content to byte buffer
+        ByteArrayOutputStream byteOut = new ByteArrayOutputStream(size);
+        DataOutputStream buffer = new DataOutputStream(byteOut);
+        try {
+            buffer.writeInt(cMsgConstants.version);
+            buffer.writeInt(message.getUserInt());
+            buffer.writeInt(message.getSysMsgId());
+            buffer.writeInt(message.getSenderToken());
+            buffer.writeInt(message.getInfo());
+            // Time values (64-bit -> two 32-bit ints)
+            buffer.writeInt((int) (now >>> 32));
+            buffer.writeInt((int) (now & 0xFFFFFFFFL));
+            buffer.writeInt((int) (message.getUserTime().getTime() >>> 32));
+            buffer.writeInt((int) (message.getUserTime().getTime() & 0xFFFFFFFFL));
+            // main content lengths
+            buffer.writeInt(subject.length());
+            buffer.writeInt(type.length());
+            buffer.writeInt(payloadLen);
+            buffer.writeInt(textLen);
+            buffer.writeInt(binaryLength);
+            // main content
+            buffer.write(subject.getBytes("US-ASCII"));
+            buffer.write(type.getBytes("US-ASCII"));
+
+            if (payloadLen > 0) {
+                buffer.write(payloadTxt.getBytes("US-ASCII"));
+            }
+
+            if (textLen > 0) {
+                buffer.write(text.getBytes("US-ASCII"));
+            }
+
+            if (binaryLength > 0) {
+                buffer.write(
+                    message.getByteArray(),
+                    message.getByteArrayOffset(),
+                    binaryLength
+                );
+            }
+
+            buffer.flush();
+        } catch (IOException e) {
+            throw new cMsgException("cMsgDomain.client.cMsg::send: I/O error during message serialization", e);
+        }
+
+        byte[] data = byteOut.toByteArray();
+        xMsgTopic pubTopic = xMsgTopic.build(domainType, subject, type);
+        xMsgMessage pubMsg = new xMsgMessage(pubTopic, xMsgMimeType.BYTES, data);
+
+        // connect to the proxy
+        try (xMsgConnection con = this.actor.getConnection()) {
+            // publish data for sever
+            this.actor.publish(con, pubMsg);
+        } catch (xMsgException e) {
+                throw new cMsgException("cMsgDomain.client.cMsg::send: Sending failed", e);
+        }
+        System.out.println("Published the given message successfully!");
+    }
+
+
+    /**
+     * {@inheritDoc}
+     *
+     *
+     * @param subject {@inheritDoc}
+     * @param type    {@inheritDoc}
+     * @param cb      {@inheritDoc}
+     * @param userObj {@inheritDoc}
+     * @return {@inheritDoc}
+     * @throws cMsgException if the callback, subject and/or type is null or blank;
+     *                       an identical subscription already exists; there are
+     *                       communication problems with the server
+     */
+    public cMsgDomainSubscriptionHandle subscribe(String subject, String type, cMsgCallbackInterface cb, Object userObj)
+            throws cMsgException {
+
+       // check args first
+        if (subject == null || type == null || cb == null) {
+            throw new cMsgException("cMsgDomain.client.cMsg::subscribe: subject, type or callback argument is null");
+        }
+        else if (subject.length() < 1 || type.length() < 1) {
+            throw new cMsgException("cMsgDomain.client.cMsg::subscribe: subject or type is blank string");
+        }
+
+        if (!connected) {
+            throw new cMsgException("cMsgDomain.client.cMsg::subscribe: not connected to server");
+        }
+
+        
+        cMsgDomainSubscriptionHandle cMsgHandle = new cMsgDomainSubscriptionHandle(actor, cb, userObj, domainType, subject, type);
+        xMsgCallBack xMsgcb = new XMsgToCMsgCallbackAdapter(cMsgHandle);
+        
+        try {
+            xMsgTopic subTopic = xMsgTopic.build(domainType, subject, type);
+            xMsgSubscription xMsgHandle = this.actor.subscribe(subTopic, xMsgcb);
+            cMsgHandle.setXMsgHandle(xMsgHandle);
+        } catch (xMsgException e) {
+                throw new cMsgException("cMsgDomain.client.cMsg::subscribe: Subscribing  failed for subject: " + subject + ", type: " + type +", error: "  + e);
+        }
+
+        System.out.println("Subscribed successfully!");
+        return cMsgHandle;
+    }
+
+
+    /**
+     * Private adapter class that allows a {@link cMsgCallbackInterface} to be used as an {@link xMsgCallBack}.
+     * This class wraps a cMsg-style callback and user object, and implements the xMsg callback interface.
+     * When xMsg delivers a message, it is deserialized into a {@link cMsgMessage}, and the wrapped
+     * cMsg callback is invoked with the deserialized message and the original user object.
+     * 
+     * Used internally to bridge xMsg messaging with existing cMsg callback logic.
+     */
+    private class XMsgToCMsgCallbackAdapter implements xMsgCallBack {
+
+        private cMsgDomainSubscriptionHandle cMsgHandle;
+
+        XMsgToCMsgCallbackAdapter(cMsgDomainSubscriptionHandle cMsgHandle) {
+            this.cMsgHandle = cMsgHandle;
+        }
+
+        @Override
+        public void callback(xMsgMessage xmsg) {
+            cMsgMessage cmsg = convertToCMsgMessage(xmsg);
+            cMsgCallbackInterface cb = cMsgHandle.getCallback();
+            Object userObj = cMsgHandle.getUserObject();
+            System.out.println("Conversion done successfully");
+            cb.callback(cmsg, userObj);
+        }
+
+        private cMsgMessage convertToCMsgMessage(xMsgMessage xmsg) {
+            byte[] data = xmsg.getData();
+            String dataType = xmsg.getMimeType();
+
+            if (!xMsgMimeType.BYTES.equals(dataType)) {
+                throw new RuntimeException("cMsgDomain.client.cMsg.XMsgToCMsgCallbackAdapter::convertToCMsgMessage Expected BYTES mime type, got: " + dataType);
+            }
+
+            try {
+                return deserializeCMsgMessage(data);
+            } catch (IOException e) {
+                throw new RuntimeException("cMsgDomain.client.cMsg.XMsgToCMsgCallbackAdapter::convertToCMsgMessage: Failed to deserialize cMsgMessage", e);
+            }
+        }
+
+        private cMsgMessageFull deserializeCMsgMessage(byte[] array) throws IOException {
+            cMsgMessageFull msg = new cMsgMessageFull();
+            int index = 0;
+
+            msg.setVersion(cMsgUtilities.bytesToInt(array, index)); index += 4;
+            msg.setUserInt(cMsgUtilities.bytesToInt(array, index)); index += 4;
+            msg.setSysMsgId(cMsgUtilities.bytesToInt(array, index)); index += 4;
+            msg.setSenderToken(cMsgUtilities.bytesToInt(array, index)); index += 4;
+            msg.setInfo(cMsgUtilities.bytesToInt(array, index) |
+                        cMsgMessage.wasSent | cMsgMessage.expandedPayload); index += 4;
+
+            long now = ((long) cMsgUtilities.bytesToInt(array, index) << 32) |
+                    ((long) cMsgUtilities.bytesToInt(array, index + 4) & 0xFFFFFFFFL);
+            msg.setSenderTime(new Date(now));
+            index += 8;
+
+            long time = ((long) cMsgUtilities.bytesToInt(array, index) << 32) |
+                        ((long) cMsgUtilities.bytesToInt(array, index + 4) & 0xFFFFFFFFL);
+            msg.setUserTime(new Date(time));
+            index += 8;
+
+            int lengthSubject    = cMsgUtilities.bytesToInt(array, index); index += 4;
+            int lengthType       = cMsgUtilities.bytesToInt(array, index); index += 4;
+            int lengthPayloadTxt = cMsgUtilities.bytesToInt(array, index); index += 4;
+            int lengthText       = cMsgUtilities.bytesToInt(array, index); index += 4;
+            int lengthBinary     = cMsgUtilities.bytesToInt(array, index); index += 4;
+
+            msg.setSubject(new String(array, index, lengthSubject, "US-ASCII")); index += lengthSubject;
+            msg.setType(new String(array, index, lengthType, "US-ASCII")); index += lengthType;
+
+            if (lengthPayloadTxt > 0) {
+                String s = new String(array, index, lengthPayloadTxt, "US-ASCII");
+                index += lengthPayloadTxt;
+                try {
+                    msg.setFieldsFromText(s, cMsgMessage.allFields);
+                } catch (cMsgException e) {
+                    System.out.println("Invalid payload text: " + e.getMessage());
+                }
+            }
+
+            if (lengthText > 0) {
+                msg.setText(new String(array, index, lengthText, "US-ASCII"));
+                index += lengthText;
+            }
+
+            if (lengthBinary > 0) {
+                try {
+                    msg.setByteArray(array, index, lengthBinary);
+                } catch (cMsgException ignored) {}
+            }
+
+            msg.setDomain(domainType); // defined in outer class
+            return msg;
+        }
+    }
+
+
+    /**
+     * 
+     * Method to unsubscribe a previous subscription to receive messages of a subject and type
+     * from the domain.
+     * 
+     * Note: This method does not override {@code unsubscribe(cMsgSubscriptionHandle)} 
+     * from {@code cMsgDomainInterface} because it takes a different parameter type: 
+     * {@code cMsgDomainSubscriptionHandle}. This type serves as an adapter that wraps 
+     * the underlying xMsg subscription handle, enabling integration between xMsg and cMsg.
+     * 
+     * @param obj the object returned from a subscribe call
+     * @throws cMsgException if there are communication problems with the server; subscription handle obj is null
+     */
+    public void unsubscribe(cMsgDomainSubscriptionHandle obj)
+            throws cMsgException {
+        
+        if (obj == null) {
+            throw new cMsgException("argument is null");
+        }
+
+        this.actor.unsubscribe(obj.getXMsgHandle());
     }
 
 }
