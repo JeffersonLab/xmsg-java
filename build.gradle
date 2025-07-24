@@ -59,7 +59,7 @@ repositories {
 }
 
 dependencies {
-    api 'org.zeromq:jeromq:0.4.3'
+    api 'org.zeromq:jeromq:0.5.4'
     api 'com.google.protobuf:protobuf-java:4.28.2'
     implementation 'net.sf.jopt-simple:jopt-simple:5.0.4'
     testImplementation 'org.junit.jupiter:junit-jupiter:5.5.0'
@@ -189,14 +189,14 @@ def deploySpec = copySpec {
 }
 
 tasks.register('deploy', Copy) {
-    def dest = "$System.env.CLARA_HOME"
+    def dest = "$System.env.ERSAP_HOME"
 
     into dest
     with deploySpec
 
     doFirst {
         if (dest == 'null') {
-            throw new GradleException('CLARA_HOME not set')
+            throw new GradleException('ERSAP_HOME not set')
         }
     }
 
