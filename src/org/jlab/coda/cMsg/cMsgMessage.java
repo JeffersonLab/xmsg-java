@@ -22,6 +22,7 @@
 
 package org.jlab.coda.cMsg;
 
+import org.jlab.coda.xmsg.data.xMsgM.xMsgMeta;
 
 import org.jlab.coda.cMsg.common.Base64;
 import org.jlab.coda.cMsg.common.cMsgMessageContextDefault;
@@ -230,6 +231,9 @@ public class cMsgMessage implements Cloneable, Serializable {
     /** Message exists in this domain. */
     protected String domain;
 
+    /** xMsgMetaData (populated only in cMsgDomain for sendAndGet requests; used to get resTopic in response) */
+    protected xMsgMeta.Builder xMsgMetaData;
+
     /**
      * Condensed information stored in bits.
      * Is message a sendAndGet request? -- stored in 1st bit.
@@ -376,6 +380,7 @@ public class cMsgMessage implements Cloneable, Serializable {
         // general
         dst.sysMsgId            = src.sysMsgId;
         dst.domain              = src.domain;
+        dst.xMsgMetaData        = src.xMsgMetaData;
         dst.info                = src.info;
         dst.version             = src.version;
         dst.reserved            = src.reserved;
@@ -448,6 +453,7 @@ public class cMsgMessage implements Cloneable, Serializable {
         cMsgMessage msg = new cMsgMessage();
         msg.subject = "dummy";
         msg.type = "dummy";
+        msg.xMsgMetaData = xMsgMetaData;
         msg.sysMsgId = sysMsgId;
         msg.senderToken = senderToken;
         msg.info = isGetResponse;
@@ -552,6 +558,19 @@ public class cMsgMessage implements Cloneable, Serializable {
      */
     public String getDomain() {return domain;}
 
+    /** Sets the xMsgMetaData builder 
+     * (used in sendAndGet requests for response topic). 
+     * */
+    public void setXMsgMetaData(xMsgMeta.Builder meta) {
+        this.xMsgMetaData = meta;
+    }
+
+    /** Gets the xMsgMetaData builder 
+     * (null if not a sendAndGet request).
+     *  */
+    public xMsgMeta.Builder getXMsgMetaData() {
+        return this.xMsgMetaData;
+    }
 
     /**
      * Is this message a response to a "sendAndGet" message?
@@ -566,6 +585,13 @@ public class cMsgMessage implements Cloneable, Serializable {
         info = getResponse ? info|isGetResponse : info & ~isGetResponse;
     }
 
+    /**
+     * Specify whether this message is a "sendAndGet" request.
+     * @param getRequest - true if this message is a "sendAndGet" request
+     */
+    public void setGetRequest(boolean getRequest) {
+        info = getRequest ? info|isGetRequest : info & ~isGetRequest;
+    }
 
     /**
      * Is this message a null response to a "sendAndGet" message?

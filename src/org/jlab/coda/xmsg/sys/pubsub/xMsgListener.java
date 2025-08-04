@@ -48,6 +48,7 @@ public abstract class xMsgListener implements Runnable {
         this.items = new ConcurrentHashMap<>();
         this.context = context;
         this.pollingThread = ThreadUtils.newThread(name, this);
+        this.pollingThread.setDaemon(true);
     }
 
     public void start() {

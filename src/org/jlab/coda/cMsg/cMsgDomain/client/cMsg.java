@@ -33,6 +33,7 @@ import org.jlab.coda.xmsg.excp.xMsgException;
 import org.jlab.coda.xmsg.net.xMsgProxyAddress;
 import org.jlab.coda.xmsg.core.xMsgConnection;
 import org.jlab.coda.xmsg.net.xMsgRegAddress;
+import org.jlab.coda.xmsg.data.xMsgM.xMsgMeta;
 
 import java.io.*;
 import java.net.*;
@@ -1310,6 +1311,35 @@ public class cMsg extends cMsgDomainAdapter {
 
     }
 
+    /**
+     * {@inheritDoc}
+     *
+     * NOTE: Disconnecting when one thread is in the waiting part of a sendAndGet may cause that
+     * thread to block forever. It is best to always use a timeout with sendAndGet so the thread
+     * is assured of eventually resuming execution.
+     *
+     * @param message {@inheritDoc}
+     * @param timeout {@inheritDoc}
+     * @return {@inheritDoc}
+     * @throws cMsgException if there are communication problems with the server;
+     *                       server died; subject and/or type is null
+     * @throws TimeoutException if timeout occurs
+     */
+    public cMsgMessage sendAndGet(cMsgMessage orgMessage, int timeout) throws cMsgException, TimeoutException {
+        cMsgMessage message = orgMessage.copy();
+        message.setGetRequest(true);
+        xMsgMessage req_xmsg = prepareOutgoingMessage(message);
+        xMsgMessage resp_xmsg;
+        try (xMsgConnection con = this.actor.getConnection()) {
+            resp_xmsg = this.actor.syncPublish(con, req_xmsg, timeout);
+        } catch (xMsgException | TimeoutException e) {
+            e.printStackTrace();
+            throw new cMsgException("cMsgDomain.client.cMsg::sendAndGet failed: ", e);
+        }
+
+        cMsgMessageFull resp_cmsg = readIncomingMessage(resp_xmsg);        
+        return resp_cmsg;
+    }
 
     /**
      * {@inheritDoc}
@@ -1318,102 +1348,29 @@ public class cMsg extends cMsgDomainAdapter {
      * @throws cMsgException if there are communication problems with the server;
      *                       subject and/or type is null
      */
-    public void send(cMsgMessage message) throws cMsgException {
-
+    public void send(cMsgMessage orgMessage) throws cMsgException {
+        cMsgMessage message = orgMessage.copy();
         String subject = message.getSubject();
         String type = message.getType();
 
-        // Check message fields
-        if (subject == null || type == null) {
-            throw new cMsgException("message subject and/or type is null");
+        if(!message.isGetResponse()) {
+            // Check message fields
+            if (subject == null || type == null) {
+                throw new cMsgException("message subject and/or type is null");
+            }
         }
-
-        // Text field
-        String text = message.getText();
-        int textLen = (text != null) ? text.length() : 0;
-
-        // Payload field
-        long now = System.currentTimeMillis();
-        String payloadTxt;
-        int payloadLen = 0;
-
-        if (message.noHistoryAdditions()) {
-            payloadTxt = message.getPayloadText();
-        } else {
-            payloadTxt = message.addHistoryToPayloadText(name, host, now);
-        }
-
-        if (payloadTxt != null) {
-            payloadLen = payloadTxt.length();
-        }
-
-        int binaryLength = message.getByteArrayLength();
 
         if (!connected) {
             throw new cMsgException("cMsgDomain.client.cMsg::send: not connected to server");
         }
 
-        // Total message body size (excluding size prefix)
-        int size = 4 * 14 + subject.length() + type.length()
-                + payloadLen + textLen + binaryLength;
+        xMsgMessage xmsg = prepareOutgoingMessage(message);
 
-        // Write full message content to byte buffer
-        ByteArrayOutputStream byteOut = new ByteArrayOutputStream(size);
-        DataOutputStream buffer = new DataOutputStream(byteOut);
-        try {
-            buffer.writeInt(cMsgConstants.version);
-            buffer.writeInt(message.getUserInt());
-            buffer.writeInt(message.getSysMsgId());
-            buffer.writeInt(message.getSenderToken());
-            buffer.writeInt(message.getInfo());
-            // Time values (64-bit -> two 32-bit ints)
-            buffer.writeInt((int) (now >>> 32));
-            buffer.writeInt((int) (now & 0xFFFFFFFFL));
-            buffer.writeInt((int) (message.getUserTime().getTime() >>> 32));
-            buffer.writeInt((int) (message.getUserTime().getTime() & 0xFFFFFFFFL));
-            // main content lengths
-            buffer.writeInt(subject.length());
-            buffer.writeInt(type.length());
-            buffer.writeInt(payloadLen);
-            buffer.writeInt(textLen);
-            buffer.writeInt(binaryLength);
-            // main content
-            buffer.write(subject.getBytes("US-ASCII"));
-            buffer.write(type.getBytes("US-ASCII"));
-
-            if (payloadLen > 0) {
-                buffer.write(payloadTxt.getBytes("US-ASCII"));
-            }
-
-            if (textLen > 0) {
-                buffer.write(text.getBytes("US-ASCII"));
-            }
-
-            if (binaryLength > 0) {
-                buffer.write(
-                    message.getByteArray(),
-                    message.getByteArrayOffset(),
-                    binaryLength
-                );
-            }
-
-            buffer.flush();
-        } catch (IOException e) {
-            throw new cMsgException("cMsgDomain.client.cMsg::send: I/O error during message serialization", e);
-        }
-
-        byte[] data = byteOut.toByteArray();
-        xMsgTopic pubTopic = xMsgTopic.build(domainType, subject, type);
-        xMsgMessage pubMsg = new xMsgMessage(pubTopic, xMsgMimeType.BYTES, data);
-
-        // connect to the proxy
         try (xMsgConnection con = this.actor.getConnection()) {
-            // publish data for sever
-            this.actor.publish(con, pubMsg);
-        } catch (xMsgException e) {
+            this.actor.publish(con, xmsg);
+        } catch (Exception e) {
                 throw new cMsgException("cMsgDomain.client.cMsg::send: Sending failed", e);
         }
-        System.out.println("Published the given message successfully!");
     }
 
 
@@ -1445,6 +1402,13 @@ public class cMsg extends cMsgDomainAdapter {
             throw new cMsgException("cMsgDomain.client.cMsg::subscribe: not connected to server");
         }
 
+        // Trim trailing * if present
+        if (subject.endsWith("*")) {
+            subject = subject.substring(0, subject.length() - 1);
+        }
+        if (type.endsWith("*")) {
+            type = type.substring(0, type.length() - 1);
+        }
         
         cMsgDomainSubscriptionHandle cMsgHandle = new cMsgDomainSubscriptionHandle(actor, cb, userObj, domainType, subject, type);
         xMsgCallBack xMsgcb = new XMsgToCMsgCallbackAdapter(cMsgHandle);
@@ -1457,7 +1421,7 @@ public class cMsg extends cMsgDomainAdapter {
                 throw new cMsgException("cMsgDomain.client.cMsg::subscribe: Subscribing  failed for subject: " + subject + ", type: " + type +", error: "  + e);
         }
 
-        System.out.println("Subscribed successfully!");
+        System.out.println("Subscribed, subject: " + subject + ", type: " + type);
         return cMsgHandle;
     }
 
@@ -1480,82 +1444,13 @@ public class cMsg extends cMsgDomainAdapter {
 
         @Override
         public void callback(xMsgMessage xmsg) {
-            cMsgMessage cmsg = convertToCMsgMessage(xmsg);
+            cMsgMessageFull msg = readIncomingMessage(xmsg);
             cMsgCallbackInterface cb = cMsgHandle.getCallback();
             Object userObj = cMsgHandle.getUserObject();
             System.out.println("Conversion done successfully");
-            cb.callback(cmsg, userObj);
+            cb.callback(msg, userObj);
         }
 
-        private cMsgMessage convertToCMsgMessage(xMsgMessage xmsg) {
-            byte[] data = xmsg.getData();
-            String dataType = xmsg.getMimeType();
-
-            if (!xMsgMimeType.BYTES.equals(dataType)) {
-                throw new RuntimeException("cMsgDomain.client.cMsg.XMsgToCMsgCallbackAdapter::convertToCMsgMessage Expected BYTES mime type, got: " + dataType);
-            }
-
-            try {
-                return deserializeCMsgMessage(data);
-            } catch (IOException e) {
-                throw new RuntimeException("cMsgDomain.client.cMsg.XMsgToCMsgCallbackAdapter::convertToCMsgMessage: Failed to deserialize cMsgMessage", e);
-            }
-        }
-
-        private cMsgMessageFull deserializeCMsgMessage(byte[] array) throws IOException {
-            cMsgMessageFull msg = new cMsgMessageFull();
-            int index = 0;
-
-            msg.setVersion(cMsgUtilities.bytesToInt(array, index)); index += 4;
-            msg.setUserInt(cMsgUtilities.bytesToInt(array, index)); index += 4;
-            msg.setSysMsgId(cMsgUtilities.bytesToInt(array, index)); index += 4;
-            msg.setSenderToken(cMsgUtilities.bytesToInt(array, index)); index += 4;
-            msg.setInfo(cMsgUtilities.bytesToInt(array, index) |
-                        cMsgMessage.wasSent | cMsgMessage.expandedPayload); index += 4;
-
-            long now = ((long) cMsgUtilities.bytesToInt(array, index) << 32) |
-                    ((long) cMsgUtilities.bytesToInt(array, index + 4) & 0xFFFFFFFFL);
-            msg.setSenderTime(new Date(now));
-            index += 8;
-
-            long time = ((long) cMsgUtilities.bytesToInt(array, index) << 32) |
-                        ((long) cMsgUtilities.bytesToInt(array, index + 4) & 0xFFFFFFFFL);
-            msg.setUserTime(new Date(time));
-            index += 8;
-
-            int lengthSubject    = cMsgUtilities.bytesToInt(array, index); index += 4;
-            int lengthType       = cMsgUtilities.bytesToInt(array, index); index += 4;
-            int lengthPayloadTxt = cMsgUtilities.bytesToInt(array, index); index += 4;
-            int lengthText       = cMsgUtilities.bytesToInt(array, index); index += 4;
-            int lengthBinary     = cMsgUtilities.bytesToInt(array, index); index += 4;
-
-            msg.setSubject(new String(array, index, lengthSubject, "US-ASCII")); index += lengthSubject;
-            msg.setType(new String(array, index, lengthType, "US-ASCII")); index += lengthType;
-
-            if (lengthPayloadTxt > 0) {
-                String s = new String(array, index, lengthPayloadTxt, "US-ASCII");
-                index += lengthPayloadTxt;
-                try {
-                    msg.setFieldsFromText(s, cMsgMessage.allFields);
-                } catch (cMsgException e) {
-                    System.out.println("Invalid payload text: " + e.getMessage());
-                }
-            }
-
-            if (lengthText > 0) {
-                msg.setText(new String(array, index, lengthText, "US-ASCII"));
-                index += lengthText;
-            }
-
-            if (lengthBinary > 0) {
-                try {
-                    msg.setByteArray(array, index, lengthBinary);
-                } catch (cMsgException ignored) {}
-            }
-
-            msg.setDomain(domainType); // defined in outer class
-            return msg;
-        }
     }
 
 
@@ -1580,6 +1475,212 @@ public class cMsg extends cMsgDomainAdapter {
         }
 
         this.actor.unsubscribe(obj.getXMsgHandle());
+    }
+
+    /**
+     * {@inheritDoc}
+     *
+     * @param obj {@inheritDoc}
+     * @throws cMsgException if there are communication problems with the server; object arg is null
+     */
+    public void unsubscribe(cMsgSubscriptionHandle obj) throws cMsgException {
+        if (obj == null) {
+            throw new cMsgException("cMsgDomain.client.cMsg::unsubscribe: handle is null");
+        }
+        if (!(obj instanceof cMsgDomainSubscriptionHandle)) {
+            throw new cMsgException("cMsgDomain.client.cMsg::unsubscribe: handle is not of type cMsgDomainSubscriptionHandle");
+        }
+        unsubscribe((cMsgDomainSubscriptionHandle) obj);    
+    }
+
+    /**
+     * 
+     * Deserializes the raw byte array payload of the given {@code xMsgMessage} and creates a 
+     * {@code cMsgMessageFull} by extracting all standard fields, including version, subject, type, sender, 
+     * payload, text, binary data, timestamps, and metadata.
+     * 
+     * @param xmsg the {@code xMsgMessage} with binary payload
+     * @return the resulting {@code cMsgMessageFull} instance
+     * @throws RuntimeException if the mime type is not {@code BYTES} or deserialization fails
+     */
+    public cMsgMessageFull readIncomingMessage(xMsgMessage xmsg) {
+
+        String dataType = xmsg.getMimeType();
+
+        if (!xMsgMimeType.BYTES.equals(dataType)) {
+            throw new RuntimeException("cMsgDomain.client.cMsg::readIncomingMessage Expected BYTES mime type, got: " + dataType);
+        }
+
+        cMsgMessageFull msg = new cMsgMessageFull();
+
+        try {
+            msg.setXMsgMetaData(xmsg.getMetaData());
+            byte [] array = xmsg.getData();
+            int index = 0;
+
+            msg.setVersion(cMsgUtilities.bytesToInt(array, index)); index += 4;
+            msg.setUserInt(cMsgUtilities.bytesToInt(array, index)); index += 4;
+            msg.setSysMsgId(cMsgUtilities.bytesToInt(array, index)); index += 4;
+            msg.setSenderToken(cMsgUtilities.bytesToInt(array, index)); index += 4;
+            msg.setInfo(cMsgUtilities.bytesToInt(array, index)); index += 4;
+
+            long now = ((long) cMsgUtilities.bytesToInt(array, index) << 32) |
+                    ((long) cMsgUtilities.bytesToInt(array, index + 4) & 0xFFFFFFFFL);
+            msg.setSenderTime(new Date(now));
+            index += 8;
+
+            long time = ((long) cMsgUtilities.bytesToInt(array, index) << 32) |
+                        ((long) cMsgUtilities.bytesToInt(array, index + 4) & 0xFFFFFFFFL);
+            msg.setUserTime(new Date(time));
+            index += 8;
+
+            int lengthSubject    = cMsgUtilities.bytesToInt(array, index); index += 4;
+            int lengthType       = cMsgUtilities.bytesToInt(array, index); index += 4;
+            int lengthSender     = cMsgUtilities.bytesToInt(array, index); index += 4;
+            int lengthSenderHost = cMsgUtilities.bytesToInt(array, index); index += 4;
+            int lengthPayloadTxt = cMsgUtilities.bytesToInt(array, index); index += 4;
+            int lengthText       = cMsgUtilities.bytesToInt(array, index); index += 4;
+            int lengthBinary     = cMsgUtilities.bytesToInt(array, index); index += 4;
+
+            msg.setSubject(new String(array, index, lengthSubject, "US-ASCII")); index += lengthSubject;
+            msg.setType(new String(array, index, lengthType, "US-ASCII")); index += lengthType;
+            msg.setSender(new String(array, index, lengthSender, "US-ASCII")); index += lengthSender;
+            msg.setSenderHost(new String(array, index, lengthSenderHost, "US-ASCII")); index += lengthSenderHost;
+
+            if (lengthPayloadTxt > 0) {
+                String s = new String(array, index, lengthPayloadTxt, "US-ASCII");
+                index += lengthPayloadTxt;
+                try {
+                    msg.setFieldsFromText(s, cMsgMessage.allFields);
+                } catch (cMsgException e) {
+                    System.out.println("Invalid payload text: " + e.getMessage());
+                }
+            }
+
+            if (lengthText > 0) {
+                msg.setText(new String(array, index, lengthText, "US-ASCII"));
+                index += lengthText;
+            }
+
+            if (lengthBinary > 0) {
+                try {
+                    msg.setByteArray(array, index, lengthBinary);
+                } catch (cMsgException ignored) {}
+            }
+        } catch (IOException e) {
+            throw new RuntimeException("cMsgDomain.client.cMsg.readIncomingMessage: Failed to deserialize cMsgMessage", e);
+        }
+
+        msg.setDomain(domainType);
+        return msg;
+    }
+
+    /**
+     * Serializes the fields of a {@code cMsgMessage} into a byte array and returns an {@code xMsgMessage}
+     * having that byte array as a binary payload.
+     * 
+     * If {@code replyTo} metadata is present, the message is marked as a get request and the reply
+     * topic is used. Otherwise, a topic is built from the subject and type fields. 
+     * 
+     * @param msg the {@code cMsgMessage} to convert
+     * @return the resulting {@code xMsgMessage} ready for transmission
+     * @throws cMsgException if subject/type are missing or if a serialization error occurs
+     */
+    public xMsgMessage prepareOutgoingMessage(cMsgMessage msg) throws cMsgException {
+        // prepare topic
+        String subject = (msg.getSubject() != null) ? msg.getSubject() : "";
+        String type = (msg.getType() != null) ? msg.getType() : "";        
+        xMsgMeta.Builder metaData = msg.getXMsgMetaData();
+
+        xMsgTopic topic;
+
+        if(metaData != null && metaData.hasReplyTo()) {
+            msg.setGetRequest(true);
+            topic = xMsgTopic.wrap(metaData.getReplyTo());
+        } else {
+            if(subject == null || type == null) {
+                throw new cMsgException("cMsgDomain.client.cMsg::prepareOutgoingMessage: empty subject or type");
+            } else {
+                topic = xMsgTopic.build(this.domain, subject, type);
+            }
+        }
+
+        //  -------- prepare data -------------------------
+        // Text field
+        String text = msg.getText();
+        int textLen = (text != null) ? text.length() : 0;
+        // Payload field
+        long now = System.currentTimeMillis();
+        String payloadTxt;
+        int payloadLen = 0;
+
+        if (msg.noHistoryAdditions()) {
+            payloadTxt = msg.getPayloadText();
+        } else {
+            payloadTxt = msg.addHistoryToPayloadText(name, host, now);
+        }
+
+        if (payloadTxt != null) {
+            payloadLen = payloadTxt.length();
+        }
+
+        int binaryLength = msg.getByteArrayLength();
+        int senderLen = name.length();
+        int senderHostLen = host.length();
+
+        // Total message body size (excluding size prefix)
+        int size = 4 * 16 + subject.length() + type.length() + senderLen + senderHostLen
+                + payloadLen + textLen + binaryLength;
+        // Write full message content to byte buffer
+        ByteArrayOutputStream byteOut = new ByteArrayOutputStream(size);
+        DataOutputStream buffer = new DataOutputStream(byteOut);
+        try {
+            buffer.writeInt(cMsgConstants.version);
+            buffer.writeInt(msg.getUserInt());
+            buffer.writeInt(msg.getSysMsgId());
+            buffer.writeInt(msg.getSenderToken());
+            buffer.writeInt(msg.getInfo());
+            // Time values (64-bit -> two 32-bit ints)
+            buffer.writeInt((int) (now >>> 32));
+            buffer.writeInt((int) (now & 0xFFFFFFFFL));
+            buffer.writeInt((int) (msg.getUserTime().getTime() >>> 32));
+            buffer.writeInt((int) (msg.getUserTime().getTime() & 0xFFFFFFFFL));
+            // main content lengths
+            buffer.writeInt(subject.length());
+            buffer.writeInt(type.length());
+            buffer.writeInt(senderLen);
+            buffer.writeInt(senderHostLen);
+            buffer.writeInt(payloadLen);
+            buffer.writeInt(textLen);
+            buffer.writeInt(binaryLength);
+            // main content
+            buffer.write(subject.getBytes("US-ASCII"));
+            buffer.write(type.getBytes("US-ASCII"));
+            buffer.write(name.getBytes("US-ASCII"));
+            buffer.write(host.getBytes("US-ASCII"));
+
+            if (payloadLen > 0) {
+                buffer.write(payloadTxt.getBytes("US-ASCII"));
+            }
+
+            if (textLen > 0) {
+                buffer.write(text.getBytes("US-ASCII"));
+            }
+
+            if (binaryLength > 0) {
+                buffer.write(
+                    msg.getByteArray(),
+                    msg.getByteArrayOffset(),
+                    binaryLength
+                );
+            }
+            buffer.flush();
+        } catch (IOException e) {
+            throw new cMsgException("cMsgDomain.client.cMsgDomaincMsgMessage::cMsgMessageToBytes: I/O error during message serialization", e);
+        }
+
+        byte[] data = byteOut.toByteArray();
+        return new xMsgMessage(topic, xMsgMimeType.BYTES, data);
     }
 
 }

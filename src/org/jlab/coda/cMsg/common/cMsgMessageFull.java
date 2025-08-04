@@ -738,6 +738,7 @@ public class cMsgMessageFull extends cMsgMessage implements Serializable {
         msg.subject = "dummy";
         msg.type = "dummy";
         msg.sysMsgId = sysMsgId;
+        msg.xMsgMetaData = xMsgMetaData;
         msg.senderToken = senderToken;
         msg.info = isGetResponse;
         return msg;
