@@ -1447,7 +1447,6 @@ public class cMsg extends cMsgDomainAdapter {
             cMsgMessageFull msg = readIncomingMessage(xmsg);
             cMsgCallbackInterface cb = cMsgHandle.getCallback();
             Object userObj = cMsgHandle.getUserObject();
-            System.out.println("Conversion done successfully");
             cb.callback(msg, userObj);
         }
 
