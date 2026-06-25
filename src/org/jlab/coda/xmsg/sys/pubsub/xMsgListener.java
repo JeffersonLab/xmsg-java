@@ -73,6 +73,15 @@ public abstract class xMsgListener implements Runnable {
     public void run() {
         try (Poller poller = context.getContext().poller(items.size())) {
             while (isRunning) {
+                if (items.isEmpty()) {
+                    try {
+                        Thread.sleep(TIMEOUT);
+                    } catch (InterruptedException e) {
+                        Thread.currentThread().interrupt();
+                        isRunning = false;
+                    }
+                    continue;
+                }
                 for (xMsgProxyDriver connection : items.values()) {
                     poller.register(connection.getSocket(), Poller.POLLIN);
                 }
